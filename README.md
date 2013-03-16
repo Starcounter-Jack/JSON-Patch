@@ -11,3 +11,16 @@ http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-10
 
 ## Performance
 ![Fast](http://www.rebelslounge.com/res/jsonpatch/chart.png)
+
+## Roadmap
+
+The project will monitor the updates to the draft specification. It will also make use of ES6 Object.observe() to generate
+patches.
+
+### Usage
+
+js
+```
+jsonpatch.appy( object, patcharray );
+```
+
