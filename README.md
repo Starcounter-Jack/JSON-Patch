@@ -14,10 +14,11 @@ http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-10
 
 ## Roadmap
 
-The project will monitor the updates to the draft specification. It will also make use of ES6 Object.observe() to generate
-patches.
+* The project will monitor the updates to the draft specification.
+* Add generation of outgoing patches
+* Make use of ES6 Object.observe() to generate patches when available (Chrome 27)
 
-### Usage
+## Usage
 
 ```js
 jsonpatch.apply( object, patcharray );
