@@ -7,7 +7,7 @@ A leaner and meaner implementation of the JSON Patch specification. Small footpr
 http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-10
 
 ## Footprint
-1.6 KB minified
+0.6 KB minified and gzipped (1.6 KB minified)
 
 ## Performance
 ![Fast](http://www.rebelslounge.com/res/jsonpatch/chart.png)
