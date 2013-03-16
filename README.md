@@ -9,8 +9,7 @@ JSON-Patch allows you to update a JSON document by sending the changes rather th
 And now there is a standard to do it (an IEFT DRAFT spec). JSON Patch plays well with the HTTP PATCH and
 REST style programming.
 
-[test](http://www.mnot.net/blog/2012/09/05/patch)
-
+Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) about it.
 
 ## Specification
 http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-10
