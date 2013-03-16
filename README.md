@@ -20,6 +20,6 @@ patches.
 ### Usage
 
 ```js
-jsonpatch.appy( object, patcharray );
+jsonpatch.apply( object, patcharray );
 ```
 
