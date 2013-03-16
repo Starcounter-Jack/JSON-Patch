@@ -17,7 +17,7 @@ test('invalid patches', function() {
 test('add', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
-   jsonpatch.listenTo(obj,[]);
+   //jsonpatch.listenTo(obj,[]);
 
     jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: [1, 2, 3, 4]}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]});
@@ -54,7 +54,7 @@ test('add', function() {
 
 test('remove', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-   jsonpatch.listenTo(obj,[]);
+   //jsonpatch.listenTo(obj,[]);
 
     jsonpatch.apply(obj, [{op: 'remove', path: '/bar'}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}]});
@@ -67,7 +67,7 @@ test('remove', function() {
 test('replace', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
-   jsonpatch.listenTo(obj,[]);
+  // jsonpatch.listenTo(obj,[]);
 
     jsonpatch.apply(obj, [{op: 'replace', path: '/foo', value: [1, 2, 3, 4]}]);
     deepEqual(obj, {foo: [1, 2, 3, 4], baz: [{qux: 'hello'}]});
@@ -87,7 +87,7 @@ test('test', function() {
 test('move', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
-   jsonpatch.listenTo(obj,[]);
+  // jsonpatch.listenTo(obj,[]);
 
    jsonpatch.apply(obj, [{op: 'move', from: '/foo', path: '/bar'}]);
     deepEqual(obj, {baz: [{qux: 'hello'}], bar: 1});
@@ -100,7 +100,7 @@ test('move', function() {
 test('copy', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
-   jsonpatch.listenTo(obj,[]);
+ //  jsonpatch.listenTo(obj,[]);
 
     jsonpatch.apply(obj, [{op: 'copy', from: '/foo', path: '/bar'}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: 1});
