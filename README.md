@@ -6,13 +6,10 @@ A leaner and meaner implementation of JSON Patch. Small footprint. High performa
 ## Why you should use JSON-Patch
 
 JSON-Patch allows you to update a JSON document by sending the changes rather than the whole document. 
-And now there is a standard to do it (an IEFT DRAFT spec). JSON Patch plays well with the HTTP PATCH and
+And now there is a [standard way](http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-10) to do it. JSON Patch plays well with the HTTP PATCH and
 REST style programming.
 
 Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) about it.
-
-## Specification
-http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-10
 
 ## Footprint
 0.6 KB minified and gzipped (1.6 KB minified)
