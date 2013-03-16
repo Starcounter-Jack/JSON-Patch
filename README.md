@@ -19,8 +19,7 @@ patches.
 
 ### Usage
 
-js
-```
+js```
 jsonpatch.appy( object, patcharray );
 ```
 
