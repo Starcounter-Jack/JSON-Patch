@@ -23,7 +23,10 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 
 * The project will monitor the updates to the draft specification.
 * The API for generating patches will change in the comming days
-* 
+* An bin directory will be added with minified versions
+* Node.js module
+* More unit tests
+
 ## Usage
 
 Include "json-patch.js" if you want support for applying patches **or**
