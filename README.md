@@ -17,7 +17,7 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 
 ## Performance
 ![Fast](http://www.rebelslounge.com/res/jsonpatch/chart.png)
-* Makes use of ES6 Object.observe() to generate patches when available (Chrome 27)
+ES6 Object.observe() is used when available
 
 ## Roadmap
 
