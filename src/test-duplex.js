@@ -67,6 +67,8 @@ test('apply remove', function() {
 test('apply replace', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
+  // jsonpatch.listenTo(obj,[]);
+
     jsonpatch.apply(obj, [{op: 'replace', path: '/foo', value: [1, 2, 3, 4]}]);
     deepEqual(obj, {foo: [1, 2, 3, 4], baz: [{qux: 'hello'}]});
 
@@ -85,6 +87,8 @@ test('apply test', function() {
 test('apply move', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
+  // jsonpatch.listenTo(obj,[]);
+
    jsonpatch.apply(obj, [{op: 'move', from: '/foo', path: '/bar'}]);
     deepEqual(obj, {baz: [{qux: 'hello'}], bar: 1});
 
@@ -96,6 +100,8 @@ test('apply move', function() {
 test('apply copy', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
+ //  jsonpatch.listenTo(obj,[]);
+
     jsonpatch.apply(obj, [{op: 'copy', from: '/foo', path: '/bar'}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: 1});
 
@@ -103,8 +109,62 @@ test('apply copy', function() {
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}, 'hello'], bar: 1});
 });
 
+test('generate replace', function() {
+   var patches = [];
+   obj = { firstName:"Albert", lastName:"Einstein",
+      phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
+   var observer = jsonpatch.observe(obj,patches);
+   obj.firstName = "Joachim";
+   obj.lastName = "Wester";
+   obj.phoneNumbers[0].number = "123";
+   obj.phoneNumbers[1].number = "456";
+
+   jsonpatch.generate(obj,observer);
+   obj2 = { firstName:"Albert", lastName:"Einstein",
+      phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
+
+   ok(true,JSON.stringify(patches));
+   jsonpatch.apply(obj2,patches);
+   deepEqual(obj2,obj);
+});
+
+test('generate add', function() {
+   var patches = [];
+   obj = { lastName:"Einstein",
+      phoneNumbers:[ {number:"12345"} ]};
+   var observer = jsonpatch.observe(obj,patches);
+   obj.firstName = "Joachim";
+   obj.lastName = "Wester";
+   obj.phoneNumbers[0].number = "123";
+   obj.phoneNumbers.push( { number: "456" } );
+
+   jsonpatch.generate(obj,observer);
+   obj2 = { lastName:"Einstein",
+      phoneNumbers:[ {number:"12345"} ]};
+
+   ok(true,JSON.stringify(patches));
+   jsonpatch.apply(obj2,patches);
+   deepEqual(obj2,obj);
+});
 
 
+test('generate delete', function() {
+   var patches = [];
+   obj = { lastName:"Einstein", firstName:"Albert",
+      phoneNumbers:[ {number:"12345"}, {number:"4234"} ]};
+   var observer = jsonpatch.observe(obj,patches);
+   delete obj.firstName;
+   obj.lastName = "Wester";
+   obj.phoneNumbers[0].number = "123";
+   obj.phoneNumbers.pop(1);
+
+   jsonpatch.generate(obj,observer);
+   obj2 = { lastName:"Einstein", firstName:"Albert",
+      phoneNumbers:[ {number:"12345"}, {number:"4234"} ]};
+   ok(true,JSON.stringify(patches));
+   jsonpatch.apply(obj2,patches);
+   deepEqual(obj2,obj);
+});
 
 // JSLitmus
 JSLitmus.test('Add Operation', function() {
@@ -137,6 +197,25 @@ JSLitmus.test('Test Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
     jsonpatch.apply(obj, [{op: 'test', path: '/baz', value: [{qux: 'hello'}]}]);
 });
+
+
+JSLitmus.test('Generate replace', function() {
+   var patches = [];
+   obj = { firstName:"Albert", lastName:"Einstein",
+      phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
+   var observer = jsonpatch.observe(obj,patches);
+   obj.firstName = "Joachim";
+   obj.lastName = "Wester";
+   obj.phoneNumbers[0].number = "123";
+   obj.phoneNumbers[1].number = "456";
+
+   jsonpatch.generate(obj,observer);
+   obj2 = { firstName:"Albert", lastName:"Einstein",
+      phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
+
+   jsonpatch.apply(obj2,patches);
+});
+
         /*
 var addCompiled = jsonpatch.compile([{op: 'add', path: '/bar', value: [1, 2, 3, 4]}]);
 JSLitmus.test('Compiled Add Operation', function() {

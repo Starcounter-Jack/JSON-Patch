@@ -2,6 +2,7 @@ JSON-Patch
 ==========
 
 A leaner and meaner implementation of JSON Patch. Small footprint. High performance.
+Supports both applying patches and generating patches.
 
 ## Why you should use JSON-Patch
 
@@ -16,16 +17,37 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 
 ## Performance
 ![Fast](http://www.rebelslounge.com/res/jsonpatch/chart.png)
+* Makes use of ES6 Object.observe() to generate patches when available (Chrome 27)
 
 ## Roadmap
 
 * The project will monitor the updates to the draft specification.
-* Add generation of outgoing patches
-* Make use of ES6 Object.observe() to generate patches when available (Chrome 27)
 
 ## Usage
 
-```js
-jsonpatch.apply( object, patcharray );
-```
+Include "json-patch-min.js" if you want support for applying patches **or**
+include "json-patch-duplex-min.js" if you also want to generate patches.
 
+Applying patches:
+```js
+var myobj = { firstName:"Albert" };
+var patches = [
+   {op:"replace", path:"/firstName", value:"Joachim" },
+   {op:"add", path:"/lastName", value:"Wester" }
+   ];
+jsonpatch.apply( object, patcharray );
+// myobj == { firstName:"Joachim", lastName:"Wester" };
+```
+Generating patches:
+```js
+var patches = [];
+var myobj = { firstName:"Joachim", lastName:"Wester" };
+observer = jsonpatch.observe( object, patcharray );
+myobj.firstName = "Albert";
+myobj.lastName = "Einstein";
+jsonpatch.generate(object,observer);
+// patches  == [
+//   { op:"replace", path="/firstName", value:"Joachim"},
+//   { op:"replace", path="/lastName", value:"Wester" }
+//   ];
+```

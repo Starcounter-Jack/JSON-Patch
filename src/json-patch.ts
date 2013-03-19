@@ -2,10 +2,6 @@
 // (c) 2013 Joachim Wester
 // BSD license
 
-declare interface Object {
-   observe : any;
-}
-
 module jsonpatch {
 
    var objOps = {
@@ -39,62 +35,6 @@ module jsonpatch {
       test: objOps.test,
       _get: objOps._get
    };
-
-   var observeOps = {
-      new: function(patches : any[], path) {
-         var patch = {
-            op: "iadd",
-            path: path + this.name,
-            value: this.object[this.name]};
-         patches.push(patch);
-         //console.log( patch );
-      },
-      deleted: function( patches:any[], path)   {
-         var patch = {
-            op:"iremove",
-            path:path + this.name
-         };
-         patches.push(patch);
-         //console.log( patch );
-      },
-      updated: function( patches:any[], path)   {
-         var patch = {
-            op:"ireplace",
-            path:path + this.name,
-            value:this.object[this.name]
-         };
-         patches.push(patch);
-         //console.log( patch );
-      }
-   }
-
-
-   /// Listen to changes on an object tree, accumulate patches
-   export function listenTo(obj: any, patches:any[], callback : any) {
-      _listenTo(obj,patches,callback,null);
-
-   }
-
-   function _listenTo(obj: any, patches:any[], callback : any, parent:any) {
-      //parents[obj] = path;
-      Object.observe(obj, function(arr) {
-         arr.forEach(function(elem) {
-            observeOps[elem.type].call(elem,arr,"?");
-         })
-         if (callback)
-            callback.call(obj,patches);
-      });
-      //path += "/";
-      for (var key in obj) {
-         if (obj.hasOwnProperty(key) ) {
-            var v: any = obj[key];
-            if (v && typeof (v) === "object" ) {
-               _listenTo(v,patches,callback,obj); //path+key);
-            }
-         }
-      }
-   }
-
 
    /// Apply a json-patch operation on an object tree
    export function apply( tree : any, patches : any[], listen?:any ) : bool {

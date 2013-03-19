@@ -1,3 +1,6 @@
+// json-patch.js 0.3
+// (c) 2013 Joachim Wester
+// BSD license
 var jsonpatch;
 (function (jsonpatch) {
     var objOps = {
@@ -72,60 +75,6 @@ var jsonpatch;
         test: objOps.test,
         _get: objOps._get
     };
-    var observeOps = {
-        new: function (patches, path) {
-            var patch = {
-                op: "iadd",
-                path: path + this.name,
-                value: this.object[this.name]
-            };
-            patches.push(patch);
-            //console.log( patch );
-                    },
-        deleted: function (patches, path) {
-            var patch = {
-                op: "iremove",
-                path: path + this.name
-            };
-            patches.push(patch);
-            //console.log( patch );
-                    },
-        updated: function (patches, path) {
-            var patch = {
-                op: "ireplace",
-                path: path + this.name,
-                value: this.object[this.name]
-            };
-            patches.push(patch);
-            //console.log( patch );
-                    }
-    };
-    /// Listen to changes on an object tree, accumulate patches
-    function listenTo(obj, patches, callback) {
-        _listenTo(obj, patches, callback, null);
-    }
-    jsonpatch.listenTo = listenTo;
-    function _listenTo(obj, patches, callback, parent) {
-        //parents[obj] = path;
-        Object.observe(obj, function (arr) {
-            arr.forEach(function (elem) {
-                observeOps[elem.type].call(elem, arr, "?");
-            });
-            if(callback) {
-                callback.call(obj, patches);
-            }
-        });
-        //path += "/";
-        for(var key in obj) {
-            if(obj.hasOwnProperty(key)) {
-                var v = obj[key];
-                if(v && typeof (v) === "object") {
-                    _listenTo(v, patches, callback, obj)//path+key);
-                    ;
-                }
-            }
-        }
-    }
     /// Apply a json-patch operation on an object tree
     function apply(tree, patches, listen) {
         try  {
