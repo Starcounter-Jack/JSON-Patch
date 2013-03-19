@@ -26,8 +26,8 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 * 
 ## Usage
 
-Include "json-patch-min.js" if you want support for applying patches **or**
-include "json-patch-duplex-min.js" if you also want to generate patches.
+Include "json-patch.js" if you want support for applying patches **or**
+include "json-patch-duplex.js" if you also want to generate patches.
 
 Applying patches:
 ```js
