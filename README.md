@@ -22,7 +22,8 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 ## Roadmap
 
 * The project will monitor the updates to the draft specification.
-
+* The API for generating patches will change in the comming days
+* 
 ## Usage
 
 Include "json-patch-min.js" if you want support for applying patches **or**
@@ -35,7 +36,7 @@ var patches = [
    {op:"replace", path:"/firstName", value:"Joachim" },
    {op:"add", path:"/lastName", value:"Wester" }
    ];
-jsonpatch.apply( object, patcharray );
+jsonpatch.apply( myobj, patches );
 // myobj == { firstName:"Joachim", lastName:"Wester" };
 ```
 Generating patches:
@@ -45,7 +46,7 @@ var myobj = { firstName:"Joachim", lastName:"Wester" };
 observer = jsonpatch.observe( object, patcharray );
 myobj.firstName = "Albert";
 myobj.lastName = "Einstein";
-jsonpatch.generate(object,observer);
+jsonpatch.generate(myobj,observer);
 // patches  == [
 //   { op:"replace", path="/firstName", value:"Joachim"},
 //   { op:"replace", path="/lastName", value:"Wester" }
