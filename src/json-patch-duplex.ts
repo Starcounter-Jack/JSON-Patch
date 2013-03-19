@@ -1,6 +1,6 @@
-// json-patch.js 0.3
+// json-patch-duplex.js 0.3
 // (c) 2013 Joachim Wester
-// BSD license
+// MIT license
 
 declare interface Object {
    observe : any;

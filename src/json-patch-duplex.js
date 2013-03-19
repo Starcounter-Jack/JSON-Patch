@@ -97,6 +97,7 @@ var jsonpatch;
             patches.push(patch);
         }
     };
+    // ES6 symbols are not here yet. Used to calculate the json pointer to each object
     function markPaths(observer, node) {
         for(var key in node) {
             var kid = node[key];
@@ -107,6 +108,7 @@ var jsonpatch;
             }
         }
     }
+    // Detach poor mans ES6 symbols
     function clearPaths(observer, node) {
         delete node.____Path;
         Object.observe(node, observer);
@@ -137,11 +139,13 @@ var jsonpatch;
             };
         } else {
             observer = patches;
-            beforeDict[obj] = JSON.parse(JSON.stringify(obj));
+            beforeDict[obj] = JSON.parse(JSON.stringify(obj))// Faster than ES5 clone
+            ;
         }
         return _observe(observer, obj, patches, parent);
     }
     jsonpatch.observe = observe;
+    /// Listen to changes on an object tree, accumulate patches
     function _observe(observer, obj, patches, parent) {
         if(Object.observe) {
             Object.observe(obj, observer);
@@ -150,7 +154,8 @@ var jsonpatch;
             if(obj.hasOwnProperty(key)) {
                 var v = obj[key];
                 if(v && typeof (v) === "object") {
-                    _observe(observer, v, patches, obj);
+                    _observe(observer, v, patches, obj)//path+key);
+                    ;
                 }
             }
         }
@@ -166,6 +171,7 @@ var jsonpatch;
         }
     }
     jsonpatch.generate = generate;
+    // Dirty check if obj is different from mirror, generate patches and update mirror
     function _generate(mirror, obj, patches, path) {
         var newKeys = Object.keys(obj);
         var oldKeys = Object.keys(mirror);
@@ -195,7 +201,8 @@ var jsonpatch;
                     op: "remove",
                     path: path + "/" + key
                 });
-                deleted = true;
+                deleted = true// property has been deleted
+                ;
             }
         }
         if(!deleted && newKeys.length == oldKeys.length) {
@@ -212,11 +219,14 @@ var jsonpatch;
             }
         }
     }
+    /// Apply a json-patch operation on an object tree
     function apply(tree, patches, listen) {
         try  {
             patches.forEach(function (patch) {
+                // Find the object
                 var keys = patch.path.split('/');
-                keys.shift();
+                keys.shift()// Remove empty element
+                ;
                 var obj = tree;
                 var t = 0;
                 var len = keys.length;
@@ -225,7 +235,8 @@ var jsonpatch;
                         var index = parseInt(keys[t], 10);
                         t++;
                         if(t >= len) {
-                            arrOps[patch.op].call(patch, obj, index, tree);
+                            arrOps[patch.op].call(patch, obj, index, tree)// Apply patch
+                            ;
                             break;
                         }
                         obj = obj[index];
@@ -233,10 +244,12 @@ var jsonpatch;
                         var key = keys[t];
                         if(key.indexOf('~') != -1) {
                             key = key.replace('~1', '/').replace('~0', '~');
-                        }
+                        }// escape chars
+                        
                         t++;
                         if(t >= len) {
-                            objOps[patch.op].call(patch, obj, key, tree);
+                            objOps[patch.op].call(patch, obj, key, tree)// Apply patch
+                            ;
                             break;
                         }
                         obj = obj[key];
