@@ -23,13 +23,13 @@ var jsonpatch;
             };
             apply(tree, [
                 temp
-            ], undefined);
+            ]);
             apply(tree, [
                 {
                     op: "remove",
                     path: this.from
                 }
-            ], undefined);
+            ]);
             apply(tree, [
                 {
                     op: "add",
@@ -46,7 +46,7 @@ var jsonpatch;
             };
             apply(tree, [
                 temp
-            ], undefined);
+            ]);
             apply(tree, [
                 {
                     op: "add",
@@ -82,12 +82,11 @@ var jsonpatch;
         var result = false;
         patches.forEach(function (patch) {
             var keys = patch.path.split('/');
-            keys.shift();
             var obj = tree;
-            var t = 0;
+            var t = 1;
             var len = keys.length;
             while(true) {
-                if(obj instanceof Array) {
+                if(Array.isArray(obj)) {
                     var index = parseInt(keys[t], 10);
                     t++;
                     if(t >= len) {
