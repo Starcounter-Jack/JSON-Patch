@@ -55,8 +55,7 @@ myobj.lastName = "Einstein";
 jsonpatch.generate(observer);
 // patches  == [
 //   { op:"replace", path="/firstName", value:"Joachim"},
-//   { op:"replace", path="/lastName", value:"Wester" }
-//   ];
+//   { op:"replace", path="/lastName", value:"Wester" }];
 ```
 
 Automatic callback when object changes (wow!):
@@ -67,11 +66,8 @@ myobj.firstName = "Albert";
 myobj.lastName = "Einstein";
 
 jsonpatch.generate(observer, function(patches) {
-
    console.log( JSON.stringify(patches) );
-   // [
-   //   { "op":"replace", "path"="/firstName", "value":"Joachim"},
-   //   { "op":"replace", "path"="/lastName", "value":"Wester" }
-   // ]
+   // [{ "op":"replace", "path"="/firstName", "value":"Joachim"},
+   //  { "op":"replace", "path"="/lastName", "value":"Wester" }]
 
 });
