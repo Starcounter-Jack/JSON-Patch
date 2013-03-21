@@ -110,16 +110,15 @@ test('apply copy', function() {
 });
 
 test('generate replace', function() {
-   var patches = [];
    obj = { firstName:"Albert", lastName:"Einstein",
       phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
-   var observer = jsonpatch.observe(obj,patches);
+   var observer = jsonpatch.observe(obj);
    obj.firstName = "Joachim";
    obj.lastName = "Wester";
    obj.phoneNumbers[0].number = "123";
    obj.phoneNumbers[1].number = "456";
 
-   jsonpatch.generate(obj,observer);
+   var patches = jsonpatch.generate(observer);
    obj2 = { firstName:"Albert", lastName:"Einstein",
       phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
 
@@ -129,16 +128,15 @@ test('generate replace', function() {
 });
 
 test('generate add', function() {
-   var patches = [];
    obj = { lastName:"Einstein",
       phoneNumbers:[ {number:"12345"} ]};
-   var observer = jsonpatch.observe(obj,patches);
+   var observer = jsonpatch.observe(obj);
    obj.firstName = "Joachim";
    obj.lastName = "Wester";
    obj.phoneNumbers[0].number = "123";
    obj.phoneNumbers.push( { number: "456" } );
 
-   jsonpatch.generate(obj,observer);
+   patches = jsonpatch.generate(observer);
    obj2 = { lastName:"Einstein",
       phoneNumbers:[ {number:"12345"} ]};
 
@@ -149,16 +147,15 @@ test('generate add', function() {
 
 
 test('generate delete', function() {
-   var patches = [];
    obj = { lastName:"Einstein", firstName:"Albert",
       phoneNumbers:[ {number:"12345"}, {number:"4234"} ]};
-   var observer = jsonpatch.observe(obj,patches);
+   var observer = jsonpatch.observe(obj);
    delete obj.firstName;
    obj.lastName = "Wester";
    obj.phoneNumbers[0].number = "123";
    obj.phoneNumbers.pop(1);
 
-   jsonpatch.generate(obj,observer);
+   patches = jsonpatch.generate(observer);
    obj2 = { lastName:"Einstein", firstName:"Albert",
       phoneNumbers:[ {number:"12345"}, {number:"4234"} ]};
    ok(true,JSON.stringify(patches));
@@ -200,16 +197,15 @@ JSLitmus.test('Test Operation', function() {
 
 
 JSLitmus.test('Generate replace', function() {
-   var patches = [];
    obj = { firstName:"Albert", lastName:"Einstein",
       phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
-   var observer = jsonpatch.observe(obj,patches);
+   var observer = jsonpatch.observe(obj);
    obj.firstName = "Joachim";
    obj.lastName = "Wester";
    obj.phoneNumbers[0].number = "123";
    obj.phoneNumbers[1].number = "456";
 
-   jsonpatch.generate(obj,observer);
+   var patches = jsonpatch.generate(observer);
    obj2 = { firstName:"Albert", lastName:"Einstein",
       phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
 

@@ -78,19 +78,24 @@ var jsonpatch;
         test: objOps.test,
         _get: objOps._get
     };
+    /// Apply a json-patch operation on an object tree
     function apply(tree, patches, listen) {
         var result = false;
         patches.forEach(function (patch) {
+            // Find the object
             var keys = patch.path.split('/');
             var obj = tree;
-            var t = 1;
+            var t = 1;//skip empty element - http://jsperf.com/to-shift-or-not-to-shift
+            
             var len = keys.length;
             while(true) {
                 if(Array.isArray(obj)) {
+                    //http://jsperf.com/isarray-shim/4
                     var index = parseInt(keys[t], 10);
                     t++;
                     if(t >= len) {
-                        result = arrOps[patch.op].call(patch, obj, index, tree);
+                        result = arrOps[patch.op].call(patch, obj, index, tree)// Apply patch
+                        ;
                         break;
                     }
                     obj = obj[index];
@@ -98,10 +103,12 @@ var jsonpatch;
                     var key = keys[t];
                     if(key.indexOf('~') != -1) {
                         key = key.replace('~1', '/').replace('~0', '~');
-                    }
+                    }// escape chars
+                    
                     t++;
                     if(t >= len) {
-                        result = objOps[patch.op].call(patch, obj, key, tree);
+                        result = objOps[patch.op].call(patch, obj, key, tree)// Apply patch
+                        ;
                         break;
                     }
                     obj = obj[key];

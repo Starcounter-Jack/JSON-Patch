@@ -49,14 +49,30 @@ jsonpatch.apply( myobj, patches );
 ```
 Generating patches:
 ```js
-var patches = [];
 var myobj = { firstName:"Joachim", lastName:"Wester" };
-observer = jsonpatch.observe( object, patcharray );
+observer = jsonpatch.observe( object );
 myobj.firstName = "Albert";
 myobj.lastName = "Einstein";
-jsonpatch.generate(myobj,observer);
+jsonpatch.generate(observer);
 // patches  == [
 //   { op:"replace", path="/firstName", value:"Joachim"},
 //   { op:"replace", path="/lastName", value:"Wester" }
 //   ];
 ```
+
+Automatic callback when object changes (wow!):
+```js
+var myobj = { firstName:"Joachim", lastName:"Wester" };
+observer = jsonpatch.observe( object );
+myobj.firstName = "Albert";
+myobj.lastName = "Einstein";
+
+jsonpatch.generate(observer, function(patches) {
+
+   console.log( JSON.stringify(patches) );
+   // [
+   //   { "op":"replace", "path"="/firstName", "value":"Joachim"},
+   //   { "op":"replace", "path"="/lastName", "value":"Wester" }
+   // ]
+
+});

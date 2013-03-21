@@ -92,8 +92,10 @@ module jsonpatch {
    }
 
    var beforeDict = {};
+   var callbacks = [];
 
-   export function observe(obj: any, patches:any[], parent:any) : any {
+   export function observe(obj: any, callback) : any {
+      var patches = [];
       var root = obj;
       if (Object.observe) {
          var observer = function(arr) {
@@ -112,39 +114,75 @@ module jsonpatch {
 
                clearPaths(observer,root);
             }
+            if (callback)
+               callback.call(patches);
          };
       }
       else {
-         observer = patches;
+         observer = {};
          beforeDict[obj] = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone
+         if (callback) {
+            callbacks.push(callback);
+            var next;
+            var intervals = [100,1000,10000,60000];
+            var currentInterval = 0;
+
+            var dirtyCheck = function () {
+               var temp = generate(obj,observer);
+               if(temp.length > 0) {
+                  observer.patches = [];
+                  callback.call(null, temp);
+               }
+            };
+            var fastCheck = function(e) {
+               clearTimeout(next);
+               next = setTimeout(function() {
+                  dirtyCheck();
+                  currentInterval = 0;
+                  next = setTimeout(slowCheck,intervals[currentInterval++]);
+               },0);
+            };
+            var slowCheck = function() {
+               dirtyCheck();
+               if (currentInterval==intervals.length)
+                  currentInterval = intervals.length-1;
+               next = setTimeout(slowCheck,intervals[currentInterval++]);
+            };
+            ["mousedown","mouseup","keydown"].forEach( function(str) {
+               window.addEventListener(str, fastCheck);
+            });
+            next = setTimeout(slowCheck,intervals[currentInterval++]);
+         }
       }
-      return _observe(observer,obj,patches,parent);
+      observer.patches = patches;
+      observer.object = obj;
+      return _observe(observer,obj,patches);
    }
 
    /// Listen to changes on an object tree, accumulate patches
-   function _observe(observer:any,obj: any, patches:any[], parent:any) : any {
+   function _observe(observer:any,obj: any, patches:any[]) : any {
       if (Object.observe)
          Object.observe(obj, observer );
       for (var key in obj) {
          if (obj.hasOwnProperty(key) ) {
             var v: any = obj[key];
             if (v && typeof (v) === "object" ) {
-               _observe(observer,v,patches,obj); //path+key);
+               _observe(observer,v,patches); //path+key);
             }
          }
       }
       return observer;
    }
 
-   export function generate(obj,observer) {
+   export function generate(observer) {
       if (Object.observe) {
          Object.deliverChangeRecords( observer ) ;
       }
       else {
          var mirror = beforeDict[obj];
-         _generate(mirror,obj,observer,"");
-         delete beforeDict[obj];
+         _generate(mirror,observer.object,observer.patches,"");
       }
+      return observer.patches;
    }
 
 
@@ -232,4 +270,6 @@ module jsonpatch {
       }
       return true;
    }
+
 }
+
