@@ -128,7 +128,7 @@ module jsonpatch {
             var currentInterval = 0;
 
             var dirtyCheck = function () {
-               var temp = generate(obj,observer);
+               var temp = generate(observer);
                if(temp.length > 0) {
                   observer.patches = [];
                   callback.call(null, temp);
@@ -179,7 +179,7 @@ module jsonpatch {
          Object.deliverChangeRecords( observer ) ;
       }
       else {
-         var mirror = beforeDict[obj];
+         var mirror = beforeDict[observer.object];
          _generate(mirror,observer.object,observer.patches,"");
       }
       return observer.patches;
