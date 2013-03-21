@@ -59,15 +59,3 @@ jsonpatch.generate(observer);
 //   { op:"replace", path="/lastName", value:"Wester" }];
 ```
 
-Automatic callback when object changes (wow!):
-```js
-var myobj = { firstName:"Joachim", lastName:"Wester" };
-observer = jsonpatch.observe( object, function(patches) {
-   console.log( JSON.stringify(patches) );
-   // [{ "op":"replace", "path"="/firstName", "value":"Joachim"},
-   //  { "op":"replace", "path"="/lastName", "value":"Wester" }]
-});
-
-myobj.firstName = "Albert";
-myobj.lastName = "Einstein";
-
