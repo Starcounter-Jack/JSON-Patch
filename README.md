@@ -2,7 +2,8 @@ JSON-Patch
 ==========
 
 A leaner and meaner implementation of JSON Patch. Small footprint. High performance.
-Supports both applying patches and generating patches.
+
+Dual directions! Supports both applying patches and generating patches.
 
 ## Why you should use JSON-Patch
 
