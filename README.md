@@ -17,7 +17,7 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 0.5 KB minified and gzipped (1.1 KB minified)
 
 ## Performance
-![Fast](http://www.rebelslounge.com/res/jsonpatch/chart2.png)
+![Fast](http://www.rebelslounge.com/res/jsonpatch/chart3.png)
 
 
 ## Features
