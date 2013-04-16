@@ -1,0 +1,24 @@
+{
+  "name": "json-patch",
+  "version": "0.0.1",
+  "description": "JSON-Patch allows you to update a JSON document by sending the changes rather than the whole document.",
+  "keywords": ["json", "patch", "http", "rest"],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Starcounter-Jack/JSON-Patch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Starcounter-Jack/JSON-Patch/issues"
+  },
+  "author": {
+    "name": "Joachim Wester",
+    "email": "joachimwester@me.com",
+    "url": "http://www.starcounter.com/"
+  },
+  "licenses": [ {
+    "type": "MIT",
+    "url": "http://www.opensource.org/licenses/MIT"
+  } ],
+  "main": "./src/json-patch-duplex",
+  "engines": { "node": ">= 0.4.0" }
+}
