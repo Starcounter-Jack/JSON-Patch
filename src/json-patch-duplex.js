@@ -1,4 +1,7 @@
 var jsonpatch;
+
+jsonpatch = exports;
+
 (function (jsonpatch) {
     var objOps = {
         add: function (obj, key) {
@@ -151,9 +154,9 @@ var jsonpatch;
                 callbacks.push(callback);
                 var next;
                 var intervals = [
-                    100, 
-                    1000, 
-                    10000, 
+                    100,
+                    1000,
+                    10000,
                     60000
                 ];
                 var currentInterval = 0;
@@ -180,8 +183,8 @@ var jsonpatch;
                     next = setTimeout(slowCheck, intervals[currentInterval++]);
                 };
                 [
-                    "mousedown", 
-                    "mouseup", 
+                    "mousedown",
+                    "mouseup",
                     "keydown"
                 ].forEach(function (str) {
                     window.addEventListener(str, fastCheck);
@@ -294,7 +297,7 @@ var jsonpatch;
                         if(key.indexOf('~') != -1) {
                             key = key.replace('~1', '/').replace('~0', '~');
                         }// escape chars
-                        
+
                         t++;
                         if(t >= len) {
                             objOps[patch.op].call(patch, obj, key, tree)// Apply patch
