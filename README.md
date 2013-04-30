@@ -6,8 +6,8 @@ Also support dual directions! I.e. you can both apply patches and generate patch
 
 ## Why you should use JSON-Patch
 
-JSON-Patch allows you to update a JSON document by sending the changes rather than the whole document. 
-And now there is a standard way using [RFC6902](http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-10) to do it. 
+JSON-Patch [(RFC6902)](http://tools.ietf.org/html/rfc6902) is a new standard format that 
+allows you to update a JSON document by sending the changes rather than the whole document. 
 JSON Patch plays well with the HTTP PATCH verb (method) and REST style programming.
 
 Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) about it.
