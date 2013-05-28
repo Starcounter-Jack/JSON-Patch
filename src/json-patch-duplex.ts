@@ -91,7 +91,7 @@ module jsonpatch {
      }
    }
 
-   var beforeDict = {};
+   var beforeDict = [];
    var callbacks = [];
 
    export function observe(obj: any, callback) : any {
@@ -120,7 +120,22 @@ module jsonpatch {
       }
       else {
          observer = {};
-         beforeDict[obj] = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone
+
+         var mirror;
+         for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
+            if (beforeDict[i].obj === obj) {
+               mirror = beforeDict[i];
+               break;
+            }
+         }
+
+         if (!mirror) {
+            mirror = {obj: obj};
+            beforeDict.push(mirror);
+         }
+
+        mirror.value = JSON.parse(JSON.stringify(obj))// Faster than ES5 clone
+
          if (callback) {
             callbacks.push(callback);
             var next;
@@ -179,8 +194,14 @@ module jsonpatch {
          Object.deliverChangeRecords( observer ) ;
       }
       else {
-         var mirror = beforeDict[observer.object];
-         _generate(mirror,observer.object,observer.patches,"");
+         var mirror;
+         for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
+            if (beforeDict[i].obj === observer.object) {
+               mirror = beforeDict[i];
+               break;
+            }
+         }
+         _generate(mirror.value,observer.object,observer.patches,"");
       }
       return observer.patches;
    }
