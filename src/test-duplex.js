@@ -127,6 +127,23 @@ test('generate replace', function() {
    deepEqual(obj2,obj);
 });
 
+test('generate replace (2 observers)', function() {
+   var person1 = {firstName: "Alexandra", lastName: "Galbreath"};
+   var person2 = {firstName: "Lisa", lastName: "Mendoza"};
+
+   var observer1 = jsonpatch.observe(person1);
+   var observer2 = jsonpatch.observe(person2);
+
+   person1.firstName = "Alexander";
+   person2.firstName = "Lucas";
+
+   var patch1 = jsonpatch.generate(observer1);
+   var patch2 = jsonpatch.generate(observer2);
+
+   deepEqual(patch1, [{"op": "replace", "path": "/firstName", "value": "Alexander"}]);
+   deepEqual(patch2, [{"op": "replace", "path": "/firstName", "value": "Lucas"}]);
+});
+
 test('generate add', function() {
    obj = { lastName:"Einstein",
       phoneNumbers:[ {number:"12345"} ]};
