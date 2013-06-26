@@ -50,13 +50,13 @@ jsonpatch.apply( myobj, patches );
 Generating patches:
 ```js
 var myobj = { firstName:"Joachim", lastName:"Wester", contactDetails: { phonenumbers: [ { number:"555-123" }] } };
-observer = jsonpatch.observe( object );
+observer = jsonpatch.observe( myobj );
 myobj.firstName = "Albert";
 myobj.contactDetails.phonenumbers[0] = "123";
 myobj.contactDetails.phonenumbers.push({number:"456"});
 jsonpatch.generate(observer);
 // patches  == [
-//   { op:"replace", path="/firstName", value:"Joachim"},
+//   { op:"replace", path="/firstName", value:"Albert"},
 //   { op:"replace", path="/contactDetails/phonenumbers/0", value:"123"},
 //   { op:"add", path="/contactDetails/phonenumbers", value:{number:"456"}}];
 ```
