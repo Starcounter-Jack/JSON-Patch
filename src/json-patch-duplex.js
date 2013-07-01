@@ -1,17 +1,17 @@
 var jsonpatch;
-
-jsonpatch = exports;
-
 (function (jsonpatch) {
     var objOps = {
         add: function (obj, key) {
             obj[key] = this.value;
+            return true;
         },
         remove: function (obj, key) {
             delete obj[key];
+            return true;
         },
         replace: function (obj, key) {
             obj[key] = this.value;
+            return true;
         },
         move: function (obj, key, tree) {
             var temp = {
@@ -20,13 +20,13 @@ jsonpatch = exports;
             };
             apply(tree, [
                 temp
-            ], undefined);
+            ]);
             apply(tree, [
                 {
                     op: "remove",
                     path: this.from
                 }
-            ], undefined);
+            ]);
             apply(tree, [
                 {
                     op: "add",
@@ -34,6 +34,7 @@ jsonpatch = exports;
                     value: temp.value
                 }
             ]);
+            return true;
         },
         copy: function (obj, key, tree) {
             var temp = {
@@ -42,7 +43,7 @@ jsonpatch = exports;
             };
             apply(tree, [
                 temp
-            ], undefined);
+            ]);
             apply(tree, [
                 {
                     op: "add",
@@ -50,11 +51,10 @@ jsonpatch = exports;
                     value: temp.value
                 }
             ]);
+            return true;
         },
         test: function (obj, key) {
-            if(JSON.stringify(obj[key]) != JSON.stringify(this.value)) {
-                throw "";
-            }
+            return (JSON.stringify(obj[key]) === JSON.stringify(this.value));
         },
         _get: function (obj, key) {
             this.value = obj[key];
@@ -160,14 +160,15 @@ jsonpatch = exports;
                 };
                 beforeDict.push(mirror);
             }
-            mirror.value = JSON.parse(JSON.stringify(obj));
+            mirror.value = JSON.parse(JSON.stringify(obj))// Faster than ES5 clone
+            ;
             if(callback) {
                 callbacks.push(callback);
                 var next;
                 var intervals = [
-                    100,
-                    1000,
-                    10000,
+                    100, 
+                    1000, 
+                    10000, 
                     60000
                 ];
                 var currentInterval = 0;
@@ -178,7 +179,7 @@ jsonpatch = exports;
                         callback.call(null, temp);
                     }
                 };
-                var fastCheck = function (e) {
+                var fastCheck = function () {
                     clearTimeout(next);
                     next = setTimeout(function () {
                         dirtyCheck();
@@ -194,8 +195,8 @@ jsonpatch = exports;
                     next = setTimeout(slowCheck, intervals[currentInterval++]);
                 };
                 [
-                    "mousedown",
-                    "mouseup",
+                    "mousedown", 
+                    "mouseup", 
                     "keydown"
                 ].forEach(function (str) {
                     window.addEventListener(str, fastCheck);
@@ -246,7 +247,6 @@ jsonpatch = exports;
         var oldKeys = Object.keys(mirror);
         var changed = false;
         var deleted = false;
-        var added = false;
         for(var t = 0; t < oldKeys.length; t++) {
             var key = oldKeys[t];
             var oldVal = mirror[key];
@@ -290,46 +290,48 @@ jsonpatch = exports;
     }
     /// Apply a json-patch operation on an object tree
     function apply(tree, patches, listen) {
-        try  {
-            patches.forEach(function (patch) {
-                // Find the object
-                var keys = patch.path.split('/');
-                keys.shift()// Remove empty element
-                ;
-                var obj = tree;
-                var t = 0;
-                var len = keys.length;
-                while(true) {
-                    if(obj instanceof Array) {
-                        var index = parseInt(keys[t], 10);
-                        t++;
-                        if(t >= len) {
-                            arrOps[patch.op].call(patch, obj, index, tree)// Apply patch
-                            ;
-                            break;
-                        }
-                        obj = obj[index];
-                    } else {
-                        var key = keys[t];
-                        if(key.indexOf('~') != -1) {
-                            key = key.replace('~1', '/').replace('~0', '~');
-                        }// escape chars
-
-                        t++;
-                        if(t >= len) {
-                            objOps[patch.op].call(patch, obj, key, tree)// Apply patch
-                            ;
-                            break;
-                        }
-                        obj = obj[key];
+        var result = false;
+        patches.forEach(function (patch) {
+            // Find the object
+            var keys = patch.path.split('/');
+            var obj = tree;
+            var t = 1;//skip empty element - http://jsperf.com/to-shift-or-not-to-shift
+            
+            var len = keys.length;
+            while(true) {
+                if(Array.isArray(obj)) {
+                    //http://jsperf.com/isarray-shim/4
+                    var index = parseInt(keys[t], 10);
+                    t++;
+                    if(t >= len) {
+                        result = arrOps[patch.op].call(patch, obj, index, tree)// Apply patch
+                        ;
+                        break;
                     }
+                    obj = obj[index];
+                } else {
+                    var key = keys[t];
+                    if(key.indexOf('~') != -1) {
+                        key = key.replace('~1', '/').replace('~0', '~');
+                    }// escape chars
+                    
+                    t++;
+                    if(t >= len) {
+                        result = objOps[patch.op].call(patch, obj, key, tree)// Apply patch
+                        ;
+                        break;
+                    }
+                    obj = obj[key];
                 }
-            });
-        } catch (e) {
-            return false;
-        }
-        return true;
+            }
+        });
+        return result;
     }
     jsonpatch.apply = apply;
 })(jsonpatch || (jsonpatch = {}));
+if(typeof exports !== "undefined") {
+    exports.apply = jsonpatch.apply;
+    exports.observe = jsonpatch.observe;
+    exports.generate = jsonpatch.generate;
+}
 //@ sourceMappingURL=json-patch-duplex.js.map

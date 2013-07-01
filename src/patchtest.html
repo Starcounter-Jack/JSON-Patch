@@ -1,15 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Unit testing json-patch.js</title>
-    <link rel="stylesheet" href="lib/qunit-1.11.0.css">
+  <title>Jasmine Spec Runner</title>
+
+  <link rel="shortcut icon" type="image/png" href="lib/jasmine/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="lib/jasmine/jasmine.css">
+  <script src="lib/jasmine/jasmine.js"></script>
+  <script src="lib/jasmine/jasmine-html.js"></script>
+
+  <script>
+    (function() {
+      var jasmineEnv = jasmine.getEnv();
+      jasmineEnv.updateInterval = 1000;
+
+      var htmlReporter = new jasmine.HtmlReporter();
+
+      jasmineEnv.addReporter(htmlReporter);
+
+      jasmineEnv.specFilter = function(spec) {
+        return htmlReporter.specFilter(spec);
+      };
+
+      var currentWindowOnload = window.onload;
+
+      window.onload = function() {
+        if (currentWindowOnload) {
+          currentWindowOnload();
+        }
+        execJasmine();
+      };
+
+      function execJasmine() {
+        jasmineEnv.execute();
+      }
+
+    })();
+  </script>
+  <script src="lib/jslitmus.js"></script>
+
+  <!-- include source files here... -->
+  <script src="json-patch.js"></script>
+
+  <!-- include spec files here... -->
+  <script src="test.js"></script>
+
 </head>
+
 <body>
-<div id="qunit"></div>
-<div id="qunit-fixture"></div>
-<script src="json-patch.js"></script>
-<script src="lib/qunit-1.11.0.js"></script>
-<script src="lib/jslitmus.js"></script>
-<script src="test.js"></script>
 </body>
 </html>

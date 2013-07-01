@@ -1,120 +1,120 @@
 var obj, compiled;
 
+if(typeof jsonpatch === 'undefined') {
+  if(process.env.duplex === 'yes') {
+    jsonpatch = require('./json-patch-duplex.js'); //testing in NodeJS, type `npm install`, then `jasmine-node --matchall --config duplex yes test.js test-duplex.js`
+  }
+  else {
+    jsonpatch = require('./json-patch.js'); //testing in NodeJS, type `npm install`, then `jasmine-node --matchall --config duplex no test.js`
+  }
+}
 
-
-test('apply add', function() {
+describe("JSON-Patch", function () {
+  it('should apply add', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
-   //jsonpatch.listenTo(obj,[]);
-
     jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: [1, 2, 3, 4]}]);
-    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]});
+    expect(obj).toEqual({foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]});
 
     jsonpatch.apply(obj, [{op: 'add', path: '/baz/0/foo', value: 'world'}]);
-    deepEqual(obj, {foo: 1, baz: [{qux: 'hello', foo: 'world'}], bar: [1, 2, 3, 4]});
+    expect(obj).toEqual({foo: 1, baz: [{qux: 'hello', foo: 'world'}], bar: [1, 2, 3, 4]});
 
 
     obj = {foo: 1, baz: [{qux: 'hello'}]};
     jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: true}]);
-    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: true});
+    expect(obj).toEqual({foo: 1, baz: [{qux: 'hello'}], bar: true});
 
     obj = {foo: 1, baz: [{qux: 'hello'}]};
     jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: false}]);
-    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: false});
+    expect(obj).toEqual({foo: 1, baz: [{qux: 'hello'}], bar: false});
 
     obj = {foo: 1, baz: [{qux: 'hello'}]};
     jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: null}]);
-    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: null});
-});
+    expect(obj).toEqual({foo: 1, baz: [{qux: 'hello'}], bar: null});
+  });
 
 
-test('apply remove', function() {
+  it('should apply remove', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
    //jsonpatch.listenTo(obj,[]);
 
     jsonpatch.apply(obj, [{op: 'remove', path: '/bar'}]);
-    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}]});
+    expect(obj).toEqual({foo: 1, baz: [{qux: 'hello'}]});
 
     jsonpatch.apply(obj, [{op: 'remove', path: '/baz/0/qux'}]);
-    deepEqual(obj, {foo: 1, baz: [{}]});
-});
+    expect(obj).toEqual({foo: 1, baz: [{}]});
+  });
 
 
-test('apply replace', function() {
+  it('should apply replace', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
     jsonpatch.apply(obj, [{op: 'replace', path: '/foo', value: [1, 2, 3, 4]}]);
-    deepEqual(obj, {foo: [1, 2, 3, 4], baz: [{qux: 'hello'}]});
+    expect(obj).toEqual({foo: [1, 2, 3, 4], baz: [{qux: 'hello'}]});
 
     jsonpatch.apply(obj, [{op: 'replace', path: '/baz/0/qux', value: 'world'}]);
-    deepEqual(obj, {foo: [1, 2, 3, 4], baz: [{qux: 'world'}]});
-});
+    expect(obj).toEqual({foo: [1, 2, 3, 4], baz: [{qux: 'world'}]});
+  });
 
 
-test('apply test', function() {
+  it('should apply test', function() {
     obj = {foo: {bar: [1, 2, 5, 4]}};
-    ok(jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: {bar: [1, 2, 5, 4]}}]));
-    ok(!jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: [1, 2]}]));
-});
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: {bar: [1, 2, 5, 4]}}])).toBe(true);
+    expect(!jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: [1, 2]}])).toBe(true);
+  });
 
 
-test('apply move', function() {
+  it('should apply move', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
    jsonpatch.apply(obj, [{op: 'move', from: '/foo', path: '/bar'}]);
-    deepEqual(obj, {baz: [{qux: 'hello'}], bar: 1});
+    expect(obj).toEqual({baz: [{qux: 'hello'}], bar: 1});
 
     jsonpatch.apply(obj, [{op: 'move', from: '/baz/0/qux', path: '/baz/1'}]);
-    deepEqual(obj, {baz: [{}, 'hello'], bar: 1});
-});
+    expect(obj).toEqual({baz: [{}, 'hello'], bar: 1});
+  });
 
 
-test('apply copy', function() {
+  it('should apply copy', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
     jsonpatch.apply(obj, [{op: 'copy', from: '/foo', path: '/bar'}]);
-    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: 1});
+    expect(obj).toEqual({foo: 1, baz: [{qux: 'hello'}], bar: 1});
 
     jsonpatch.apply(obj, [{op: 'copy', from: '/baz/0/qux', path: '/baz/1'}]);
-    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}, 'hello'], bar: 1});
+    expect(obj).toEqual({foo: 1, baz: [{qux: 'hello'}, 'hello'], bar: 1});
+  });
 });
 
-
-
-
-// JSLitmus
-JSLitmus.test('Add Operation', function() {
+// JSLitmus performance test
+if(typeof JSLitmus !== 'undefined') {
+  JSLitmus.test('should Add Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
     jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: [1, 2, 3, 4]}]);
-});
+  });
 
-JSLitmus.test('Remove Operation', function() {
+  JSLitmus.test('should Remove Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
     jsonpatch.apply(obj, [{op: 'remove', path: '/bar'}]);
-});
+  });
 
-JSLitmus.test('Replace Operation', function() {
+  JSLitmus.test('should Replace Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
     jsonpatch.apply(obj, [{op: 'replace', path: '/foo', value: [1, 2, 3, 4]}]);
-});
+  });
 
-JSLitmus.test('Move Operation', function() {
+  JSLitmus.test('should Move Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
     jsonpatch.apply(obj, [{op: 'move', from: '/baz/0', path: '/bar/0'}]);
-});
+  });
 
-JSLitmus.test('Copy Operation', function() {
+  JSLitmus.test('should Copy Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
     jsonpatch.apply(obj, [{op: 'copy', from: '/baz/0', path: '/bar/0'}]);
-});
+  });
 
-
-JSLitmus.test('Test Operation', function() {
+  JSLitmus.test('should Test Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
     jsonpatch.apply(obj, [{op: 'test', path: '/baz', value: [{qux: 'hello'}]}]);
-});
-        /*
-
-    testCompiled(obj);
-});
-            */
+  });
+}
