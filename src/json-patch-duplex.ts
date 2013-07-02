@@ -139,7 +139,7 @@ module jsonpatch {
           clearPaths(observer, root);
         }
         if (callback)
-          callback.call(patches);
+          callback(patches);
       };
     }
     else {
@@ -170,7 +170,7 @@ module jsonpatch {
           var temp = generate(observer);
           if (temp.length > 0) {
             observer.patches = [];
-            callback.call(null, temp);
+            callback(temp);
           }
         };
         var fastCheck = function () {
@@ -187,9 +187,11 @@ module jsonpatch {
             currentInterval = intervals.length - 1;
           next = setTimeout(slowCheck, intervals[currentInterval++]);
         };
-        ["mousedown", "mouseup", "keydown"].forEach(function (str) {
-          window.addEventListener(str, fastCheck);
-        });
+        if(typeof window !== 'undefined') {
+          ["mousedown", "mouseup", "keydown"].forEach(function (str) {
+            window.addEventListener(str, fastCheck);
+          });
+        }
         next = setTimeout(slowCheck, intervals[currentInterval++]);
       }
     }

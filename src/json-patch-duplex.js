@@ -141,7 +141,7 @@ var jsonpatch;
                     clearPaths(observer, root);
                 }
                 if(callback) {
-                    callback.call(patches);
+                    callback(patches);
                 }
             };
         } else {
@@ -176,7 +176,7 @@ var jsonpatch;
                     var temp = generate(observer);
                     if(temp.length > 0) {
                         observer.patches = [];
-                        callback.call(null, temp);
+                        callback(temp);
                     }
                 };
                 var fastCheck = function () {
@@ -194,13 +194,15 @@ var jsonpatch;
                     }
                     next = setTimeout(slowCheck, intervals[currentInterval++]);
                 };
-                [
-                    "mousedown", 
-                    "mouseup", 
-                    "keydown"
-                ].forEach(function (str) {
-                    window.addEventListener(str, fastCheck);
-                });
+                if(typeof window !== 'undefined') {
+                    [
+                        "mousedown", 
+                        "mouseup", 
+                        "keydown"
+                    ].forEach(function (str) {
+                        window.addEventListener(str, fastCheck);
+                    });
+                }
                 next = setTimeout(slowCheck, intervals[currentInterval++]);
             }
         }
