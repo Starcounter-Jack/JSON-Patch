@@ -60,17 +60,31 @@ module jsonpatch {
     _get: objOps._get
   };
 
+  var _isArray;
+  if(Array.isArray) { //standards; http://jsperf.com/isarray-shim/4
+    _isArray = Array.isArray;
+  }
+  else { //IE8 shim
+    _isArray = function (obj:any) {
+      return obj.push && typeof obj.length === 'number';
+    }
+  }
+
   /// Apply a json-patch operation on an object tree
   export function apply(tree:any, patches:any[], listen?:any):bool {
-    var result = false;
-    patches.forEach(function (patch:any) {
+    var result = false
+      , p = 0
+      , plen = patches.length
+      , patch;
+    while(p < plen) {
+      patch = patches[p];
       // Find the object
       var keys = patch.path.split('/');
       var obj = tree;
       var t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
       var len = keys.length;
       while (true) {
-        if (Array.isArray(obj)) { //http://jsperf.com/isarray-shim/4
+        if (_isArray(obj)) {
           var index = parseInt(keys[t], 10);
           t++;
           if (t >= len) {
@@ -91,7 +105,8 @@ module jsonpatch {
           obj = obj[key];
         }
       }
-    });
+      p++;
+    }
     return result;
   }
 }

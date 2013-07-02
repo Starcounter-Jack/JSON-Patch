@@ -78,10 +78,21 @@ var jsonpatch;
         test: objOps.test,
         _get: objOps._get
     };
+    var _isArray;
+    if(Array.isArray) {
+        //standards; http://jsperf.com/isarray-shim/4
+        _isArray = Array.isArray;
+    } else {
+        //IE8 shim
+        _isArray = function (obj) {
+            return obj.push && typeof obj.length === 'number';
+        };
+    }
     /// Apply a json-patch operation on an object tree
     function apply(tree, patches, listen) {
-        var result = false;
-        patches.forEach(function (patch) {
+        var result = false, p = 0, plen = patches.length, patch;
+        while(p < plen) {
+            patch = patches[p];
             // Find the object
             var keys = patch.path.split('/');
             var obj = tree;
@@ -89,8 +100,7 @@ var jsonpatch;
             
             var len = keys.length;
             while(true) {
-                if(Array.isArray(obj)) {
-                    //http://jsperf.com/isarray-shim/4
+                if(_isArray(obj)) {
                     var index = parseInt(keys[t], 10);
                     t++;
                     if(t >= len) {
@@ -114,7 +124,8 @@ var jsonpatch;
                     obj = obj[key];
                 }
             }
-        });
+            p++;
+        }
         return result;
     }
     jsonpatch.apply = apply;

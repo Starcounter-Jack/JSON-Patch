@@ -67,7 +67,7 @@ module jsonpatch {
   };
 
   var observeOps = {
-    new: function (patches:any[], path) {
+    'new': function (patches:any[], path) { //single quotes needed because 'new' is a keyword in IE8
       var patch = {
         op: "add",
         path: path + "/" + this.name,
@@ -94,11 +94,13 @@ module jsonpatch {
   // ES6 symbols are not here yet. Used to calculate the json pointer to each object
   function markPaths(observer, node) {
     for (var key in node) {
-      var kid = node[key];
-      if (kid instanceof Object) {
-        Object.unobserve(kid, observer);
-        kid.____Path = node.____Path + "/" + key;
-        markPaths(observer, kid);
+      if (node.hasOwnProperty(key)) {
+        var kid = node[key];
+        if (kid instanceof Object) {
+          Object.unobserve(kid, observer);
+          kid.____Path = node.____Path + "/" + key;
+          markPaths(observer, kid);
+        }
       }
     }
   }
@@ -108,9 +110,11 @@ module jsonpatch {
     delete node.____Path;
     Object.observe(node, observer);
     for (var key in node) {
-      var kid = node[key];
-      if (kid instanceof Object) {
-        clearPaths(observer, kid);
+      if (node.hasOwnProperty(key)) {
+        var kid = node[key];
+        if (kid instanceof Object) {
+          clearPaths(observer, kid);
+        }
       }
     }
   }
@@ -130,11 +134,14 @@ module jsonpatch {
           root.____Path = "";
           markPaths(observer, root);
 
-          arr.forEach(function (elem) {
-            if (elem.name != "____Path") {
-              observeOps[elem.type].call(elem, patches, elem.object.____Path);
+          var a = 0
+            , alen = arr.length;
+          while (a < alen) {
+            if (arr[a].name != "____Path") {
+              observeOps[arr[a].type].call(arr[a], patches, arr[a].object.____Path);
             }
-          });
+            a++;
+          }
 
           clearPaths(observer, root);
         }
@@ -187,10 +194,17 @@ module jsonpatch {
             currentInterval = intervals.length - 1;
           next = setTimeout(slowCheck, intervals[currentInterval++]);
         };
-        if(typeof window !== 'undefined') {
-          ["mousedown", "mouseup", "keydown"].forEach(function (str) {
-            window.addEventListener(str, fastCheck);
-          });
+        if (typeof window !== 'undefined') { //not Node
+          if (window.addEventListener) { //standards
+            window.addEventListener('mousedown', fastCheck);
+            window.addEventListener('mouseup', fastCheck);
+            window.addEventListener('keydown', fastCheck);
+          }
+          else { //IE8
+            window.attachEvent('onmousedown', fastCheck);
+            window.attachEvent('onmouseup', fastCheck);
+            window.attachEvent('onkeydown', fastCheck);
+          }
         }
         next = setTimeout(slowCheck, intervals[currentInterval++]);
       }
@@ -232,11 +246,26 @@ module jsonpatch {
     return observer.patches;
   }
 
+  var _objectKeys;
+  if (Object.keys) { //standards
+    _objectKeys = Object.keys;
+  }
+  else { //IE8 shim
+    _objectKeys = function (obj) {
+      var keys = [];
+      for (var o in obj) {
+        if (obj.hasOwnProperty(o)) {
+          keys.push(o);
+        }
+      }
+      return keys;
+    }
+  }
 
   // Dirty check if obj is different from mirror, generate patches and update mirror
   function _generate(mirror, obj, patches, path) {
-    var newKeys = Object.keys(obj);
-    var oldKeys = Object.keys(mirror);
+    var newKeys = _objectKeys(obj);
+    var oldKeys = _objectKeys(mirror);
     var changed = false;
     var deleted = false;
 
@@ -276,17 +305,31 @@ module jsonpatch {
 
   }
 
+  var _isArray;
+  if (Array.isArray) { //standards; http://jsperf.com/isarray-shim/4
+    _isArray = Array.isArray;
+  }
+  else { //IE8 shim
+    _isArray = function (obj:any) {
+      return obj.push && typeof obj.length === 'number';
+    }
+  }
+
   /// Apply a json-patch operation on an object tree
   export function apply(tree:any, patches:any[], listen?:any):bool {
-    var result = false;
-    patches.forEach(function (patch:any) {
+    var result = false
+      , p = 0
+      , plen = patches.length
+      , patch;
+    while (p < plen) {
+      patch = patches[p];
       // Find the object
       var keys = patch.path.split('/');
       var obj = tree;
       var t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
       var len = keys.length;
       while (true) {
-        if (Array.isArray(obj)) { //http://jsperf.com/isarray-shim/4
+        if (_isArray(obj)) {
           var index = parseInt(keys[t], 10);
           t++;
           if (t >= len) {
@@ -307,12 +350,13 @@ module jsonpatch {
           obj = obj[key];
         }
       }
-    });
+      p++;
+    }
     return result;
   }
 }
 
-declare var exports: any;
+declare var exports:any;
 
 if (typeof exports !== "undefined") {
   exports.apply = jsonpatch.apply;
