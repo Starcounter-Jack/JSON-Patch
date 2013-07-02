@@ -129,6 +129,7 @@ var jsonpatch;
     }
     var beforeDict = [];
     var callbacks = [];
+    jsonpatch.intervals;
     function observe(obj, callback) {
         var patches = [];
         var root = obj;
@@ -150,6 +151,8 @@ var jsonpatch;
                 if(callback) {
                     callback(patches);
                 }
+                observer.patches = patches;
+                patches = [];
             };
         } else {
             observer = {
@@ -167,12 +170,12 @@ var jsonpatch;
                 };
                 beforeDict.push(mirror);
             }
-            mirror.value = JSON.parse(JSON.stringify(obj))// Faster than ES5 clone
+            mirror.value = JSON.parse(JSON.stringify(obj))// Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
             ;
             if(callback) {
                 callbacks.push(callback);
                 var next;
-                var intervals = [
+                var intervals = this.intervals || [
                     100, 
                     1000, 
                     10000, 
@@ -182,7 +185,6 @@ var jsonpatch;
                 var dirtyCheck = function () {
                     var temp = generate(observer);
                     if(temp.length > 0) {
-                        observer.patches = [];
                         callback(temp);
                     }
                 };
@@ -227,13 +229,13 @@ var jsonpatch;
     function _observe(observer, obj, patches) {
         if(Object.observe) {
             Object.observe(obj, observer);
-        }
-        for(var key in obj) {
-            if(obj.hasOwnProperty(key)) {
-                var v = obj[key];
-                if(v && typeof (v) === "object") {
-                    _observe(observer, v, patches)//path+key);
-                    ;
+            for(var key in obj) {
+                if(obj.hasOwnProperty(key)) {
+                    var v = obj[key];
+                    if(v && typeof (v) === "object") {
+                        _observe(observer, v, patches)//path+key);
+                        ;
+                    }
                 }
             }
         }
@@ -243,6 +245,9 @@ var jsonpatch;
         if(Object.observe) {
             Object.deliverChangeRecords(observer);
         } else {
+            if(observer.patches.length > 0) {
+                observer.patches = [];
+            }
             var mirror;
             for(var i = 0, ilen = beforeDict.length; i < ilen; i++) {
                 if(beforeDict[i].obj === observer.object) {

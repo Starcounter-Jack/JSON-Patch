@@ -122,6 +122,8 @@ module jsonpatch {
   var beforeDict = [];
   var callbacks = [];
 
+  export var intervals;
+
   export function observe(obj:any, callback):any {
     var patches = [];
     var root = obj;
@@ -145,8 +147,11 @@ module jsonpatch {
 
           clearPaths(observer, root);
         }
-        if (callback)
+        if (callback) {
           callback(patches);
+        }
+        observer.patches = patches;
+        patches = [];
       };
     }
     else {
@@ -165,18 +170,17 @@ module jsonpatch {
         beforeDict.push(mirror);
       }
 
-      mirror.value = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone
+      mirror.value = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
 
       if (callback) {
         callbacks.push(callback);
         var next;
-        var intervals = [100, 1000, 10000, 60000];
+        var intervals = this.intervals || [100, 1000, 10000, 60000];
         var currentInterval = 0;
 
         var dirtyCheck = function () {
           var temp = generate(observer);
           if (temp.length > 0) {
-            observer.patches = [];
             callback(temp);
           }
         };
@@ -216,13 +220,14 @@ module jsonpatch {
 
   /// Listen to changes on an object tree, accumulate patches
   function _observe(observer:any, obj:any, patches:any[]):any {
-    if (Object.observe)
+    if (Object.observe) {
       Object.observe(obj, observer);
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        var v:any = obj[key];
-        if (v && typeof (v) === "object") {
-          _observe(observer, v, patches); //path+key);
+      for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          var v:any = obj[key];
+          if (v && typeof (v) === "object") {
+            _observe(observer, v, patches); //path+key);
+          }
         }
       }
     }
@@ -234,6 +239,9 @@ module jsonpatch {
       Object.deliverChangeRecords(observer);
     }
     else {
+      if(observer.patches.length > 0) {
+        observer.patches = [];
+      }
       var mirror;
       for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
         if (beforeDict[i].obj === observer.object) {
