@@ -61,3 +61,24 @@ jsonpatch.generate(observer);
 //   { op:"add", path="/contactDetails/phonenumbers", value:{number:"456"}}];
 ```
 
+## Testing
+
+### In a web browser
+
+1. Testing **json-patch.js**
+ - Load `src/patchtest.html` in your web browser
+2. Testing **json-patch-duplex.js**
+ - Load `src/test-duplex.html` in your web browser
+
+Each of the test suite files contains *Jasmine* unit test suite and *JSLitmus* performance test suite.
+
+To run *JSLitmus* performance tests, press "Run Tests" button.
+
+### In Node.js
+
+1. Go to directory where you have cloned the repo
+2. Install Jasmine Node.js module by running command `npm install jasmine-node -g`
+3. Testing **json-patch.js**
+ - Run command `jasmine-node --matchall --config duplex no src/test.js`
+4. Testing **json-patch-duplex.js**
+ - Run command `jasmine-node --matchall --config duplex yes src/test.js src/test-duplex.js`

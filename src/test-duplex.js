@@ -1,11 +1,11 @@
 var obj, obj2, patches;
 
 if(typeof jsonpatch === 'undefined') {
-  if(process.env.duplex === 'yes') {
-    jsonpatch = require('./json-patch-duplex.js'); //testing in NodeJS, type `npm install`, then `jasmine-node --matchall --config duplex yes test.js test-duplex.js`
+  if(process.env.duplex === 'yes') { //required by `jasmine-node` test runner in Node.js
+    jsonpatch = require('./json-patch-duplex.js');
   }
   else {
-    jsonpatch = require('./json-patch.js'); //testing in NodeJS, type `npm install`, then `jasmine-node --matchall --config duplex no test.js`
+    jsonpatch = require('./json-patch.js');
   }
 }
 
