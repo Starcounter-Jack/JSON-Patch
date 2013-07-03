@@ -156,8 +156,6 @@ describe("JSON-Patch-Duplex", function () {
       });
     });
 
-    jsonpatch.intervals = [50];
-
     it('should generate replace (double change, shallow object)', function() {
       var lastPatches
         , called = 0;
@@ -165,6 +163,7 @@ describe("JSON-Patch-Duplex", function () {
       obj = { firstName:"Albert", lastName:"Einstein",
         phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
 
+      jsonpatch.intervals = [50];
       jsonpatch.observe(obj, function(patches) {
         called++;
         lastPatches = patches;
@@ -202,6 +201,7 @@ describe("JSON-Patch-Duplex", function () {
       obj = { firstName:"Albert", lastName:"Einstein",
         phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
 
+      jsonpatch.intervals = [50];
       jsonpatch.observe(obj, function(patches) {
         called++;
         lastPatches = patches;
@@ -230,6 +230,35 @@ describe("JSON-Patch-Duplex", function () {
         expect(obj).toEqual({ firstName:"Albert", lastName:"Einstein",
           phoneNumbers:[ {number:"123"}, {number:"456"} ]}); //objects should be still the same
       });
+    });
+
+    it('generate should execute callback synchronously', function() {
+      var lastPatches
+        , called = 0
+        , res;
+
+      obj = { firstName:"Albert", lastName:"Einstein",
+        phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
+
+      jsonpatch.intervals = [10];
+      var observer = jsonpatch.observe(obj, function(patches) {
+        called++;
+        lastPatches = patches;
+      });
+      obj.phoneNumbers[0].number = "123";
+
+      waits(100);
+      expect(called).toEqual(0);
+
+      res = jsonpatch.generate(observer);
+      expect(called).toEqual(1);
+      expect(lastPatches).toEqual([{op: 'replace', path: '/phoneNumbers/0/number', value: '123'}]);
+      expect(lastPatches).toEqual(res);
+
+      res = jsonpatch.generate(observer);
+      expect(called).toEqual(1);
+      expect(lastPatches).toEqual([{op: 'replace', path: '/phoneNumbers/0/number', value: '123'}]);
+      expect(res).toEqual([]);
     });
   });
 });

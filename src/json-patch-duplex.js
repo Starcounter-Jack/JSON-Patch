@@ -128,7 +128,7 @@ var jsonpatch;
         }
     }
     var beforeDict = [];
-    var callbacks = [];
+    //var callbacks = []; this has no purpose
     jsonpatch.intervals;
     function observe(obj, callback) {
         var patches = [];
@@ -173,7 +173,8 @@ var jsonpatch;
             mirror.value = JSON.parse(JSON.stringify(obj))// Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
             ;
             if(callback) {
-                callbacks.push(callback);
+                //callbacks.push(callback); this has no purpose
+                observer.callback = callback;
                 var next;
                 var intervals = this.intervals || [
                     100, 
@@ -183,10 +184,7 @@ var jsonpatch;
                 ];
                 var currentInterval = 0;
                 var dirtyCheck = function () {
-                    var temp = generate(observer);
-                    if(temp.length > 0) {
-                        callback(temp);
-                    }
+                    generate(observer);
                 };
                 var fastCheck = function () {
                     clearTimeout(next);
@@ -245,9 +243,6 @@ var jsonpatch;
         if(Object.observe) {
             Object.deliverChangeRecords(observer);
         } else {
-            if(observer.patches.length > 0) {
-                observer.patches = [];
-            }
             var mirror;
             for(var i = 0, ilen = beforeDict.length; i < ilen; i++) {
                 if(beforeDict[i].obj === observer.object) {
@@ -257,7 +252,14 @@ var jsonpatch;
             }
             _generate(mirror.value, observer.object, observer.patches, "");
         }
-        return observer.patches;
+        var temp = observer.patches;
+        if(temp.length > 0) {
+            observer.patches = [];
+            if(observer.callback) {
+                observer.callback(temp);
+            }
+        }
+        return temp;
     }
     jsonpatch.generate = generate;
     var _objectKeys;

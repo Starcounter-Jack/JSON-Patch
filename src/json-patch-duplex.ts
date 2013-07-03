@@ -120,7 +120,7 @@ module jsonpatch {
   }
 
   var beforeDict = [];
-  var callbacks = [];
+  //var callbacks = []; this has no purpose
 
   export var intervals;
 
@@ -173,16 +173,14 @@ module jsonpatch {
       mirror.value = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
 
       if (callback) {
-        callbacks.push(callback);
+        //callbacks.push(callback); this has no purpose
+        observer.callback = callback;
         var next;
         var intervals = this.intervals || [100, 1000, 10000, 60000];
         var currentInterval = 0;
 
         var dirtyCheck = function () {
-          var temp = generate(observer);
-          if (temp.length > 0) {
-            callback(temp);
-          }
+          generate(observer);
         };
         var fastCheck = function () {
           clearTimeout(next);
@@ -239,9 +237,6 @@ module jsonpatch {
       Object.deliverChangeRecords(observer);
     }
     else {
-      if(observer.patches.length > 0) {
-        observer.patches = [];
-      }
       var mirror;
       for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
         if (beforeDict[i].obj === observer.object) {
@@ -251,7 +246,14 @@ module jsonpatch {
       }
       _generate(mirror.value, observer.object, observer.patches, "");
     }
-    return observer.patches;
+    var temp = observer.patches;
+    if(temp.length > 0) {
+      observer.patches = [];
+      if(observer.callback) {
+        observer.callback(temp);
+      }
+    }
+    return temp;
   }
 
   var _objectKeys;
@@ -309,8 +311,6 @@ module jsonpatch {
         patches.push({op: "add", path: path + "/" + key, value: obj[key]});
       }
     }
-
-
   }
 
   var _isArray;
