@@ -38,7 +38,13 @@ include `json-patch-duplex.js` if you also want to generate patches.
 
 ### In Node.js
 
-Add `fast-json-patch` to dependencies list in your project's `package.json`, then run `npm install`. After installation, you are ready to go with require:
+Install the current version (and save it as a dependency in package.json):
+
+```
+$ npm install fast-json-patch --save
+```
+
+Call require to get the instance: 
 
 ```js
 var jsonpatch = require('fast-json-patch')
