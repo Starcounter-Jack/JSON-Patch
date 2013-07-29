@@ -29,10 +29,22 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 * A /bin directory will be added with minified versions
 * More unit tests
 
-## Usage
+## Adding to your project
+
+### In a web browser
 
 Include `json-patch.js` if you want support for applying patches **or**
 include `json-patch-duplex.js` if you also want to generate patches.
+
+### In Node.js
+
+Add `fast-json-patch` to dependencies list in your project's `package.json`, then run `npm install`. After installation, you are ready to go with require:
+
+```js
+var jsonpatch = require('fast-json-patch')
+```
+
+## Usage
 
 Applying patches:
 ```js
