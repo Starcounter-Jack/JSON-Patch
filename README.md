@@ -36,27 +36,27 @@ include `json-patch-duplex.js` if you also want to generate patches.
 
 Applying patches:
 ```js
-var myobj = { firstName:"Albert", contactDetails: { phonenumbers: [ ] } };
+var myobj = { firstName:"Albert", contactDetails: { phoneNumbers: [ ] } };
 var patches = [
    {op:"replace", path:"/firstName", value:"Joachim" },
-   {op:"add", path:"/lastName", value:"Wester" }
-   {op:"add", path:"/contactDetails/phonenumbers", value:{ number:"555-123" }  }
+   {op:"add", path:"/lastName", value:"Wester" },
+   {op:"add", path:"/contactDetails/phoneNumbers/0", value:{ number:"555-123" }  }
    ];
 jsonpatch.apply( myobj, patches );
 // myobj == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
 ```
 Generating patches:
 ```js
-var myobj = { firstName:"Joachim", lastName:"Wester", contactDetails: { phonenumbers: [ { number:"555-123" }] } };
+var myobj = { firstName:"Joachim", lastName:"Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
 observer = jsonpatch.observe( myobj );
 myobj.firstName = "Albert";
-myobj.contactDetails.phonenumbers[0] = "123";
-myobj.contactDetails.phonenumbers.push({number:"456"});
-jsonpatch.generate(observer);
+myobj.contactDetails.phoneNumbers[0].number = "123";
+myobj.contactDetails.phoneNumbers.push({number:"456"});
+var patches = jsonpatch.generate(observer);
 // patches  == [
 //   { op:"replace", path="/firstName", value:"Albert"},
-//   { op:"replace", path="/contactDetails/phonenumbers/0", value:"123"},
-//   { op:"add", path="/contactDetails/phonenumbers", value:{number:"456"}}];
+//   { op:"replace", path="/contactDetails/phoneNumbers/0/number", value:"123"},
+//   { op:"add", path="/contactDetails/phoneNumbers/1", value:{number:"456"}}];
 ```
 
 ## Testing
