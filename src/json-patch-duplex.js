@@ -130,6 +130,15 @@ var jsonpatch;
     var beforeDict = [];
     //var callbacks = []; this has no purpose
     jsonpatch.intervals;
+    function unobserve(root, observer) {
+        if(Object.observe) {
+            Object.unobserve(root, observer);
+            markPaths(observer, root);
+        } else {
+            clearTimeout(observer.next);
+        }
+    }
+    jsonpatch.unobserve = unobserve;
     function observe(obj, callback) {
         var patches = [];
         var root = obj;
@@ -175,7 +184,7 @@ var jsonpatch;
             if(callback) {
                 //callbacks.push(callback); this has no purpose
                 observer.callback = callback;
-                var next;
+                observer.next = null;
                 var intervals = this.intervals || [
                     100, 
                     1000, 
@@ -187,11 +196,11 @@ var jsonpatch;
                     generate(observer);
                 };
                 var fastCheck = function () {
-                    clearTimeout(next);
-                    next = setTimeout(function () {
+                    clearTimeout(observer.next);
+                    observer.next = setTimeout(function () {
                         dirtyCheck();
                         currentInterval = 0;
-                        next = setTimeout(slowCheck, intervals[currentInterval++]);
+                        observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
                     }, 0);
                 };
                 var slowCheck = function () {
@@ -199,7 +208,7 @@ var jsonpatch;
                     if(currentInterval == intervals.length) {
                         currentInterval = intervals.length - 1;
                     }
-                    next = setTimeout(slowCheck, intervals[currentInterval++]);
+                    observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
                 };
                 if(typeof window !== 'undefined') {
                     //not Node
@@ -215,7 +224,7 @@ var jsonpatch;
                         window.attachEvent('onkeydown', fastCheck);
                     }
                 }
-                next = setTimeout(slowCheck, intervals[currentInterval++]);
+                observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
             }
         }
         observer.patches = patches;
@@ -380,6 +389,7 @@ var jsonpatch;
 if(typeof exports !== "undefined") {
     exports.apply = jsonpatch.apply;
     exports.observe = jsonpatch.observe;
+    exports.unobserve = jsonpatch.unobserve;
     exports.generate = jsonpatch.generate;
 }
 //@ sourceMappingURL=json-patch-duplex.js.map

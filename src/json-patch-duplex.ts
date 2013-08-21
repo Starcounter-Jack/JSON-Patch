@@ -124,6 +124,16 @@ module jsonpatch {
 
   export var intervals;
 
+  export function unobserve(root, observer) {
+    if(Object.observe) {
+      Object.unobserve(root, observer);
+      markPaths(observer, root);
+    }
+    else {
+      clearTimeout(observer.next);
+    }
+  }
+
   export function observe(obj:any, callback):any {
     var patches = [];
     var root = obj;
@@ -175,7 +185,7 @@ module jsonpatch {
       if (callback) {
         //callbacks.push(callback); this has no purpose
         observer.callback = callback;
-        var next;
+        observer.next = null;
         var intervals = this.intervals || [100, 1000, 10000, 60000];
         var currentInterval = 0;
 
@@ -183,18 +193,18 @@ module jsonpatch {
           generate(observer);
         };
         var fastCheck = function () {
-          clearTimeout(next);
-          next = setTimeout(function () {
+          clearTimeout(observer.next);
+          observer.next = setTimeout(function () {
             dirtyCheck();
             currentInterval = 0;
-            next = setTimeout(slowCheck, intervals[currentInterval++]);
+            observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
           }, 0);
         };
         var slowCheck = function () {
           dirtyCheck();
           if (currentInterval == intervals.length)
             currentInterval = intervals.length - 1;
-          next = setTimeout(slowCheck, intervals[currentInterval++]);
+          observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
         };
         if (typeof window !== 'undefined') { //not Node
           if (window.addEventListener) { //standards
@@ -208,7 +218,7 @@ module jsonpatch {
             window.attachEvent('onkeydown', fastCheck);
           }
         }
-        next = setTimeout(slowCheck, intervals[currentInterval++]);
+        observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
       }
     }
     observer.patches = patches;
@@ -369,5 +379,6 @@ declare var exports:any;
 if (typeof exports !== "undefined") {
   exports.apply = jsonpatch.apply;
   exports.observe = jsonpatch.observe;
+  exports.unobserve = jsonpatch.unobserve;
   exports.generate = jsonpatch.generate;
 }

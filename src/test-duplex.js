@@ -260,6 +260,90 @@ describe("JSON-Patch-Duplex", function () {
       expect(lastPatches).toEqual([{op: 'replace', path: '/phoneNumbers/0/number', value: '123'}]);
       expect(res).toEqual([]);
     });
+
+    it('should unobserve then observe again', function() {
+      var called = 0;
+
+      obj = { firstName:"Albert", lastName:"Einstein",
+        phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
+
+      jsonpatch.intervals = [10];
+      var observer = jsonpatch.observe(obj, function(patches) {
+        called++;
+      });
+
+      obj.firstName = 'Malvin';
+
+      waits(20);
+
+      runs(function(){
+        expect(called).toEqual(1);
+
+        jsonpatch.unobserve(obj, observer);
+
+        obj.firstName = 'Wilfred';
+      });
+
+      waits(20);
+
+      runs(function(){
+        expect(called).toEqual(1);
+
+        observer = jsonpatch.observe(obj, function(patches) {
+          called++;
+        });
+
+        obj.firstName = 'Megan';
+      });
+
+      waits(20);
+
+      runs(function(){
+        expect(called).toEqual(2);
+      });
+    });
+
+    it('should unobserve then observe again (deep value)', function() {
+      var called = 0;
+
+      obj = { firstName:"Albert", lastName:"Einstein",
+        phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
+
+      jsonpatch.intervals = [10];
+      var observer = jsonpatch.observe(obj, function(patches) {
+        called++;
+      });
+
+      obj.phoneNumbers[1].number = '555';
+
+      waits(20);
+
+      runs(function(){
+        expect(called).toEqual(1);
+
+        jsonpatch.unobserve(obj, observer);
+
+        obj.phoneNumbers[1].number = '556';
+      });
+
+      waits(20);
+
+      runs(function(){
+        expect(called).toEqual(1);
+
+        observer = jsonpatch.observe(obj, function(patches) {
+          called++;
+        });
+
+        obj.phoneNumbers[1].number = '557';
+      });
+
+      waits(20);
+
+      runs(function(){
+        expect(called).toEqual(2);
+      });
+    });
   });
 });
 
