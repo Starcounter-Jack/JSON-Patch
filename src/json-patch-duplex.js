@@ -293,6 +293,7 @@ var jsonpatch;
         var oldKeys = _objectKeys(mirror);
         var changed = false;
         var deleted = false;
+        //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
         for(var t = 0; t < oldKeys.length; t++) {
             var key = oldKeys[t];
             var oldVal = mirror[key];
@@ -316,6 +317,7 @@ var jsonpatch;
                     op: "remove",
                     path: path + "/" + key
                 });
+                delete mirror[key];
                 deleted = true// property has been deleted
                 ;
             }
@@ -331,6 +333,7 @@ var jsonpatch;
                     path: path + "/" + key,
                     value: obj[key]
                 });
+                mirror[key] = obj[key];
             }
         }
     }

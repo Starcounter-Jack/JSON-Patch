@@ -289,6 +289,8 @@ module jsonpatch {
     var changed = false;
     var deleted = false;
 
+    //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
+
     for (var t = 0; t < oldKeys.length; t++) {
       var key = oldKeys[t];
       var oldVal = mirror[key];
@@ -307,6 +309,7 @@ module jsonpatch {
       }
       else {
         patches.push({op: "remove", path: path + "/" + key});
+        delete mirror[key];
         deleted = true; // property has been deleted
       }
     }
@@ -319,6 +322,7 @@ module jsonpatch {
       var key = newKeys[t];
       if (!mirror.hasOwnProperty(key)) {
         patches.push({op: "add", path: path + "/" + key, value: obj[key]});
+        mirror[key] = obj[key];
       }
     }
   }

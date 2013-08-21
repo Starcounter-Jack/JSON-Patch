@@ -126,6 +126,67 @@ describe("JSON-Patch-Duplex", function () {
       jsonpatch.apply(obj2,patches);
       expect(obj2).toEqualInJSON(obj);
     });
+
+    it('should not generate the same patch twice (replace)', function() {
+      obj = { lastName:"Einstein" };
+      var observer = jsonpatch.observe(obj);
+
+      obj.lastName = "Wester";
+
+      patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([
+        { op: 'replace', path: '/lastName', value: 'Wester' }
+      ]);
+
+      patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([]);
+    });
+
+    it('should not generate the same patch twice (add)', function() {
+      obj = { lastName:"Einstein" };
+      var observer = jsonpatch.observe(obj);
+
+      obj.firstName = "Albert";
+
+      patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([
+        { op: 'add', path: '/firstName', value: 'Albert' }
+      ]);
+
+      patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([]);
+    });
+
+    it('should not generate the same patch twice (remove)', function() {
+      obj = { lastName:"Einstein" };
+      var observer = jsonpatch.observe(obj);
+
+      delete obj.lastName;
+
+      patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([
+        { op: 'remove', path: '/lastName' }
+      ]);
+
+      patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([]);
+    });
+
+    /*it('should not generate the same patch twice (move)', function() { //"move" is not implemented yet in jsonpatch.generate
+      obj = { lastName: {str: "Einstein"} };
+      var observer = jsonpatch.observe(obj);
+
+      obj.lastName2 = obj.lastName;
+      delete obj.lastName;
+
+      patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([
+        { op: 'move', from: '/lastName', to: '/lastName2' }
+      ]);
+
+      patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([]);
+    });*/
   });
 
   describe('callback', function() {
