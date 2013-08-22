@@ -91,6 +91,54 @@ describe("JSON-Patch-Duplex", function () {
         phoneNumbers:[ {number:"123"}, {number:"456"} ]}); //objects should be still the same
     });
 
+    it('should generate replace (changes in new array cell, primitive values)', function() {
+      arr = [1];
+
+      var observer = jsonpatch.observe(arr);
+      arr.push(2);
+
+      var patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([{op: 'add', path: '/1', value: 2}]);
+
+      arr[0] = 3;
+
+      var patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([{op: 'replace', path: '/0', value: 3}]);
+
+      arr[1] = 4;
+
+      var patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([{op: 'replace', path: '/1', value: 4}]);
+
+    });
+
+
+    it('should generate replace (changes in new array cell, complex values)', function() {
+      arr = [
+        {
+          id: 1,
+          name: 'Ted'
+        }
+      ];
+
+      var observer = jsonpatch.observe(arr);
+      arr.push({id: 2, name: 'Jerry'});
+
+      var patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([{op: 'add', path: '/1', value: {id: 2, name: 'Jerry'}}]);
+
+      arr[0].id = 3;
+
+      var patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([{op: 'replace', path: '/0/id', value: 3}]);
+
+      arr[1].id = 4;
+
+      var patches = jsonpatch.generate(observer);
+      expect(patches).toEqual([{op: 'replace', path: '/1/id', value: 4}]);
+
+    });
+
     it('should generate add', function() {
       obj = { lastName:"Einstein",
         phoneNumbers:[ {number:"12345"} ]};
