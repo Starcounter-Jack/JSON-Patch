@@ -137,8 +137,9 @@ module jsonpatch {
   export function observe(obj:any, callback):any {
     var patches = [];
     var root = obj;
+    var observer;
     if (Object.observe) {
-      var observer = function (arr) {
+      observer = function (arr) {
 
         if (!root.___Path) {
 
@@ -338,7 +339,7 @@ module jsonpatch {
   }
 
   /// Apply a json-patch operation on an object tree
-  export function apply(tree:any, patches:any[], listen?:any):bool {
+  export function apply(tree:any, patches:any[], listen?:any):boolean {
     var result = false
       , p = 0
       , plen = patches.length
