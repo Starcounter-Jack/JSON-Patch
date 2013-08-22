@@ -1,4 +1,4 @@
-// json-patch.js 0.3
+// json-patch.js 0.3.1
 // (c) 2013 Joachim Wester
 // MIT license
 
@@ -61,7 +61,7 @@ module jsonpatch {
   };
 
   var _isArray;
-  if(Array.isArray) { //standards; http://jsperf.com/isarray-shim/4
+  if (Array.isArray) { //standards; http://jsperf.com/isarray-shim/4
     _isArray = Array.isArray;
   }
   else { //IE8 shim
@@ -71,12 +71,12 @@ module jsonpatch {
   }
 
   /// Apply a json-patch operation on an object tree
-  export function apply(tree:any, patches:any[], listen?:any):bool {
+  export function apply(tree:any, patches:any[], listen?:any):boolean {
     var result = false
       , p = 0
       , plen = patches.length
       , patch;
-    while(p < plen) {
+    while (p < plen) {
       patch = patches[p];
       // Find the object
       var keys = patch.path.split('/');
@@ -111,7 +111,7 @@ module jsonpatch {
   }
 }
 
-declare var exports: any;
+declare var exports:any;
 
 if (typeof exports !== "undefined") {
   exports.apply = jsonpatch.apply;

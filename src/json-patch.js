@@ -1,4 +1,4 @@
-// json-patch.js 0.3
+// json-patch.js 0.3.1
 // (c) 2013 Joachim Wester
 // MIT license
 var jsonpatch;
@@ -17,42 +17,21 @@ var jsonpatch;
             return true;
         },
         move: function (obj, key, tree) {
-            var temp = {
-                op: "_get",
-                path: this.from
-            };
+            var temp = { op: "_get", path: this.from };
+            apply(tree, [temp]);
             apply(tree, [
-                temp
+                { op: "remove", path: this.from }
             ]);
             apply(tree, [
-                {
-                    op: "remove",
-                    path: this.from
-                }
-            ]);
-            apply(tree, [
-                {
-                    op: "add",
-                    path: this.path,
-                    value: temp.value
-                }
+                { op: "add", path: this.path, value: temp.value }
             ]);
             return true;
         },
         copy: function (obj, key, tree) {
-            var temp = {
-                op: "_get",
-                path: this.from
-            };
+            var temp = { op: "_get", path: this.from };
+            apply(tree, [temp]);
             apply(tree, [
-                temp
-            ]);
-            apply(tree, [
-                {
-                    op: "add",
-                    path: this.path,
-                    value: temp.value
-                }
+                { op: "add", path: this.path, value: temp.value }
             ]);
             return true;
         },
@@ -63,6 +42,7 @@ var jsonpatch;
             this.value = obj[key];
         }
     };
+
     var arrOps = {
         add: function (arr, i) {
             arr.splice(i, 0, this.value);
@@ -78,47 +58,43 @@ var jsonpatch;
         test: objOps.test,
         _get: objOps._get
     };
+
     var _isArray;
-    if(Array.isArray) {
-        //standards; http://jsperf.com/isarray-shim/4
+    if (Array.isArray) {
         _isArray = Array.isArray;
     } else {
-        //IE8 shim
         _isArray = function (obj) {
             return obj.push && typeof obj.length === 'number';
         };
     }
+
     /// Apply a json-patch operation on an object tree
     function apply(tree, patches, listen) {
         var result = false, p = 0, plen = patches.length, patch;
-        while(p < plen) {
+        while (p < plen) {
             patch = patches[p];
+
             // Find the object
             var keys = patch.path.split('/');
             var obj = tree;
-            var t = 1;//skip empty element - http://jsperf.com/to-shift-or-not-to-shift
-            
+            var t = 1;
             var len = keys.length;
-            while(true) {
-                if(_isArray(obj)) {
+            while (true) {
+                if (_isArray(obj)) {
                     var index = parseInt(keys[t], 10);
                     t++;
-                    if(t >= len) {
-                        result = arrOps[patch.op].call(patch, obj, index, tree)// Apply patch
-                        ;
+                    if (t >= len) {
+                        result = arrOps[patch.op].call(patch, obj, index, tree);
                         break;
                     }
                     obj = obj[index];
                 } else {
                     var key = keys[t];
-                    if(key.indexOf('~') != -1) {
+                    if (key.indexOf('~') != -1)
                         key = key.replace('~1', '/').replace('~0', '~');
-                    }// escape chars
-                    
                     t++;
-                    if(t >= len) {
-                        result = objOps[patch.op].call(patch, obj, key, tree)// Apply patch
-                        ;
+                    if (t >= len) {
+                        result = objOps[patch.op].call(patch, obj, key, tree);
                         break;
                     }
                     obj = obj[key];
@@ -130,7 +106,8 @@ var jsonpatch;
     }
     jsonpatch.apply = apply;
 })(jsonpatch || (jsonpatch = {}));
-if(typeof exports !== "undefined") {
+
+if (typeof exports !== "undefined") {
     exports.apply = jsonpatch.apply;
 }
-//@ sourceMappingURL=json-patch.js.map
+//# sourceMappingURL=json-patch.js.map
