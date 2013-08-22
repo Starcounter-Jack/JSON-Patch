@@ -308,7 +308,7 @@ var jsonpatch;
             var key = newKeys[t];
             if (!mirror.hasOwnProperty(key)) {
                 patches.push({ op: "add", path: path + "/" + key, value: obj[key] });
-                mirror[key] = obj[key];
+                mirror[key] = JSON.parse(JSON.stringify(obj[key]));
             }
         }
     }
