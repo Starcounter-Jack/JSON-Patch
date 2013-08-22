@@ -1,4 +1,4 @@
-// json-patch.js 0.3.1
+// json-patch.js 0.3.2
 // (c) 2013 Joachim Wester
 // MIT license
 
