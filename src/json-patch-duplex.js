@@ -1,4 +1,4 @@
-// json-patch-duplex.js 0.3
+// json-patch-duplex.js 0.3.1
 // (c) 2013 Joachim Wester
 // MIT license
 var jsonpatch;
@@ -367,3 +367,4 @@ if (typeof exports !== "undefined") {
     exports.unobserve = jsonpatch.unobserve;
     exports.generate = jsonpatch.generate;
 }
+//# sourceMappingURL=json-patch-duplex.js.map
