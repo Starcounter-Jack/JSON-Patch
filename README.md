@@ -1,5 +1,5 @@
-JSON-Patch
-==========
+Fast-JSON-Patch
+===============
 
 A leaner and meaner implementation of JSON-Patch. Small footprint. High performance.
 Also support dual directions! I.e. you can both apply patches and generate patches.
