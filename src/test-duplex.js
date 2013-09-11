@@ -38,6 +38,24 @@ describe("JSON-Patch-Duplex", function () {
       expect(obj2).toEqual(obj);
     });
 
+    it('should generate replace (escaped chars)', function() {
+      obj = { "/name/first":"Albert", "/name/last":"Einstein",
+        "~phone~/numbers":[ {number:"12345"}, {number:"45353"} ]};
+
+      var observer = jsonpatch.observe(obj);
+      obj['/name/first'] = "Joachim";
+      obj['/name/last'] = "Wester";
+      obj['~phone~/numbers'][0].number = "123";
+      obj['~phone~/numbers'][1].number = "456";
+
+      var patches = jsonpatch.generate(observer);
+      obj2 = { "/name/first":"Albert", "/name/last":"Einstein",
+        "~phone~/numbers":[ {number:"12345"}, {number:"45353"} ]};
+
+      jsonpatch.apply(obj2,patches);
+      expect(obj2).toEqual(obj);
+    });
+
     it('should generate replace (2 observers)', function() {
       var person1 = {firstName: "Alexandra", lastName: "Galbreath"};
       var person2 = {firstName: "Lisa", lastName: "Mendoza"};

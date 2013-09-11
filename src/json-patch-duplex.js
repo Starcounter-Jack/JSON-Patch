@@ -63,7 +63,7 @@ var jsonpatch;
         'new': function (patches, path) {
             var patch = {
                 op: "add",
-                path: path + "/" + this.name,
+                path: path + "/" + escapePathComponent(this.name),
                 value: this.object[this.name]
             };
             patches.push(patch);
@@ -71,19 +71,25 @@ var jsonpatch;
         deleted: function (patches, path) {
             var patch = {
                 op: "remove",
-                path: path + "/" + this.name
+                path: path + "/" + escapePathComponent(this.name)
             };
             patches.push(patch);
         },
         updated: function (patches, path) {
             var patch = {
                 op: "replace",
-                path: path + "/" + this.name,
+                path: path + "/" + escapePathComponent(this.name),
                 value: this.object[this.name]
             };
             patches.push(patch);
         }
     };
+
+    function escapePathComponent(str) {
+        if (str.indexOf('/') === -1 && str.indexOf('~') === -1)
+            return str;
+        return str.replace(/~/g, '~0').replace(/\//g, '~1');
+    }
 
     // ES6 symbols are not here yet. Used to calculate the json pointer to each object
     function markPaths(observer, node) {
@@ -92,7 +98,7 @@ var jsonpatch;
                 var kid = node[key];
                 if (kid instanceof Object) {
                     Object.unobserve(kid, observer);
-                    kid.____Path = node.____Path + "/" + key;
+                    kid.____Path = node.____Path + "/" + escapePathComponent(key);
                     markPaths(observer, kid);
                 }
             }
@@ -285,16 +291,16 @@ var jsonpatch;
             if (obj.hasOwnProperty(key)) {
                 var newVal = obj[key];
                 if (oldVal instanceof Object) {
-                    _generate(oldVal, newVal, patches, path + "/" + key);
+                    _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
                 } else {
                     if (oldVal != newVal) {
                         changed = true;
-                        patches.push({ op: "replace", path: path + "/" + key, value: newVal });
+                        patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: newVal });
                         mirror[key] = newVal;
                     }
                 }
             } else {
-                patches.push({ op: "remove", path: path + "/" + key });
+                patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
                 delete mirror[key];
                 deleted = true;
             }
@@ -307,7 +313,7 @@ var jsonpatch;
         for (var t = 0; t < newKeys.length; t++) {
             var key = newKeys[t];
             if (!mirror.hasOwnProperty(key)) {
-                patches.push({ op: "add", path: path + "/" + key, value: obj[key] });
+                patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: obj[key] });
                 mirror[key] = JSON.parse(JSON.stringify(obj[key]));
             }
         }
@@ -345,7 +351,7 @@ var jsonpatch;
                 } else {
                     var key = keys[t];
                     if (key.indexOf('~') != -1)
-                        key = key.replace('~1', '/').replace('~0', '~');
+                        key = key.replace(/~1/g, '/').replace(/~0/g, '~');
                     t++;
                     if (t >= len) {
                         result = objOps[patch.op].call(patch, obj, key, tree);
