@@ -51,6 +51,9 @@ Call require to get the instance:
 var jsonpatch = require('fast-json-patch')
 ```
 
+:bulb: Node.js supports native `Object.observe` in preview release 0.11.x (and only when started with `--harmony_observation` flag). With stable versions of Node, a shimmed version of `Object.observe` is used.
+
+
 ## Usage
 
 Applying patches:
