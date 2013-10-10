@@ -63,7 +63,7 @@ var jsonpatch;
         'new': function (patches, path) {
             var patch = {
                 op: "add",
-                path: path + "/" + escapePathComponent(this.name),
+                path: path + escapePathComponent(this.name),
                 value: this.object[this.name]
             };
             patches.push(patch);
@@ -71,14 +71,14 @@ var jsonpatch;
         deleted: function (patches, path) {
             var patch = {
                 op: "remove",
-                path: path + "/" + escapePathComponent(this.name)
+                path: path + escapePathComponent(this.name)
             };
             patches.push(patch);
         },
         updated: function (patches, path) {
             var patch = {
                 op: "replace",
-                path: path + "/" + escapePathComponent(this.name),
+                path: path + escapePathComponent(this.name),
                 value: this.object[this.name]
             };
             patches.push(patch);
@@ -91,32 +91,32 @@ var jsonpatch;
         return str.replace(/~/g, '~0').replace(/\//g, '~1');
     }
 
-    // ES6 symbols are not here yet. Used to calculate the json pointer to each object
-    function markPaths(observer, node) {
-        for (var key in node) {
-            if (node.hasOwnProperty(key)) {
-                var kid = node[key];
-                if (kid instanceof Object) {
-                    Object.unobserve(kid, observer);
-                    kid.____Path = node.____Path + "/" + escapePathComponent(key);
-                    markPaths(observer, kid);
+    function _getPathRecursive(root, obj) {
+        var found;
+        for (var key in root) {
+            if (root.hasOwnProperty(key)) {
+                if (root[key] === obj) {
+                    return escapePathComponent(key) + '/';
+                } else if (typeof root[key] === 'object') {
+                    found = _getPathRecursive(root[key], obj);
+                    if (found != '') {
+                        return escapePathComponent(key) + '/' + found;
+                    }
                 }
             }
         }
+        return '';
     }
 
-    // Detach poor mans ES6 symbols
-    function clearPaths(observer, node) {
-        delete node.____Path;
-        Object.observe(node, observer);
-        for (var key in node) {
-            if (node.hasOwnProperty(key)) {
-                var kid = node[key];
-                if (kid instanceof Object) {
-                    clearPaths(observer, kid);
-                }
-            }
+    function getPath(root, obj) {
+        if (root === obj) {
+            return '/';
         }
+        var path = _getPathRecursive(root, obj);
+        if (path === '') {
+            throw new Error("Object not found in root");
+        }
+        return '/' + path;
     }
 
     var beforeDict = [];
@@ -126,8 +126,7 @@ var jsonpatch;
 
     function unobserve(root, observer) {
         if (Object.observe) {
-            Object.unobserve(root, observer);
-            markPaths(observer, root);
+            _unobserve(observer, root);
         } else {
             clearTimeout(observer.next);
         }
@@ -140,26 +139,25 @@ var jsonpatch;
         var observer;
         if (Object.observe) {
             observer = function (arr) {
-                if (!root.___Path) {
-                    Object.unobserve(root, observer);
-                    root.____Path = "";
-                    markPaths(observer, root);
+                _unobserve(observer, obj);
 
-                    var a = 0, alen = arr.length;
-                    while (a < alen) {
-                        if (!(arr[a].name === '____Path') && !(arr[a].name === 'length' && _isArray(arr[a].object)) && !(arr[a].name === '__Jasmine_been_here_before__')) {
-                            observeOps[arr[a].type].call(arr[a], patches, arr[a].object.____Path);
-                        }
-                        a++;
+                var a = 0, alen = arr.length;
+                while (a < alen) {
+                    if (!(arr[a].name === 'length' && _isArray(arr[a].object)) && !(arr[a].name === '__Jasmine_been_here_before__')) {
+                        observeOps[arr[a].type].call(arr[a], patches, getPath(root, arr[a].object));
                     }
-
-                    clearPaths(observer, root);
+                    a++;
                 }
-                if (callback) {
-                    callback(patches);
+
+                if (patches) {
+                    if (callback) {
+                        callback(patches);
+                    }
                 }
                 observer.patches = patches;
                 patches = [];
+
+                _observe(observer, obj);
             };
         } else {
             observer = {};
@@ -219,19 +217,34 @@ var jsonpatch;
         }
         observer.patches = patches;
         observer.object = obj;
-        return _observe(observer, obj, patches);
+        return _observe(observer, obj);
     }
     jsonpatch.observe = observe;
 
     /// Listen to changes on an object tree, accumulate patches
-    function _observe(observer, obj, patches) {
+    function _observe(observer, obj) {
         if (Object.observe) {
             Object.observe(obj, observer);
             for (var key in obj) {
                 if (obj.hasOwnProperty(key)) {
                     var v = obj[key];
                     if (v && typeof (v) === "object") {
-                        _observe(observer, v, patches);
+                        _observe(observer, v);
+                    }
+                }
+            }
+        }
+        return observer;
+    }
+
+    function _unobserve(observer, obj) {
+        if (Object.observe) {
+            Object.unobserve(obj, observer);
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    var v = obj[key];
+                    if (v && typeof (v) === "object") {
+                        _unobserve(observer, v);
                     }
                 }
             }
