@@ -323,7 +323,7 @@ var jsonpatch;
     }
 
     /// Apply a json-patch operation on an object tree
-    function apply(tree, patches, listen) {
+    function apply(tree, patches) {
         var result = false, p = 0, plen = patches.length, patch;
         while (p < plen) {
             patch = patches[p];

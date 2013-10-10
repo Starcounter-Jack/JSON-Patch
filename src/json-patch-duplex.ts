@@ -343,7 +343,7 @@ module jsonpatch {
   }
 
   /// Apply a json-patch operation on an object tree
-  export function apply(tree:any, patches:any[], listen?:any):boolean {
+  export function apply(tree:any, patches:any[]):boolean {
     var result = false
       , p = 0
       , plen = patches.length
