@@ -141,7 +141,7 @@ var jsonpatch;
 
                     var a = 0, alen = arr.length;
                     while (a < alen) {
-                        if (arr[a].name != "____Path") {
+                        if (!(arr[a].name === '____Path') && !(arr[a].name === 'length' && _isArray(arr[a].object)) && !(arr[a].name === '__Jasmine_been_here_before__')) {
                             observeOps[arr[a].type].call(arr[a], patches, arr[a].object.____Path);
                         }
                         a++;
@@ -367,4 +367,3 @@ if (typeof exports !== "undefined") {
     exports.unobserve = jsonpatch.unobserve;
     exports.generate = jsonpatch.generate;
 }
-//# sourceMappingURL=json-patch-duplex.js.map
