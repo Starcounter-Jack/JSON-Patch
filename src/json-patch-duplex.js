@@ -121,10 +121,10 @@ var jsonpatch;
 
     var beforeDict = [];
 
-    //var callbacks = []; this has no purpose
     jsonpatch.intervals;
 
     function unobserve(root, observer) {
+        generate(observer);
         if (Object.observe) {
             _unobserve(observer, root);
         } else {

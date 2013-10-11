@@ -471,6 +471,35 @@ describe("JSON-Patch-Duplex", function () {
         expect(called).toEqual(2);
       });
     });
+
+    it('calling unobserve should deliver pending changes synchronously', function() {
+      var lastPatches = '';
+
+      obj = { firstName: "Albert", lastName: "Einstein",
+        phoneNumbers: [
+          {number: "12345"},
+          {number: "45353"}
+        ]};
+
+      jsonpatch.intervals = [10];
+      var observer = jsonpatch.observe(obj, function (patches) {
+        lastPatches = patches;
+      });
+
+      obj.firstName = 'Malvin';
+
+      jsonpatch.unobserve(obj, observer);
+
+      expect(lastPatches[0].value).toBe('Malvin');
+
+      obj.firstName = 'Jonathan';
+
+      waits(20);
+
+      runs(function () {
+        expect(lastPatches[0].value).toBe('Malvin');
+      });
+    });
   });
 });
 

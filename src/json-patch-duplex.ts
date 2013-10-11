@@ -126,11 +126,11 @@ module jsonpatch {
   }
 
   var beforeDict = [];
-  //var callbacks = []; this has no purpose
 
   export var intervals;
 
   export function unobserve(root, observer) {
+    generate(observer);
     if(Object.observe) {
       _unobserve(observer, root);
     }
