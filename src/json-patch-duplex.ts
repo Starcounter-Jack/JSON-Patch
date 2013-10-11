@@ -53,12 +53,15 @@ module jsonpatch {
   var arrOps = {
     add: function (arr, i) {
       arr.splice(i, 0, this.value);
+      return true;
     },
     remove: function (arr, i) {
       arr.splice(i, 1);
+      return true;
     },
     replace: function (arr, i) {
       arr[i] = this.value;
+      return true;
     },
     move: objOps.move,
     copy: objOps.copy,
