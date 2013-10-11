@@ -72,7 +72,7 @@ var jsonpatch;
     }
 
     /// Apply a json-patch operation on an object tree
-    function apply(tree, patches, listen) {
+    function apply(tree, patches) {
         var result = false, p = 0, plen = patches.length, patch;
         while (p < plen) {
             patch = patches[p];
@@ -94,7 +94,7 @@ var jsonpatch;
                 } else {
                     var key = keys[t];
                     if (key.indexOf('~') != -1)
-                        key = key.replace('~1', '/').replace('~0', '~');
+                        key = key.replace(/~1/g, '/').replace(/~0/g, '~');
                     t++;
                     if (t >= len) {
                         result = objOps[patch.op].call(patch, obj, key, tree);

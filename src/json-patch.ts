@@ -74,7 +74,7 @@ module jsonpatch {
   }
 
   /// Apply a json-patch operation on an object tree
-  export function apply(tree:any, patches:any[], listen?:any):boolean {
+  export function apply(tree:any, patches:any[]):boolean {
     var result = false
       , p = 0
       , plen = patches.length
@@ -99,7 +99,7 @@ module jsonpatch {
         else {
           var key = keys[t];
           if (key.indexOf('~') != -1)
-            key = key.replace('~1', '/').replace('~0', '~'); // escape chars
+            key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
           t++;
           if (t >= len) {
             result = objOps[patch.op].call(patch, obj, key, tree); // Apply patch
