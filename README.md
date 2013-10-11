@@ -102,3 +102,43 @@ To run *JSLitmus* performance tests, press "Run Tests" button.
  - Run command `jasmine-node --matchall --config duplex no src/test.js`
 4. Testing **json-patch-duplex.js**
  - Run command `jasmine-node --matchall --config duplex yes src/test.js src/test-duplex.js`
+
+## API
+
+#### jsonpatch.apply (`obj` Object, `patches` Array) : boolean
+
+Available in *json-patch.js* and *json-patch-duplex.js*
+
+Applies `patches` array on `obj`.
+
+If patch was succesfully applied, returns `true`. Otherwise returns `false`.
+
+If there was a `test` patch in `patches` array, returns the result of the test.
+
+If there was more then one patch in the array, the result of the last patch is returned.
+
+#### jsonpatch.observe (`obj` Object, `callback` Function (optional)) : `observer` Object
+
+Available in *json-patch-duplex.js*
+
+Sets up an deep observer on `obj` that listens for changes in object tree. When changes are detected, the optional
+callback is called with the generated patches array as the parameter.
+
+Returns `observer`.
+
+#### jsonpatch.generate (`obj` Object, `observer` Object) : `patches` Array
+
+Available in *json-patch-duplex.js*
+
+If there are pending changes in `obj`, returns them synchronously. If a `callback` was defined in `observe`
+method, it will be triggered synchronously as well.
+
+If there are no pending changes in `obj`, returns an empty array.
+
+#### jsonpatch.unobserve (`obj` Object, `observer` Object) : void
+
+Available in *json-patch-duplex.js*
+
+Destroys the observer set up on `obj`.
+
+Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). Note: this is different that ES6/7 `Object.unobserve`, which delivers remaining changes asynchronously.
