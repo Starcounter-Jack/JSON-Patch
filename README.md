@@ -142,3 +142,15 @@ Available in *json-patch-duplex.js*
 Destroys the observer set up on `obj`.
 
 Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). Note: this is different that ES6/7 `Object.unobserve`, which delivers remaining changes asynchronously.
+
+## Changelog
+
+#### 0.3.3 (Oct 11, 2013)
+
+Bugfixes:
+- properly escape `~` and `/` characters in poiner paths ([#19](https://github.com/Starcounter-Jack/JSON-Patch/pull/19))
+- generated patch contained array `length` (only in native Object.observe version) ([#14](https://github.com/Starcounter-Jack/JSON-Patch/issues/14))
+- `jsonpatch.unobserve` now delivers pending changes immediately (previously last-minute changes could be lost)
+- stability fixes for browsers with native `Object.observe` (Chrome)
+- code cleanup
+- removed sourcemap reference from output js file

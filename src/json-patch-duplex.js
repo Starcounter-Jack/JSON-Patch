@@ -1,4 +1,4 @@
-// json-patch-duplex.js 0.3.2
+// json-patch-duplex.js 0.3.3
 // (c) 2013 Joachim Wester
 // MIT license
 var jsonpatch;
