@@ -179,7 +179,7 @@ describe("JSON-Patch-Duplex", function () {
       expect(obj2).toEqualInJson(obj);
     });
 
-    it('should generate delete', function() {
+    it('should generate remove', function() {
       obj = { lastName:"Einstein", firstName:"Albert",
         phoneNumbers:[ {number:"12345"}, {number:"4234"} ]};
       var observer = jsonpatch.observe(obj);
@@ -195,6 +195,26 @@ describe("JSON-Patch-Duplex", function () {
 
       jsonpatch.apply(obj2,patches);
       expect(obj2).toEqualInJson(obj);
+    });
+
+    it('should generate remove (array indexes should be sorted descending)', function() {
+      obj = { items: ["a", "b", "c"]};
+      var observer = jsonpatch.observe(obj);
+
+      obj.items.pop();
+      obj.items.pop();
+
+      patches = jsonpatch.generate(observer);
+
+      //array indexes must be sorted descending, otherwise there is an index collision in apply
+      expect(patches).toEqual([
+        { op: 'remove', path: '/items/2' },
+        { op: 'remove', path: '/items/1' }
+      ]);
+
+      obj2 = { items: ["a", "b", "c"]};
+      jsonpatch.apply(obj2,patches);
+      expect(obj).toEqualInJson(obj2);
     });
 
     it('should not generate the same patch twice (replace)', function() {

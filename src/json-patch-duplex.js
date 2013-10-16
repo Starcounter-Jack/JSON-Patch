@@ -301,7 +301,7 @@ var jsonpatch;
         var changed = false;
         var deleted = false;
 
-        for (var t = 0; t < oldKeys.length; t++) {
+        for (var t = oldKeys.length - 1; t >= 0; t--) {
             var key = oldKeys[t];
             var oldVal = mirror[key];
             if (obj.hasOwnProperty(key)) {
