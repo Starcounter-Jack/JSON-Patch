@@ -17,7 +17,7 @@ describe("JSON-Patch-Duplex", function () {
  * @param obj
  * @returns {boolean}
  */
-      toEqualInJSON: function (expected) {
+      toEqualInJson: function (expected) {
         return JSON.stringify(this.actual) == JSON.stringify(expected);
       }
     });
@@ -176,7 +176,7 @@ describe("JSON-Patch-Duplex", function () {
         phoneNumbers:[ {number:"12345"} ]};
 
       jsonpatch.apply(obj2,patches);
-      expect(obj2).toEqualInJSON(obj);
+      expect(obj2).toEqualInJson(obj);
     });
 
     it('should generate delete', function() {
@@ -194,7 +194,7 @@ describe("JSON-Patch-Duplex", function () {
         phoneNumbers:[ {number:"12345"}, {number:"4234"} ]};
 
       jsonpatch.apply(obj2,patches);
-      expect(obj2).toEqualInJSON(obj);
+      expect(obj2).toEqualInJson(obj);
     });
 
     it('should not generate the same patch twice (replace)', function() {
