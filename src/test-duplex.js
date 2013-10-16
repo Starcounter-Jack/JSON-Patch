@@ -9,16 +9,20 @@ if(typeof jsonpatch === 'undefined') {
   }
 }
 
+describe("JSON-Patch-Duplex", function () {
+  beforeEach(function () {
+    this.addMatchers({
 /**
  * This matcher is only needed in Chrome 28 (Chrome 28 cannot successfully compare observed objects immediately after they have been changed. Chrome 30 is unaffected)
  * @param obj
  * @returns {boolean}
  */
-jasmine.Matchers.prototype.toEqualInJSON = function(obj) {
-  return JSON.stringify(this.actual) == JSON.stringify(obj);
-};
+      toEqualInJSON: function (expected) {
+        return JSON.stringify(this.actual) == JSON.stringify(expected);
+      }
+    });
+  });
 
-describe("JSON-Patch-Duplex", function () {
   describe("generate", function () {
     it('should generate replace', function() {
       obj = { firstName:"Albert", lastName:"Einstein",
