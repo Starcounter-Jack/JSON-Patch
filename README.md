@@ -145,6 +145,11 @@ Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). 
 
 ## Changelog
 
+#### 0.3.4 (Oct 16, 2013)
+
+Bugfixes:
+- generate array item `remove` patches in reverse order, so they can be correctly applied in order they were generated ([#16](https://github.com/Starcounter-Jack/JSON-Patch/issues/16))
+
 #### 0.3.3 (Oct 11, 2013)
 
 Bugfixes:
