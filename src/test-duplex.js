@@ -554,6 +554,104 @@ describe("JSON-Patch-Duplex", function () {
       });
     });
 
+    it("should handle callbacks that calls observe() and unobserve() internally (native Object.observe)", function () {
+
+      var obj = {
+        foo: 'bar'
+      };
+
+      var observer;
+
+      expect(Object.observe).toBeDefined();
+
+      var callback = jasmine.createSpy('callback');
+      callback.plan = function(){
+        jsonpatch.unobserve(obj, observer);
+
+        jsonpatch.observe(obj, callback);
+      };
+
+      observer = jsonpatch.observe(obj, callback);
+
+      expect(callback.calls.length).toEqual(0);
+
+      obj.foo = 'bazz';
+
+      waitsFor(function () {
+        return callback.calls.length > 0;
+      }, 'callback calls', 1000);
+
+      runs(function () {
+         expect(callback.calls.length).toEqual(1);
+
+        callback.reset();
+
+        obj.foo = 'bazinga';
+      });
+
+      waitsFor(function () {
+        return callback.calls.length > 0;
+      }, 'callback calls', 1000);
+
+      runs(function () {
+        expect(callback.calls.length).toEqual(1);
+      });
+
+
+    });
+
+    it("should handle callbacks that calls observe() and unobserve() internally (Object.observe shim)", function () {
+
+      var obj = {
+        foo: 'bar'
+      };
+
+      var observer;
+
+      //Disable native Object.observe to force the use of shim
+      var nativeObserve = Object.observe;
+      delete Object.observe;
+
+      expect(Object.observe).toBeUndefined();
+
+      var callback = jasmine.createSpy('callback');
+      callback.plan = function(){
+        jsonpatch.unobserve(obj, observer);
+
+        jsonpatch.observe(obj, callback);
+      };
+
+      observer = jsonpatch.observe(obj, callback);
+
+      expect(callback.calls.length).toEqual(0);
+
+      obj.foo = 'bazz';
+
+      waitsFor(function () {
+        return callback.calls.length > 0;
+      }, 'callback calls', 1000);
+
+      runs(function () {
+        expect(callback.calls.length).toEqual(1);
+
+        callback.reset();
+
+        obj.foo = 'bazinga';
+      });
+
+      waitsFor(function () {
+        return callback.calls.length > 0;
+      }, 'callback calls', 1000);
+
+      runs(function () {
+        expect(callback.calls.length).toEqual(1);
+
+        Object.observe = nativeObserve;
+      });
+
+
+    });
+
 
   });
 

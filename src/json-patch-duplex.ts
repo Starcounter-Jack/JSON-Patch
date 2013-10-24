@@ -209,7 +209,9 @@ module jsonpatch {
 
     if (Object.observe) {
       observer = function (arr) {
+        //This "refresh" is needed to begin observing new object properties
         _unobserve(observer, obj);
+        _observe(observer, obj);
 
         var a = 0
           , alen = arr.length;
@@ -231,7 +233,7 @@ module jsonpatch {
         observer.patches = patches;
         patches = [];
 
-        _observe(observer, obj);
+
       };
     } else {
       observer = {};
