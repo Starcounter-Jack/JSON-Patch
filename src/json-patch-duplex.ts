@@ -132,6 +132,50 @@ module jsonpatch {
 
   export var intervals;
 
+  class Mirror {
+    obj: any;
+    observers = [];
+
+    constructor(obj:any){
+      this.obj = obj;
+    }
+  }
+
+  class ObserverInfo {
+    callback: any;
+    observer: any;
+
+    constructor(callback, observer){
+      this.callback = callback;
+      this.observer = observer;
+    }
+  }
+
+  function getMirror(obj:any):any {
+    for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
+      if (beforeDict[i].obj === obj) {
+        return beforeDict[i];
+      }
+    }
+  }
+
+  function getObserverFromMirror(mirror:any, callback):any {
+    for (var j = 0, jlen = mirror.observers.length; j < jlen; j++) {
+      if (mirror.observers[j].callback === callback) {
+        return mirror.observers[j].observer;
+      }
+    }
+  }
+
+  function removeObserverFromMirror(mirror:any, observer):any {
+    for (var j = 0, jlen = mirror.observers.length; j < jlen; j++) {
+      if (mirror.observers[j].observer === observer) {
+        mirror.observers.splice(j, 1);
+        return;
+      }
+    }
+  }
+
   export function unobserve(root, observer) {
     generate(observer);
     if(Object.observe) {
@@ -140,12 +184,29 @@ module jsonpatch {
     else {
       clearTimeout(observer.next);
     }
+
+    var mirror = getMirror(root);
+    removeObserverFromMirror(mirror, observer);
+
   }
 
   export function observe(obj:any, callback):any {
     var patches = [];
     var root = obj;
     var observer;
+    var mirror = getMirror(obj);
+
+    if (!mirror) {
+      mirror = new Mirror(obj);
+      beforeDict.push(mirror);
+    } else {
+      observer = getObserverFromMirror(mirror, callback);
+    }
+
+    if(observer){
+      return observer;
+    }
+
     if (Object.observe) {
       observer = function (arr) {
         _unobserve(observer, obj);
@@ -174,19 +235,6 @@ module jsonpatch {
       };
     } else {
       observer = {};
-
-      var mirror;
-      for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
-        if (beforeDict[i].obj === obj) {
-          mirror = beforeDict[i];
-          break;
-        }
-      }
-
-      if (!mirror) {
-        mirror = {obj: obj};
-        beforeDict.push(mirror);
-      }
 
       mirror.value = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
 
@@ -231,6 +279,9 @@ module jsonpatch {
     }
     observer.patches = patches;
     observer.object = obj;
+
+    mirror.observers.push(new ObserverInfo(callback, observer));
+
     return _observe(observer, obj);
   }
 

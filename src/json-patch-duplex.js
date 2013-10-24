@@ -126,6 +126,47 @@ var jsonpatch;
 
     jsonpatch.intervals;
 
+    var Mirror = (function () {
+        function Mirror(obj) {
+            this.observers = [];
+            this.obj = obj;
+        }
+        return Mirror;
+    })();
+
+    var ObserverInfo = (function () {
+        function ObserverInfo(callback, observer) {
+            this.callback = callback;
+            this.observer = observer;
+        }
+        return ObserverInfo;
+    })();
+
+    function getMirror(obj) {
+        for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
+            if (beforeDict[i].obj === obj) {
+                return beforeDict[i];
+            }
+        }
+    }
+
+    function getObserverFromMirror(mirror, callback) {
+        for (var j = 0, jlen = mirror.observers.length; j < jlen; j++) {
+            if (mirror.observers[j].callback === callback) {
+                return mirror.observers[j].observer;
+            }
+        }
+    }
+
+    function removeObserverFromMirror(mirror, observer) {
+        for (var j = 0, jlen = mirror.observers.length; j < jlen; j++) {
+            if (mirror.observers[j].observer === observer) {
+                mirror.observers.splice(j, 1);
+                return;
+            }
+        }
+    }
+
     function unobserve(root, observer) {
         generate(observer);
         if (Object.observe) {
@@ -133,6 +174,9 @@ var jsonpatch;
         } else {
             clearTimeout(observer.next);
         }
+
+        var mirror = getMirror(root);
+        removeObserverFromMirror(mirror, observer);
     }
     jsonpatch.unobserve = unobserve;
 
@@ -140,6 +184,19 @@ var jsonpatch;
         var patches = [];
         var root = obj;
         var observer;
+        var mirror = getMirror(obj);
+
+        if (!mirror) {
+            mirror = new Mirror(obj);
+            beforeDict.push(mirror);
+        } else {
+            observer = getObserverFromMirror(mirror, callback);
+        }
+
+        if (observer) {
+            return observer;
+        }
+
         if (Object.observe) {
             observer = function (arr) {
                 _unobserve(observer, obj);
@@ -164,19 +221,6 @@ var jsonpatch;
             };
         } else {
             observer = {};
-
-            var mirror;
-            for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
-                if (beforeDict[i].obj === obj) {
-                    mirror = beforeDict[i];
-                    break;
-                }
-            }
-
-            if (!mirror) {
-                mirror = { obj: obj };
-                beforeDict.push(mirror);
-            }
 
             mirror.value = JSON.parse(JSON.stringify(obj));
 
@@ -220,6 +264,9 @@ var jsonpatch;
         }
         observer.patches = patches;
         observer.object = obj;
+
+        mirror.observers.push(new ObserverInfo(callback, observer));
+
         return _observe(observer, obj);
     }
     jsonpatch.observe = observe;
@@ -389,3 +436,4 @@ if (typeof exports !== "undefined") {
     exports.unobserve = jsonpatch.unobserve;
     exports.generate = jsonpatch.generate;
 }
+//# sourceMappingURL=json-patch-duplex.js.map
