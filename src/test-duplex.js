@@ -554,15 +554,13 @@ describe("JSON-Patch-Duplex", function () {
       });
     });
 
-    it("should handle callbacks that calls observe() and unobserve() internally (native Object.observe)", function () {
+    it("should handle callbacks that calls observe() and unobserve() internally", function () {
 
       var obj = {
         foo: 'bar'
       };
 
       var observer;
-
-      expect(Object.observe).toBeDefined();
 
       var callback = jasmine.createSpy('callback');
       callback.plan = function(){
@@ -600,74 +598,19 @@ describe("JSON-Patch-Duplex", function () {
 
     });
 
-    it("should handle callbacks that calls observe() and unobserve() internally (Object.observe shim)", function () {
-
-      var obj = {
-        foo: 'bar'
-      };
-
-      var observer;
-
-      //Disable native Object.observe to force the use of shim
-      var nativeObserve = Object.observe;
-      delete Object.observe;
-
-      expect(Object.observe).toBeUndefined();
-
-      var callback = jasmine.createSpy('callback');
-      callback.plan = function(){
-        jsonpatch.unobserve(obj, observer);
-
-        jsonpatch.observe(obj, callback);
-      };
-
-      observer = jsonpatch.observe(obj, callback);
-
-      expect(callback.calls.length).toEqual(0);
-
-      obj.foo = 'bazz';
-
-      waitsFor(function () {
-        return callback.calls.length > 0;
-      }, 'callback calls', 1000);
-
-      runs(function () {
-        expect(callback.calls.length).toEqual(1);
-
-        callback.reset();
-
-        obj.foo = 'bazinga';
-      });
-
-      waitsFor(function () {
-        return callback.calls.length > 0;
-      }, 'callback calls', 1000);
-
-      runs(function () {
-        expect(callback.calls.length).toEqual(1);
-
-        Object.observe = nativeObserve;
-      });
-
-
-    });
-
-
   });
 
 
 
   describe("Registering multiple observers with the same callback", function () {
 
-    it("should register only one observer (native Object.observe)", function () {
+    it("should register only one observer", function () {
 
       var obj = {
         foo: 'bar'
       };
 
       var callback = jasmine.createSpy('callback');
-
-      expect(Object.observe).toBeDefined();
 
       jsonpatch.observe(obj, callback);
       jsonpatch.observe(obj, callback);
@@ -686,46 +629,12 @@ describe("JSON-Patch-Duplex", function () {
 
     });
 
-    it("should register only one observer (Object.observe shim )", function () {
-
+    it("should return the same observer if callback has been already registered)", function () {
       var obj = {
         foo: 'bar'
       };
 
       var callback = jasmine.createSpy('callback');
-
-      //Disable native Object.observe to force the use of shim
-      var nativeObserve = Object.observe;
-      delete Object.observe;
-
-      expect(Object.observe).toBeUndefined();
-
-      jsonpatch.observe(obj, callback);
-      jsonpatch.observe(obj, callback);
-
-      expect(callback.calls.length).toEqual(0);
-
-      obj.foo = 'bazz';
-
-      waitsFor(function () {
-        return callback.calls.length > 0;
-      }, 'callback call', 1000);
-
-      runs(function () {
-        expect(callback.calls.length).toEqual(1);
-        Object.observe = nativeObserve;
-      });
-
-    });
-
-    it("should return the same observer if callback has been already registered (native Object.observe)", function () {
-      var obj = {
-        foo: 'bar'
-      };
-
-      var callback = jasmine.createSpy('callback');
-
-      expect(Object.observe).toBeDefined();
 
       var observer1 = jsonpatch.observe(obj, callback);
       var observer2 = jsonpatch.observe(obj, callback);
@@ -735,36 +644,12 @@ describe("JSON-Patch-Duplex", function () {
 
     });
 
-    it("should return the same observer if callback has been already registered (Object.observe shim)", function () {
-      var obj = {
-        foo: 'bar'
-      };
-
-      //Disable native Object.observe to force the use of shim
-      var nativeObserve = Object.observe;
-      delete Object.observe;
-
-      var callback = jasmine.createSpy('callback');
-
-      expect(Object.observe).toBeUndefined();
-
-      var observer1 = jsonpatch.observe(obj, callback);
-      var observer2 = jsonpatch.observe(obj, callback);
-
-      expect(observer1).toBe(observer2);
-
-      Object.observe = nativeObserve;
-
-    });
-
-    it("should return a different observer if callback has been unregistered and registered again (native Object.observe)", function () {
+    it("should return a different observer if callback has been unregistered and registered again", function () {
       var obj = {
         foo: 'bar'
       };
 
       var callback = jasmine.createSpy('callback');
-
-      expect(Object.observe).toBeDefined();
 
       var observer1 = jsonpatch.observe(obj, callback);
 
@@ -773,33 +658,6 @@ describe("JSON-Patch-Duplex", function () {
       var observer2 = jsonpatch.observe(obj, callback);
 
       expect(observer1).not.toBe(observer2);
-
-
-    });
-
-    it("should return a different observer if callback has been unregistered and registered again (Object.observe shim)", function () {
-      var obj = {
-        foo: 'bar'
-      };
-
-      var callback = jasmine.createSpy('callback');
-
-      //Disable native Object.observe to force the use of shim
-      var nativeObserve = Object.observe;
-      delete Object.observe;
-
-      expect(Object.observe).toBeUndefined();
-
-      var observer1 = jsonpatch.observe(obj, callback);
-
-      jsonpatch.unobserve(obj, observer1);
-
-      var observer2 = jsonpatch.observe(obj, callback);
-
-      expect(observer1).not.toBe(observer2);
-
-      Object.observe = nativeObserve;
-
 
     });
   });
