@@ -145,9 +145,14 @@ Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). 
 
 ## Changelog
 
+#### 0.3.5 (Oct 28, 2013)
+
+Bugfix:
+- issues with calling observe/unobserve method on an object multiple times in Chrome (native Object.observe) ([#20](https://github.com/Starcounter-Jack/JSON-Patch/issues/20))
+
 #### 0.3.4 (Oct 16, 2013)
 
-Bugfixes:
+Bugfix:
 - generate array item `remove` patches in reverse order, so they can be correctly applied in order they were generated ([#16](https://github.com/Starcounter-Jack/JSON-Patch/issues/16))
 
 #### 0.3.3 (Oct 11, 2013)
