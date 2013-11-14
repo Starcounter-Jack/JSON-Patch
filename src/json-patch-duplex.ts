@@ -70,21 +70,21 @@ module jsonpatch {
   };
 
   var observeOps = {
-    'new': function (patches:any[], path) { //single quotes needed because 'new' is a keyword in IE8
+    add: function (patches:any[], path) {
       var patch = {
         op: "add",
         path: path + escapePathComponent(this.name),
         value: this.object[this.name]};
       patches.push(patch);
     },
-    deleted: function (patches:any[], path) {
+    'delete': function (patches:any[], path) { //single quotes needed because 'delete' is a keyword in IE8
       var patch = {
         op: "remove",
         path: path + escapePathComponent(this.name)
       };
       patches.push(patch);
     },
-    updated: function (patches:any[], path) {
+    update: function (patches:any[], path) {
       var patch = {
         op: "replace",
         path: path + escapePathComponent(this.name),
@@ -220,7 +220,25 @@ module jsonpatch {
             !(arr[a].name === 'length' && _isArray(arr[a].object))
               && !(arr[a].name === '__Jasmine_been_here_before__')
             ) {
-            observeOps[arr[a].type].call(arr[a], patches, getPath(root, arr[a].object));
+            var type = arr[a].type;
+
+            //old record type names before 10/29/2013 (http://wiki.ecmascript.org/doku.php?id=harmony:observe)
+            //this block can be removed when Chrome 33 stable is released
+            switch(type) {
+              case 'new':
+                type = 'add';
+                break;
+
+              case 'deleted':
+                type = 'delete';
+                break;
+
+              case 'updated':
+                type = 'update';
+                break;
+            }
+
+            observeOps[type].call(arr[a], patches, getPath(root, arr[a].object));
           }
           a++;
         }
