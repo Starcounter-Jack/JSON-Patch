@@ -145,6 +145,11 @@ Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). 
 
 ## Changelog
 
+#### 0.3.6 (Nov 14, 2013)
+
+Update:
+- use the new record type names that landed in Chrome Canary (http://wiki.ecmascript.org/doku.php?id=harmony:observe - listed at 10/29/2013)
+
 #### 0.3.5 (Oct 28, 2013)
 
 Bugfix:

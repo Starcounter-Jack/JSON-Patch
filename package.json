@@ -1,6 +1,6 @@
 {
   "name": "fast-json-patch",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "JSON-Patch allows you to update a JSON document by sending the changes rather than the whole document.",
   "homepage": "https://github.com/Starcounter-Jack/JSON-Patch",
   "keywords": ["json", "patch", "http", "rest"],
