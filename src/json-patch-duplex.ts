@@ -10,6 +10,14 @@ interface Object {
 
 module jsonpatch {
 
+  /* We use a Javascript hash to store each 
+     function. Each hash entry (property) uses
+     the operation identifiers specified in rfc6902.
+     In this way, we can map each patch operation 
+     to its dedicated function in efficient way.
+     */
+     
+  /* The operations applicable to an object */
   var objOps = {
     add: function (obj, key) {
       obj[key] = this.value;
@@ -50,6 +58,7 @@ module jsonpatch {
     }
   };
 
+  /* The operations applicable to an array. Many are the same as for the object */
   var arrOps = {
     add: function (arr, i) {
       arr.splice(i, 0, this.value);
