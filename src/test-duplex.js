@@ -600,6 +600,34 @@ describe("JSON-Patch-Duplex", function () {
 
   });
 
+  describe('compare', function () {
+    it('should return an add for a property that does not exist in the first obj', function () {
+      var objA = {user: {firstName: "Albert"}};
+      var objB = {user: {firstName: "Albert", lastName: "Einstein"}};
+
+      expect(jsonpatch.compare(objA, objB)).toEqual([
+        {op: "add", path: "/user/lastName", value: "Einstein"}
+      ]);
+    });
+
+    it('should return a remove for a property that does not exist in the second obj', function () {
+      var objA = {user: {firstName: "Albert", lastName: "Einstein"}};
+      var objB = {user: {firstName: "Albert"}};
+
+      expect(jsonpatch.compare(objA, objB)).toEqual([
+        {op: "remove", path: "/user/lastName"}
+      ]);
+    });
+
+    it('should return a replace for a property that exists in both', function () {
+      var objA = {user: {firstName: "Albert", lastName: "Einstein"}};
+      var objB = {user: {firstName: "Albert", lastName: "Collins"}};
+
+      expect(jsonpatch.compare(objA, objB)).toEqual([
+        {op: "replace", path: "/user/lastName", value: "Collins"}
+      ]);
+    });
+  });
 
 
   describe("Registering multiple observers with the same callback", function () {

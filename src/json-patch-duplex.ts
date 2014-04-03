@@ -482,6 +482,12 @@ module jsonpatch {
     }
     return result;
   }
+
+  export function compare(tree1:any, tree2:any):any[] {
+    var patches = [];
+    _generate(tree1, tree2, patches, '');
+    return patches;
+  }
 }
 
 declare var exports:any;
