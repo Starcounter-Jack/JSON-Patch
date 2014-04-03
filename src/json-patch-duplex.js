@@ -1,8 +1,16 @@
 // json-patch-duplex.js 0.3.6
 // (c) 2013 Joachim Wester
 // MIT license
+
 var jsonpatch;
 (function (jsonpatch) {
+    /* We use a Javascript hash to store each
+    function. Each hash entry (property) uses
+    the operation identifiers specified in rfc6902.
+    In this way, we can map each patch operation
+    to its dedicated function in efficient way.
+    */
+    /* The operations applicable to an object */
     var objOps = {
         add: function (obj, key) {
             obj[key] = this.value;
@@ -43,6 +51,7 @@ var jsonpatch;
         }
     };
 
+    /* The operations applicable to an array. Many are the same as for the object */
     var arrOps = {
         add: function (arr, i) {
             arr.splice(i, 0, this.value);
@@ -67,8 +76,7 @@ var jsonpatch;
             var patch = {
                 op: "add",
                 path: path + escapePathComponent(this.name),
-                value: this.object[this.name]
-            };
+                value: this.object[this.name] };
             patches.push(patch);
         },
         'delete': function (patches, path) {
@@ -238,7 +246,7 @@ var jsonpatch;
         } else {
             observer = {};
 
-            mirror.value = JSON.parse(JSON.stringify(obj));
+            mirror.value = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
 
             if (callback) {
                 //callbacks.push(callback); this has no purpose
@@ -384,7 +392,7 @@ var jsonpatch;
             } else {
                 patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
                 delete mirror[key];
-                deleted = true;
+                deleted = true; // property has been deleted
             }
         }
 
@@ -426,17 +434,17 @@ var jsonpatch;
                     var index = parseInt(keys[t], 10);
                     t++;
                     if (t >= len) {
-                        result = arrOps[patch.op].call(patch, obj, index, tree);
+                        result = arrOps[patch.op].call(patch, obj, index, tree); // Apply patch
                         break;
                     }
                     obj = obj[index];
                 } else {
                     var key = keys[t];
                     if (key.indexOf('~') != -1)
-                        key = key.replace(/~1/g, '/').replace(/~0/g, '~');
+                        key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
                     t++;
                     if (t >= len) {
-                        result = objOps[patch.op].call(patch, obj, key, tree);
+                        result = objOps[patch.op].call(patch, obj, key, tree); // Apply patch
                         break;
                     }
                     obj = obj[key];
@@ -447,6 +455,13 @@ var jsonpatch;
         return result;
     }
     jsonpatch.apply = apply;
+
+    function compare(tree1, tree2) {
+        var patches = [];
+        _generate(tree1, tree2, patches, '');
+        return patches;
+    }
+    jsonpatch.compare = compare;
 })(jsonpatch || (jsonpatch = {}));
 
 if (typeof exports !== "undefined") {
@@ -455,3 +470,4 @@ if (typeof exports !== "undefined") {
     exports.unobserve = jsonpatch.unobserve;
     exports.generate = jsonpatch.generate;
 }
+//# sourceMappingURL=json-patch-duplex.js.map
