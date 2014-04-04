@@ -308,6 +308,17 @@ describe("JSON-Patch-Duplex", function () {
     });*/
   });
 
+  describe("apply", function() {
+    // https://tools.ietf.org/html/rfc6902#appendix-A.16
+    it('should add an Array Value', function() {
+      var obj = { "foo": ["bar"] };
+      var patches = [ { "op": "add", "path": "/foo/-", "value": ["abc", "def"] } ];
+
+      jsonpatch.apply(obj, patches);
+      expect(obj).toEqual({ "foo": ["bar", ["abc", "def"]] });
+    });
+  });
+
   describe('callback', function() {
     it('should generate replace', function() {
       var patches;

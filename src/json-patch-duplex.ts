@@ -10,13 +10,13 @@ interface Object {
 
 module jsonpatch {
 
-  /* We use a Javascript hash to store each 
+  /* We use a Javascript hash to store each
      function. Each hash entry (property) uses
      the operation identifiers specified in rfc6902.
-     In this way, we can map each patch operation 
+     In this way, we can map each patch operation
      to its dedicated function in efficient way.
      */
-     
+
   /* The operations applicable to an object */
   var objOps = {
     add: function (obj, key) {
@@ -458,7 +458,7 @@ module jsonpatch {
       var len = keys.length;
       while (true) {
         if (_isArray(obj)) {
-          var index = parseInt(keys[t], 10);
+          var index = keys[t] === '-' ? obj.length : parseInt(keys[t], 10);
           t++;
           if (t >= len) {
             result = arrOps[patch.op].call(patch, obj, index, tree); // Apply patch
