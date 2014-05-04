@@ -160,10 +160,10 @@ If there are no differences, returns an empty array.
 
 ## Changelog
 
-#### Current
+#### 0.3.7 (May 5, 2014)
 
 Feature:
-- add a new method `compare`
+- add a new method `compare` ([#24](https://github.com/Starcounter-Jack/JSON-Patch/issues/24))
 
 #### 0.3.6 (Nov 14, 2013)
 

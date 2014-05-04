@@ -1,4 +1,4 @@
-// json-patch.js 0.3.6
+// json-patch.js 0.3.7
 // (c) 2013 Joachim Wester
 // MIT license
 var jsonpatch;
@@ -87,17 +87,17 @@ var jsonpatch;
                     var index = parseInt(keys[t], 10);
                     t++;
                     if (t >= len) {
-                        result = arrOps[patch.op].call(patch, obj, index, tree);
+                        result = arrOps[patch.op].call(patch, obj, index, tree); // Apply patch
                         break;
                     }
                     obj = obj[index];
                 } else {
                     var key = keys[t];
                     if (key.indexOf('~') != -1)
-                        key = key.replace(/~1/g, '/').replace(/~0/g, '~');
+                        key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
                     t++;
                     if (t >= len) {
-                        result = objOps[patch.op].call(patch, obj, key, tree);
+                        result = objOps[patch.op].call(patch, obj, key, tree); // Apply patch
                         break;
                     }
                     obj = obj[key];
@@ -113,3 +113,4 @@ var jsonpatch;
 if (typeof exports !== "undefined") {
     exports.apply = jsonpatch.apply;
 }
+//# sourceMappingURL=json-patch.js.map
