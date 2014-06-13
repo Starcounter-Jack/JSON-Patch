@@ -469,5 +469,6 @@ if (typeof exports !== "undefined") {
     exports.observe = jsonpatch.observe;
     exports.unobserve = jsonpatch.unobserve;
     exports.generate = jsonpatch.generate;
+    exports.compare = jsonpatch.compare;
 }
 //# sourceMappingURL=json-patch-duplex.js.map
