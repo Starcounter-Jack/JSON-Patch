@@ -58,9 +58,20 @@ describe("JSON-Patch", function () {
 
 
   it('should apply test', function() {
-    obj = {foo: {bar: [1, 2, 5, 4]}};
+    obj = {
+      foo: {bar: [1, 2, 5, 4]},
+      bar: {a: 'a', b: 42, c: null, d: true}
+    };
     expect(jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: {bar: [1, 2, 5, 4]}}])).toBe(true);
-    expect(!jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: [1, 2]}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: [1, 2]}])).toBe(false);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar', value: {d: true, b: 42, c: null, a: 'a'}}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar', value: obj.bar}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/a', value: 'a'}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/b', value: 42}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/c', value: null}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/d', value: true}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/d', value: false}])).toBe(false);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar', value: {d: true, b: 42, c: null, a: 'a', foo: 'bar'}}])).toBe(false);
   });
 
 
