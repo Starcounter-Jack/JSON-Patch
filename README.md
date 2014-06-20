@@ -122,7 +122,7 @@ If patch was succesfully applied, returns `true`. Otherwise returns `false`.
 
 If there was a `test` patch in `patches` array, returns the result of the test.
 
-If there was more then one patch in the array, the result of the last patch is returned.
+If there was more than one patch in the array, the result of the last patch is returned.
 
 #### jsonpatch.observe (`obj` Object, `callback` Function (optional)) : `observer` Object
 
