@@ -402,9 +402,10 @@ var jsonpatch;
 
         for (var t = 0; t < newKeys.length; t++) {
             var key = newKeys[t];
+            var mirrorVal = obj[key];
             if (!mirror.hasOwnProperty(key)) {
-                patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: obj[key] });
-                mirror[key] = JSON.parse(JSON.stringify(obj[key]));
+                patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: mirrorVal });
+                mirror[key] = mirrorVal ? JSON.parse(JSON.stringify(mirrorVal)) : mirrorVal;
             }
         }
     }
