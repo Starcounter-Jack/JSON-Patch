@@ -84,7 +84,7 @@ Comparing two object trees:
 ```
 var objA = {user: {firstName: "Albert", lastName: "Einstein"}};
 var objB = {user: {firstName: "Albert", lastName: "Collins"}};
-var diff = jsonpatch.compare(objA, objB));
+var diff = jsonpatch.compare(objA, objB);
 //diff == [{op: "replace", path: "/user/lastName", value: "Collins"}]
 ```
 
