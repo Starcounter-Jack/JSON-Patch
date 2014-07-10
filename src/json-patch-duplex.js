@@ -246,7 +246,7 @@ var jsonpatch;
         } else {
             observer = {};
 
-            mirror.value = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+            mirror.value = JSON.parse(JSON.stringify(obj), _dateReviver); // Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
 
             if (callback) {
                 //callbacks.push(callback); this has no purpose
@@ -404,7 +404,7 @@ var jsonpatch;
             var key = newKeys[t];
             if (!mirror.hasOwnProperty(key)) {
                 patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: obj[key] });
-                mirror[key] = JSON.parse(JSON.stringify(obj[key]));
+                mirror[key] = JSON.parse(JSON.stringify(obj[key]), _dateReviver);
             }
         }
     }
@@ -462,6 +462,13 @@ var jsonpatch;
         return patches;
     }
     jsonpatch.compare = compare;
+
+    function _dateReviver(name, value) {
+        if (typeof value === "string" && /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ$/.test(value)) {
+            return new Date(value);
+        }
+        return value;
+    }
 })(jsonpatch || (jsonpatch = {}));
 
 if (typeof exports !== "undefined") {
