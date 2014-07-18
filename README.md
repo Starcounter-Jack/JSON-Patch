@@ -173,6 +173,11 @@ If there are no differences, returns an empty array.
 
 ## Changelog
 
+#### 0.3.8 (Jul 18, 2014)
+
+Feature:
+- minified build now available in [dist/](https://github.com/Starcounter-Jack/JSON-Patch/tree/master/dist) directory ([#9](https://github.com/Starcounter-Jack/JSON-Patch/issues/9))
+
 #### 0.3.7 (May 5, 2014)
 
 Feature:
