@@ -15,5 +15,8 @@ npm-debug.log
 # Git
 .git*
 
-#bower
+# bower
 bower.json
+
+# grunt
+gruntfile.js

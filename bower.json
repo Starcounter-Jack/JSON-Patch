@@ -12,7 +12,7 @@
     "src/lib",
     "src/test*",
     "src/patchtest.html",
-    "Gruntfile.js",
+    "gruntfile.js",
     "node_modules",
     "package.json"
   ]

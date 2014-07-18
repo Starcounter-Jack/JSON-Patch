@@ -1,6 +1,8 @@
-// json-patch-duplex.js 0.3.7
-// (c) 2013 Joachim Wester
-// MIT license
+/*!
+ * json-patch-duplex.js 0.3.7
+ * (c) 2013 Joachim Wester
+ * MIT license
+ */
 
 interface Object {
   observe : any;
