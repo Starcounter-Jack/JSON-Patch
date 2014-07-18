@@ -30,6 +30,25 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 * A /bin directory will be added with minified versions
 * More unit tests
 
+
+## Install
+
+Install the current version (and save it as a dependency):
+
+### npm
+
+```sh
+$ npm install fast-json-patch --save
+```
+### bower
+
+```sh
+$ bower install fast-json-patch --save
+```
+
+### [download as ZIP](https://github.com/my-user/my-repo/archive/master.zip)
+
+
 ## Adding to your project
 
 ### In a web browser
@@ -38,12 +57,6 @@ Include `json-patch.js` if you want support for applying patches **or**
 include `json-patch-duplex.js` if you also want to generate patches.
 
 ### In Node.js
-
-Install the current version (and save it as a dependency in package.json):
-
-```
-$ npm install fast-json-patch --save
-```
 
 Call require to get the instance: 
 
