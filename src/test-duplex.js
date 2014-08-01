@@ -690,6 +690,15 @@ describe("JSON-Patch-Duplex", function () {
     });
   });
 
+
+ describe("compare", function () {
+   it("should not modify the source object", function() {
+     var obj = { foo: 'bar' };
+     jsonpatch.compare(obj, {});
+     expect(obj.foo ).toEqual('bar');
+   });
+ });
+
 });
 
 // JSLitmus performance test

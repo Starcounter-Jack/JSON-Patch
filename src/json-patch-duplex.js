@@ -460,7 +460,7 @@ var jsonpatch;
 
     function compare(tree1, tree2) {
         var patches = [];
-        _generate(tree1, tree2, patches, '');
+        _generate(JSON.parse(JSON.stringify(tree1)), tree2, patches, '');
         return patches;
     }
     jsonpatch.compare = compare;
