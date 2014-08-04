@@ -692,9 +692,9 @@ describe("JSON-Patch-Duplex", function () {
 
 });
 
-// JSLitmus performance test
-if(typeof JSLitmus !== 'undefined') {
-  JSLitmus.test('should Generate replace', function() {
+// Benchmark performance test
+if (typeof Benchmark !== 'undefined') {
+  suite.add('generate operation', function () {
     obj = { firstName:"Albert", lastName:"Einstein",
       phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
     var observer = jsonpatch.observe(obj);

@@ -119,35 +119,59 @@ describe("JSON-Patch", function () {
   });
 });
 
-// JSLitmus performance test
-if(typeof JSLitmus !== 'undefined') {
-  JSLitmus.test('should Add Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: [1, 2, 3, 4]}]);
+// Benchmark performance test
+if (typeof Benchmark !== 'undefined') {
+  var suite = new Benchmark.Suite;
+  suite.add('add operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ]};
+    jsonpatch.apply(obj, [
+      {op: 'add', path: '/bar', value: [1, 2, 3, 4]}
+    ]);
+  });
+  suite.add('remove operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ], bar: [1, 2, 3, 4]};
+    jsonpatch.apply(obj, [
+      {op: 'remove', path: '/bar'}
+    ]);
+  });
+  suite.add('replace operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ]};
+    jsonpatch.apply(obj, [
+      {op: 'replace', path: '/foo', value: [1, 2, 3, 4]}
+    ]);
+  });
+  suite.add('move operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ], bar: [1, 2, 3, 4]};
+    jsonpatch.apply(obj, [
+      {op: 'move', from: '/baz/0', path: '/bar/0'}
+    ]);
+  });
+  suite.add('copy operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ], bar: [1, 2, 3, 4]};
+    jsonpatch.apply(obj, [
+      {op: 'copy', from: '/baz/0', path: '/bar/0'}
+    ]);
+  });
+  suite.add('test operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ]};
+    jsonpatch.apply(obj, [
+      {op: 'test', path: '/baz', value: [
+        {qux: 'hello'}
+      ]}
+    ]);
   });
 
-  JSLitmus.test('should Remove Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{op: 'remove', path: '/bar'}]);
-  });
-
-  JSLitmus.test('should Replace Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{op: 'replace', path: '/foo', value: [1, 2, 3, 4]}]);
-  });
-
-  JSLitmus.test('should Move Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{op: 'move', from: '/baz/0', path: '/bar/0'}]);
-  });
-
-  JSLitmus.test('should Copy Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{op: 'copy', from: '/baz/0', path: '/bar/0'}]);
-  });
-
-  JSLitmus.test('should Test Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{op: 'test', path: '/baz', value: [{qux: 'hello'}]}]);
-  });
+  benchmarkReporter(suite);
 }
