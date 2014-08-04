@@ -173,6 +173,11 @@ If there are no differences, returns an empty array.
 
 ## Changelog
 
+#### 0.3.9 (Aug 4, 2014)
+
+Feature:
+- expose method `jsonpatch.compare` for comparing two object trees
+
 #### 0.3.8 (Jul 18, 2014)
 
 Feature:
