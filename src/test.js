@@ -1,4 +1,4 @@
-var obj, compiled;
+var obj;
 
 if(typeof jsonpatch === 'undefined') {
   if(process.env.duplex === 'yes') { //required by `jasmine-node` test runner in Node.js
@@ -33,6 +33,13 @@ describe("JSON-Patch", function () {
     expect(obj).toEqual({foo: 1, baz: [{qux: 'hello'}], bar: null});
   });
 
+  it('should apply add on root', function() {
+    var obj = {"hello": "world"};
+    jsonpatch.apply(obj, [{"op":"add","path":"","value":{"hello": "universe"}}]);
+
+    expect(obj).toEqual({"hello": "universe"});
+  });
+
 
   it('should apply remove', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
@@ -57,10 +64,25 @@ describe("JSON-Patch", function () {
   });
 
 
+  it('should apply replace on root', function() {
+    var obj = {"hello": "world"};
+    jsonpatch.apply(obj, [{"op":"replace","path":"","value":{"hello": "universe"}}]);
+
+    expect(obj).toEqual({"hello": "universe"});
+  });
+
+
   it('should apply test', function() {
     obj = {foo: {bar: [1, 2, 5, 4]}};
     expect(jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: {bar: [1, 2, 5, 4]}}])).toBe(true);
     expect(!jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: [1, 2]}])).toBe(true);
+  });
+
+
+  it('should apply test on root', function() {
+    var obj = {"hello": "world"};
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '', value: {"hello": "world"}}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '', value: {"hello": "universe"}}])).toBe(false);
   });
 
 
@@ -74,6 +96,11 @@ describe("JSON-Patch", function () {
     expect(obj).toEqual({baz: [{}, 'hello'], bar: 1});
   });
 
+  it('should apply move on root', function() { //investigate if this test is right (https://github.com/Starcounter-Jack/JSON-Patch/issues/40)
+    var obj = {"hello": "world", "location": {"city": "Vancouver"}};
+    jsonpatch.apply(obj, [{op: 'move', from: '/location', path: ''}]);
+    expect(obj).toEqual({"hello": "world", "city": "Vancouver"});
+  });
 
   it('should apply copy', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
@@ -83,6 +110,12 @@ describe("JSON-Patch", function () {
 
     jsonpatch.apply(obj, [{op: 'copy', from: '/baz/0/qux', path: '/baz/1'}]);
     expect(obj).toEqual({foo: 1, baz: [{qux: 'hello'}, 'hello'], bar: 1});
+  });
+
+  it('should apply copy on root', function() {
+    var obj = {"hello": "world", "location": {"city": "Vancouver"}};
+    jsonpatch.apply(obj, [{op: 'copy', from: '/location', path: ''}]);
+    expect(obj).toEqual({"hello": "world", "location": {"city": "Vancouver"}, "city": "Vancouver"});
   });
 });
 

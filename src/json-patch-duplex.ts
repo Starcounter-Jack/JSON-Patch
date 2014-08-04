@@ -80,6 +80,41 @@ module jsonpatch {
     _get: objOps._get
   };
 
+  /* The operations applicable to object root. Many are the same as for the object */
+  var rootOps = {
+    add: function (obj) {
+      for (var key in this.value) {
+        if (this.value.hasOwnProperty(key)) {
+          obj[key] = this.value[key];
+        }
+      }
+      return true;
+    },
+    remove: function (obj) {
+      for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          objOps.remove.call(this, obj, key);
+        }
+      }
+      return true;
+    },
+    replace: function (obj) {
+      apply(obj, [
+        {op: "remove", path: this.path}
+      ]);
+      apply(obj, [
+        {op: "add", path: this.path, value: this.value}
+      ]);
+      return true;
+    },
+    move: objOps.move,
+    copy: objOps.copy,
+    test: function (obj) {
+      return (JSON.stringify(obj) === JSON.stringify(this.value));
+    },
+    _get: objOps._get
+  };
+
   var observeOps = {
     add: function (patches:any[], path) {
       var patch = {
@@ -448,16 +483,18 @@ module jsonpatch {
   /// Apply a json-patch operation on an object tree
   export function apply(tree:any, patches:any[]):boolean {
     var result = false
-      , p = 0
-      , plen = patches.length
-      , patch;
+        , p = 0
+        , plen = patches.length
+        , patch;
     while (p < plen) {
       patch = patches[p];
+      p++;
       // Find the object
       var keys = patch.path.split('/');
       var obj = tree;
       var t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
       var len = keys.length;
+
       while (true) {
         if (_isArray(obj)) {
           var index = parseInt(keys[t], 10);
@@ -470,17 +507,25 @@ module jsonpatch {
         }
         else {
           var key = keys[t];
-          if (key.indexOf('~') != -1)
-            key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
-          t++;
-          if (t >= len) {
-            result = objOps[patch.op].call(patch, obj, key, tree); // Apply patch
-            break;
+          if(key) {
+            if (key && key.indexOf('~') != -1)
+              key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
+            t++;
+            if (t >= len) {
+              result = objOps[patch.op].call(patch, obj, key, tree); // Apply patch
+              break;
+            }
+          }
+          else { //is root
+            t++;
+            if (t >= len) {
+              result = rootOps[patch.op].call(patch, obj, key, tree); // Apply patch
+              break;
+            }
           }
           obj = obj[key];
         }
       }
-      p++;
     }
     return result;
   }
