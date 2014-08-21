@@ -11,8 +11,11 @@ var jsonpatch;
 
         return function (o) {
             var keys = [];
-            for (var i in o)
-                keys.push(i);
+            for (var i in o) {
+                if (o.hasOwnProperty(i)) {
+                    keys.push(i);
+                }
+            }
             return keys;
         };
     })();

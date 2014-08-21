@@ -11,10 +11,13 @@ module jsonpatch {
     if (Object.keys)
       return Object.keys;
 
-    return function(o) { //IE8
+    return function (o) { //IE8
       var keys = [];
-      for (var i in o)
-        keys.push(i);
+      for (var i in o) {
+        if (o.hasOwnProperty(i)) {
+          keys.push(i);
+        }
+      }
       return keys;
     }
   })();
