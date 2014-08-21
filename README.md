@@ -173,6 +173,14 @@ If there are no differences, returns an empty array.
 
 ## Changelog
 
+#### 0.3.10 (Aug 21, 2014)
+
+Bugfix:
+- `test` operation failed of test if properties in two were ordered differently ([#39](https://github.com/Starcounter-Jack/JSON-Patch/issues/39))
+- implement `add`, `replace`, `test`, `move`, `copy` operation on object root ([#40](https://github.com/Starcounter-Jack/JSON-Patch/issues/40), [#45](https://github.com/Starcounter-Jack/JSON-Patch/issues/45))
+
+Upgraded test suite to use Benchmark.js instead of JSLitmus
+
 #### 0.3.9 (Aug 4, 2014)
 
 Feature:
