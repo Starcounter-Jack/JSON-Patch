@@ -12,6 +12,58 @@ interface Object {
 
 module jsonpatch {
 
+
+  var _objectKeys = (function() {
+    if (Object.keys)
+      return Object.keys;
+
+    return function (o) { //IE8
+      var keys = [];
+      for (var i in o) {
+        if (o.hasOwnProperty(i)) {
+          keys.push(i);
+        }
+      }
+      return keys;
+    }
+  })();
+
+  function _equals(a, b) {
+    switch (typeof a) {
+      case 'undefined': //backward compatibility, but really I think we should return false
+      case 'boolean':
+      case 'string':
+      case 'number':
+        return a === b;
+      case 'object':
+        if (a === null)
+          return b === null;
+        if (_isArray(a)) {
+          if (!_isArray(b) || a.length !== b.length)
+            return false;
+
+          for (var i = 0, l = a.length; i < l; i++)
+            if (!_equals(a[i], b[i])) return false;
+
+          return true;
+        }
+
+        var bKeys = _objectKeys(b);
+        var bLength = bKeys.length;
+        if (_objectKeys(a).length !== bLength)
+          return false;
+
+        for (var i = 0; i < bLength; i++)
+          if (!_equals(a[i], b[i])) return false;
+
+        return true;
+
+      default:
+        return false;
+
+    }
+  }
+
   /* We use a Javascript hash to store each 
      function. Each hash entry (property) uses
      the operation identifiers specified in rfc6902.
@@ -53,7 +105,7 @@ module jsonpatch {
       return true;
     },
     test: function (obj, key) {
-      return(JSON.stringify(obj[key]) === JSON.stringify(this.value));
+      return _equals(obj[key], this.value);
     },
     _get: function (obj, key) {
       this.value = obj[key];
@@ -407,22 +459,6 @@ module jsonpatch {
       }
     }
     return temp;
-  }
-
-  var _objectKeys;
-  if (Object.keys) { //standards
-    _objectKeys = Object.keys;
-  }
-  else { //IE8 shim
-    _objectKeys = function (obj) {
-      var keys = [];
-      for (var o in obj) {
-        if (obj.hasOwnProperty(o)) {
-          keys.push(o);
-        }
-      }
-      return keys;
-    }
   }
 
   // Dirty check if obj is different from mirror, generate patches and update mirror
