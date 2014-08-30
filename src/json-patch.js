@@ -1,8 +1,62 @@
-// json-patch.js 0.3.7
-// (c) 2013 Joachim Wester
-// MIT license
+/*!
+* json-patch-duplex.js 0.3.10
+* (c) 2013 Joachim Wester
+* MIT license
+*/
 var jsonpatch;
 (function (jsonpatch) {
+    var _objectKeys = (function () {
+        if (Object.keys)
+            return Object.keys;
+
+        return function (o) {
+            var keys = [];
+            for (var i in o) {
+                if (o.hasOwnProperty(i)) {
+                    keys.push(i);
+                }
+            }
+            return keys;
+        };
+    })();
+
+    function _equals(a, b) {
+        switch (typeof a) {
+            case 'undefined':
+            case 'boolean':
+            case 'string':
+            case 'number':
+                return a === b;
+            case 'object':
+                if (a === null)
+                    return b === null;
+                if (_isArray(a)) {
+                    if (!_isArray(b) || a.length !== b.length)
+                        return false;
+
+                    for (var i = 0, l = a.length; i < l; i++)
+                        if (!_equals(a[i], b[i]))
+                            return false;
+
+                    return true;
+                }
+
+                var bKeys = _objectKeys(b);
+                var bLength = bKeys.length;
+                if (_objectKeys(a).length !== bLength)
+                    return false;
+
+                for (var i = 0; i < bLength; i++)
+                    if (!_equals(a[i], b[i]))
+                        return false;
+
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
     var objOps = {
         add: function (obj, key) {
             obj[key] = this.value;
@@ -36,7 +90,7 @@ var jsonpatch;
             return true;
         },
         test: function (obj, key) {
-            return (JSON.stringify(obj[key]) === JSON.stringify(this.value));
+            return _equals(obj[key], this.value);
         },
         _get: function (obj, key) {
             this.value = obj[key];
@@ -62,6 +116,41 @@ var jsonpatch;
         _get: objOps._get
     };
 
+    /* The operations applicable to object root. Many are the same as for the object */
+    var rootOps = {
+        add: function (obj) {
+            for (var key in this.value) {
+                if (this.value.hasOwnProperty(key)) {
+                    obj[key] = this.value[key];
+                }
+            }
+            return true;
+        },
+        remove: function (obj) {
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    objOps.remove.call(this, obj, key);
+                }
+            }
+            return true;
+        },
+        replace: function (obj) {
+            apply(obj, [
+                { op: "remove", path: this.path }
+            ]);
+            apply(obj, [
+                { op: "add", path: this.path, value: this.value }
+            ]);
+            return true;
+        },
+        move: objOps.move,
+        copy: objOps.copy,
+        test: function (obj) {
+            return (JSON.stringify(obj) === JSON.stringify(this.value));
+        },
+        _get: objOps._get
+    };
+
     var _isArray;
     if (Array.isArray) {
         _isArray = Array.isArray;
@@ -76,12 +165,14 @@ var jsonpatch;
         var result = false, p = 0, plen = patches.length, patch;
         while (p < plen) {
             patch = patches[p];
+            p++;
 
             // Find the object
             var keys = patch.path.split('/');
             var obj = tree;
             var t = 1;
             var len = keys.length;
+
             while (true) {
                 if (_isArray(obj)) {
                     var index = parseInt(keys[t], 10);
@@ -93,17 +184,24 @@ var jsonpatch;
                     obj = obj[index];
                 } else {
                     var key = keys[t];
-                    if (key.indexOf('~') != -1)
-                        key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
-                    t++;
-                    if (t >= len) {
-                        result = objOps[patch.op].call(patch, obj, key, tree); // Apply patch
-                        break;
+                    if (key) {
+                        if (key && key.indexOf('~') != -1)
+                            key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
+                        t++;
+                        if (t >= len) {
+                            result = objOps[patch.op].call(patch, obj, key, tree); // Apply patch
+                            break;
+                        }
+                    } else {
+                        t++;
+                        if (t >= len) {
+                            result = rootOps[patch.op].call(patch, obj, key, tree); // Apply patch
+                            break;
+                        }
                     }
                     obj = obj[key];
                 }
             }
-            p++;
         }
         return result;
     }

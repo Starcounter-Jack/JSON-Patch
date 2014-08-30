@@ -1,0 +1,76 @@
+#test_results {
+  margin-top: 10px;
+  font-size: 12px;
+  font-family: sans-serif;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+#test_results th, #test_results td {
+  border: solid 1px #ccc;
+  vertical-align: top;
+  padding: 3px;
+}
+
+#test_results th {
+  vertical-align: bottom;
+  background-color: #ccc;
+  padding: 1px;
+  font-size: 10px;
+}
+
+#test_results #test_platform {
+  color: #444;
+  text-align: center;
+}
+
+#test_results .test_row {
+  color: #006;
+  cursor: pointer;
+}
+
+#test_results .test_nonlooping {
+  border-left-style: dotted;
+  border-left-width: 2px;
+}
+
+#test_results .test_looping {
+  border-left-style: solid;
+  border-left-width: 2px;
+}
+
+#test_results .test_name {
+  white-space: nowrap;
+}
+
+#test_results .test_pending {
+}
+
+#test_results .test_running {
+  font-style: italic;
+}
+
+#test_results .test_done {
+}
+
+#test_results .test_done {
+  text-align: right;
+  font-family: monospace;
+}
+
+#test_results .test_error {
+  color: #600;
+}
+
+#test_results .test_error .error_head {
+  font-weight: bold;
+}
+
+#test_results .test_error .error_body {
+  font-size: 85%;
+}
+
+#test_results .test_row:hover td {
+  background-color: #ffc;
+  text-decoration: underline;
+}

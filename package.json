@@ -1,9 +1,14 @@
 {
   "name": "fast-json-patch",
-  "version": "0.3.7",
+  "version": "0.3.10",
   "description": "JSON-Patch allows you to update a JSON document by sending the changes rather than the whole document.",
   "homepage": "https://github.com/Starcounter-Jack/JSON-Patch",
-  "keywords": ["json", "patch", "http", "rest"],
+  "keywords": [
+    "json",
+    "patch",
+    "http",
+    "rest"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/Starcounter-Jack/JSON-Patch.git"
@@ -16,10 +21,18 @@
     "email": "joachimwester@me.com",
     "url": "http://www.starcounter.com/"
   },
-  "licenses": [ {
-    "type": "MIT",
-    "url": "http://www.opensource.org/licenses/MIT"
-  } ],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/MIT"
+    }
+  ],
   "main": "./src/json-patch-duplex",
-  "engines": { "node": ">= 0.4.0" }
+  "engines": {
+    "node": ">= 0.4.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-uglify": "~0.5.0"
+  }
 }

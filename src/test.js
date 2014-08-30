@@ -1,4 +1,4 @@
-var obj, compiled;
+var obj;
 
 if(typeof jsonpatch === 'undefined') {
   if(process.env.duplex === 'yes') { //required by `jasmine-node` test runner in Node.js
@@ -33,6 +33,13 @@ describe("JSON-Patch", function () {
     expect(obj).toEqual({foo: 1, baz: [{qux: 'hello'}], bar: null});
   });
 
+  it('should apply add on root', function() {
+    var obj = {"hello": "world"};
+    jsonpatch.apply(obj, [{"op":"add","path":"","value":{"hello": "universe"}}]);
+
+    expect(obj).toEqual({"hello": "universe"});
+  });
+
 
   it('should apply remove', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
@@ -57,10 +64,36 @@ describe("JSON-Patch", function () {
   });
 
 
+  it('should apply replace on root', function() {
+    var obj = {"hello": "world"};
+    jsonpatch.apply(obj, [{"op":"replace","path":"","value":{"hello": "universe"}}]);
+
+    expect(obj).toEqual({"hello": "universe"});
+  });
+
+
   it('should apply test', function() {
-    obj = {foo: {bar: [1, 2, 5, 4]}};
+    obj = {
+      foo: {bar: [1, 2, 5, 4]},
+      bar: {a: 'a', b: 42, c: null, d: true}
+    };
     expect(jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: {bar: [1, 2, 5, 4]}}])).toBe(true);
-    expect(!jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: [1, 2]}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: [1, 2]}])).toBe(false);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar', value: {d: true, b: 42, c: null, a: 'a'}}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar', value: obj.bar}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/a', value: 'a'}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/b', value: 42}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/c', value: null}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/d', value: true}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/d', value: false}])).toBe(false);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar', value: {d: true, b: 42, c: null, a: 'a', foo: 'bar'}}])).toBe(false);
+  });
+
+
+  it('should apply test on root', function() {
+    var obj = {"hello": "world"};
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '', value: {"hello": "world"}}])).toBe(true);
+    expect(jsonpatch.apply(obj, [{op: 'test', path: '', value: {"hello": "universe"}}])).toBe(false);
   });
 
 
@@ -74,6 +107,11 @@ describe("JSON-Patch", function () {
     expect(obj).toEqual({baz: [{}, 'hello'], bar: 1});
   });
 
+  it('should apply move on root', function() { //investigate if this test is right (https://github.com/Starcounter-Jack/JSON-Patch/issues/40)
+    var obj = {"hello": "world", "location": {"city": "Vancouver"}};
+    jsonpatch.apply(obj, [{op: 'move', from: '/location', path: ''}]);
+    expect(obj).toEqual({"hello": "world", "city": "Vancouver"});
+  });
 
   it('should apply copy', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
@@ -84,37 +122,67 @@ describe("JSON-Patch", function () {
     jsonpatch.apply(obj, [{op: 'copy', from: '/baz/0/qux', path: '/baz/1'}]);
     expect(obj).toEqual({foo: 1, baz: [{qux: 'hello'}, 'hello'], bar: 1});
   });
+
+  it('should apply copy on root', function() {
+    var obj = {"hello": "world", "location": {"city": "Vancouver"}};
+    jsonpatch.apply(obj, [{op: 'copy', from: '/location', path: ''}]);
+    expect(obj).toEqual({"hello": "world", "location": {"city": "Vancouver"}, "city": "Vancouver"});
+  });
 });
 
-// JSLitmus performance test
-if(typeof JSLitmus !== 'undefined') {
-  JSLitmus.test('should Add Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: [1, 2, 3, 4]}]);
+// Benchmark performance test
+if (typeof Benchmark !== 'undefined') {
+  var suite = new Benchmark.Suite;
+  suite.add('add operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ]};
+    jsonpatch.apply(obj, [
+      {op: 'add', path: '/bar', value: [1, 2, 3, 4]}
+    ]);
+  });
+  suite.add('remove operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ], bar: [1, 2, 3, 4]};
+    jsonpatch.apply(obj, [
+      {op: 'remove', path: '/bar'}
+    ]);
+  });
+  suite.add('replace operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ]};
+    jsonpatch.apply(obj, [
+      {op: 'replace', path: '/foo', value: [1, 2, 3, 4]}
+    ]);
+  });
+  suite.add('move operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ], bar: [1, 2, 3, 4]};
+    jsonpatch.apply(obj, [
+      {op: 'move', from: '/baz/0', path: '/bar/0'}
+    ]);
+  });
+  suite.add('copy operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ], bar: [1, 2, 3, 4]};
+    jsonpatch.apply(obj, [
+      {op: 'copy', from: '/baz/0', path: '/bar/0'}
+    ]);
+  });
+  suite.add('test operation', function () {
+    obj = {foo: 1, baz: [
+      {qux: 'hello'}
+    ]};
+    jsonpatch.apply(obj, [
+      {op: 'test', path: '/baz', value: [
+        {qux: 'hello'}
+      ]}
+    ]);
   });
 
-  JSLitmus.test('should Remove Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{op: 'remove', path: '/bar'}]);
-  });
-
-  JSLitmus.test('should Replace Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{op: 'replace', path: '/foo', value: [1, 2, 3, 4]}]);
-  });
-
-  JSLitmus.test('should Move Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{op: 'move', from: '/baz/0', path: '/bar/0'}]);
-  });
-
-  JSLitmus.test('should Copy Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{op: 'copy', from: '/baz/0', path: '/bar/0'}]);
-  });
-
-  JSLitmus.test('should Test Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{op: 'test', path: '/baz', value: [{qux: 'hello'}]}]);
-  });
+  benchmarkReporter(suite);
 }
