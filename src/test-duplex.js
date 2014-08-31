@@ -690,6 +690,62 @@ describe("JSON-Patch-Duplex", function () {
     });
   });
 
+  describe("validate", function() {
+
+    it("should return false if no validation errors", function() {
+      var patch = [
+        { "op": "test", "path": "/a/b/c", "value": "foo" },
+        { "op": "remove", "path": "/a/b/c" },
+        { "op": "add", "path": "/a/b/c", "value": [ "foo", "bar" ] },
+        { "op": "replace", "path": "/a/b/c", "value": 42 },
+        { "op": "move", "from": "/a/b/c", "path": "/a/b/d" },
+        { "op": "copy", "from": "/a/b/d", "path": "/a/b/e" }
+      ];
+
+      expect(jsonpatch.validate(patch)).toBe.false;
+    });
+
+    it('should return an error if a patch operation is not an array', function() {
+      expect(jsonpatch.validate({})).toEqual('Patch document must be an array of operations.');
+    });
+
+    it('should return an error if a patch operation does not contain an array of objects', function() {
+      expect(jsonpatch.validate([ 'test' ])).toEqual('Patch document must represent an array of objects.');
+    });
+
+    it('should return an error if a patch operation is missing "op"', function() {
+      var patch = [
+        { "op": "test", "path": "/a/b/c", "value": "foo" },
+        { "path": "/a/b/c" }
+      ];
+
+      expect(jsonpatch.validate(patch)).toEqual('Operation objects MUST have exactly one "op" member, whose value indicates the operation to perform.');
+    });
+
+    it('should return an error if a patch operation is missing "path"', function() {
+      var patch = [
+        { "op": "test", "path": "/a/b/c", "value": "foo" },
+        { "op": "remove", "value": "foo" },
+        { "op": "add", "path": "/a/b/c", "value": [ "foo", "bar" ] },
+      ];
+
+      expect(jsonpatch.validate(patch)).toEqual('Operation objects MUST have exactly one "path" member.');
+    });
+
+    it('should return an error if a patch operation is missing "value"', function() {
+      var patch = [
+        { "op": "test", "path": "/a/b/c" },
+        { "op": "remove", "path": "/a/b/c" },
+        { "op": "add", "path": "/a/b/c", "value": [ "foo", "bar" ] }
+      ];
+
+      expect(jsonpatch.validate(patch)).toEqual('Operation objects MUST have exactly one "value" member.');
+    });
+
+    it('should return an error if a patch operation is invalid', function() {
+      expect(jsonpatch.validate([{ "op": "foo", "path": "/a/b/c", "value": "foo" }])).toEqual('"op" values MUST be one of "add", "remove", "replace", "move", "copy", or "test"');
+    });
+  });
 });
 
 // Benchmark performance test

@@ -545,6 +545,46 @@ var jsonpatch;
         return patches;
     }
     jsonpatch.compare = compare;
+
+    function validate(patch) {
+        if(!Array.isArray(patch)) {
+            return 'Patch document must be an array of operations.';
+        }
+
+        var error = false;
+        for(var i = 0, l = patch.length, obj; i < l; i++) {
+            obj = patch[i];
+
+            if(typeof obj !== 'object') {
+                error = 'Patch document must represent an array of objects.';
+                break;
+            }
+
+            if(typeof obj.op === 'undefined') {
+                error = 'Operation objects MUST have exactly one "op" member, whose value indicates the operation to perform.';
+                break;
+            }
+
+            if(typeof obj.path === 'undefined') {
+                error = 'Operation objects MUST have exactly one "path" member.';
+                break;
+            }
+
+            if(typeof obj.value === 'undefined') {
+                error = 'Operation objects MUST have exactly one "value" member.';
+                break;
+            }
+
+            if(['add', 'remove', 'replace', 'move', 'copy', 'test'].indexOf(obj.op) < 0) {
+                error = '"op" values MUST be one of "add", "remove", "replace", "move", "copy", or "test"';
+                break;
+            }
+        }
+
+        return error;
+    }
+    jsonpatch.validate = validate;
+
 })(jsonpatch || (jsonpatch = {}));
 
 if (typeof exports !== "undefined") {
@@ -553,5 +593,6 @@ if (typeof exports !== "undefined") {
     exports.unobserve = jsonpatch.unobserve;
     exports.generate = jsonpatch.generate;
     exports.compare = jsonpatch.compare;
+    exports.validate = jsonpatch.validate;
 }
 //# sourceMappingURL=json-patch-duplex.js.map
