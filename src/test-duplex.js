@@ -690,9 +690,9 @@ describe("JSON-Patch-Duplex", function () {
     });
   });
 
-  describe("validate", function() {
+describe("validate", function() {
 
-    it("should return false if no validation errors", function() {
+    it('should return an empty array if the patch is valid', function() {
       var patch = [
         { "op": "test", "path": "/a/b/c", "value": "foo" },
         { "op": "remove", "path": "/a/b/c" },
@@ -701,49 +701,119 @@ describe("JSON-Patch-Duplex", function () {
         { "op": "move", "from": "/a/b/c", "path": "/a/b/d" },
         { "op": "copy", "from": "/a/b/d", "path": "/a/b/e" }
       ];
-
-      expect(jsonpatch.validate(patch)).toBe.false;
+      var errors = jsonpatch.validate(patch);
+      expect(errors.length).toBe(0);
     });
 
-    it('should return an error if a patch operation is not an array', function() {
-      expect(jsonpatch.validate({})).toEqual('Patch document must be an array of operations.');
+    it('should return an error if the patch is not an array', function() {
+      var errors = jsonpatch.validate({});
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_PATCH_TYPE');
+      expect(errors[0].index).toBe(undefined);
     });
 
-    it('should return an error if a patch operation does not contain an array of objects', function() {
-      expect(jsonpatch.validate([ 'test' ])).toEqual('Patch document must represent an array of objects.');
+    it('should return an empty array if the operation is a valid object', function() {
+      var errors = jsonpatch.validate([{op: 'add', value: 'foo', path: '/bar'}]);
+      expect(errors.length).toBe(0);
     });
 
-    it('should return an error if a patch operation is missing "op"', function() {
-      var patch = [
-        { "op": "test", "path": "/a/b/c", "value": "foo" },
-        { "path": "/a/b/c" }
-      ];
-
-      expect(jsonpatch.validate(patch)).toEqual('Operation objects MUST have exactly one "op" member, whose value indicates the operation to perform.');
+    it('should return an error if the operation is null', function() {
+      var errors = jsonpatch.validate([null]);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_OPERATION_TYPE');
+      expect(errors[0].index).toBe(0);
     });
 
-    it('should return an error if a patch operation is missing "path"', function() {
-      var patch = [
-        { "op": "test", "path": "/a/b/c", "value": "foo" },
-        { "op": "remove", "value": "foo" },
-        { "op": "add", "path": "/a/b/c", "value": [ "foo", "bar" ] },
-      ];
-
-      expect(jsonpatch.validate(patch)).toEqual('Operation objects MUST have exactly one "path" member.');
+    it('should return an error if the operation is undefined', function() {
+      var errors = jsonpatch.validate([undefined]);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_OPERATION_TYPE');
+      expect(errors[0].index).toBe(0);
     });
 
-    it('should return an error if a patch operation is missing "value"', function() {
-      var patch = [
-        { "op": "test", "path": "/a/b/c" },
-        { "op": "remove", "path": "/a/b/c" },
-        { "op": "add", "path": "/a/b/c", "value": [ "foo", "bar" ] }
-      ];
-
-      expect(jsonpatch.validate(patch)).toEqual('Operation objects MUST have exactly one "value" member.');
+    it('should return an error if the operation is an array', function() {
+      var errors = jsonpatch.validate([[]]);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_OPERATION_TYPE');
+      expect(errors[0].index).toBe(0);
     });
 
-    it('should return an error if a patch operation is invalid', function() {
-      expect(jsonpatch.validate([{ "op": "foo", "path": "/a/b/c", "value": "foo" }])).toEqual('"op" values MUST be one of "add", "remove", "replace", "move", "copy", or "test"');
+    it('should return an error if the operation "op" property is not a string', function() {
+      var errors = jsonpatch.validate([{ "path": "/a/b/c" }]);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_OP_VALUE');
+      expect(errors[0].index).toBe(0);
+    });
+
+    it('should return an error if the operation "path" property is not a string', function() {
+      var errors = jsonpatch.validate([{ "op": "remove", "value": "foo" }]);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_PATH_TYPE');
+      expect(errors[0].index).toBe(0);
+    });
+
+    it('should return an error if an "add" operation is missing "value" property', function() {
+      var errors = jsonpatch.validate([{ "op": "add", "path": "/a/b/c"}]);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_VALUE_TYPE');
+      expect(errors[0].index).toBe(0);
+    });
+
+    it('should return an error if a "replace" operation is missing "value" property', function() {
+      var errors = jsonpatch.validate([{ "op": "replace", "path": "/a/b/c"}]);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_VALUE_TYPE');
+      expect(errors[0].index).toBe(0);
+    });
+
+    it('should return an error if a "test" operation is missing "value" property', function() {
+      var errors = jsonpatch.validate([{ "op": "test", "from": "/b", "path": "/a/b/c"}]);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_VALUE_TYPE');
+      expect(errors[0].index).toBe(0);
+    });
+
+    it('should return an error if a "move" operation is missing "from" property', function() {
+      var errors = jsonpatch.validate([{ "op": "move", "path": "/a/b/c"}]);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_FROM_TYPE');
+      expect(errors[0].index).toBe(0);
+    });
+
+    it('should return an error if a "copy" operation is missing "from" property', function() {
+      var errors = jsonpatch.validate([{ "op": "copy", "path": "/a/b/c"}]);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_FROM_TYPE');
+      expect(errors[0].index).toBe(0);
+    });
+
+    it('should return an error if the "op" property is invalid', function() {
+      var errors = jsonpatch.validate([{ "op": "foobar", "path": "/a/b/c"}]);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error).toBe('INVALID_OP_VALUE');
+      expect(errors[0].index).toBe(0);
+    });
+
+    it('should return only the first error if break argument is not set', function() {
+      var patch = [{},{}];
+      var errors = jsonpatch.validate(patch);
+      expect(errors.length).toBe(1);
+      expect(errors[0].index).toBe(0);
+    });
+
+    it('should return only the first error if break argument is false', function() {
+      var patch = [{},{}];
+      var errors = jsonpatch.validate(patch, false);
+      expect(errors.length).toBe(1);
+      expect(errors[0].index).toBe(0);
+    });
+
+    it('should return multiple errors if break argument is false', function() {
+      var patch = [{},{"op": "add", "path": "/a/b/c", "value": "foobar"},{}];
+      var errors = jsonpatch.validate(patch, true);
+      expect(errors.length).toBe(2);
+      expect(errors[0].index).toBe(0);
+      expect(errors[1].index).toBe(2);
     });
   });
 });

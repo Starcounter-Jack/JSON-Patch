@@ -546,45 +546,39 @@ var jsonpatch;
     }
     jsonpatch.compare = compare;
 
-    function validate(patch) {
-        if(!Array.isArray(patch)) {
-            return 'Patch document must be an array of operations.';
-        }
+    function validate(patch, multiple) {
+        if (typeof multiple === "undefined") { multiple = false; }
+        // document is an array
+        if (!_isArray(patch))
+            return [{ error: 'INVALID_PATCH_TYPE' }];
 
-        var error = false;
-        for(var i = 0, l = patch.length, obj; i < l; i++) {
-            obj = patch[i];
+        var errors = [];
 
-            if(typeof obj !== 'object') {
-                error = 'Patch document must represent an array of objects.';
-                break;
-            }
+        for (var i = 0; i < patch.length; i++) {
+            var obj = patch[i];
+            var error = '';
 
-            if(typeof obj.op === 'undefined') {
-                error = 'Operation objects MUST have exactly one "op" member, whose value indicates the operation to perform.';
-                break;
-            }
+            //operation is an object
+            if (typeof obj !== 'object' || obj === null || obj === undefined || _isArray(obj))
+                error = 'INVALID_OPERATION_TYPE';
+            else if (['add', 'remove', 'replace', 'move', 'copy', 'test'].indexOf(obj.op) < 0)
+                error = 'INVALID_OP_VALUE';
+            else if (typeof obj.path !== 'string')
+                error = 'INVALID_PATH_TYPE';
+            else if ((obj.op === 'move' || obj.op === 'copy') && typeof obj.from !== 'string')
+                error = 'INVALID_FROM_TYPE';
+            else if (['add', 'replace', 'test'].indexOf(obj.op) > -1 && obj.value === undefined)
+                error = 'INVALID_VALUE_TYPE';
 
-            if(typeof obj.path === 'undefined') {
-                error = 'Operation objects MUST have exactly one "path" member.';
-                break;
-            }
-
-            if(typeof obj.value === 'undefined') {
-                error = 'Operation objects MUST have exactly one "value" member.';
-                break;
-            }
-
-            if(['add', 'remove', 'replace', 'move', 'copy', 'test'].indexOf(obj.op) < 0) {
-                error = '"op" values MUST be one of "add", "remove", "replace", "move", "copy", or "test"';
-                break;
+            if (error) {
+                errors.push({ index: i, error: error });
+                if (!multiple)
+                    break;
             }
         }
-
-        return error;
+        return errors;
     }
     jsonpatch.validate = validate;
-
 })(jsonpatch || (jsonpatch = {}));
 
 if (typeof exports !== "undefined") {
