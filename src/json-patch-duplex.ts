@@ -575,7 +575,7 @@ module jsonpatch {
   export function validate(patch:any[], multiple:boolean = false) {
     // document is an array
     if(!_isArray(patch))
-      return [{error: 'INVALID_PATCH_TYPE'}];
+      return [{error: 'PATCH_TYPE'}];
 
     var errors = [];
 
@@ -585,23 +585,23 @@ module jsonpatch {
 
       //operation is an object
       if(typeof obj !== 'object' || obj === null || obj === undefined || _isArray(obj))
-        error = 'INVALID_OPERATION_TYPE';
+        error = 'OPERATION_TYPE';
 
       //operation.op is valid
       else if (['add', 'remove', 'replace', 'move', 'copy', 'test'].indexOf(obj.op) < 0)
-        error = 'INVALID_OP_VALUE';
+        error = 'OP_VALUE';
 
       //operation.path is a string
       else if(typeof obj.path !== 'string')
-        error = 'INVALID_PATH_TYPE';
+        error = 'PATH_TYPE';
 
       //operation.from is a string for move and copy operations
       else if ((obj.op === 'move' || obj.op === 'copy') && typeof obj.from !== 'string')
-        error = 'INVALID_FROM_TYPE';
+        error = 'FROM_TYPE';
 
       //operation.value is present for add, replace and test operations
       else if (['add', 'replace', 'test'].indexOf(obj.op) > -1 && obj.value === undefined)
-        error = 'INVALID_VALUE_TYPE';
+        error = 'VALUE_REQUIRED';
 
       if (error) {
         errors.push({index: i, error: error});

@@ -550,7 +550,7 @@ var jsonpatch;
         if (typeof multiple === "undefined") { multiple = false; }
         // document is an array
         if (!_isArray(patch))
-            return [{ error: 'INVALID_PATCH_TYPE' }];
+            return [{ error: 'PATCH_TYPE' }];
 
         var errors = [];
 
@@ -560,15 +560,15 @@ var jsonpatch;
 
             //operation is an object
             if (typeof obj !== 'object' || obj === null || obj === undefined || _isArray(obj))
-                error = 'INVALID_OPERATION_TYPE';
+                error = 'OPERATION_TYPE';
             else if (['add', 'remove', 'replace', 'move', 'copy', 'test'].indexOf(obj.op) < 0)
-                error = 'INVALID_OP_VALUE';
+                error = 'OP_VALUE';
             else if (typeof obj.path !== 'string')
-                error = 'INVALID_PATH_TYPE';
+                error = 'PATH_TYPE';
             else if ((obj.op === 'move' || obj.op === 'copy') && typeof obj.from !== 'string')
-                error = 'INVALID_FROM_TYPE';
+                error = 'FROM_TYPE';
             else if (['add', 'replace', 'test'].indexOf(obj.op) > -1 && obj.value === undefined)
-                error = 'INVALID_VALUE_TYPE';
+                error = 'VALUE_REQUIRED';
 
             if (error) {
                 errors.push({ index: i, error: error });
