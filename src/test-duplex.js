@@ -9,6 +9,24 @@ if(typeof jsonpatch === 'undefined') {
   }
 }
 
+function triggerMouseup(elem) {
+  fireEvent((elem || document.body), 'mouseup')
+}
+
+//http://stackoverflow.com/questions/827716/emulate-clicking-a-link-with-javascript-that-works-with-ie
+function fireEvent(obj, evt) {
+  var fireOnThis = obj;
+  if (document.createEvent) {
+    var evObj = document.createEvent(evt.indexOf('mouse') > -1 ? 'MouseEvents' : 'KeyboardEvent');
+    evObj.initEvent(evt, true, false);
+    fireOnThis.dispatchEvent(evObj);
+
+  } else if (document.createEventObject) {
+    var evObj = document.createEventObject();
+    fireOnThis.fireEvent('on' + evt, evObj);
+  }
+}
+
 describe("JSON-Patch-Duplex", function () {
   beforeEach(function () {
     this.addMatchers({
@@ -594,8 +612,23 @@ describe("JSON-Patch-Duplex", function () {
       runs(function () {
         expect(callback.calls.length).toEqual(1);
       });
+    });
 
+    it('should generate patch after mouse up event', function() {
+      obj = { lastName:"Einstein" };
+      var lastPatches;
+      var observer = jsonpatch.observe(obj, function(patches) {
+        lastPatches = patches;
+      });
 
+      obj.lastName = "Hawking";
+      triggerMouseup();
+
+      setTimeout(function () {
+        expect(lastPatches).toEqual([
+          { op: 'replace', path: '/lastName', value: 'Hawking' }
+        ]);
+      }, 0);
     });
 
   });
