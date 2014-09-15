@@ -9,9 +9,7 @@
   "ignore": [
     ".npmignore",
     ".gitignore",
-    "src/lib",
-    "src/test*",
-    "src/patchtest.html",
+    "test",
     "gruntfile.js",
     "node_modules",
     "package.json"

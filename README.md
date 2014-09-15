@@ -106,22 +106,22 @@ var diff = jsonpatch.compare(objA, objB));
 ### In a web browser
 
 1. Testing **json-patch.js**
- - Load `src/patchtest.html` in your web browser
+ - Load `test/SpecRunner.html` in your web browser
 2. Testing **json-patch-duplex.js**
- - Load `src/test-duplex.html` in your web browser
+ - Load `test/SpecRunnerDuplex.html` in your web browser
 
-Each of the test suite files contains *Jasmine* unit test suite and *JSLitmus* performance test suite.
+Each of the test suite files contains *Jasmine* unit test suite and *Benchmark.js* performance test suite.
 
-To run *JSLitmus* performance tests, press "Run Tests" button.
+To run *Benchmark.js* performance tests, press "Run Tests" button.
 
 ### In Node.js
 
 1. Go to directory where you have cloned the repo
 2. Install Jasmine Node.js module by running command `npm install jasmine-node -g`
 3. Testing **json-patch.js**
- - Run command `jasmine-node --matchall --config duplex no src/test.js`
+ - Run command `jasmine-node --matchall --config duplex no test/spec/coreSpec.js`
 4. Testing **json-patch-duplex.js**
- - Run command `jasmine-node --matchall --config duplex yes src/test.js src/test-duplex.js`
+ - Run command `jasmine-node --matchall --config duplex yes test/spec/coreSpec.js test/spec/duplexSpec.js`
 
 ## API
 

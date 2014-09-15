@@ -2,14 +2,14 @@ var obj;
 
 if(typeof jsonpatch === 'undefined') {
   if(process.env.duplex === 'yes') { //required by `jasmine-node` test runner in Node.js
-    jsonpatch = require('./json-patch-duplex.js');
+    jsonpatch = require('./../../src/json-patch-duplex.js');
   }
   else {
-    jsonpatch = require('./json-patch.js');
+    jsonpatch = require('./../../src/json-patch.js');
   }
 }
 
-describe("JSON-Patch", function () {
+describe("core", function () {
   it('should apply add', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
