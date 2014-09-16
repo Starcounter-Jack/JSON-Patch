@@ -27,7 +27,11 @@
         if (currentWindowOnload) {
           currentWindowOnload();
         }
-        execJasmine();
+        loadJsonTestSuite("tests.json", "spec/json-patch-tests/tests.json", function () {
+          loadJsonTestSuite("spec_tests.json", "spec/json-patch-tests/spec_tests.json", function () {
+            execJasmine();
+          });
+        });
       };
 
       function execJasmine() {
@@ -47,10 +51,10 @@
   <!-- include source files here... -->
 
   <!-- include spec files here... -->
-  <!-- include spec files here... -->
   <script src="../src/json-patch-duplex.js"></script>
   <script src="spec/coreSpec.js"></script>
   <script src="spec/duplexSpec.js"></script>
+  <script src="spec/jsonPatchTestsSpec.js"></script>
 
 </head>
 
