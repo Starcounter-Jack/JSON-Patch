@@ -184,17 +184,6 @@
     "error": "add to a non-existent target"
   },
 
- {
-    "comment": "A.13 Invalid JSON Patch Document",
-    "doc": {
-     "foo": "bar"
-    },
-    "patch": [
-  { "op": "add", "path": "/baz", "value": "qux", "op": "remove" }
-],
-    "error": "operation has two 'op' members"
-  },
-
   {
     "comment": "A.14. ~ Escape Ordering",
     "doc": {
