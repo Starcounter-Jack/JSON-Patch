@@ -1,5 +1,5 @@
 /*!
-* json-patch-duplex.js 0.3.10
+* json-patch-duplex.js 0.4.0
 * (c) 2013 Joachim Wester
 * MIT license
 */
