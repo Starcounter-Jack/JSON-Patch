@@ -5,6 +5,14 @@
  */
 
 module jsonpatch {
+  /* Do nothing if module is already defined.
+     Doesn't look nice, as we cannot simply put 
+     `!jsonpatch &&` before this immediate function call
+     in TypeScript.
+     */
+  if (jsonpatch.apply) {
+      return;
+  }
 
 
   var _objectKeys = (function () {

@@ -6,6 +6,15 @@
 
 var jsonpatch;
 (function (jsonpatch) {
+    /* Do nothing if module is already defined.
+    Doesn't look nice, as we cannot simply put
+    `!jsonpatch &&` before this immediate function call
+    in TypeScript.
+    */
+    if (jsonpatch.observe) {
+        return;
+    }
+
     var _objectKeys = (function () {
         if (Object.keys)
             return Object.keys;
@@ -588,4 +597,3 @@ if (typeof exports !== "undefined") {
     exports.generate = jsonpatch.generate;
     exports.compare = jsonpatch.compare;
 }
-//# sourceMappingURL=json-patch-duplex.js.map
