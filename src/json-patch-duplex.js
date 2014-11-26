@@ -597,4 +597,3 @@ if (typeof exports !== "undefined") {
     exports.generate = jsonpatch.generate;
     exports.compare = jsonpatch.compare;
 }
-//# sourceMappingURL=json-patch-duplex.js.map

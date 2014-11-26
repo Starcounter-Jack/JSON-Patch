@@ -262,3 +262,4 @@ var jsonpatch;
 if (typeof exports !== "undefined") {
     exports.apply = jsonpatch.apply;
 }
+//# sourceMappingURL=json-patch.js.map
