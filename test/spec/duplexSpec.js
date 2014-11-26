@@ -737,6 +737,15 @@ describe("duplex", function () {
     });
   });
 
+
+ describe("compare", function () {
+   it("should not modify the source object", function() {
+     var obj = { foo: 'bar' };
+     jsonpatch.compare(obj, {});
+     expect(obj.foo ).toEqual('bar');
+   });
+ });
+
 });
 
 // Benchmark performance test

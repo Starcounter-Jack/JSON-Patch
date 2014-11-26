@@ -612,7 +612,7 @@ module jsonpatch {
 
   export function compare(tree1:any, tree2:any):any[] {
     var patches = [];
-    _generate(tree1, tree2, patches, '');
+    _generate(JSON.parse(JSON.stringify(tree1)), tree2, patches, '');
     return patches;
   }
 }
