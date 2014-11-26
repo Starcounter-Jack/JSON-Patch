@@ -290,6 +290,14 @@ var jsonpatch;
     }
     jsonpatch.unobserve = unobserve;
 
+    function deepClone(obj) {
+        if (typeof obj === "object") {
+            return JSON.parse(JSON.stringify(obj));
+        } else {
+            return obj;
+        }
+    }
+
     function observe(obj, callback) {
         var patches = [];
         var root = obj;
@@ -348,7 +356,7 @@ var jsonpatch;
         } else {
             observer = {};
 
-            mirror.value = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+            mirror.value = deepClone(obj);
 
             if (callback) {
                 //callbacks.push(callback); this has no purpose
@@ -475,7 +483,7 @@ var jsonpatch;
                 } else {
                     if (oldVal != newVal) {
                         changed = true;
-                        patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: JSON.parse(JSON.stringify(newVal)) });
+                        patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: deepClone(newVal) });
                     }
                 }
             } else {
@@ -491,7 +499,7 @@ var jsonpatch;
         for (var t = 0; t < newKeys.length; t++) {
             var key = newKeys[t];
             if (!mirror.hasOwnProperty(key)) {
-                patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: JSON.parse(JSON.stringify(obj[key])) });
+                patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: deepClone(obj[key]) });
             }
         }
     }

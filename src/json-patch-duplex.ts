@@ -300,6 +300,15 @@ module jsonpatch {
 
   }
 
+  function deepClone(obj:any) {
+    if (typeof obj === "object") {
+      return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+    }
+    else {
+      return obj; //no need to clone primitives
+    }
+  }
+
   export function observe(obj:any, callback):any {
     var patches = [];
     var root = obj;
@@ -366,7 +375,7 @@ module jsonpatch {
     } else {
       observer = {};
 
-      mirror.value = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+      mirror.value = deepClone(obj);
 
       if (callback) {
         //callbacks.push(callback); this has no purpose
@@ -496,7 +505,7 @@ module jsonpatch {
         else {
           if (oldVal != newVal) {
             changed = true;
-            patches.push({op: "replace", path: path + "/" + escapePathComponent(key), value: JSON.parse(JSON.stringify(newVal))});
+            patches.push({op: "replace", path: path + "/" + escapePathComponent(key), value: deepClone(newVal)});
           }
         }
       }
@@ -513,7 +522,7 @@ module jsonpatch {
     for (var t = 0; t < newKeys.length; t++) {
       var key = newKeys[t];
       if (!mirror.hasOwnProperty(key)) {
-        patches.push({op: "add", path: path + "/" + escapePathComponent(key), value: JSON.parse(JSON.stringify(obj[key]))});
+        patches.push({op: "add", path: path + "/" + escapePathComponent(key), value: deepClone(obj[key])});
       }
     }
   }
