@@ -462,6 +462,9 @@ module jsonpatch {
         }
       }
       _generate(mirror.value, observer.object, observer.patches, "");
+      if(observer.patches.length) {
+        apply(mirror.value, observer.patches);
+      }
     }
     var temp = observer.patches;
     if(temp.length > 0) {
@@ -493,14 +496,12 @@ module jsonpatch {
         else {
           if (oldVal != newVal) {
             changed = true;
-            patches.push({op: "replace", path: path + "/" + escapePathComponent(key), value: newVal});
-            mirror[key] = newVal;
+            patches.push({op: "replace", path: path + "/" + escapePathComponent(key), value: JSON.parse(JSON.stringify(newVal))});
           }
         }
       }
       else {
         patches.push({op: "remove", path: path + "/" + escapePathComponent(key)});
-        delete mirror[key];
         deleted = true; // property has been deleted
       }
     }
@@ -512,8 +513,7 @@ module jsonpatch {
     for (var t = 0; t < newKeys.length; t++) {
       var key = newKeys[t];
       if (!mirror.hasOwnProperty(key)) {
-        patches.push({op: "add", path: path + "/" + escapePathComponent(key), value: obj[key]});
-        mirror[key] = JSON.parse(JSON.stringify(obj[key]));
+        patches.push({op: "add", path: path + "/" + escapePathComponent(key), value: JSON.parse(JSON.stringify(obj[key]))});
       }
     }
   }
@@ -612,7 +612,7 @@ module jsonpatch {
 
   export function compare(tree1:any, tree2:any):any[] {
     var patches = [];
-    _generate(JSON.parse(JSON.stringify(tree1)), tree2, patches, '');
+    _generate(tree1, tree2, patches, '');
     return patches;
   }
 }
