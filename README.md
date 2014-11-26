@@ -22,7 +22,7 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 ## Features
 * Allows you to apply patches on object trees for incoming traffic.
 * Allows you to freely manipulate object trees and then generate patches for outgoing traffic.
-* ES6/7 Object.observe() is used when available.
+* ES7 Object.observe() is used when available.
 * Tested in IE 8-10, Firefox, Chrome and Node.js
 
 ## Roadmap
