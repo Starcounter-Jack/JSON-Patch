@@ -739,6 +739,28 @@ describe("duplex", function () {
 
 
  describe("compare", function () {
+   it("should return patch difference between objects", function () {
+     var obj = {
+       firstName: "Albert", lastName: "Einstein",
+       phoneNumbers: [{number: "12345"}, {number: "45353"}]
+     };
+     var obj2 = {
+       firstName: "Joachim", lastName: "Wester",
+       mobileNumbers: [{number: "12345"}, {number: "45353"}]
+     };
+
+     var patches = jsonpatch.compare(obj, obj2);
+     expect(patches).toEqual([{"op": "remove", "path": "/phoneNumbers"}, {
+       "op": "replace",
+       "path": "/lastName",
+       "value": "Wester"
+     }, {"op": "replace", "path": "/firstName", "value": "Joachim"}, {
+       "op": "add",
+       "path": "/mobileNumbers",
+       "value": [{"number": "12345"}, {"number": "45353"}]
+     }]);
+   });
+
    it("should not modify the source object", function() {
      var obj = { foo: 'bar' };
      jsonpatch.compare(obj, {});
@@ -765,5 +787,13 @@ if (typeof Benchmark !== 'undefined') {
       phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
 
     jsonpatch.apply(obj2,patches);
+  });
+  suite.add('compare operation', function () {
+    var obj = { firstName:"Albert", lastName:"Einstein",
+      phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
+    var obj2 = { firstName:"Joachim", lastName:"Wester",
+      mobileNumbers:[ {number:"12345"}, {number:"45353"} ]};
+
+    var patches = jsonpatch.compare(obj, obj2);
   });
 }
