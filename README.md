@@ -1,4 +1,4 @@
-JSON-Patch
+Fast-JSON-Patch
 ===============
 
 A leaner and meaner implementation of JSON-Patch. Small footprint. High performance.
