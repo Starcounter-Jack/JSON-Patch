@@ -46,7 +46,7 @@ $ npm install fast-json-patch --save
 $ bower install fast-json-patch --save
 ```
 
-### [download as ZIP](https://github.com/my-user/my-repo/archive/master.zip)
+### [download as ZIP](https://github.com/Starcounter-Jack/Fast-JSON-Patch/archive/master.zip)
 
 
 ## Adding to your project
