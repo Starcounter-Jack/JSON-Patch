@@ -173,4 +173,4 @@ If there are no differences, returns an empty array.
 
 ## Changelog
 
-To see the list of recent changes, see [Releases](https://github.com/PuppetJs/PuppetJs/releases).
+To see the list of recent changes, see [Releases](https://github.com/Starcounter-Jack/Fast-JSON-Patch/releases).
