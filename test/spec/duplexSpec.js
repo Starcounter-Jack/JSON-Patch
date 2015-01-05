@@ -674,6 +674,24 @@ describe("duplex", function () {
         {op: "replace", path: "/user/lastName", value: "Collins"}
       ]);
     });
+
+    it('should replace null with object', function () {
+      var objA = {user: null};
+      var objB = {user: {}};
+
+      expect(jsonpatch.compare(objA, objB)).toEqual([
+        {op: "replace", path: "/user", value: {}}
+      ]);
+    });
+
+    it('should replace object with null', function () {
+      var objA = {user: {}};
+      var objB = {user: null};
+
+      expect(jsonpatch.compare(objA, objB)).toEqual([
+        {op: "replace", path: "/user", value: null}
+      ]);
+    });
   });
 
 

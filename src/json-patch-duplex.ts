@@ -500,7 +500,7 @@ module jsonpatch {
       var oldVal = mirror[key];
       if (obj.hasOwnProperty(key)) {
         var newVal = obj[key];
-        if (oldVal instanceof Object) {
+        if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
           _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
         }
         else {
