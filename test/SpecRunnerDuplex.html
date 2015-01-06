@@ -27,7 +27,11 @@
         if (currentWindowOnload) {
           currentWindowOnload();
         }
-        execJasmine();
+        loadJsonTestSuite("tests.json", "spec/json-patch-tests/tests.json", function () {
+          loadJsonTestSuite("spec_tests.json", "spec/json-patch-tests/spec_tests.json", function () {
+            execJasmine();
+          });
+        });
       };
 
       function execJasmine() {
@@ -45,11 +49,12 @@
   <link rel="stylesheet" type="text/css" href="lib/benchmark_reporter.css">
 
   <!-- include source files here... -->
-  <script src="json-patch-duplex.js"></script>
 
   <!-- include spec files here... -->
-  <script src="test.js"></script>
-  <script src="test-duplex.js"></script>
+  <script src="../src/json-patch-duplex.js"></script>
+  <script src="spec/coreSpec.js"></script>
+  <script src="spec/duplexSpec.js"></script>
+  <script src="spec/jsonPatchTestsSpec.js"></script>
 
 </head>
 

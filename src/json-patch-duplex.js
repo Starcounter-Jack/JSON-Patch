@@ -1,11 +1,21 @@
 /*!
-* json-patch-duplex.js 0.3.10
+* https://github.com/Starcounter-Jack/Fast-JSON-Patch
+* json-patch-duplex.js 0.5.0
 * (c) 2013 Joachim Wester
 * MIT license
 */
 
 var jsonpatch;
 (function (jsonpatch) {
+    /* Do nothing if module is already defined.
+    Doesn't look nice, as we cannot simply put
+    `!jsonpatch &&` before this immediate function call
+    in TypeScript.
+    */
+    if (jsonpatch.observe) {
+        return;
+    }
+
     var _objectKeys = (function () {
         if (Object.keys)
             return Object.keys;
@@ -108,6 +118,9 @@ var jsonpatch;
     /* The operations applicable to an array. Many are the same as for the object */
     var arrOps = {
         add: function (arr, i) {
+            if (i > arr.length) {
+                throw new Error("The specified index MUST NOT be greater than the number of elements in the array.");
+            }
             arr.splice(i, 0, this.value);
             return true;
         },
@@ -128,6 +141,7 @@ var jsonpatch;
     /* The operations applicable to object root. Many are the same as for the object */
     var rootOps = {
         add: function (obj) {
+            rootOps.remove.call(this, obj);
             for (var key in this.value) {
                 if (this.value.hasOwnProperty(key)) {
                     obj[key] = this.value[key];
@@ -277,6 +291,14 @@ var jsonpatch;
     }
     jsonpatch.unobserve = unobserve;
 
+    function deepClone(obj) {
+        if (typeof obj === "object") {
+            return JSON.parse(JSON.stringify(obj));
+        } else {
+            return obj;
+        }
+    }
+
     function observe(obj, callback) {
         var patches = [];
         var root = obj;
@@ -335,7 +357,7 @@ var jsonpatch;
         } else {
             observer = {};
 
-            mirror.value = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+            mirror.value = deepClone(obj);
 
             if (callback) {
                 //callbacks.push(callback); this has no purpose
@@ -430,6 +452,9 @@ var jsonpatch;
                 }
             }
             _generate(mirror.value, observer.object, observer.patches, "");
+            if (observer.patches.length) {
+                apply(mirror.value, observer.patches);
+            }
         }
         var temp = observer.patches;
         if (temp.length > 0) {
@@ -454,18 +479,16 @@ var jsonpatch;
             var oldVal = mirror[key];
             if (obj.hasOwnProperty(key)) {
                 var newVal = obj[key];
-                if (oldVal instanceof Object) {
+                if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
                     _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
                 } else {
                     if (oldVal != newVal) {
                         changed = true;
-                        patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: newVal });
-                        mirror[key] = newVal;
+                        patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: deepClone(newVal) });
                     }
                 }
             } else {
                 patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
-                delete mirror[key];
                 deleted = true; // property has been deleted
             }
         }
@@ -477,8 +500,7 @@ var jsonpatch;
         for (var t = 0; t < newKeys.length; t++) {
             var key = newKeys[t];
             if (!mirror.hasOwnProperty(key)) {
-                patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: obj[key] });
-                mirror[key] = JSON.parse(JSON.stringify(obj[key]));
+                patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: deepClone(obj[key]) });
             }
         }
     }
@@ -490,6 +512,22 @@ var jsonpatch;
         _isArray = function (obj) {
             return obj.push && typeof obj.length === 'number';
         };
+    }
+
+    //3x faster than cached /^\d+$/.test(str)
+    function isInteger(str) {
+        var i = 0;
+        var len = str.length;
+        var charCode;
+        while (i < len) {
+            charCode = str.charCodeAt(i);
+            if (charCode >= 48 && charCode <= 57) {
+                i++;
+                continue;
+            }
+            return false;
+        }
+        return true;
     }
 
     /// Apply a json-patch operation on an object tree
@@ -505,9 +543,23 @@ var jsonpatch;
             var t = 1;
             var len = keys.length;
 
+            if (patch.value === undefined && (patch.op === "add" || patch.op === "replace" || patch.op === "test")) {
+                throw new Error("'value' MUST be defined");
+            }
+            if (patch.from === undefined && (patch.op === "copy" || patch.op === "move")) {
+                throw new Error("'from' MUST be defined");
+            }
+
             while (true) {
                 if (_isArray(obj)) {
-                    var index = parseInt(keys[t], 10);
+                    var index;
+                    if (keys[t] === '-') {
+                        index = obj.length;
+                    } else if (isInteger(keys[t])) {
+                        index = parseInt(keys[t], 10);
+                    } else {
+                        throw new Error("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index");
+                    }
                     t++;
                     if (t >= len) {
                         result = arrOps[patch.op].call(patch, obj, index, tree); // Apply patch
@@ -516,7 +568,7 @@ var jsonpatch;
                     obj = obj[index];
                 } else {
                     var key = keys[t];
-                    if (key) {
+                    if (key !== undefined) {
                         if (key && key.indexOf('~') != -1)
                             key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
                         t++;
@@ -589,4 +641,3 @@ if (typeof exports !== "undefined") {
     exports.compare = jsonpatch.compare;
     exports.validate = jsonpatch.validate;
 }
-//# sourceMappingURL=json-patch-duplex.js.map

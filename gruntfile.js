@@ -4,10 +4,8 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         beautify: {
-          ascii_only: true,
+          ascii_only: true
         },
-        sourceMap: true,
-        sourceMapIncludeSources: true,
         preserveComments: "some"
       },
       default: {
@@ -22,7 +20,7 @@ module.exports = function(grunt) {
           },
         ]
       }
-    },
+    }
   });    
 grunt.loadNpmTasks('grunt-contrib-uglify');
 };

@@ -1,5 +1,6 @@
 /*!
- * json-patch-duplex.js 0.3.10
+ * https://github.com/Starcounter-Jack/Fast-JSON-Patch
+ * json-patch-duplex.js 0.5.0
  * (c) 2013 Joachim Wester
  * MIT license
  */
@@ -11,9 +12,17 @@ interface Object {
 }
 
 module jsonpatch {
+  /* Do nothing if module is already defined.
+     Doesn't look nice, as we cannot simply put 
+     `!jsonpatch &&` before this immediate function call
+     in TypeScript.
+     */
+  if (jsonpatch.observe) {
+      return;
+  }
 
 
-  var _objectKeys = (function() {
+  var _objectKeys = (function () {
     if (Object.keys)
       return Object.keys;
 
@@ -64,13 +73,13 @@ module jsonpatch {
     }
   }
 
-  /* We use a Javascript hash to store each 
-     function. Each hash entry (property) uses
-     the operation identifiers specified in rfc6902.
-     In this way, we can map each patch operation 
-     to its dedicated function in efficient way.
-     */
-     
+  /* We use a Javascript hash to store each
+   function. Each hash entry (property) uses
+   the operation identifiers specified in rfc6902.
+   In this way, we can map each patch operation
+   to its dedicated function in efficient way.
+   */
+
   /* The operations applicable to an object */
   var objOps = {
     add: function (obj, key) {
@@ -115,6 +124,9 @@ module jsonpatch {
   /* The operations applicable to an array. Many are the same as for the object */
   var arrOps = {
     add: function (arr, i) {
+      if (i > arr.length) {
+        throw new Error("The specified index MUST NOT be greater than the number of elements in the array.");
+      }
       arr.splice(i, 0, this.value);
       return true;
     },
@@ -135,6 +147,7 @@ module jsonpatch {
   /* The operations applicable to object root. Many are the same as for the object */
   var rootOps = {
     add: function (obj) {
+      rootOps.remove.call(this, obj);
       for (var key in this.value) {
         if (this.value.hasOwnProperty(key)) {
           obj[key] = this.value[key];
@@ -288,6 +301,15 @@ module jsonpatch {
 
   }
 
+  function deepClone(obj:any) {
+    if (typeof obj === "object") {
+      return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+    }
+    else {
+      return obj; //no need to clone primitives
+    }
+  }
+
   export function observe(obj:any, callback):any {
     var patches = [];
     var root = obj;
@@ -354,7 +376,7 @@ module jsonpatch {
     } else {
       observer = {};
 
-      mirror.value = JSON.parse(JSON.stringify(obj)); // Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+      mirror.value = deepClone(obj);
 
       if (callback) {
         //callbacks.push(callback); this has no purpose
@@ -450,6 +472,9 @@ module jsonpatch {
         }
       }
       _generate(mirror.value, observer.object, observer.patches, "");
+      if(observer.patches.length) {
+        apply(mirror.value, observer.patches);
+      }
     }
     var temp = observer.patches;
     if(temp.length > 0) {
@@ -475,20 +500,18 @@ module jsonpatch {
       var oldVal = mirror[key];
       if (obj.hasOwnProperty(key)) {
         var newVal = obj[key];
-        if (oldVal instanceof Object) {
+        if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
           _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
         }
         else {
           if (oldVal != newVal) {
             changed = true;
-            patches.push({op: "replace", path: path + "/" + escapePathComponent(key), value: newVal});
-            mirror[key] = newVal;
+            patches.push({op: "replace", path: path + "/" + escapePathComponent(key), value: deepClone(newVal)});
           }
         }
       }
       else {
         patches.push({op: "remove", path: path + "/" + escapePathComponent(key)});
-        delete mirror[key];
         deleted = true; // property has been deleted
       }
     }
@@ -500,8 +523,7 @@ module jsonpatch {
     for (var t = 0; t < newKeys.length; t++) {
       var key = newKeys[t];
       if (!mirror.hasOwnProperty(key)) {
-        patches.push({op: "add", path: path + "/" + escapePathComponent(key), value: obj[key]});
-        mirror[key] = JSON.parse(JSON.stringify(obj[key]));
+        patches.push({op: "add", path: path + "/" + escapePathComponent(key), value: deepClone(obj[key])});
       }
     }
   }
@@ -514,6 +536,22 @@ module jsonpatch {
     _isArray = function (obj:any) {
       return obj.push && typeof obj.length === 'number';
     }
+  }
+
+  //3x faster than cached /^\d+$/.test(str)
+  function isInteger(str:string):boolean {
+    var i = 0;
+    var len = str.length;
+    var charCode;
+    while (i < len) {
+      charCode = str.charCodeAt(i);
+      if (charCode >= 48 && charCode <= 57) {
+        i++;
+        continue;
+      }
+      return false;
+    }
+    return true;
   }
 
   /// Apply a json-patch operation on an object tree
@@ -531,9 +569,25 @@ module jsonpatch {
       var t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
       var len = keys.length;
 
+      if (patch.value === undefined && (patch.op === "add" || patch.op === "replace" || patch.op === "test")) {
+        throw new Error("'value' MUST be defined");
+      }
+      if (patch.from === undefined && (patch.op === "copy" || patch.op === "move")) {
+        throw new Error("'from' MUST be defined");
+      }
+
       while (true) {
         if (_isArray(obj)) {
-          var index = parseInt(keys[t], 10);
+          var index;
+          if (keys[t] === '-') {
+            index = obj.length;
+          }
+          else if (isInteger(keys[t])) {
+            index = parseInt(keys[t], 10);
+          }
+          else {
+            throw new Error("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index");
+          }
           t++;
           if (t >= len) {
             result = arrOps[patch.op].call(patch, obj, index, tree); // Apply patch
@@ -543,7 +597,7 @@ module jsonpatch {
         }
         else {
           var key = keys[t];
-          if(key) {
+          if (key !== undefined) {
             if (key && key.indexOf('~') != -1)
               key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
             t++;

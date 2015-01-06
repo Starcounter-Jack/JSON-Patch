@@ -1,15 +1,36 @@
 var obj, obj2, patches;
 
+if(typeof jsonpatchduplex !== 'undefined') {
+  jsonpatch = jsonpatchduplex;
+}
 if(typeof jsonpatch === 'undefined') {
   if(process.env.duplex === 'yes') { //required by `jasmine-node` test runner in Node.js
-    jsonpatch = require('./json-patch-duplex.js');
+    jsonpatch = require('./../../src/json-patch-duplex.js');
   }
   else {
-    jsonpatch = require('./json-patch.js');
+    jsonpatch = require('./../../src/json-patch.js');
   }
 }
 
-describe("JSON-Patch-Duplex", function () {
+function triggerMouseup(elem) {
+  fireEvent((elem || document.body), 'mouseup')
+}
+
+//http://stackoverflow.com/questions/827716/emulate-clicking-a-link-with-javascript-that-works-with-ie
+function fireEvent(obj, evt) {
+  var fireOnThis = obj;
+  if (document.createEvent) {
+    var evObj = document.createEvent(evt.indexOf('mouse') > -1 ? 'MouseEvents' : 'KeyboardEvent');
+    evObj.initEvent(evt, true, false);
+    fireOnThis.dispatchEvent(evObj);
+
+  } else if (document.createEventObject) {
+    var evObj = document.createEventObject();
+    fireOnThis.fireEvent('on' + evt, evObj);
+  }
+}
+
+describe("duplex", function () {
   beforeEach(function () {
     this.addMatchers({
 /**
@@ -308,6 +329,17 @@ describe("JSON-Patch-Duplex", function () {
     });*/
   });
 
+  describe("apply", function() {
+    // https://tools.ietf.org/html/rfc6902#appendix-A.16
+    it('should add an Array Value', function() {
+      var obj = { "foo": ["bar"] };
+      var patches = [ { "op": "add", "path": "/foo/-", "value": ["abc", "def"] } ];
+
+      jsonpatch.apply(obj, patches);
+      expect(obj).toEqual({ "foo": ["bar", ["abc", "def"]] });
+    });
+  });
+
   describe('callback', function() {
     it('should generate replace', function() {
       var patches;
@@ -594,8 +626,23 @@ describe("JSON-Patch-Duplex", function () {
       runs(function () {
         expect(callback.calls.length).toEqual(1);
       });
+    });
 
+    it('should generate patch after mouse up event', function() {
+      obj = { lastName:"Einstein" };
+      var lastPatches;
+      var observer = jsonpatch.observe(obj, function(patches) {
+        lastPatches = patches;
+      });
 
+      obj.lastName = "Hawking";
+      triggerMouseup();
+
+      setTimeout(function () {
+        expect(lastPatches).toEqual([
+          { op: 'replace', path: '/lastName', value: 'Hawking' }
+        ]);
+      }, 0);
     });
 
   });
@@ -625,6 +672,24 @@ describe("JSON-Patch-Duplex", function () {
 
       expect(jsonpatch.compare(objA, objB)).toEqual([
         {op: "replace", path: "/user/lastName", value: "Collins"}
+      ]);
+    });
+
+    it('should replace null with object', function () {
+      var objA = {user: null};
+      var objB = {user: {}};
+
+      expect(jsonpatch.compare(objA, objB)).toEqual([
+        {op: "replace", path: "/user", value: {}}
+      ]);
+    });
+
+    it('should replace object with null', function () {
+      var objA = {user: {}};
+      var objB = {user: null};
+
+      expect(jsonpatch.compare(objA, objB)).toEqual([
+        {op: "replace", path: "/user", value: null}
       ]);
     });
   });
@@ -689,6 +754,37 @@ describe("JSON-Patch-Duplex", function () {
 
     });
   });
+
+
+ describe("compare", function () {
+   it("should return patch difference between objects", function () {
+     var obj = {
+       firstName: "Albert", lastName: "Einstein",
+       phoneNumbers: [{number: "12345"}, {number: "45353"}]
+     };
+     var obj2 = {
+       firstName: "Joachim", lastName: "Wester",
+       mobileNumbers: [{number: "12345"}, {number: "45353"}]
+     };
+
+     var patches = jsonpatch.compare(obj, obj2);
+     expect(patches).toEqual([{"op": "remove", "path": "/phoneNumbers"}, {
+       "op": "replace",
+       "path": "/lastName",
+       "value": "Wester"
+     }, {"op": "replace", "path": "/firstName", "value": "Joachim"}, {
+       "op": "add",
+       "path": "/mobileNumbers",
+       "value": [{"number": "12345"}, {"number": "45353"}]
+     }]);
+   });
+
+   it("should not modify the source object", function() {
+     var obj = { foo: 'bar' };
+     jsonpatch.compare(obj, {});
+     expect(obj.foo ).toEqual('bar');
+   });
+ });
 
 describe("validate", function() {
 
@@ -835,5 +931,13 @@ if (typeof Benchmark !== 'undefined') {
       phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
 
     jsonpatch.apply(obj2,patches);
+  });
+  suite.add('compare operation', function () {
+    var obj = { firstName:"Albert", lastName:"Einstein",
+      phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
+    var obj2 = { firstName:"Joachim", lastName:"Wester",
+      mobileNumbers:[ {number:"12345"}, {number:"45353"} ]};
+
+    var patches = jsonpatch.compare(obj, obj2);
   });
 }

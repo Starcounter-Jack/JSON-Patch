@@ -9,7 +9,7 @@
   <script src="lib/jasmine/jasmine-html.js"></script>
 
   <script>
-    (function() {
+    (function () {
       var jasmineEnv = jasmine.getEnv();
       jasmineEnv.updateInterval = 1000;
 
@@ -17,17 +17,22 @@
 
       jasmineEnv.addReporter(htmlReporter);
 
-      jasmineEnv.specFilter = function(spec) {
+      jasmineEnv.specFilter = function (spec) {
         return htmlReporter.specFilter(spec);
       };
 
       var currentWindowOnload = window.onload;
 
-      window.onload = function() {
+      //load JSON Patch Tests (https://github.com/json-patch/json-patch-tests)
+      window.onload = function () {
         if (currentWindowOnload) {
           currentWindowOnload();
         }
-        execJasmine();
+        loadJsonTestSuite("tests.json", "spec/json-patch-tests/tests.json", function () {
+          loadJsonTestSuite("spec_tests.json", "spec/json-patch-tests/spec_tests.json", function () {
+            execJasmine();
+          });
+        });
       };
 
       function execJasmine() {
@@ -45,10 +50,12 @@
   <link rel="stylesheet" type="text/css" href="lib/benchmark_reporter.css">
 
   <!-- include source files here... -->
-  <script src="json-patch.js"></script>
 
   <!-- include spec files here... -->
-  <script src="test.js"></script>
+  <script src="../src/json-patch.js"></script>
+  <script src="spec/coreSpec.js"></script>
+  <script src="spec/jsonPatchTestsSpec.js"></script>
+
 
 </head>
 

@@ -1,4 +1,4 @@
-JSON-Patch
+Fast-JSON-Patch
 ===============
 
 A leaner and meaner implementation of JSON-Patch. Small footprint. High performance.
@@ -22,7 +22,7 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 ## Features
 * Allows you to apply patches on object trees for incoming traffic.
 * Allows you to freely manipulate object trees and then generate patches for outgoing traffic.
-* ES6/7 Object.observe() is used when available.
+* ES7 Object.observe() is used when available.
 * Tested in IE 8-10, Firefox, Chrome and Node.js
 
 ## Roadmap
@@ -46,7 +46,7 @@ $ npm install fast-json-patch --save
 $ bower install fast-json-patch --save
 ```
 
-### [download as ZIP](https://github.com/my-user/my-repo/archive/master.zip)
+### [download as ZIP](https://github.com/Starcounter-Jack/Fast-JSON-Patch/archive/master.zip)
 
 
 ## Adding to your project
@@ -106,22 +106,22 @@ var diff = jsonpatch.compare(objA, objB));
 ### In a web browser
 
 1. Testing **json-patch.js**
- - Load `src/patchtest.html` in your web browser
+ - Load `test/SpecRunner.html` in your web browser
 2. Testing **json-patch-duplex.js**
- - Load `src/test-duplex.html` in your web browser
+ - Load `test/SpecRunnerDuplex.html` in your web browser
 
-Each of the test suite files contains *Jasmine* unit test suite and *JSLitmus* performance test suite.
+Each of the test suite files contains *Jasmine* unit test suite and *Benchmark.js* performance test suite.
 
-To run *JSLitmus* performance tests, press "Run Tests" button.
+To run *Benchmark.js* performance tests, press "Run Tests" button.
 
 ### In Node.js
 
 1. Go to directory where you have cloned the repo
 2. Install Jasmine Node.js module by running command `npm install jasmine-node -g`
 3. Testing **json-patch.js**
- - Run command `jasmine-node --matchall --config duplex no src/test.js`
+ - Run command `jasmine-node --matchall --config duplex no test/spec/coreSpec.js`
 4. Testing **json-patch-duplex.js**
- - Run command `jasmine-node --matchall --config duplex yes src/test.js src/test-duplex.js`
+ - Run command `jasmine-node --matchall --config duplex yes test/spec/coreSpec.js test/spec/duplexSpec.js`
 
 ## API
 
@@ -173,50 +173,4 @@ If there are no differences, returns an empty array.
 
 ## Changelog
 
-#### 0.3.10 (Aug 21, 2014)
-
-Bugfix:
-- `test` operation failed of test if properties in two were ordered differently ([#39](https://github.com/Starcounter-Jack/JSON-Patch/issues/39))
-- implement `add`, `replace`, `test`, `move`, `copy` operation on object root ([#40](https://github.com/Starcounter-Jack/JSON-Patch/issues/40), [#45](https://github.com/Starcounter-Jack/JSON-Patch/issues/45))
-
-Upgraded test suite to use Benchmark.js instead of JSLitmus
-
-#### 0.3.9 (Aug 4, 2014)
-
-Feature:
-- expose method `jsonpatch.compare` for comparing two object trees
-
-#### 0.3.8 (Jul 18, 2014)
-
-Feature:
-- minified build now available in [dist/](https://github.com/Starcounter-Jack/JSON-Patch/tree/master/dist) directory ([#9](https://github.com/Starcounter-Jack/JSON-Patch/issues/9))
-
-#### 0.3.7 (May 5, 2014)
-
-Feature:
-- add a new method `compare` ([#24](https://github.com/Starcounter-Jack/JSON-Patch/issues/24))
-
-#### 0.3.6 (Nov 14, 2013)
-
-Update:
-- use the new record type names that landed in Chrome Canary (http://wiki.ecmascript.org/doku.php?id=harmony:observe - listed at 10/29/2013)
-
-#### 0.3.5 (Oct 28, 2013)
-
-Bugfix:
-- issues with calling observe/unobserve method on an object multiple times in Chrome (native Object.observe) ([#20](https://github.com/Starcounter-Jack/JSON-Patch/issues/20))
-
-#### 0.3.4 (Oct 16, 2013)
-
-Bugfix:
-- generate array item `remove` patches in reverse order, so they can be correctly applied in order they were generated ([#16](https://github.com/Starcounter-Jack/JSON-Patch/issues/16))
-
-#### 0.3.3 (Oct 11, 2013)
-
-Bugfixes:
-- properly escape `~` and `/` characters in poiner paths ([#19](https://github.com/Starcounter-Jack/JSON-Patch/pull/19))
-- generated patch contained array `length` (only in native Object.observe version) ([#14](https://github.com/Starcounter-Jack/JSON-Patch/issues/14))
-- `jsonpatch.unobserve` now delivers pending changes immediately (previously last-minute changes could be lost)
-- stability fixes for browsers with native `Object.observe` (Chrome)
-- code cleanup
-- removed sourcemap reference from output js file
+To see the list of recent changes, see [Releases](https://github.com/Starcounter-Jack/Fast-JSON-Patch/releases).
