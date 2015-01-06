@@ -598,34 +598,40 @@ var jsonpatch;
     }
     jsonpatch.compare = compare;
 
-    function validate(patch, multiple) {
-        if (typeof multiple === "undefined") { multiple = false; }
-        // document is an array
-        if (!_isArray(patch))
-            return [{ error: 'PATCH_TYPE' }];
+    function _validate(operation) {
+        //operation is an object
+        if (typeof operation !== 'object' || operation === null || _isArray(operation))
+            return 'OPERATION_NOT_AN_OBJECT';
+        else if (['add', 'remove', 'replace', 'move', 'copy', 'test'].indexOf(operation.op) < 0)
+            return 'OPERATION_OP_INVALID';
+        else if (typeof operation.path !== 'string')
+            return 'OPERATION_PATH_INVALID';
+        else if ((operation.op === 'move' || operation.op === 'copy') && typeof operation.from !== 'string')
+            return 'OPERATION_FROM_REQUIRED';
+        else if (['add', 'replace', 'test'].indexOf(operation.op) > -1 && operation.value === undefined)
+            return 'OPERATION_VALUE_REQUIRED';
+
+        return '';
+    }
+
+    /**
+    * Validates a sequence (array) of operations. Returns an array of errors found in the operations.
+    * If there are no errors, the array length is 0.
+    * If there are errors, an error code string is located at the array index corresponding to the array of operations.
+    * @param sequence
+    * @returns {Array}
+    */
+    function validate(sequence) {
+        // sequence is an array
+        if (!_isArray(sequence))
+            return ['SEQUENCE_NOT_AN_ARRAY'];
 
         var errors = [];
 
-        for (var i = 0; i < patch.length; i++) {
-            var obj = patch[i];
-            var error = '';
-
-            //operation is an object
-            if (typeof obj !== 'object' || obj === null || obj === undefined || _isArray(obj))
-                error = 'OPERATION_TYPE';
-            else if (['add', 'remove', 'replace', 'move', 'copy', 'test'].indexOf(obj.op) < 0)
-                error = 'OP_VALUE';
-            else if (typeof obj.path !== 'string')
-                error = 'PATH_TYPE';
-            else if ((obj.op === 'move' || obj.op === 'copy') && typeof obj.from !== 'string')
-                error = 'FROM_TYPE';
-            else if (['add', 'replace', 'test'].indexOf(obj.op) > -1 && obj.value === undefined)
-                error = 'VALUE_REQUIRED';
-
+        for (var i = 0; i < sequence.length; i++) {
+            var error = _validate(sequence[i]);
             if (error) {
-                errors.push({ index: i, error: error });
-                if (!multiple)
-                    break;
+                errors[i] = error;
             }
         }
         return errors;
