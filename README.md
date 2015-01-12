@@ -101,6 +101,27 @@ var diff = jsonpatch.compare(objA, objB));
 //diff == [{op: "replace", path: "/user/lastName", value: "Collins"}]
 ```
 
+Validating a sequence of patches:
+```
+var obj = {user: {firstName: "Albert"}};
+var patches = [{op: "replace", path: "/user/firstName", value: "Albert"}, {op: "replace", path: "/user/lastName", value: "Einstein"}];
+var errors = jsonpatch.validate(patches, obj);
+if(errors.length == 0) {
+ //there are no errors!
+}
+else {
+  for(var i=0; i<errors.length; i++) {
+    if(!errors[i]) {
+      console.log("Valid patch at index", i, patches[i]);
+    }
+    else {
+      console.error("Invalid patch at index", i, errors[i], patches[i]);
+    }
+  }
+}
+```
+
+
 ## Testing
 
 ### In a web browser
@@ -153,7 +174,7 @@ Available in *json-patch-duplex.js*
 If there are pending changes in `obj`, returns them synchronously. If a `callback` was defined in `observe`
 method, it will be triggered synchronously as well.
 
-If there are no pending changes in `obj`, returns an empty array.
+If there are no pending changes in `obj`, returns an empty array (length 0).
 
 #### jsonpatch.unobserve (`obj` Object, `observer` Object) : void
 
@@ -169,7 +190,28 @@ Available in *json-patch-duplex.js*
 
 Compares object trees `obj1` and `obj2` and returns the difference relative to `obj1` as a patches array.
 
-If there are no differences, returns an empty array.
+If there are no differences, returns an empty array (length 0).
+
+#### jsonpatch.validate (`patches` Array, `tree` Object (optional) : `errors` Array
+
+Available in *json-patch-duplex.js*
+
+Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree.
+
+If there are errors, returns an array with error codes located at the array index of the operation. If there are no errors, returns an empty array (length 0).
+
+Possible errors:
+
+Error code                    | Description
+------------------------------|------------
+SEQUENCE_NOT_AN_ARRAY         | Sequence of operations is not an array
+OPERATION_NOT_AN_OBJECT       | Operation is not an object
+OPERATION_OP_INVALID          | Operation `op` property is not one of operations defined in RFC-6902
+OPERATION_PATH_INVALID        | Operation `path` property is not a string
+OPERATION_FROM_REQUIRED       | Operation `from` property is not present (applicable in `move` and `copy` operations)
+OPERATION_VALUE_REQUIRED      | Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)
+OPERATION_PATH_ALREADY_EXISTS | Cannot perform an `add` operation at a path that already exists
+OPERATION_PATH_UNRESOLVABLE   | Cannot perform a `replace`, `remove`, `move` or `copy` operation at a path that doesn't exist
 
 ## Changelog
 

@@ -886,6 +886,37 @@ describe("validate", function() {
       expect(errors[1]).toBe(undefined);
       expect(errors[2]).toBe('OPERATION_OP_INVALID');
     });
+
+    it('should return error removing an unexisting path', function() {
+      var tree = {
+        name: "Elvis"
+      };
+      var sequence = [{"op": "remove", "path": "/name/first"}];
+      var errors = jsonpatch.validate(sequence, tree);
+      expect(errors.length).toBe(1);
+      expect(errors[0]).toBe('OPERATION_PATH_UNRESOLVABLE');
+    });
+
+    it('should return error when adding an already existing path', function() {
+      var tree = {
+        name: "Elvis"
+      };
+      var sequence = [{"op": "add", "path": "/name", "value": "Freddie"}];
+      var errors = jsonpatch.validate(sequence, tree);
+      expect(errors.length).toBe(1);
+      expect(errors[0]).toBe('OPERATION_PATH_ALREADY_EXISTS');
+    });
+
+    it('should return error when replacing a removed path', function() {
+      var tree = {
+        name: "Elvis"
+      };
+      var sequence = [{"op": "remove", "path": "/name"}, {"op": "replace", "path": "/name", "value": "Freddie"}];
+      var errors = jsonpatch.validate(sequence, tree);
+      expect(errors.length).toBe(2);
+      expect(errors[0]).toBe(undefined);
+      expect(errors[1]).toBe('OPERATION_PATH_UNRESOLVABLE');
+    });
   });
 });
 

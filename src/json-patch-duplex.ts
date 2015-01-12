@@ -626,46 +626,67 @@ module jsonpatch {
     return patches;
   }
 
-  function _validate(operation):string {
-    //operation is an object
+  function _validate(operation:any, tree?:any):string {
+    //Operation is not an object
     if(typeof operation !== 'object' || operation === null || _isArray(operation))
       return 'OPERATION_NOT_AN_OBJECT';
 
-    //operation.op is valid
+    //Operation `op` property is not one of operations defined in RFC-6902
     else if (['add', 'remove', 'replace', 'move', 'copy', 'test'].indexOf(operation.op) < 0)
       return 'OPERATION_OP_INVALID';
 
-    //operation.path is a string
+    //Operation `path` property is not a string
     else if(typeof operation.path !== 'string')
       return 'OPERATION_PATH_INVALID';
 
-    //operation.from is a string for move and copy operations
+    //Operation `from` property is not present (applicable in `move` and `copy` operations)
     else if ((operation.op === 'move' || operation.op === 'copy') && typeof operation.from !== 'string')
       return 'OPERATION_FROM_REQUIRED';
 
-    //operation.value is present for add, replace and test operations
+    //Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)
     else if (['add', 'replace', 'test'].indexOf(operation.op) > -1 && operation.value === undefined)
       return 'OPERATION_VALUE_REQUIRED';
+
+    else if (tree) {
+      var test = {op: "_get", path: operation.path, value: undefined}; //undefined is an invaild value in JSON (ECMA-404)
+      apply(tree, [test]);
+      if (test.value !== undefined) {
+        //Cannot perform an `add` operation at a path that already exists
+        if (operation.op == "add") {
+          return 'OPERATION_PATH_ALREADY_EXISTS';
+        }
+      }
+      else { //path does not exist
+        if (operation.op !== "add") {
+          return 'OPERATION_PATH_UNRESOLVABLE';
+        }
+      }
+      apply(tree, [operation]);
+    }
 
     return '';
   }
 
   /**
-   * Validates a sequence (array) of operations. Returns an array of errors found in the operations.
-   * If there are no errors, the array length is 0.
-   * If there are errors, an error code string is located at the array index corresponding to the array of operations.
+   * Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree.
+   * If there are errors, returns an array with error codes located at the array index of the operation. If there are no errors, returns an empty array (length 0).
    * @param sequence
+   * @param tree
    * @returns {Array}
    */
-  export function validate(sequence:any[]):any[] {
+  export function validate(sequence:any[], tree?:any):any[] {
     // sequence is an array
     if(!_isArray(sequence))
       return ['SEQUENCE_NOT_AN_ARRAY'];
 
     var errors = [];
+    if(tree) {
+      tree = JSON.parse(JSON.stringify(tree)); //clone tree so that we can safely try applying operations
+    }
 
     for (var i = 0; i < sequence.length; i++) {
-      var error = _validate(sequence[i]);
+      var error = _validate(sequence[i], tree);
+
       if (error) {
         errors[i] = error;
       }
