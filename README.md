@@ -99,7 +99,7 @@ var patches = jsonpatch.generate(observer);
 //   { op:"add", path="/contactDetails/phoneNumbers/1", value:{number:"456"}}];
 ```
 Comparing two object trees:
-```
+```js
 var objA = {user: {firstName: "Albert", lastName: "Einstein"}};
 var objB = {user: {firstName: "Albert", lastName: "Collins"}};
 var diff = jsonpatch.compare(objA, objB));
@@ -107,16 +107,16 @@ var diff = jsonpatch.compare(objA, objB));
 ```
 
 Validating a sequence of patches:
-```
+```js
 var obj = {user: {firstName: "Albert"}};
 var patches = [{op: "replace", path: "/user/firstName", value: "Albert"}, {op: "replace", path: "/user/lastName", value: "Einstein"}];
 var errors = jsonpatch.validate(patches, obj);
-if(errors.length == 0) {
+if (errors.length == 0) {
  //there are no errors!
 }
 else {
-  for(var i=0; i<errors.length; i++) {
-    if(!errors[i]) {
+  for (var i=0; i<errors.length; i++) {
+    if (!errors[i]) {
       console.log("Valid patch at index", i, patches[i]);
     }
     else {
