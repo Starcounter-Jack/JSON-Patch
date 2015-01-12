@@ -192,7 +192,7 @@ Compares object trees `obj1` and `obj2` and returns the difference relative to `
 
 If there are no differences, returns an empty array (length 0).
 
-#### jsonpatch.validate (`patches` Array, `tree` Object (optional) : `errors` Array
+#### jsonpatch.validate (`patches` Array, `tree` Object (optional)) : `errors` Array
 
 Available in *json-patch-duplex.js*
 
