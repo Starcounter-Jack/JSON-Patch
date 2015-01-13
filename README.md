@@ -30,11 +30,6 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 * ES7 Object.observe() is used when available.
 * Tested in IE 8-10, Firefox, Chrome and Node.js
 
-## Roadmap
-
-* A /bin directory will be added with minified versions
-* More unit tests
-
 
 ## Install
 
