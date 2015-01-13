@@ -192,11 +192,11 @@ Compares object trees `obj1` and `obj2` and returns the difference relative to `
 
 If there are no differences, returns an empty array (length 0).
 
-#### jsonpatch.validate (`patches` Array, `tree` Object (optional)) : `errors` Array
+#### jsonpatch.validate (`patches` Array, `tree` Object (optional), `stopOnFirstError` Boolean) : `errors` Array
 
 Available in *json-patch-duplex.js*
 
-Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree.
+Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree. If `stopOnFirstError` parameter is set to `true`, validation stops after first error is encountered.
 
 If there are errors, returns an array with error codes located at the array index of the operation. If there are no errors, returns an empty array (length 0).
 

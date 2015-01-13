@@ -917,6 +917,69 @@ describe("validate", function() {
       expect(errors[0]).toBe(undefined);
       expect(errors[1]).toBe('OPERATION_PATH_UNRESOLVABLE');
     });
+
+    it('should allow to override validator to add custom validation', function() {
+      var tree = {
+        password: "Elvis"
+      };
+      var sequence = [
+        {"op": "replace", "path": "/password", "value": "Elvis123"},
+        {"op": "replace", "path": "/password", "value": "Presley123"},
+        {"op": "replace", "path": "/password"}
+      ];
+
+      function CustomJsonPatch() {
+      }; //Object.create would be better, but let's make it testable also in IE8
+      CustomJsonPatch.prototype = jsonpatch;
+      var customJsonpatch = new CustomJsonPatch();
+      customJsonpatch.validator = function (operation, tree, oldValue) {
+        var error = CustomJsonPatch.prototype.validator.call(this, operation, tree, oldValue);
+        if (error) {
+          return error;
+        }
+
+        if (operation.op === "replace" && String(operation.value).indexOf(oldValue) > -1) {
+          return 'OPERATION_VALUE_MUST_NOT_CONTAIN_OLD_VALUE';
+        }
+
+        return '';
+      };
+
+      var customErrors = customJsonpatch.validate(sequence, tree);
+      expect(customErrors.length).toBe(3);
+      expect(customErrors[0]).toBe('OPERATION_VALUE_MUST_NOT_CONTAIN_OLD_VALUE');
+      expect(customErrors[1]).toBe(undefined);
+      expect(customErrors[2]).toBe('OPERATION_VALUE_REQUIRED'); //overridden validator should detect the error
+
+      var errors = jsonpatch.validate(sequence, tree);
+      expect(errors.length).toBe(3);
+      expect(errors[0]).toBe(undefined);
+      expect(errors[1]).toBe(undefined);
+      expect(errors[2]).toBe('OPERATION_VALUE_REQUIRED'); //original validator should only detect a built-in error
+    });
+
+    it('should not stop after first error by default', function() {
+      var sequence = [
+        {"op": "replace", "path": "/name"},
+        {"op": "move", "path": "/name"}
+      ];
+
+      var errors = jsonpatch.validate(sequence);
+      expect(errors.length).toBe(2);
+      expect(errors[0]).toBe('OPERATION_VALUE_REQUIRED');
+      expect(errors[1]).toBe('OPERATION_FROM_REQUIRED');
+    });
+
+    it('should stop after first error when stopAfterFirstError=true', function() {
+      var sequence = [
+        {"op": "replace", "path": "/name"},
+        {"op": "move", "path": "/name"}
+      ];
+
+      var errors = jsonpatch.validate(sequence, null, true);
+      expect(errors.length).toBe(1);
+      expect(errors[0]).toBe('OPERATION_VALUE_REQUIRED');
+    });
   });
 });
 

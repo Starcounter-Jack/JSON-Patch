@@ -626,17 +626,24 @@ module jsonpatch {
     return patches;
   }
 
-  function _validate(operation:any, tree?:any):string {
+  /**
+   * Validates a single operation. Called from jsonpatch.validate. Returns error code as a string. Empty string means no error.
+   * @param operation {Object}
+   * @param tree {Object} Optional
+   * @param oldValue Optional. (comes along with `tree`)
+   * @returns {String}
+   */
+  export function validator(operation:any, tree?:any, oldValue?:any):string {
     //Operation is not an object
-    if(typeof operation !== 'object' || operation === null || _isArray(operation))
+    if (typeof operation !== 'object' || operation === null || _isArray(operation))
       return 'OPERATION_NOT_AN_OBJECT';
 
     //Operation `op` property is not one of operations defined in RFC-6902
-    else if (['add', 'remove', 'replace', 'move', 'copy', 'test'].indexOf(operation.op) < 0)
+    else if (operation.op !== 'add' && operation.op !== 'remove' && operation.op !== 'replace' && operation.op !== 'move' && operation.op !== 'copy' && operation.op !== 'test')
       return 'OPERATION_OP_INVALID';
 
     //Operation `path` property is not a string
-    else if(typeof operation.path !== 'string')
+    else if (typeof operation.path !== 'string')
       return 'OPERATION_PATH_INVALID';
 
     //Operation `from` property is not present (applicable in `move` and `copy` operations)
@@ -644,13 +651,11 @@ module jsonpatch {
       return 'OPERATION_FROM_REQUIRED';
 
     //Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)
-    else if (['add', 'replace', 'test'].indexOf(operation.op) > -1 && operation.value === undefined)
+    else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && operation.value === undefined)
       return 'OPERATION_VALUE_REQUIRED';
 
     else if (tree) {
-      var test = {op: "_get", path: operation.path, value: undefined}; //undefined is an invaild value in JSON (ECMA-404)
-      apply(tree, [test]);
-      if (test.value !== undefined) {
+      if (oldValue !== undefined) {
         //Cannot perform an `add` operation at a path that already exists
         if (operation.op == "add") {
           return 'OPERATION_PATH_ALREADY_EXISTS';
@@ -661,7 +666,6 @@ module jsonpatch {
           return 'OPERATION_PATH_UNRESOLVABLE';
         }
       }
-      apply(tree, [operation]);
     }
 
     return '';
@@ -672,23 +676,35 @@ module jsonpatch {
    * If there are errors, returns an array with error codes located at the array index of the operation. If there are no errors, returns an empty array (length 0).
    * @param sequence
    * @param tree
+   * @param stopAfterFirstError {Boolean}
    * @returns {Array}
    */
-  export function validate(sequence:any[], tree?:any):any[] {
+  export function validate(sequence:any[], tree?:any, stopAfterFirstError?:boolean):any[] {
     // sequence is an array
-    if(!_isArray(sequence))
+    if (!_isArray(sequence))
       return ['SEQUENCE_NOT_AN_ARRAY'];
 
     var errors = [];
-    if(tree) {
+    if (tree) {
       tree = JSON.parse(JSON.stringify(tree)); //clone tree so that we can safely try applying operations
     }
 
     for (var i = 0; i < sequence.length; i++) {
-      var error = _validate(sequence[i], tree);
+      if (tree) {
+        var test = { op: "_get", path: sequence[i].path, value: undefined };
+        apply(tree, [test]);
+      }
+      var error = this.validator(sequence[i], tree, tree ? test.value : undefined);
 
       if (error) {
         errors[i] = error;
+
+        if(stopAfterFirstError) {
+          break;
+        }
+      }
+      else if (tree) {
+        apply(tree, [sequence[i]]);
       }
     }
     return errors;
@@ -704,4 +720,5 @@ if (typeof exports !== "undefined") {
   exports.generate = jsonpatch.generate;
   exports.compare = jsonpatch.compare;
   exports.validate = jsonpatch.validate;
+  exports.validator = jsonpatch.validator;
 }

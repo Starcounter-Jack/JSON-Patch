@@ -598,22 +598,27 @@ var jsonpatch;
     }
     jsonpatch.compare = compare;
 
-    function _validate(operation, tree) {
+    /**
+    * Validates a single operation. Called from jsonpatch.validate. Returns error code as a string. Empty string means no error.
+    * @param operation {Object}
+    * @param tree {Object} Optional
+    * @param oldValue Optional. (comes along with `tree`)
+    * @returns {String}
+    */
+    function validator(operation, tree, oldValue) {
         //Operation is not an object
         if (typeof operation !== 'object' || operation === null || _isArray(operation))
             return 'OPERATION_NOT_AN_OBJECT';
-        else if (['add', 'remove', 'replace', 'move', 'copy', 'test'].indexOf(operation.op) < 0)
+        else if (operation.op !== 'add' && operation.op !== 'remove' && operation.op !== 'replace' && operation.op !== 'move' && operation.op !== 'copy' && operation.op !== 'test')
             return 'OPERATION_OP_INVALID';
         else if (typeof operation.path !== 'string')
             return 'OPERATION_PATH_INVALID';
         else if ((operation.op === 'move' || operation.op === 'copy') && typeof operation.from !== 'string')
             return 'OPERATION_FROM_REQUIRED';
-        else if (['add', 'replace', 'test'].indexOf(operation.op) > -1 && operation.value === undefined)
+        else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && operation.value === undefined)
             return 'OPERATION_VALUE_REQUIRED';
         else if (tree) {
-            var test = { op: "_get", path: operation.path, value: undefined };
-            apply(tree, [test]);
-            if (test.value !== undefined) {
+            if (oldValue !== undefined) {
                 //Cannot perform an `add` operation at a path that already exists
                 if (operation.op == "add") {
                     return 'OPERATION_PATH_ALREADY_EXISTS';
@@ -623,20 +628,21 @@ var jsonpatch;
                     return 'OPERATION_PATH_UNRESOLVABLE';
                 }
             }
-            apply(tree, [operation]);
         }
 
         return '';
     }
+    jsonpatch.validator = validator;
 
     /**
     * Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree.
     * If there are errors, returns an array with error codes located at the array index of the operation. If there are no errors, returns an empty array (length 0).
     * @param sequence
     * @param tree
+    * @param stopAfterFirstError {Boolean}
     * @returns {Array}
     */
-    function validate(sequence, tree) {
+    function validate(sequence, tree, stopAfterFirstError) {
         // sequence is an array
         if (!_isArray(sequence))
             return ['SEQUENCE_NOT_AN_ARRAY'];
@@ -647,10 +653,20 @@ var jsonpatch;
         }
 
         for (var i = 0; i < sequence.length; i++) {
-            var error = _validate(sequence[i], tree);
+            if (tree) {
+                var test = { op: "_get", path: sequence[i].path, value: undefined };
+                apply(tree, [test]);
+            }
+            var error = this.validator(sequence[i], tree, tree ? test.value : undefined);
 
             if (error) {
                 errors[i] = error;
+
+                if (stopAfterFirstError) {
+                    break;
+                }
+            } else if (tree) {
+                apply(tree, [sequence[i]]);
             }
         }
         return errors;
@@ -665,4 +681,5 @@ if (typeof exports !== "undefined") {
     exports.generate = jsonpatch.generate;
     exports.compare = jsonpatch.compare;
     exports.validate = jsonpatch.validate;
+    exports.validator = jsonpatch.validator;
 }
