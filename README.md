@@ -18,7 +18,7 @@ JSON Patch plays well with the HTTP PATCH verb (method) and REST style programmi
 Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) about it.
 
 ## Footprint
-0.5 KB minified and gzipped (1.1 KB minified)
+1.22 KB minified and gzipped (3 KB minified)
 
 ## Performance
 ![Fast](http://www.rebelslounge.com/res/jsonpatch/chart3.png)
