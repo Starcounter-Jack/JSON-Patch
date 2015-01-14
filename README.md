@@ -7,7 +7,7 @@ With Fast-JSON-Patch, you can:
 - **apply** patches
 - **observe** for changes (and generate patches when a change is detected)
 - **compare** two objects (to obtain the difference)
-- **valiate** a sequence of patches
+- **validate** a sequence of patches
 
 ## Why you should use JSON-Patch
 
