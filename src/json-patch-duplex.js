@@ -171,7 +171,9 @@ var jsonpatch;
         test: function (obj) {
             return (JSON.stringify(obj) === JSON.stringify(this.value));
         },
-        _get: objOps._get
+        _get: function (obj) {
+            this.value = obj;
+        }
     };
 
     var observeOps = {

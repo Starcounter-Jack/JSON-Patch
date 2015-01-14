@@ -980,6 +980,18 @@ describe("validate", function() {
       expect(errors.length).toBe(1);
       expect(errors[0]).toBe('OPERATION_VALUE_REQUIRED');
     });
+
+    it('should pass replacing the tree root', function() {
+      var tree = {
+        password: "Elvis"
+      };
+      var sequence = [
+        {"op": "replace", "path": "", value: {}}
+      ];
+
+      var errors = jsonpatch.validate(sequence, tree);
+      expect(errors.length).toBe(0);
+    });
   });
 });
 
