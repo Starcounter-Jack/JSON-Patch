@@ -673,6 +673,20 @@ module jsonpatch {
     return '';
   }
 
+  function isValidPath(path, tree) {
+    var keys = path.split('/');
+    var t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
+    var len = keys.length;
+    while(t < len) {
+      if(tree[keys[t]] === undefined) {
+        return false;
+      }
+      tree = tree[keys[t]];
+      t++;
+    }
+    return true;
+  }
+
   /**
    * Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree.
    * If there are errors, returns an array with error codes located at the array index of the operation. If there are no errors, returns an empty array (length 0).
@@ -692,11 +706,15 @@ module jsonpatch {
     }
 
     for (var i = 0; i < sequence.length; i++) {
+      var oldValue = undefined;
       if (tree) {
-        var test = { op: "_get", path: sequence[i].path, value: undefined };
-        apply(tree, [test]);
+        if(isValidPath(sequence[i].path, tree)) {
+          var test = { op: "_get", path: sequence[i].path, value: undefined };
+          apply(tree, [test]);
+          oldValue = test.value;
+        }
       }
-      var error = this.validator(sequence[i], tree, tree ? test.value : undefined);
+      var error = this.validator(sequence[i], tree, oldValue);
 
       if (error) {
         errors[i] = error;

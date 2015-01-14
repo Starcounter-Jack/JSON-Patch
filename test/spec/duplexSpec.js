@@ -887,11 +887,47 @@ describe("validate", function() {
       expect(errors[2]).toBe('OPERATION_OP_INVALID');
     });
 
+    it('should return error replacing an unexisting path', function() {
+      var tree = {
+        "": "empty string is a valid key",
+        name: "Elvis",
+        cars: [{
+          brand: "Jaguar"
+        }],
+        address: {}
+      };
+      var sequence = [
+        {"op": "replace", "path": "/name/first", value:""},
+        {"op": "replace", "path": "/firstName", value:""},
+        {"op": "replace", "path": "/cars/0/name", value:""},
+        {"op": "replace", "path": "/cars/1/name", value:""},
+        {"op": "replace", "path": "/children/0/name", value:""},
+        {"op": "replace", "path": "/address/address/address", value:""},
+        {"op": "replace", "path": "/address/address", value:""},
+        {"op": "replace", "path": "/address", value:""},
+        {"op": "replace", "path": "/name", value:""},
+        {"op": "replace", "path": "/", value:""},
+        {"op": "replace", "path": "", value:""}
+      ];
+      var errors = jsonpatch.validate(sequence, tree);
+      expect(errors.length).toBe(7);
+      expect(errors[0]).toBe('OPERATION_PATH_UNRESOLVABLE');
+      expect(errors[1]).toBe('OPERATION_PATH_UNRESOLVABLE');
+      expect(errors[2]).toBe('OPERATION_PATH_UNRESOLVABLE');
+      expect(errors[3]).toBe('OPERATION_PATH_UNRESOLVABLE');
+      expect(errors[4]).toBe('OPERATION_PATH_UNRESOLVABLE');
+      expect(errors[5]).toBe('OPERATION_PATH_UNRESOLVABLE');
+      expect(errors[6]).toBe('OPERATION_PATH_UNRESOLVABLE');
+    });
+
     it('should return error removing an unexisting path', function() {
       var tree = {
-        name: "Elvis"
+        name: "Elvis",
+        cars: []
       };
-      var sequence = [{"op": "remove", "path": "/name/first"}];
+      var sequence = [
+        {"op": "remove", "path": "/name/first"}
+      ];
       var errors = jsonpatch.validate(sequence, tree);
       expect(errors.length).toBe(1);
       expect(errors[0]).toBe('OPERATION_PATH_UNRESOLVABLE');
@@ -929,7 +965,7 @@ describe("validate", function() {
       ];
 
       function CustomJsonPatch() {
-      }; //Object.create would be better, but let's make it testable also in IE8
+      } //Object.create would be better, but let's make it testable also in IE8
       CustomJsonPatch.prototype = jsonpatch;
       var customJsonpatch = new CustomJsonPatch();
       customJsonpatch.validator = function (operation, tree, oldValue) {
