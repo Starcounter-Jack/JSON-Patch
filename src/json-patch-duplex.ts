@@ -9,11 +9,14 @@ interface Object {
   observe : any;
   deliverChangeRecords : any;
   unobserve : any;
+  setPrototypeOf : any;
 }
+
+var OriginalError = Error;
 
 module jsonpatch {
   /* Do nothing if module is already defined.
-     Doesn't look nice, as we cannot simply put 
+     Doesn't look nice, as we cannot simply put
      `!jsonpatch &&` before this immediate function call
      in TypeScript.
      */
@@ -125,7 +128,7 @@ module jsonpatch {
   var arrOps = {
     add: function (arr, i) {
       if (i > arr.length) {
-        throw new Error("The specified index MUST NOT be greater than the number of elements in the array.");
+        throw new OriginalError("The specified index MUST NOT be greater than the number of elements in the array.");
       }
       arr.splice(i, 0, this.value);
       return true;
@@ -236,7 +239,7 @@ module jsonpatch {
     }
     var path = _getPathRecursive(root, obj);
     if (path === '') {
-      throw new Error("Object not found in root");
+      throw new OriginalError("Object not found in root");
     }
     return '/' + path;
   }
@@ -386,7 +389,7 @@ module jsonpatch {
         observer.next = null;
         var intervals = this.intervals || [100, 1000, 10000, 60000];
         if (intervals.push === void 0) {
-          throw new Error("jsonpatch.intervals must be an array");
+          throw new OriginalError("jsonpatch.intervals must be an array");
         }
         var currentInterval = 0;
 
@@ -572,10 +575,10 @@ module jsonpatch {
       var len = keys.length;
 
       if (patch.value === undefined && (patch.op === "add" || patch.op === "replace" || patch.op === "test")) {
-        throw new Error("'value' MUST be defined");
+        throw new OriginalError("'value' MUST be defined");
       }
       if (patch.from === undefined && (patch.op === "copy" || patch.op === "move")) {
-        throw new Error("'from' MUST be defined");
+        throw new OriginalError("'from' MUST be defined");
       }
 
       while (true) {
@@ -588,7 +591,7 @@ module jsonpatch {
             index = parseInt(keys[t], 10);
           }
           else {
-            throw new Error("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index");
+            throw new OriginalError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index");
           }
           t++;
           if (t >= len) {
@@ -628,57 +631,72 @@ module jsonpatch {
     return patches;
   }
 
+  export declare class OriginalError {
+    public name:string;
+    public message:string;
+    public stack:string;
+
+    constructor(message?:string);
+  }
+
+  export class FastJsonPatchError extends OriginalError {
+    constructor(public message:string, public name:string, public operation?:any, public tree?:any) {
+      super(message);
+    }
+  }
+
+  export var Error = FastJsonPatchError;
+
   /**
    * Validates a single operation. Called from jsonpatch.validate. Returns error code as a string. Empty string means no error.
    * @param operation {Object}
    * @param tree {Object} Optional
    * @param oldValue Optional. (comes along with `tree`)
-   * @returns {String}
+   * @returns {Error|undefined}
    */
-  export function validator(operation:any, tree?:any, oldValue?:any):string {
-    //Operation is not an object
-    if (typeof operation !== 'object' || operation === null || _isArray(operation))
-      return 'OPERATION_NOT_AN_OBJECT';
+  export function validator(operation:any, tree?:any, oldValue?:any):FastJsonPatchError {
+    if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
+      return new FastJsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', operation, tree);
+    }
 
-    //Operation `op` property is not one of operations defined in RFC-6902
-    else if (operation.op !== 'add' && operation.op !== 'remove' && operation.op !== 'replace' && operation.op !== 'move' && operation.op !== 'copy' && operation.op !== 'test')
-      return 'OPERATION_OP_INVALID';
+    else if (operation.op !== 'add' && operation.op !== 'remove' && operation.op !== 'replace' && operation.op !== 'move' && operation.op !== 'copy' && operation.op !== 'test') {
+      return new FastJsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', operation, tree);
+    }
 
-    //Operation `path` property is not a string
-    else if (typeof operation.path !== 'string')
-      return 'OPERATION_PATH_INVALID';
+    else if (typeof operation.path !== 'string') {
+      return new FastJsonPatchError('Operation `path` property is not a string', 'OPERATION_PATH_INVALID', operation, tree);
+    }
 
-    //Operation `from` property is not present (applicable in `move` and `copy` operations)
-    else if ((operation.op === 'move' || operation.op === 'copy') && typeof operation.from !== 'string')
-      return 'OPERATION_FROM_REQUIRED';
+    else if ((operation.op === 'move' || operation.op === 'copy') && typeof operation.from !== 'string') {
+      return new FastJsonPatchError('Operation `from` property is not present (applicable in `move` and `copy` operations)', 'OPERATION_FROM_REQUIRED', operation, tree);
+    }
 
-    //Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)
-    else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && operation.value === undefined)
-      return 'OPERATION_VALUE_REQUIRED';
+    else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && operation.value === undefined) {
+      return new FastJsonPatchError('Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)', 'OPERATION_VALUE_REQUIRED', operation, tree);
+    }
 
     else if (tree) {
       if (oldValue !== undefined) {
-        //Cannot perform an `add` operation at a path that already exists
         if (operation.op == "add") {
-          return 'OPERATION_PATH_ALREADY_EXISTS';
+          return new FastJsonPatchError('Cannot perform an `add` operation at a path that already exists', 'OPERATION_PATH_ALREADY_EXISTS', operation, tree);
         }
       }
-      else { //path does not exist
+      else {
         if (operation.op !== "add") {
-          return 'OPERATION_PATH_UNRESOLVABLE';
+          return new FastJsonPatchError('Cannot perform the operation at a path that does not exist', 'OPERATION_PATH_UNRESOLVABLE', operation, tree);
         }
       }
     }
 
-    return '';
+    return undefined;
   }
 
   function isValidPath(path, tree) {
     var keys = path.split('/');
     var t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
     var len = keys.length;
-    while(t < len) {
-      if(tree[keys[t]] === undefined) {
+    while (t < len) {
+      if (tree[keys[t]] === undefined) {
         return false;
       }
       tree = tree[keys[t]];
@@ -696,9 +714,10 @@ module jsonpatch {
    * @returns {Array}
    */
   export function validate(sequence:any[], tree?:any, stopAfterFirstError?:boolean):any[] {
-    // sequence is an array
-    if (!_isArray(sequence))
-      return ['SEQUENCE_NOT_AN_ARRAY'];
+    if (!_isArray(sequence)) {
+      var err = new FastJsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
+      return [err];
+    }
 
     var errors = [];
     if (tree) {
@@ -708,8 +727,8 @@ module jsonpatch {
     for (var i = 0; i < sequence.length; i++) {
       var oldValue = undefined;
       if (tree) {
-        if(isValidPath(sequence[i].path, tree)) {
-          var test = { op: "_get", path: sequence[i].path, value: undefined };
+        if (isValidPath(sequence[i].path, tree)) {
+          var test = {op: "_get", path: sequence[i].path, value: undefined};
           apply(tree, [test]);
           oldValue = test.value;
         }
@@ -719,7 +738,7 @@ module jsonpatch {
       if (error) {
         errors[i] = error;
 
-        if(stopAfterFirstError) {
+        if (stopAfterFirstError) {
           break;
         }
       }
@@ -741,4 +760,6 @@ if (typeof exports !== "undefined") {
   exports.compare = jsonpatch.compare;
   exports.validate = jsonpatch.validate;
   exports.validator = jsonpatch.validator;
+  exports.FastJsonPatchError = jsonpatch.FastJsonPatchError;
+  exports.Error = jsonpatch.Error;
 }
