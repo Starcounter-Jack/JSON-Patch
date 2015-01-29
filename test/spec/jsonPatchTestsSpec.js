@@ -21,7 +21,7 @@ function executeJsonTestSuite(name, tests) {
         var testName = test.comment || test.error || JSON.stringify(test.patch);
         if (test.expected) {
           it("should succeed: " + testName, function () {
-            jsonpatch.apply(test.doc, test.patch);
+            jsonpatch.apply(test.doc, test.patch, true);
             expect(test.doc).toEqual(test.expected)
           });
         }
@@ -29,7 +29,7 @@ function executeJsonTestSuite(name, tests) {
           it("should throw an error: " + testName, function () {
             var errors = 0;
             try {
-              var res = jsonpatch.apply(test.doc, test.patch);
+              var res = jsonpatch.apply(test.doc, test.patch, true);
               if (res === false) {
                 throw new Error("Test failed");
               }

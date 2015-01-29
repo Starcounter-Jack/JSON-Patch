@@ -5,9 +5,9 @@ A leaner and meaner implementation of JSON-Patch. Small footprint. High performa
 
 With Fast-JSON-Patch, you can:
 - **apply** patches
+- **validate** a sequence of patches
 - **observe** for changes (and generate patches when a change is detected)
 - **compare** two objects (to obtain the difference)
-- **validate** a sequence of patches
 
 ## Why you should use JSON-Patch
 
@@ -192,26 +192,33 @@ Compares object trees `obj1` and `obj2` and returns the difference relative to `
 
 If there are no differences, returns an empty array (length 0).
 
-#### jsonpatch.validate (`patches` Array, `tree` Object (optional), `stopOnFirstError` Boolean) : `errors` Array
+#### jsonpatch.validate (`patches` Array, `tree` Object (optional)) : `error` JsonPatchError
 
-Available in *json-patch-duplex.js*
+Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree.
 
-Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree. If `stopOnFirstError` parameter is set to `true`, validation stops after first error is encountered.
+If there are no errors, returns undefined. If there is an errors, returns a JsonPatchError object with the following properties:
 
-If there are errors, returns an array with error codes located at the array index of the operation. If there are no errors, returns an empty array (length 0).
+- `name` String - short error code
+- `message` String - long human readable error message
+- `index` Number - index of the operation in the sequence
+- `operation` Object - reference to the operation
+- `tree` Object - reference to the tree
 
 Possible errors:
 
-Error code                    | Description
+Error name                    | Error message
 ------------------------------|------------
-SEQUENCE_NOT_AN_ARRAY         | Sequence of operations is not an array
+SEQUENCE_NOT_AN_ARRAY         | Patch sequence must be an array
 OPERATION_NOT_AN_OBJECT       | Operation is not an object
 OPERATION_OP_INVALID          | Operation `op` property is not one of operations defined in RFC-6902
 OPERATION_PATH_INVALID        | Operation `path` property is not a string
 OPERATION_FROM_REQUIRED       | Operation `from` property is not present (applicable in `move` and `copy` operations)
 OPERATION_VALUE_REQUIRED      | Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)
-OPERATION_PATH_ALREADY_EXISTS | Cannot perform an `add` operation at a path that already exists
-OPERATION_PATH_UNRESOLVABLE   | Cannot perform a `replace`, `remove`, `move` or `copy` operation at a path that doesn't exist
+OPERATION_PATH_CANNOT_ADD     | Cannot perform an `add` operation at the desired path
+OPERATION_PATH_UNRESOLVABLE   | Cannot perform the operation at a path that does not exist
+OPERATION_FROM_UNRESOLVABLE   | Cannot perform the operation from a path that does not exist
+OPERATION_PATH_ILLEGAL_ARRAY_INDEX | Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index
+OPERATION_VALUE_OUT_OF_BOUNDS | The specified index MUST NOT be greater than the number of elements in the array
 
 ## Changelog
 
