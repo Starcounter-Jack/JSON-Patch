@@ -146,13 +146,16 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 
 ## API
 
-#### jsonpatch.apply (`obj` Object, `patches` Array) : boolean
+#### jsonpatch.apply (`obj` Object, `patches` Array, `debug` Boolean) : boolean
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
 Applies `patches` array on `obj`.
 
-If patch was succesfully applied, returns `true`. Otherwise returns `false`.
+If the `debug` parameter is set to `true`, the patch is extensively validated before applying.
+An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
+
+If patch was succesfully applied, returns `true`.
 
 If there was a `test` patch in `patches` array, returns the result of the test.
 
@@ -193,6 +196,8 @@ Compares object trees `obj1` and `obj2` and returns the difference relative to `
 If there are no differences, returns an empty array (length 0).
 
 #### jsonpatch.validate (`patches` Array, `tree` Object (optional)) : `error` JsonPatchError
+
+Available in *json-patch.js* and *json-patch-duplex.js*
 
 Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree.
 
