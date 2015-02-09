@@ -629,11 +629,11 @@ var jsonpatch;
     jsonpatch.Error = JsonPatchError;
 
     /**
-    * Validates a single operation. Called from jsonpatch.validate. Throws JsonPatchError in case of an error.
-    * @param operation {Object}
-    * @param index {Number}
-    * @param tree {Object} Optional
-    * @param existingPathFragment Optional. (comes along with `tree`)
+    * Validates a single operation. Called from `jsonpatch.validate`. Throws `JsonPatchError` in case of an error.
+    * @param {object} operation - operation object (patch)
+    * @param {number} index - index of operation in the sequence
+    * @param {object} [tree] - object where the operation is supposed to be applied
+    * @param {string} [existingPathFragment] - comes along with `tree`
     */
     function validator(operation, index, tree, existingPathFragment) {
         if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
