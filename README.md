@@ -3,7 +3,7 @@ JSON-Patch
 
 A leaner and meaner implementation of JSON-Patch. Small footprint. High performance.
 
-With Fast-JSON-Patch, you can:
+With JSON-Patch, you can:
 - **apply** patches
 - **validate** a sequence of patches
 - **observe** for changes (and generate patches when a change is detected)
@@ -46,7 +46,7 @@ $ npm install fast-json-patch --save
 $ bower install fast-json-patch --save
 ```
 
-### [download as ZIP](https://github.com/Starcounter-Jack/Fast-JSON-Patch/archive/master.zip)
+### [download as ZIP](https://github.com/Starcounter-Jack/JSON-Patch/archive/master.zip)
 
 
 ## Adding to your project
@@ -227,4 +227,4 @@ OPERATION_VALUE_OUT_OF_BOUNDS | The specified index MUST NOT be greater than the
 
 ## Changelog
 
-To see the list of recent changes, see [Releases](https://github.com/Starcounter-Jack/Fast-JSON-Patch/releases).
+To see the list of recent changes, see [Releases](https://github.com/Starcounter-Jack/JSON-Patch/releases).

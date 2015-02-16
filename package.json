@@ -1,8 +1,8 @@
 {
   "name": "fast-json-patch",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Fast implementation of JSON-Patch (RFC-6902) with duplex (observe changes) capabilities",
-  "homepage": "https://github.com/Starcounter-Jack/Fast-JSON-Patch",
+  "homepage": "https://github.com/Starcounter-Jack/JSON-Patch",
   "keywords": [
     "json",
     "patch",
@@ -11,10 +11,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/Starcounter-Jack/Fast-JSON-Patch.git"
+    "url": "git://github.com/Starcounter-Jack/JSON-Patch.git"
   },
   "bugs": {
-    "url": "https://github.com/Starcounter-Jack/Fast-JSON-Patch/issues"
+    "url": "https://github.com/Starcounter-Jack/JSON-Patch/issues"
   },
   "author": {
     "name": "Joachim Wester",
