@@ -146,13 +146,13 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 
 ## API
 
-#### jsonpatch.apply (`obj` Object, `patches` Array, `debug` Boolean) : boolean
+#### jsonpatch.apply (`obj` Object, `patches` Array, `validate` Boolean) : boolean
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
 Applies `patches` array on `obj`.
 
-If the `debug` parameter is set to `true`, the patch is extensively validated before applying.
+If the `validate` parameter is set to `true`, the patch is extensively validated before applying.
 An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
 
 If patch was succesfully applied, returns `true`.

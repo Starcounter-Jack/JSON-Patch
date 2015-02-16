@@ -557,7 +557,7 @@ module jsonpatch {
   }
 
   /// Apply a json-patch operation on an object tree
-  export function apply(tree:any, patches:any[], debug?:boolean):boolean {
+  export function apply(tree:any, patches:any[], validate?:boolean):boolean {
     var result = false
         , p = 0
         , plen = patches.length
@@ -576,7 +576,7 @@ module jsonpatch {
       while (true) {
         key = keys[t];
 
-        if (debug) {
+        if (validate) {
           if (existingPathFragment == undefined) {
             if (obj[key] == undefined) {
               existingPathFragment = keys.slice(0, t).join('/');
@@ -602,13 +602,13 @@ module jsonpatch {
             key = obj.length;
           }
           else {
-            if (debug && !isInteger(key)) {
+            if (validate && !isInteger(key)) {
               throw new JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", p - 1, patch.path, patch);
             }
             key = parseInt(key, 10);
           }
           if (t >= len) {
-            if (debug && patch.op === "add" && key > obj.length) {
+            if (validate && patch.op === "add" && key > obj.length) {
               throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", p - 1, patch.path, patch);
             }
             result = arrOps[patch.op].call(patch, obj, key, tree); // Apply patch
