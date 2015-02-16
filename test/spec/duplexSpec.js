@@ -13,7 +13,9 @@ if(typeof jsonpatch === 'undefined') {
 }
 
 function triggerMouseup(elem) {
-  fireEvent((elem || document.body), 'mouseup')
+  if (typeof document !== 'undefined') {
+    fireEvent((elem || document.documentElement), 'mouseup');
+  }
 }
 
 //http://stackoverflow.com/questions/827716/emulate-clicking-a-link-with-javascript-that-works-with-ie

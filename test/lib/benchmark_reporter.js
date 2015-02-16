@@ -43,23 +43,25 @@ function benchmarkReporter(suite) {
     }
   }
 
-  window.addEventListener("load", function () {
-    var button = document.createElement('button');
-    button.innerHTML = "Run benchmark";
-    button.addEventListener("click", function () {
-      suite.run();
+  if (window.addEventListener) {
+    window.addEventListener("load", function () {
+      var button = document.createElement('button');
+      button.innerHTML = "Run benchmark";
+      button.addEventListener("click", function () {
+        suite.run();
+      });
+      document.body.appendChild(button);
+
+      var p = document.createElement('p');
+      p.innerHTML = Benchmark.platform.toString();
+      document.body.appendChild(p);
+
+      table.id = "test_results";
+      document.body.appendChild(table);
+
+      renderBenchmark();
     });
-    document.body.appendChild(button);
-
-    var p = document.createElement('p');
-    p.innerHTML = Benchmark.platform.toString();
-    document.body.appendChild(p);
-
-    table.id = "test_results";
-    document.body.appendChild(table);
-
-    renderBenchmark();
-  });
+  }
 
   suite.on('cycle', function (event) {
     //renderBenchmark();

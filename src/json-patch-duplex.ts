@@ -414,9 +414,9 @@ module jsonpatch {
             window.addEventListener('keydown', fastCheck);
           }
           else { //IE8
-            window.attachEvent('onmousedown', fastCheck);
-            window.attachEvent('onmouseup', fastCheck);
-            window.attachEvent('onkeydown', fastCheck);
+            document.documentElement.attachEvent('onmousedown', fastCheck);
+            document.documentElement.attachEvent('onmouseup', fastCheck);
+            document.documentElement.attachEvent('onkeydown', fastCheck);
           }
         }
         observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
