@@ -222,14 +222,14 @@ module jsonpatch {
         key = keys[t];
 
         if (validate) {
-          if (existingPathFragment == undefined) {
-            if (obj[key] == undefined) {
+          if (existingPathFragment === undefined) {
+            if (obj[key] === undefined) {
               existingPathFragment = keys.slice(0, t).join('/');
             }
             else if (t == len - 1) {
               existingPathFragment = patch.path;
             }
-            if (existingPathFragment != undefined) {
+            if (existingPathFragment !== undefined) {
               this.validator(patch, p - 1, tree, existingPathFragment);
             }
           }
