@@ -196,6 +196,23 @@ var jsonpatch;
             };
             patches.push(patch);
         },
+        'splice': function (operationObjects, path) {
+            for(var removedNo = 0, removedLen = this.removed.length; removedNo < removedLen; removedNo++){
+                operationObjects.push({
+                    op: "remove",
+                    path: path + this.index // operation objects will get applied in sequence, so we will still be removing at same index 
+                });
+            }
+            var addedCount = 0;
+            while(addedCount < this.addedCount){                
+                operationObjects.push({
+                    op: "add",
+                    path: path + (this.index + addedCount),
+                    value: this.object[(this.index + addedCount)]
+                });
+                addedCount++;
+            }
+        },
         update: function (patches, path) {
             var patch = {
                 op: "replace",
@@ -329,26 +346,12 @@ var jsonpatch;
                 _unobserve(observer, obj);
                 _observe(observer, obj);
 
-                var a = 0, alen = arr.length;
+                var a = 0, alen = arr.length, change;
                 while (a < alen) {
-                    if (!(arr[a].name === 'length' && _isArray(arr[a].object)) && !(arr[a].name === '__Jasmine_been_here_before__')) {
-                        var type = arr[a].type;
-
-                        switch (type) {
-                            case 'new':
-                                type = 'add';
-                                break;
-
-                            case 'deleted':
-                                type = 'delete';
-                                break;
-
-                            case 'updated':
-                                type = 'update';
-                                break;
-                        }
-
-                        observeOps[type].call(arr[a], patches, getPath(root, arr[a].object));
+                    var change = arr[a];
+                    console.log(_isArray(change.object), mirror);
+                    if ( !(change.name === '__Jasmine_been_here_before__')) {
+                        observeOps[ change.type ].call(change, patches, getPath(root, change.object) );
                     }
                     a++;
                 }
@@ -418,8 +421,9 @@ var jsonpatch;
 
     /// Listen to changes on an object tree, accumulate patches
     function _observe(observer, obj) {
-        if (Object.observe) {
-            Object.observe(obj, observer);
+        var type = _isArray(obj) ? Array : Object;
+        if (type.observe) {
+            type.observe(obj, observer);
             for (var key in obj) {
                 if (obj.hasOwnProperty(key)) {
                     var v = obj[key];
@@ -506,7 +510,7 @@ var jsonpatch;
 
         for (var t = 0; t < newKeys.length; t++) {
             var key = newKeys[t];
-            if (!mirror.hasOwnProperty(key)) {
+            if (!mirror.hasOwnProperty(key) && obj[key]!== undefined) {
                 patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: deepClone(obj[key]) });
             }
         }

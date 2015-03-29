@@ -646,6 +646,47 @@ describe("duplex", function () {
         ]);
       }, 0);
     });
+    it('should generate nice remove op on array.splice', function() {
+        obj = { items: ["a", "b", "c"]};
+        var observer = jsonpatch.observe(obj);
+
+        obj.items.splice(1, 1); // <<-- removing second item in-place
+
+        patches = jsonpatch.generate(observer);
+
+        // Expect to have only one 'remove' operation, otherwise patches for big arrays are way too long:
+        // essentially it says to replace *every* item and remove last one.
+        // In case array items are not trivial, this may cause performance issues too, I guess.
+        expect(patches).toEqual([
+            { op: 'remove', path: '/items/1' }
+        ]);
+
+        obj2 = { items: ["a", "b", "c"]};
+        jsonpatch.apply(obj2,patches);
+        expect(obj).toEqualInJson(obj2);
+    });
+    it('should generate nice removes and adds op on array.splice', function() {
+        obj = { items: ["a", "b", "c", "d", "e"]};
+        var observer = jsonpatch.observe(obj);
+
+        obj.items.splice(1, 2, "2", "3"); // <<-- removing second item in-place
+
+        patches = jsonpatch.generate(observer);
+
+        // Expect to have only one 'remove' operation, otherwise patches for big arrays are way too long:
+        // essentially it says to replace *every* item and remove last one.
+        // In case array items are not trivial, this may cause performance issues too, I guess.
+        expect(patches).toEqual([
+            { op: 'remove', path: '/items/1' },
+            { op: 'remove', path: '/items/1' },
+            { op: 'add', path: '/items/1', value: "2" },
+            { op: 'add', path: '/items/12', value: "3" }
+        ]);
+
+        obj2 = { items: ["a", "b", "c"]};
+        jsonpatch.apply(obj2,patches);
+        expect(obj).toEqualInJson(obj2);
+    });
 
   });
 
