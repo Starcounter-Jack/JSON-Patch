@@ -23,6 +23,13 @@ All fields except 'doc' and 'patch' are optional. Test records consisting only
 of a comment are also OK.
 
 
+Files
+-----
+
+- tests.json: the main test file
+- spec_tests.json: tests from the RFC6902 spec
+
+
 Writing Tests
 -------------
 
