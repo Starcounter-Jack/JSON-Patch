@@ -286,7 +286,7 @@ describe("duplex", function () {
     });
 
     //related issue: https://github.com/Starcounter-Jack/JSON-Patch/issues/14
-    it('should generate the same patch using Object.observe and shim', function() {
+    it('should generate the same patch using Object.observe & Array.observe and shim', function() {
       var arr1 = [
         ["Albert", "Einstein"],
         ["Erwin", "Shrodinger"]
@@ -301,8 +301,10 @@ describe("duplex", function () {
 
       var objectObservePatches = jsonpatch.generate(observer1);
 
-      var _observe = Object.observe;
+      var _oObserve = Object.observe;
       Object.observe = undefined;
+      var _aObserve = Array.observe;
+      Array.observe = undefined;
 
       var observer2 = jsonpatch.observe(arr2);
       arr2.push(newRecord);
@@ -311,7 +313,8 @@ describe("duplex", function () {
 
       expect(objectObservePatches).toEqual(shimPatches);
 
-      Object.observe = _observe;
+      Object.observe = _oObserve;
+      Array.observe = _aObserve;
     });
 
     /*it('should not generate the same patch twice (move)', function() { //"move" is not implemented yet in jsonpatch.generate
@@ -646,6 +649,7 @@ describe("duplex", function () {
         ]);
       }, 0);
     });
+    // https://github.com/Starcounter-Jack/JSON-Patch/issues/65
     it('should generate nice remove op on array.splice', function() {
         obj = { items: ["a", "b", "c"]};
         var observer = jsonpatch.observe(obj);
@@ -673,17 +677,16 @@ describe("duplex", function () {
 
         patches = jsonpatch.generate(observer);
 
-        // Expect to have only one 'remove' operation, otherwise patches for big arrays are way too long:
-        // essentially it says to replace *every* item and remove last one.
-        // In case array items are not trivial, this may cause performance issues too, I guess.
+        // Expect to have two 'remove' operation at index 1, and `add` for every added item,
+        // NO `replace` for any old value.
         expect(patches).toEqual([
             { op: 'remove', path: '/items/1' },
             { op: 'remove', path: '/items/1' },
             { op: 'add', path: '/items/1', value: "2" },
-            { op: 'add', path: '/items/12', value: "3" }
+            { op: 'add', path: '/items/2', value: "3" }
         ]);
 
-        obj2 = { items: ["a", "b", "c"]};
+        obj2 = { items: ["a", "2", "3", "d", "e"]};
         jsonpatch.apply(obj2,patches);
         expect(obj).toEqualInJson(obj2);
     });
