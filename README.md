@@ -70,6 +70,7 @@ var jsonpatch = require('fast-json-patch')
 ## Usage
 
 Applying patches:
+
 ```js
 var myobj = { firstName:"Albert", contactDetails: { phoneNumbers: [ ] } };
 var patches = [
@@ -81,6 +82,7 @@ jsonpatch.apply( myobj, patches );
 // myobj == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
 ```
 Generating patches:
+
 ```js
 var myobj = { firstName:"Joachim", lastName:"Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
 observer = jsonpatch.observe( myobj );
@@ -94,6 +96,7 @@ var patches = jsonpatch.generate(observer);
 //   { op:"add", path="/contactDetails/phoneNumbers/1", value:{number:"456"}}];
 ```
 Comparing two object trees:
+
 ```js
 var objA = {user: {firstName: "Albert", lastName: "Einstein"}};
 var objB = {user: {firstName: "Albert", lastName: "Collins"}};
@@ -102,6 +105,7 @@ var diff = jsonpatch.compare(objA, objB));
 ```
 
 Validating a sequence of patches:
+
 ```js
 var obj = {user: {firstName: "Albert"}};
 var patches = [{op: "replace", path: "/user/firstName", value: "Albert"}, {op: "replace", path: "/user/lastName", value: "Einstein"}];
@@ -110,7 +114,7 @@ if (errors.length == 0) {
  //there are no errors!
 }
 else {
-  for (var i=0; i<errors.length; i++) {
+  for (var i=0; i < errors.length; i++) {
     if (!errors[i]) {
       console.log("Valid patch at index", i, patches[i]);
     }
@@ -218,12 +222,26 @@ OPERATION_NOT_AN_OBJECT       | Operation is not an object
 OPERATION_OP_INVALID          | Operation `op` property is not one of operations defined in RFC-6902
 OPERATION_PATH_INVALID        | Operation `path` property is not a string
 OPERATION_FROM_REQUIRED       | Operation `from` property is not present (applicable in `move` and `copy` operations)
-OPERATION_VALUE_REQUIRED      | Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)
+OPERATION_VALUE_REQUIRED      | Operation `value` property is not present, or `undefined` (applicable in `add`, `replace` and `test` operations)
 OPERATION_PATH_CANNOT_ADD     | Cannot perform an `add` operation at the desired path
 OPERATION_PATH_UNRESOLVABLE   | Cannot perform the operation at a path that does not exist
 OPERATION_FROM_UNRESOLVABLE   | Cannot perform the operation from a path that does not exist
 OPERATION_PATH_ILLEGAL_ARRAY_INDEX | Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index
 OPERATION_VALUE_OUT_OF_BOUNDS | The specified index MUST NOT be greater than the number of elements in the array
+
+
+## `undefined`s (JSON to JS extension)
+
+As `undefined` is not a valid value for any JSON node, it's also not valid value o JSON Patch operation object value property. Therefore, for valid JSON document, `jsonpatch` will not generate JSON Patches that sets anything to `undefined`.
+
+However, to play nicer with natural JavaScipt objects `jsonpatch` can be applied to an object that contains `undefined`, in such case we will treat it as JS does. `.apply` will handle JSON Patches with `value: undefined` as any other falsy value. `.generate`, `.compare`, `.observe` methods will also produce JSON Patches with `undefined`s, but only for (non valid) JSON documents that contains it.
+
+
+## :no_entry_sign: `undefined`s (JS to JSON projection)
+
+~~As `undefined` is not a valid value for any JSON node, it's also not valid value o JSON Patch operation object value property. Therefore `jsonpatch` will not generate JSON Patches that sets anything to `undefined`.~~
+
+~~However, to play nicer with natural JavaScipt objects `jsonpatch` can be applied to an object that contains `undefined`, in such case we will use it as native `JSON.stringify` - we will treat them as non-existing nodes, and map to `null` for array elements.~~
 
 ## Changelog
 

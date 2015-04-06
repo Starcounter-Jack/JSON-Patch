@@ -329,6 +329,119 @@ describe("duplex", function () {
       patches = jsonpatch.generate(observer);
       expect(patches).toEqual([]);
     });*/
+  
+    xdescribe("undefined - JS to JSON projection", function(){
+      it('when value is set to `undefined`, should generate remove (undefined is JSON.stringified to no value)', function() {
+        var obj = {foo: "bar"};
+
+        var observer = jsonpatch.observe(obj);
+        obj.foo = undefined;
+
+        var patches = jsonpatch.generate(observer);
+        expect(patches).toEqual([{op: 'remove', path: '/foo'}]);
+      });
+
+      it('when new property is added, and set to `undefined`, nothing should be generated (undefined is JSON.stringified to no value)', function() {
+        var obj = {foo: "bar"};
+
+        var observer = jsonpatch.observe(obj);
+        obj.baz = undefined;
+
+        var patches = jsonpatch.generate(observer);
+        expect(patches).toEqual([]);
+      });
+
+      it('when array element is set to `undefined`, should generate replace to `null` (undefined array elements are JSON.stringified to `null`)', function() {
+        var obj = {foo: [0,1,2]};
+
+        var observer = jsonpatch.observe(obj);
+        obj.foo[1] = undefined;
+
+        var patches = jsonpatch.generate(observer);
+        expect(patches).toEqual([{op: 'replace', path: '/foo/1', value: null}]);
+      });
+
+      it('when `undefined` property is set to something, should generate add (undefined is JSON.stringified to no value)', function() {
+        var obj = {foo: undefined};
+
+        var observer = jsonpatch.observe(obj);
+        obj.foo = "something";
+
+        var patches = jsonpatch.generate(observer);
+        expect(patches).toEqual([{op: 'add', path: '/foo', value: "something"}]);
+      });
+      it('when `undefined` array element is set to something, should generate replace (undefined array elements are JSON.stringified to `null`)', function() {
+        var obj = {foo: [0,undefined,2]};
+
+        var observer = jsonpatch.observe(obj);
+        obj.foo[1] = 1;
+
+        var patches = jsonpatch.generate(observer);
+        expect(patches).toEqual([{op: 'replace', path: '/foo/1', value: 1}]);
+      });
+    });
+    describe("undefined - JSON to JS extension", function(){
+
+      it('when new property is added, and set to `undefined`, add generated ', function() {
+        var obj = {foo: "bar"};
+
+        var observer = jsonpatch.observe(obj);
+        obj.baz = undefined;
+
+        var patches = jsonpatch.generate(observer);
+        expect(patches).toEqual([{op: 'add', path: '/baz', value: undefined}]);
+      });
+
+      describe("should generate replace, when", function(){
+        it('value is set to `undefined`', function() {
+          var obj = {foo: "bar"};
+
+          var observer = jsonpatch.observe(obj);
+          obj.foo = undefined;
+
+          var patches = jsonpatch.generate(observer);
+          expect(patches).toEqual([{op: 'replace', path: '/foo', value: undefined}]);
+        });
+        it('array element is set to `undefined`', function() {
+          var obj = {foo: [0,1,2]};
+
+          var observer = jsonpatch.observe(obj);
+          obj.foo[1] = undefined;
+
+          var patches = jsonpatch.generate(observer);
+          expect(patches).toEqual([{op: 'replace', path: '/foo/1', value: undefined}]);
+        });
+
+        it('`undefined` property is set to something', function() {
+          var obj = {foo: undefined};
+
+          var observer = jsonpatch.observe(obj);
+          obj.foo = "something";
+
+          var patches = jsonpatch.generate(observer);
+          expect(patches).toEqual([{op: 'replace', path: '/foo', value: "something"}]);
+        });
+        it('`undefined` array element is set to something', function() {
+          var obj = {foo: [0,undefined,2]};
+
+          var observer = jsonpatch.observe(obj);
+          obj.foo[1] = 1;
+
+          var patches = jsonpatch.generate(observer);
+          expect(patches).toEqual([{op: 'replace', path: '/foo/1', value: 1}]);
+        });
+      });
+      it("should generate remove when `undefined` property get removed", function(){
+        var obj = {foo: undefined};
+
+        var observer = jsonpatch.observe(obj);
+        delete obj.foo;
+
+        var patches = jsonpatch.generate(observer);
+        expect(patches).toEqual([{op: 'remove', path: '/foo'}]);
+
+      });
+    });
   });
 
   describe("apply", function() {

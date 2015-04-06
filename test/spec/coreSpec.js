@@ -130,6 +130,96 @@ describe("core", function () {
   });
 });
 
+
+describe("undefined - JS to JSON projection / JSON to JS extension", function () {
+  describe("jsonpatch should apply", function(){
+
+    it('add for properties already set to `undefined` in target JS document', function() {
+      var obj = {"hello": "world", "nothing": undefined};
+      jsonpatch.apply(obj, [{"op":"add","path":"/nothing","value":"defined"}]);
+
+      expect(obj).toEqual({"hello": "world", "nothing": "defined"});
+    });
+
+    it('add for properties with value set to `undefined` (extension)', function() {
+      var obj = {"hello": "world"};
+      jsonpatch.apply(obj, [{"op":"add","path":"/nothing","value": undefined}]);
+
+      expect(obj).toEqual({"hello": "world", "nothing": undefined});
+    });
+
+    it('remove on element already set to `undefined`, and remove it completely', function() {
+      obj = {foo: 1, not: undefined};
+
+      jsonpatch.apply(obj, [{op: 'remove', path: '/not'}]);
+      expect(obj).toEqual({foo: 1});
+    });
+    it('remove on array element set to `undefined`', function() {
+      obj = {foo: 1, bar: [0, 1, undefined, 3]};
+
+      jsonpatch.apply(obj, [{op: 'remove', path: '/bar/2'}]);
+      expect(obj).toEqual({foo: 1, bar: [0, 1, 3]});
+    });
+
+
+    it('replace on element set to `undefined`', function() {
+      obj = {foo: 1, not: undefined};
+
+      jsonpatch.apply(obj, [{op: 'replace', path: '/not', value: "defined"}]);
+      expect(obj).toEqual({foo: 1, not: "defined"});
+    });
+    it('replace on array element set to `undefined`', function() {
+      obj = {foo: 1, bar: [0, 1, undefined, 3]};
+
+      jsonpatch.apply(obj, [{op: 'replace', path: '/bar/2', value: "defined"}]);
+      expect(obj).toEqual({foo: 1, bar: [0, 1, "defined", 3]});
+    });
+    it('replace element with `undefined` (extension)', function() {
+      obj = {foo: 1};
+
+      jsonpatch.apply(obj, [{op: 'replace', path: '/foo', value: undefined}]);
+      expect(obj).toEqual({foo: undefined});
+    });
+    it('replace array element with `undefined` (extension)', function() {
+      obj = {foo: 1, bar: [0, 1, 2, 3]};
+
+      jsonpatch.apply(obj, [{op: 'replace', path: '/bar/2', value: undefined}]);
+      expect(obj).toEqual({foo: 1, bar: [0, 1, undefined, 3]});
+    });
+    it('test on element set to `undefined`', function() {
+      obj = {foo: 1, not: undefined};
+      expect(jsonpatch.apply(obj, [{op: 'test', path: '/not', value: "defined"}])).toBe(false);
+      expect(jsonpatch.apply(obj, [{op: 'test', path: '/not', value: undefined}])).toBe(true);
+    });
+    it('test on array element set to `undefined`', function() {
+      obj = {foo: 1, bar: [0, 1, undefined, 3]};
+      expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/2', value: "defined"}])).toBe(false);
+      expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/2', value: null}])).toBe(false);
+      expect(jsonpatch.apply(obj, [{op: 'test', path: '/bar/2', value: undefined}])).toBe(true);
+    });
+
+    it('move of `undefined`', function() {
+      obj = {foo: undefined, baz: "defined"};
+
+      jsonpatch.apply(obj, [{op: 'move', from: '/foo', path: '/bar'}]);
+      expect(obj).toEqual({baz: "defined", bar: undefined});
+
+      jsonpatch.apply(obj, [{op: 'move', from: '/bar', path: '/baz'}]);
+      expect(obj).toEqual({baz: undefined});
+    });
+
+    it('copy of `undefined`', function() {
+      obj = {foo: undefined, baz: "defined"};
+
+      jsonpatch.apply(obj, [{op: 'copy', from: '/foo', path: '/bar'}]);
+      expect(obj).toEqual({foo: undefined, baz: "defined", bar: undefined});
+
+      jsonpatch.apply(obj, [{op: 'copy', from: '/bar', path: '/baz'}]);
+      expect(obj).toEqual({foo: undefined, baz: undefined, bar: undefined});
+    });
+  });
+});
+
 // Benchmark performance test
 if (typeof Benchmark !== 'undefined') {
   var suite = new Benchmark.Suite;
