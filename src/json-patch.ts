@@ -83,7 +83,7 @@ module jsonpatch {
       return true;
     },
     remove: function (obj, key) {
-      delete obj[key];
+      obj[key] = undefined;
       return true;
     },
     replace: function (obj, key) {
