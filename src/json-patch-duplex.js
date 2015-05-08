@@ -598,6 +598,7 @@ var jsonpatch;
                         break;
                     }
                 }
+                obj[key] = obj[key] || (isNaN(parseInt(keys[t], 10)) ? {} : []);
                 obj = obj[key];
             }
         }
