@@ -332,23 +332,7 @@ var jsonpatch;
                 var a = 0, alen = arr.length;
                 while (a < alen) {
                     if (!(arr[a].name === 'length' && _isArray(arr[a].object)) && !(arr[a].name === '__Jasmine_been_here_before__')) {
-                        var type = arr[a].type;
-
-                        switch (type) {
-                            case 'new':
-                                type = 'add';
-                                break;
-
-                            case 'deleted':
-                                type = 'delete';
-                                break;
-
-                            case 'updated':
-                                type = 'update';
-                                break;
-                        }
-
-                        observeOps[type].call(arr[a], patches, getPath(root, arr[a].object));
+                        observeOps[arr[a].type].call(arr[a], patches, getPath(root, arr[a].object));
                     }
                     a++;
                 }

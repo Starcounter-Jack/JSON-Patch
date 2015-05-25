@@ -342,25 +342,7 @@ module jsonpatch {
             !(arr[a].name === 'length' && _isArray(arr[a].object))
               && !(arr[a].name === '__Jasmine_been_here_before__')
             ) {
-            var type = arr[a].type;
-
-            //old record type names before 10/29/2013 (http://wiki.ecmascript.org/doku.php?id=harmony:observe)
-            //this block can be removed when Chrome 33 stable is released
-            switch(type) {
-              case 'new':
-                type = 'add';
-                break;
-
-              case 'deleted':
-                type = 'delete';
-                break;
-
-              case 'updated':
-                type = 'update';
-                break;
-            }
-
-            observeOps[type].call(arr[a], patches, getPath(root, arr[a].object));
+            observeOps[arr[a].type].call(arr[a], patches, getPath(root, arr[a].object));
           }
           a++;
         }
