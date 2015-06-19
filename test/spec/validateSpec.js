@@ -113,6 +113,24 @@ describe("validate", function() {
     expect(error.name).toBe('OPERATION_VALUE_REQUIRED');
   });
 
+  it('should return an error if an "add" operation "value" contains "undefined"', function () {
+      var error = jsonpatch.validate([{ "op": "add", "path": "/a/b/c", "value": { foo: undefined } }]);
+      expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
+      expect(error.name).toBe('OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED');
+  });
+
+  it('should return an error if a "replace" operation "value" contains is "undefined"', function () {
+      var error = jsonpatch.validate([{ "op": "replace", "path": "/a/b/c", "value": { foos: [undefined] } }]);
+      expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
+      expect(error.name).toBe('OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED');
+  });
+
+  it('should return an error if a "test" operation "value" contains is "undefined"', function () {
+      var error = jsonpatch.validate([{ "op": "test", "path": "/a/b/c", "value": { foo: { bars: [undefined] }} }]);
+      expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
+      expect(error.name).toBe('OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED');
+  });
+
   it('should return an error if a "move" operation is missing "from" property', function() {
     var error = jsonpatch.validate([{ "op": "move", "path": "/a/b/c"}]);
     expect(error instanceof jsonpatch.JsonPatchError).toBe(true);

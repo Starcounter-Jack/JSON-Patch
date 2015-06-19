@@ -223,6 +223,7 @@ OPERATION_OP_INVALID          | Operation `op` property is not one of operations
 OPERATION_PATH_INVALID        | Operation `path` property is not a string
 OPERATION_FROM_REQUIRED       | Operation `from` property is not present (applicable in `move` and `copy` operations)
 OPERATION_VALUE_REQUIRED      | Operation `value` property is not present, or `undefined` (applicable in `add`, `replace` and `test` operations)
+OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED  | Operation `value` property object has at least one `undefined` value (applicable in `add`, `replace` and `test` operations)
 OPERATION_PATH_CANNOT_ADD     | Cannot perform an `add` operation at the desired path
 OPERATION_PATH_UNRESOLVABLE   | Cannot perform the operation at a path that does not exist
 OPERATION_FROM_UNRESOLVABLE   | Cannot perform the operation from a path that does not exist
