@@ -119,13 +119,13 @@ describe("validate", function() {
       expect(error.name).toBe('OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED');
   });
 
-  it('should return an error if a "replace" operation "value" contains is "undefined"', function () {
+  it('should return an error if a "replace" operation "value" contains "undefined"', function () {
       var error = jsonpatch.validate([{ "op": "replace", "path": "/a/b/c", "value": { foos: [undefined] } }]);
       expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
       expect(error.name).toBe('OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED');
   });
 
-  it('should return an error if a "test" operation "value" contains is "undefined"', function () {
+  it('should return an error if a "test" operation "value" contains "undefined"', function () {
       var error = jsonpatch.validate([{ "op": "test", "path": "/a/b/c", "value": { foo: { bars: [undefined] }} }]);
       expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
       expect(error.name).toBe('OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED');
