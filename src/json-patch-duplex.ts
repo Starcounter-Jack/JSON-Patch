@@ -549,7 +549,8 @@ module jsonpatch {
       patch = patches[p];
       p++;
       // Find the object
-      var keys = patch.path.split('/');
+      var path = patch.path || "";
+      var keys = path.split('/');
       var obj = tree;
       var t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
       var len = keys.length;

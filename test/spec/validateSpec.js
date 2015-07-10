@@ -286,4 +286,43 @@ describe("validate", function() {
     var error = jsonpatch.validate(sequence, tree);
     expect(error.name).toBe('OPERATION_FROM_UNRESOLVABLE');
   });
+
+  it('should throw OPERATION_PATH_INVALID when applying patch without path', function () {
+      var a = {};
+      var ex = null;
+
+      try {
+          jsonpatch.apply(a, [{ op: "replace", value: "" }], true);
+      } catch (e) {
+          ex = e;
+      }
+
+      expect(ex.name).toBe("OPERATION_PATH_INVALID");
+  });
+
+  it('should throw OPERATION_OP_INVALID when applying patch without operation', function () {
+      var a = {};
+      var ex = null;
+
+      try {
+          jsonpatch.apply(a, [{ path: "/foo", value: "" }], true);
+      } catch (e) {
+          ex = e;
+      }
+
+      expect(ex.name).toBe("OPERATION_OP_INVALID");
+  });
+
+  it('should throw OPERATION_VALUE_REQUIRED when applying patch without value', function () {
+      var a = {};
+      var ex = null;
+
+      try {
+          jsonpatch.apply(a, [{ path: "/foo", op: "add" }], true);
+      } catch (e) {
+          ex = e;
+      }
+
+      expect(ex.name).toBe("OPERATION_VALUE_REQUIRED");
+  });
 });

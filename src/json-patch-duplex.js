@@ -529,7 +529,8 @@ var jsonpatch;
             p++;
 
             // Find the object
-            var keys = patch.path.split('/');
+            var path = patch.path || "";
+            var keys = path.split('/');
             var obj = tree;
             var t = 1;
             var len = keys.length;
