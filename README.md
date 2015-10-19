@@ -21,8 +21,16 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 1.22 KB minified and gzipped (3 KB minified)
 
 ## Performance
-![Fast](http://www.rebelslounge.com/res/jsonpatch/chart3.png)
 
+##### [`add` benchmark](http://jsperf.com/json-patch-benchmark)
+
+<img width="931" alt="screenshot 2015-10-19 16 11 18" src="https://cloud.githubusercontent.com/assets/566463/10580253/f2b87118-767c-11e5-92ab-019abaa4afdb.png">
+
+##### [`replace` benchmark](http://jsperf.com/json-patch-benchmark-replace)
+
+<img width="931" alt="screenshot 2015-10-19 16 16 40" src="https://cloud.githubusercontent.com/assets/566463/10580251/ee033bda-767c-11e5-895c-7a64e15f0abc.png">
+
+If you'd like to test against another library, please edit the jsperf benchmarks linked above and open an issue to include new results.
 
 ## Features
 * Allows you to apply patches on object trees for incoming traffic.
