@@ -24,11 +24,11 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 
 ##### [`add` benchmark](http://jsperf.com/json-patch-benchmark)
 
-<img width="931" alt="screenshot 2015-10-19 16 11 18" src="https://cloud.githubusercontent.com/assets/566463/10580253/f2b87118-767c-11e5-92ab-019abaa4afdb.png">
+<img width="910" alt="screenshot 2015-10-19 16 11 18" src="https://cloud.githubusercontent.com/assets/566463/10580489/08ea3eca-767e-11e5-93bd-213d3f50213b.png">
 
 ##### [`replace` benchmark](http://jsperf.com/json-patch-benchmark-replace)
 
-<img width="931" alt="screenshot 2015-10-19 16 16 40" src="https://cloud.githubusercontent.com/assets/566463/10580251/ee033bda-767c-11e5-895c-7a64e15f0abc.png">
+<img width="910" alt="screenshot 2015-10-19 16 16 40" src="https://cloud.githubusercontent.com/assets/566463/10580499/0e51ef70-767e-11e5-9020-7c9e57776e3f.png">
 
 If you'd like to test against another library, please edit the jsperf benchmarks linked above and open an issue to include new results.
 
