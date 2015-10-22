@@ -22,15 +22,23 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 
 ## Performance
 
-##### [`add` benchmark](http://jsperf.com/json-patch-benchmark)
+##### [`add` benchmark](http://jsperf.com/json-patch-benchmark/2)
 
-<img width="910" alt="screenshot 2015-10-19 16 11 18" src="https://cloud.githubusercontent.com/assets/566463/10580489/08ea3eca-767e-11e5-93bd-213d3f50213b.png">
+<img width="907" alt="screenshot 2015-10-22 20 35 22" src="https://cloud.githubusercontent.com/assets/566463/10674707/b3deec60-78fc-11e5-876d-59c90a0cab2f.png">
 
-##### [`replace` benchmark](http://jsperf.com/json-patch-benchmark-replace)
+##### [`replace` benchmark](http://jsperf.com/json-patch-benchmark-replace/2)
 
-<img width="910" alt="screenshot 2015-10-19 16 16 40" src="https://cloud.githubusercontent.com/assets/566463/10580499/0e51ef70-767e-11e5-9020-7c9e57776e3f.png">
+<img width="904" alt="screenshot 2015-10-22 20 35 58" src="https://cloud.githubusercontent.com/assets/566463/10674708/b6f80d14-78fc-11e5-82c6-658510f31f63.png">
 
-If you'd like to test against another library, please edit the jsperf benchmarks linked above and open an issue to include new results.
+Tested on 22.10.2015. Compared libraries: 
+
+- [Starcounter-Jack/JSON-Patch](https://github.com/Starcounter-Jack/JSON-Patch) 0.5.4
+- [bruth/jsonpatch-js](https://github.com/bruth/jsonpatch-js) 0.5.0 
+- [dharmafly/jsonpatch.js](https://github.com/dharmafly/jsonpatch.js) master branch 
+- [jiff](https://www.npmjs.com/package/jiff) 0.7.2 browserified
+- [json8-patch](https://www.npmjs.com/package/json8-patch) 0.3.2 browserified
+
+We aim the tests to be fair. Our library puts performance as the #1 priority, while other libraries can have different priorities. If you'd like to update the benchmarks or add a library, please edit the jsperf benchmarks linked above and open an issue to include new results.
 
 ## Features
 * Allows you to apply patches on object trees for incoming traffic.
