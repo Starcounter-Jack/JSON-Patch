@@ -484,6 +484,11 @@ var jsonpatch;
             }
         }
 
+        if (!newKeys.length && newKeys.length === oldKeys.length) {
+            if (mirror.length !== obj.length) {
+                patches.push({ op: "replace", path: path + "/", value: obj });
+            }
+        }
         if (!deleted && newKeys.length == oldKeys.length) {
             return;
         }
