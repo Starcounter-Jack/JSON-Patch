@@ -314,6 +314,23 @@ describe("duplex", function () {
       Object.observe = _observe;
     });
 
+    it('should ignore array properties', function () {
+        var obj = {
+            array: [1, 2, 3]
+        };
+
+        var patches;
+        var observer = jsonpatch.observe(obj);
+
+        obj.array.value = 1;
+        patches = jsonpatch.generate(observer);
+        expect(patches.length).toEqual(0);
+
+        obj.array.value = 2;
+        patches = jsonpatch.generate(observer);
+        expect(patches.length).toEqual(0);
+    });
+
     /*it('should not generate the same patch twice (move)', function() { //"move" is not implemented yet in jsonpatch.generate
       obj = { lastName: {str: "Einstein"} };
       var observer = jsonpatch.observe(obj);
