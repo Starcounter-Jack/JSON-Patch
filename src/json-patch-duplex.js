@@ -24,20 +24,23 @@ var jsonpatch;
         return;
     }
 
-    var _objectKeys = (function () {
-        if (Object.keys)
-            return Object.keys;
+    var _objectKeys = function (obj) {
+        if (_isArray(obj)) {
+            return Array.apply(null, { length: obj.length }).map(function (e, i, a) { return i.toString(); });
+        }
 
-        return function (o) {
-            var keys = [];
-            for (var i in o) {
-                if (o.hasOwnProperty(i)) {
-                    keys.push(i);
-                }
+        if (Object.keys) {
+            return Object.keys(obj);
+        }
+
+        var keys = [];
+        for (var i in o) {
+            if (o.hasOwnProperty(i)) {
+                keys.push(i);
             }
-            return keys;
-        };
-    })();
+        }
+        return keys;
+    };
 
     function _equals(a, b) {
         switch (typeof a) {
