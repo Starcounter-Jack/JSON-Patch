@@ -287,11 +287,7 @@ var jsonpatch;
 
     function unobserve(root, observer) {
         generate(observer);
-        if (Object.observe) {
-            _unobserve(observer, root);
-        } else {
-            clearTimeout(observer.next);
-        }
+        clearTimeout(observer.next);
 
         var mirror = getMirror(root);
         removeObserverFromMirror(mirror, observer);
@@ -323,34 +319,11 @@ var jsonpatch;
             return observer;
         }
 
-        if (Object.observe) {
-            observer = function (arr) {
-                //This "refresh" is needed to begin observing new object properties
-                _unobserve(observer, obj);
-                _observe(observer, obj);
+        observer = {};
 
-                var a = 0, alen = arr.length;
-                while (a < alen) {
-                    if (!(arr[a].name === 'length' && _isArray(arr[a].object)) && !(arr[a].name === '__Jasmine_been_here_before__')) {
-                        observeOps[arr[a].type].call(arr[a], patches, getPath(root, arr[a].object));
-                    }
-                    a++;
-                }
+        mirror.value = deepClone(obj);
 
-                if (patches) {
-                    if (callback) {
-                        callback(patches);
-                    }
-                }
-                observer.patches = patches;
-                patches = [];
-            };
-        } else {
-            observer = {};
-
-            mirror.value = deepClone(obj);
-
-            if (callback) {
+        if (callback) {
                 //callbacks.push(callback); this has no purpose
                 observer.callback = callback;
                 observer.next = null;
@@ -389,64 +362,30 @@ var jsonpatch;
                     }
                 }
                 observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
-            }
         }
+
         observer.patches = patches;
         observer.object = obj;
 
         mirror.observers.push(new ObserverInfo(callback, observer));
 
-        return _observe(observer, obj);
+        return observer;
     }
     jsonpatch.observe = observe;
 
-    /// Listen to changes on an object tree, accumulate patches
-    function _observe(observer, obj) {
-        if (Object.observe) {
-            Object.observe(obj, observer);
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    var v = obj[key];
-                    if (v && typeof (v) === "object") {
-                        _observe(observer, v);
-                    }
-                }
-            }
-        }
-        return observer;
-    }
-
-    function _unobserve(observer, obj) {
-        if (Object.observe) {
-            Object.unobserve(obj, observer);
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    var v = obj[key];
-                    if (v && typeof (v) === "object") {
-                        _unobserve(observer, v);
-                    }
-                }
-            }
-        }
-        return observer;
-    }
-
     function generate(observer) {
-        if (Object.observe) {
-            Object.deliverChangeRecords(observer);
-        } else {
-            var mirror;
-            for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
-                if (beforeDict[i].obj === observer.object) {
-                    mirror = beforeDict[i];
-                    break;
-                }
-            }
-            _generate(mirror.value, observer.object, observer.patches, "");
-            if (observer.patches.length) {
-                apply(mirror.value, observer.patches);
+        var mirror;
+        for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
+            if (beforeDict[i].obj === observer.object) {
+                mirror = beforeDict[i];
+                break;
             }
         }
+        _generate(mirror.value, observer.object, observer.patches, "");
+        if (observer.patches.length) {
+            apply(mirror.value, observer.patches);
+        }
+
         var temp = observer.patches;
         if (temp.length > 0) {
             observer.patches = [];
