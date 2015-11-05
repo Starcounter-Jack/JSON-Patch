@@ -25,20 +25,23 @@ module jsonpatch {
   }
 
 
-  var _objectKeys = (function () {
-    if (Object.keys)
-      return Object.keys;
-
-    return function (o) { //IE8
-      var keys = [];
-      for (var i in o) {
-        if (o.hasOwnProperty(i)) {
-          keys.push(i);
-        }
-      }
-      return keys;
+  var _objectKeys = function (obj) {
+    if (_isArray(obj)) {
+      return Array.apply(null, { length: obj.length }).map(function (e, i, a) { return i.toString(); });
     }
-  })();
+
+    if (Object.keys) {
+      return Object.keys(obj);
+    }
+
+    var keys = [];
+    for (var i in obj) {
+      if (obj.hasOwnProperty(i)) {
+        keys.push(i);
+      }
+    }
+    return keys;
+  };
 
   function _equals(a, b) {
     switch (typeof a) {
@@ -291,12 +294,7 @@ module jsonpatch {
 
   export function unobserve(root, observer) {
     generate(observer);
-    if(Object.observe) {
-      _unobserve(observer, root);
-    }
-    else {
-      clearTimeout(observer.next);
-    }
+    clearTimeout(observer.next);
 
     var mirror = getMirror(root);
     removeObserverFromMirror(mirror, observer);
@@ -329,136 +327,70 @@ module jsonpatch {
       return observer;
     }
 
-    if (Object.observe) {
-      observer = function (arr) {
-        //This "refresh" is needed to begin observing new object properties
-        _unobserve(observer, obj);
-        _observe(observer, obj);
+    observer = {};
 
-        var a = 0
-          , alen = arr.length;
-        while (a < alen) {
-          if (
-            !(arr[a].name === 'length' && _isArray(arr[a].object))
-              && !(arr[a].name === '__Jasmine_been_here_before__')
-            ) {
-            observeOps[arr[a].type].call(arr[a], patches, getPath(root, arr[a].object));
-          }
-          a++;
-        }
+    mirror.value = deepClone(obj);
 
-        if (patches) {
-          if (callback) {
-            callback(patches);
-          }
-        }
-        observer.patches = patches;
-        patches = [];
-
-
-      };
-    } else {
-      observer = {};
-
-      mirror.value = deepClone(obj);
-
-      if (callback) {
-        //callbacks.push(callback); this has no purpose
-        observer.callback = callback;
-        observer.next = null;
-        var intervals = this.intervals || [100, 1000, 10000, 60000];
-        if (intervals.push === void 0) {
-          throw new OriginalError("jsonpatch.intervals must be an array");
-        }
-        var currentInterval = 0;
-
-        var dirtyCheck = function () {
-          generate(observer);
-        };
-        var fastCheck = function () {
-          clearTimeout(observer.next);
-          observer.next = setTimeout(function () {
-            dirtyCheck();
-            currentInterval = 0;
-            observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
-          }, 0);
-        };
-        var slowCheck = function () {
-          dirtyCheck();
-          if (currentInterval == intervals.length)
-            currentInterval = intervals.length - 1;
-          observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
-        };
-        if (typeof window !== 'undefined') { //not Node
-          if (window.addEventListener) { //standards
-            window.addEventListener('mousedown', fastCheck);
-            window.addEventListener('mouseup', fastCheck);
-            window.addEventListener('keydown', fastCheck);
-          }
-          else { //IE8
-            document.documentElement.attachEvent('onmousedown', fastCheck);
-            document.documentElement.attachEvent('onmouseup', fastCheck);
-            document.documentElement.attachEvent('onkeydown', fastCheck);
-          }
-        }
-        observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
+    if (callback) {
+      //callbacks.push(callback); this has no purpose
+      observer.callback = callback;
+      observer.next = null;
+      var intervals = this.intervals || [100, 1000, 10000, 60000];
+      if (intervals.push === void 0) {
+        throw new OriginalError("jsonpatch.intervals must be an array");
       }
+      var currentInterval = 0;
+
+      var dirtyCheck = function () {
+        generate(observer);
+      };
+      var fastCheck = function () {
+        clearTimeout(observer.next);
+        observer.next = setTimeout(function () {
+          dirtyCheck();
+          currentInterval = 0;
+          observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
+        }, 0);
+      };
+      var slowCheck = function () {
+        dirtyCheck();
+        if (currentInterval == intervals.length)
+          currentInterval = intervals.length - 1;
+        observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
+      };
+      if (typeof window !== 'undefined') { //not Node
+        if (window.addEventListener) { //standards
+          window.addEventListener('mousedown', fastCheck);
+          window.addEventListener('mouseup', fastCheck);
+          window.addEventListener('keydown', fastCheck);
+        }
+        else { //IE8
+          document.documentElement.attachEvent('onmousedown', fastCheck);
+          document.documentElement.attachEvent('onmouseup', fastCheck);
+          document.documentElement.attachEvent('onkeydown', fastCheck);
+        }
+      }
+      observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
     }
     observer.patches = patches;
     observer.object = obj;
 
     mirror.observers.push(new ObserverInfo(callback, observer));
 
-    return _observe(observer, obj);
-  }
-
-  /// Listen to changes on an object tree, accumulate patches
-  function _observe(observer:any, obj:any):any {
-    if (Object.observe) {
-      Object.observe(obj, observer);
-      for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          var v:any = obj[key];
-          if (v && typeof (v) === "object") {
-            _observe(observer, v);
-          }
-        }
-      }
-    }
-    return observer;
-  }
-
-  function _unobserve(observer:any, obj:any):any {
-    if (Object.observe) {
-      Object.unobserve(obj, observer);
-      for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          var v:any = obj[key];
-          if (v && typeof (v) === "object") {
-            _unobserve(observer, v);
-          }
-        }
-      }
-    }
     return observer;
   }
 
   export function generate(observer) {
-    if (Object.observe) {
-      Object.deliverChangeRecords(observer);
+    var mirror;
+    for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
+      if (beforeDict[i].obj === observer.object) {
+        mirror = beforeDict[i];
+        break;
+      }
     }
-    else {
-      var mirror;
-      for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
-        if (beforeDict[i].obj === observer.object) {
-          mirror = beforeDict[i];
-          break;
-        }
-      }
-      _generate(mirror.value, observer.object, observer.patches, "");
-      if(observer.patches.length) {
-        apply(mirror.value, observer.patches);
-      }
+    _generate(mirror.value, observer.object, observer.patches, "");
+    if(observer.patches.length) {
+      apply(mirror.value, observer.patches);
     }
     var temp = observer.patches;
     if(temp.length > 0) {
