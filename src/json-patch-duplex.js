@@ -34,8 +34,8 @@ var jsonpatch;
         }
 
         var keys = [];
-        for (var i in o) {
-            if (o.hasOwnProperty(i)) {
+        for (var i in obj) {
+            if (obj.hasOwnProperty(i)) {
                 keys.push(i);
             }
         }
