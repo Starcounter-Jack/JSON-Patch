@@ -27,7 +27,13 @@ module jsonpatch {
 
   var _objectKeys = function (obj) {
     if (_isArray(obj)) {
-      return Array.apply(null, { length: obj.length }).map(function (e, i, a) { return i.toString(); });
+      var keys = new Array(obj.length);
+
+      for (var i = 0; i < keys.length; i++) {
+        keys[i] = i.toString();
+      }
+
+      return keys;
     }
 
     if (Object.keys) {
