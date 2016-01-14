@@ -43,7 +43,6 @@ We aim the tests to be fair. Our library puts performance as the #1 priority, wh
 ## Features
 * Allows you to apply patches on object trees for incoming traffic.
 * Allows you to freely manipulate object trees and then generate patches for outgoing traffic.
-* ES7 Object.observe() is used when available.
 * Tested in IE 8-11, Firefox, Chrome, Safari and Node.js
 
 
@@ -79,9 +78,6 @@ Call require to get the instance:
 ```js
 var jsonpatch = require('fast-json-patch')
 ```
-
-:bulb: Node.js supports native `Object.observe` in preview release 0.11.x (and only when started with `--harmony_observation` flag). With stable versions of Node, a shimmed version of `Object.observe` is used.
-
 
 ## Usage
 

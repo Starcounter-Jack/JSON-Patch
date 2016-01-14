@@ -285,35 +285,6 @@ describe("duplex", function () {
       expect(patches).toEqual([]);
     });
 
-    //related issue: https://github.com/Starcounter-Jack/JSON-Patch/issues/14
-    it('should generate the same patch using Object.observe and shim', function() {
-      var arr1 = [
-        ["Albert", "Einstein"],
-        ["Erwin", "Shrodinger"]
-      ];
-
-      var arr2 = arr1.slice();
-
-      var newRecord = ['Niels', 'Bohr'];
-
-      var observer1 = jsonpatch.observe(arr1);
-      arr1.push(newRecord);
-
-      var objectObservePatches = jsonpatch.generate(observer1);
-
-      var _observe = Object.observe;
-      Object.observe = undefined;
-
-      var observer2 = jsonpatch.observe(arr2);
-      arr2.push(newRecord);
-
-      var shimPatches = jsonpatch.generate(observer2);
-
-      expect(objectObservePatches).toEqual(shimPatches);
-
-      Object.observe = _observe;
-    });
-
     it('should ignore array properties', function () {
         var obj = {
             array: [1, 2, 3]
