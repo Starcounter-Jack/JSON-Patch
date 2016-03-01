@@ -533,7 +533,6 @@ var jsonpatch;
         }
         return false;
     }
-    jsonpatch.hasUndefined = hasUndefined;
     /**
      * Validates a single operation. Called from `jsonpatch.validate`. Throws `JsonPatchError` in case of an error.
      * @param {object} operation - operation object (patch)
