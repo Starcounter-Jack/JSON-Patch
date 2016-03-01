@@ -15,16 +15,6 @@ interface Object {
 var OriginalError = Error;
 
 module jsonpatch {
-  /* Do nothing if module is already defined.
-     Doesn't look nice, as we cannot simply put
-     `!jsonpatch &&` before this immediate function call
-     in TypeScript.
-     */
-  if (jsonpatch.observe) {
-      return;
-  }
-
-
   var _objectKeys = function (obj) {
     if (_isArray(obj)) {
       var keys = new Array(obj.length);
