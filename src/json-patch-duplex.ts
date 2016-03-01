@@ -288,12 +288,7 @@ module jsonpatch {
   }
 
   export function unobserve(root, observer) {
-    generate(observer);
-    clearTimeout(observer.next);
-
-    var mirror = getMirror(root);
-    removeObserverFromMirror(mirror, observer);
-
+    observer.unobserve();
   }
 
   function deepClone(obj:any) {
@@ -327,7 +322,6 @@ module jsonpatch {
     mirror.value = deepClone(obj);
 
     if (callback) {
-      //callbacks.push(callback); this has no purpose
       observer.callback = callback;
       observer.next = null;
       var intervals = this.intervals || [100, 1000, 10000, 60000];
@@ -369,6 +363,25 @@ module jsonpatch {
     }
     observer.patches = patches;
     observer.object = obj;
+
+    observer.unobserve = function () {
+        generate(observer);
+        clearTimeout(observer.next);
+        removeObserverFromMirror(mirror, observer);
+
+        if (typeof window !== 'undefined') {
+            if (window.removeEventListener) {
+                window.removeEventListener('mousedown', fastCheck);
+                window.removeEventListener('mouseup', fastCheck);
+                window.removeEventListener('keydown', fastCheck);
+            }
+            else {
+                document.documentElement.detachEvent('onmousedown', fastCheck);
+                document.documentElement.detachEvent('onmouseup', fastCheck);
+                document.documentElement.detachEvent('onkeydown', fastCheck);
+            }
+        }
+    };
 
     mirror.observers.push(new ObserverInfo(callback, observer));
 

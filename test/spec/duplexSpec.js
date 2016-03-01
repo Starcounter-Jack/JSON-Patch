@@ -317,7 +317,7 @@ describe("duplex", function () {
       patches = jsonpatch.generate(observer);
       expect(patches).toEqual([]);
     });*/
-  
+
     xdescribe("undefined - JS to JSON projection", function(){
       it('when value is set to `undefined`, should generate remove (undefined is JSON.stringified to no value)', function() {
         var obj = {foo: "bar"};
@@ -855,6 +855,38 @@ describe("duplex", function () {
 
       expect(observer1).not.toBe(observer2);
 
+    });
+
+    it('should not call callback on mouse events after unobserve', function() {
+      var called = 0;
+
+      obj = { firstName:"Albert", lastName:"Einstein",
+        phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
+
+      jsonpatch.intervals = [10];
+      var observer = jsonpatch.observe(obj, function(patches) {
+        called++;
+      });
+
+      obj.firstName = 'Malvin';
+
+      waits(20);
+
+      runs(function(){
+        expect(called).toEqual(1);
+
+        jsonpatch.unobserve(obj, observer);
+
+        obj.firstName = 'Wilfred';
+
+        triggerMouseup();
+      });
+
+      waits(20);
+
+      runs(function(){
+        expect(called).toEqual(1);
+      });
     });
   });
 
