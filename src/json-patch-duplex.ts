@@ -5,12 +5,11 @@
  * MIT license
  */
 
-interface Object {
-  observe : any;
-  deliverChangeRecords : any;
-  unobserve : any;
-  setPrototypeOf : any;
+interface HTMLElement {
+  attachEvent : Function;
+  detachEvent : Function;
 }
+
 
 var OriginalError = Error;
 
@@ -19,8 +18,8 @@ module jsonpatch {
     if (_isArray(obj)) {
       var keys = new Array(obj.length);
 
-      for (var i = 0; i < keys.length; i++) {
-        keys[i] = i.toString();
+      for (var k = 0; k < keys.length; k++) {
+        keys[k] = "" + k;
       }
 
       return keys;

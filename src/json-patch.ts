@@ -6,7 +6,6 @@
  */
 
 var OriginalError = Error;
-
 module jsonpatch {
   var _objectKeys = (function () {
     if (Object.keys)
@@ -284,7 +283,7 @@ module jsonpatch {
     /**
      * Recursively checks whether an object has any undefined values inside.
      */
-    export function hasUndefined(obj:any): boolean {
+    function hasUndefined(obj:any): boolean {
         if (obj === undefined) {
             return true;
         }

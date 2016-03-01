@@ -15,8 +15,8 @@ var jsonpatch;
     var _objectKeys = function (obj) {
         if (_isArray(obj)) {
             var keys = new Array(obj.length);
-            for (var i = 0; i < keys.length; i++) {
-                keys[i] = i.toString();
+            for (var k = 0; k < keys.length; k++) {
+                keys[k] = "" + k;
             }
             return keys;
         }
@@ -168,8 +168,7 @@ var jsonpatch;
             var patch = {
                 op: "add",
                 path: path + escapePathComponent(this.name),
-                value: this.object[this.name]
-            };
+                value: this.object[this.name] };
             patches.push(patch);
         },
         'delete': function (patches, path) {
