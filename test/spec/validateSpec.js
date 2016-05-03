@@ -1,3 +1,13 @@
+
+if(typeof jsonpatch === 'undefined') {
+  if(process.env.duplex === 'yes') { //required by `jasmine-node` test runner in Node.js
+    jsonpatch = require('./../../src/json-patch-duplex.js');
+  }
+  else {
+    jsonpatch = require('./../../src/json-patch.js');
+  }
+}
+
 describe("validate", function() {
   it('should return an empty array if the patch is valid', function() {
     var patch = [
