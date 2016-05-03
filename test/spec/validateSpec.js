@@ -336,7 +336,7 @@ describe("validate", function() {
       expect(ex.name).toBe("OPERATION_VALUE_REQUIRED");
   });
 
-  it('should not modify patch value of type array', function () {
+  it('should not modify patch value of type array (issue #76)', function () {
     var patches = [
       {op: 'add', path: '/foo', value: []},
       {op: 'add', path: '/foo/-', value: 1}
@@ -349,7 +349,7 @@ describe("validate", function() {
     ]);
   });
 
-  it('should not modify patch value of type object', function () {
+  it('should not modify patch value of type object (issue #76)', function () {
     var patches = [
       {op: 'add', path: '/foo', value: {}},
       {op: 'add', path: '/foo/bar', value: 1}
