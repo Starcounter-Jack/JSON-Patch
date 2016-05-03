@@ -343,7 +343,7 @@ describe("validate", function() {
     ];
     jsonpatch.validate(patches, {});
 
-    expect(patches).toBe([
+    expect(patches).toEqual([
       {op: 'add', path: '/foo', value: []},
       {op: 'add', path: '/foo/-', value: 1}
     ]);
@@ -356,7 +356,7 @@ describe("validate", function() {
     ];
     jsonpatch.validate(patches, {});
 
-    expect(patches).toBe([
+    expect(patches).toEqual([
       {op: 'add', path: '/foo', value: {}},
       {op: 'add', path: '/foo/bar', value: 1}
     ]);
