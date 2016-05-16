@@ -445,6 +445,10 @@ var jsonpatch;
             var existingPathFragment = undefined;
             while (true) {
                 key = keys[t];
+                if (key && key.indexOf('~') != -1) {
+                    key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
+                }
+
                 if (validate) {
                     if (existingPathFragment === undefined) {
                         if (obj[key] === undefined) {

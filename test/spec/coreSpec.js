@@ -71,6 +71,14 @@ describe("core", function () {
     expect(obj).toEqual({"hello": "universe"});
   });
 
+  it('should apply replace (with validation) on path with escaped characters', function() {
+    var obj = {"a/b": "old"};
+
+    var error = jsonpatch.apply(obj, [{"op":"replace", "path": "/a~1b", "value": "new"}], true);
+
+    expect(obj["a/b"]).toBe("new");
+  });
+
 
   it('should apply test', function() {
     obj = {
