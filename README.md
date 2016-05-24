@@ -259,3 +259,7 @@ However, to play nicer with natural JavaScipt objects `jsonpatch` can be applied
 ## Changelog
 
 To see the list of recent changes, see [Releases](https://github.com/Starcounter-Jack/JSON-Patch/releases).
+
+## License
+
+MIT
