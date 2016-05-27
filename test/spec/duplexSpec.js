@@ -18,6 +18,12 @@ function triggerMouseup(elem) {
   }
 }
 
+function triggerKeyup(elem) {
+    if (typeof document !== 'undefined') {
+        fireEvent((elem || document.documentElement), 'keyup');
+    }
+}
+
 //http://stackoverflow.com/questions/827716/emulate-clicking-a-link-with-javascript-that-works-with-ie
 function fireEvent(obj, evt) {
   var fireOnThis = obj;
@@ -407,7 +413,7 @@ describe("duplex", function () {
           obj.foo = "something";
 
           var patches = jsonpatch.generate(observer);
-          expect(patches).toEqual([{op: 'replace', path: '/foo', value: "something"}]);
+          expect(patches).toEqual([{op: 'add', path: '/foo', value: "something"}]);
         });
         it('`undefined` array element is set to something', function() {
           var obj = {foo: [0,undefined,2]};
@@ -426,7 +432,7 @@ describe("duplex", function () {
         delete obj.foo;
 
         var patches = jsonpatch.generate(observer);
-        expect(patches).toEqual([{op: 'remove', path: '/foo'}]);
+        expect(patches).toEqual([]);
 
       });
     });
@@ -458,6 +464,8 @@ describe("duplex", function () {
       obj.phoneNumbers[0].number = "123";
       obj.phoneNumbers[1].number = "456";
 
+      triggerKeyup();
+
       waitsFor(function(){
         return typeof patches === 'object';
       }, 100);
@@ -478,12 +486,13 @@ describe("duplex", function () {
       obj = { firstName:"Albert", lastName:"Einstein",
         phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
 
-      jsonpatch.intervals = [50];
       jsonpatch.observe(obj, function(patches) {
         called++;
         lastPatches = patches;
       });
       obj.firstName = "Marcin";
+
+      triggerKeyup();
 
       waitsFor(function(){
         return called > 0;
@@ -494,6 +503,7 @@ describe("duplex", function () {
         expect(lastPatches).toEqual([{op: 'replace', path: '/firstName', value: 'Marcin'}]);
 
         obj.lastName = "Warp";
+        triggerKeyup();
       });
 
       waitsFor(function(){
@@ -516,12 +526,13 @@ describe("duplex", function () {
       obj = { firstName:"Albert", lastName:"Einstein",
         phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
 
-      jsonpatch.intervals = [50];
       jsonpatch.observe(obj, function(patches) {
         called++;
         lastPatches = patches;
       });
       obj.phoneNumbers[0].number = "123";
+
+      triggerKeyup();
 
       waitsFor(function(){
         return called > 0;
@@ -532,6 +543,7 @@ describe("duplex", function () {
         expect(lastPatches).toEqual([{op: 'replace', path: '/phoneNumbers/0/number', value: '123'}]);
 
         obj.phoneNumbers[1].number = "456";
+        triggerKeyup();
       });
 
       waitsFor(function(){
@@ -555,7 +567,6 @@ describe("duplex", function () {
       obj = { firstName:"Albert", lastName:"Einstein",
         phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
 
-      jsonpatch.intervals = [10];
       var observer = jsonpatch.observe(obj, function(patches) {
         called++;
         lastPatches = patches;
@@ -582,12 +593,13 @@ describe("duplex", function () {
       obj = { firstName:"Albert", lastName:"Einstein",
         phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
 
-      jsonpatch.intervals = [10];
       var observer = jsonpatch.observe(obj, function(patches) {
         called++;
       });
 
       obj.firstName = 'Malvin';
+
+      triggerKeyup();
 
       waits(20);
 
@@ -597,6 +609,8 @@ describe("duplex", function () {
         jsonpatch.unobserve(obj, observer);
 
         obj.firstName = 'Wilfred';
+
+        triggerKeyup();
       });
 
       waits(20);
@@ -609,6 +623,7 @@ describe("duplex", function () {
         });
 
         obj.firstName = 'Megan';
+        triggerKeyup();
       });
 
       waits(20);
@@ -622,14 +637,16 @@ describe("duplex", function () {
       var called = 0;
 
       obj = { firstName:"Albert", lastName:"Einstein",
-        phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
+          phoneNumbers: [{ number: "12345" }, { number: "45353" }]
+      };
 
-      jsonpatch.intervals = [10];
       var observer = jsonpatch.observe(obj, function(patches) {
         called++;
       });
 
       obj.phoneNumbers[1].number = '555';
+
+      triggerKeyup();
 
       waits(20);
 
@@ -639,6 +656,8 @@ describe("duplex", function () {
         jsonpatch.unobserve(obj, observer);
 
         obj.phoneNumbers[1].number = '556';
+
+        triggerKeyup();
       });
 
       waits(20);
@@ -651,6 +670,8 @@ describe("duplex", function () {
         });
 
         obj.phoneNumbers[1].number = '557';
+
+        triggerKeyup();
       });
 
       waits(20);
@@ -669,7 +690,6 @@ describe("duplex", function () {
           {number: "45353"}
         ]};
 
-      jsonpatch.intervals = [10];
       var observer = jsonpatch.observe(obj, function (patches) {
         lastPatches = patches;
       });
@@ -710,6 +730,8 @@ describe("duplex", function () {
 
       obj.foo = 'bazz';
 
+      triggerKeyup();
+
       waitsFor(function () {
         return callback.calls.length > 0;
       }, 'callback calls', 1000);
@@ -720,6 +742,8 @@ describe("duplex", function () {
         callback.reset();
 
         obj.foo = 'bazinga';
+
+        triggerKeyup();
       });
 
       waitsFor(function () {
@@ -745,7 +769,7 @@ describe("duplex", function () {
         expect(lastPatches).toEqual([
           { op: 'replace', path: '/lastName', value: 'Hawking' }
         ]);
-      }, 0);
+      }, 100);
     });
 
   });
@@ -815,6 +839,8 @@ describe("duplex", function () {
 
       obj.foo = 'bazz';
 
+      triggerKeyup()
+
       waitsFor(function () {
         return callback.calls.length > 0;
       }, 'callback call', 1000);
@@ -863,12 +889,13 @@ describe("duplex", function () {
       obj = { firstName:"Albert", lastName:"Einstein",
         phoneNumbers:[ {number:"12345"}, {number:"45353"} ]};
 
-      jsonpatch.intervals = [10];
       var observer = jsonpatch.observe(obj, function(patches) {
         called++;
       });
 
       obj.firstName = 'Malvin';
+
+      triggerKeyup();
 
       waits(20);
 
