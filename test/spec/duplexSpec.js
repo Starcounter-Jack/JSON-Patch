@@ -413,7 +413,7 @@ describe("duplex", function () {
           obj.foo = "something";
 
           var patches = jsonpatch.generate(observer);
-          expect(patches).toEqual([{op: 'add', path: '/foo', value: "something"}]);
+          expect(patches).toEqual([{op: 'replace', path: '/foo', value: "something"}]);
         });
         it('`undefined` array element is set to something', function() {
           var obj = {foo: [0,undefined,2]};
@@ -432,8 +432,7 @@ describe("duplex", function () {
         delete obj.foo;
 
         var patches = jsonpatch.generate(observer);
-        expect(patches).toEqual([]);
-
+        expect(patches).toEqual([{ op: 'remove', path: '/foo' }]);
       });
     });
   });

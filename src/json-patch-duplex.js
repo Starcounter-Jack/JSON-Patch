@@ -293,9 +293,7 @@ var jsonpatch;
             };
             var fastCheck = function () {
                 clearTimeout(observer.next);
-                observer.next = setTimeout(function () {
-                    dirtyCheck();
-                });
+                observer.next = setTimeout(dirtyCheck);
             };
             if (typeof window !== 'undefined') {
                 if (window.addEventListener) {
