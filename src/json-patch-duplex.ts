@@ -328,9 +328,7 @@ module jsonpatch {
       };
       var fastCheck = () => {
           clearTimeout(observer.next);
-          observer.next = setTimeout(() => {
-              dirtyCheck();
-          });
+          observer.next = setTimeout(dirtyCheck);
       };
       if (typeof window !== 'undefined') { //not Node
         if (window.addEventListener) { //standards
