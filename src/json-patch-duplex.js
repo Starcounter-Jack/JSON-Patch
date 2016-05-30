@@ -226,14 +226,14 @@ var jsonpatch;
             this.obj = obj;
         }
         return Mirror;
-    })();
+    }());
     var ObserverInfo = (function () {
         function ObserverInfo(callback, observer) {
             this.callback = callback;
             this.observer = observer;
         }
         return ObserverInfo;
-    })();
+    }());
     function getMirror(obj) {
         for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
             if (beforeDict[i].obj === obj) {
@@ -288,41 +288,23 @@ var jsonpatch;
         if (callback) {
             observer.callback = callback;
             observer.next = null;
-            var intervals = this.intervals || [100, 1000, 10000, 60000];
-            if (intervals.push === void 0) {
-                throw new OriginalError("jsonpatch.intervals must be an array");
-            }
-            var currentInterval = 0;
             var dirtyCheck = function () {
                 generate(observer);
             };
             var fastCheck = function () {
                 clearTimeout(observer.next);
-                observer.next = setTimeout(function () {
-                    dirtyCheck();
-                    currentInterval = 0;
-                    observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
-                }, 0);
-            };
-            var slowCheck = function () {
-                dirtyCheck();
-                if (currentInterval == intervals.length)
-                    currentInterval = intervals.length - 1;
-                observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
+                observer.next = setTimeout(dirtyCheck);
             };
             if (typeof window !== 'undefined') {
                 if (window.addEventListener) {
-                    window.addEventListener('mousedown', fastCheck);
                     window.addEventListener('mouseup', fastCheck);
-                    window.addEventListener('keydown', fastCheck);
+                    window.addEventListener('keyup', fastCheck);
                 }
                 else {
-                    document.documentElement.attachEvent('onmousedown', fastCheck);
                     document.documentElement.attachEvent('onmouseup', fastCheck);
-                    document.documentElement.attachEvent('onkeydown', fastCheck);
+                    document.documentElement.attachEvent('onkeyup', fastCheck);
                 }
             }
-            observer.next = setTimeout(slowCheck, intervals[currentInterval++]);
         }
         observer.patches = patches;
         observer.object = obj;
@@ -332,14 +314,12 @@ var jsonpatch;
             removeObserverFromMirror(mirror, observer);
             if (typeof window !== 'undefined') {
                 if (window.removeEventListener) {
-                    window.removeEventListener('mousedown', fastCheck);
                     window.removeEventListener('mouseup', fastCheck);
-                    window.removeEventListener('keydown', fastCheck);
+                    window.removeEventListener('keyup', fastCheck);
                 }
                 else {
-                    document.documentElement.detachEvent('onmousedown', fastCheck);
                     document.documentElement.detachEvent('onmouseup', fastCheck);
-                    document.documentElement.detachEvent('onkeydown', fastCheck);
+                    document.documentElement.detachEvent('onkeyup', fastCheck);
                 }
             }
         };
@@ -514,7 +494,7 @@ var jsonpatch;
             this.tree = tree;
         }
         return JsonPatchError;
-    })(OriginalError);
+    }(OriginalError));
     jsonpatch.JsonPatchError = JsonPatchError;
     jsonpatch.Error = JsonPatchError;
     /**
