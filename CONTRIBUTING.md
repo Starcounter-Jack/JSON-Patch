@@ -22,7 +22,7 @@ Make sure that you commit changes to both `ts` and `js` files.
  - commits changes to Git with the version number as the commit message
  - creates a Git tag wit the version
 9. Call `git push` to push the changes to `origin master`
-10. Call `git push --tags` to push the tag `origin master`
+10. Call `git push --tags` to push the tag to `origin master`
 11. Call `npm publish` to push the new version to NPM. [Read more](https://docs.npmjs.com/getting-started/publishing-npm-packages)
 12. Call `npm view fast-json-patch dist-tags` to verify that the new version was published in NPM.
 13. Explain the changes (at least an summary of the commit log) in [GitHub Releases](https://github.com/Starcounter-Jack/JSON-Patch/releases).
