@@ -38,7 +38,7 @@ function executeJsonTestSuite(name, tests) {
             var errors = 0;
             try {
               var res = jsonpatch.apply(test.doc, test.patch, true);
-              if (res === false) {
+              if (res[res.length-1].testResult === false) {
                 throw new Error("Test failed");
               }
             }
