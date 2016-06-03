@@ -24,6 +24,20 @@ function triggerKeyup(elem) {
     }
 }
 
+function getPatchesUsingGenerate(objFactory, objChanger) {
+    var obj = objFactory();
+    var observer = jsonpatch.observe(obj);
+    objChanger(obj);
+    return jsonpatch.generate(observer);
+}
+
+function getPatchesUsingCompare(objFactory, objChanger) {
+    var obj = objFactory();
+    var mirror = JSON.parse(JSON.stringify(obj));
+    objChanger(obj);
+    return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)));
+}
+
 //http://stackoverflow.com/questions/827716/emulate-clicking-a-link-with-javascript-that-works-with-ie
 function fireEvent(obj, evt) {
   var fireOnThis = obj;
@@ -394,125 +408,107 @@ describe("duplex", function () {
         describe("should generate empty patch, when", function () {
 
             it('when new property is set to `undefined`', function() {
-                var patches = (function() {
-                    var obj = {foo: "bar"};
-                    var observer = jsonpatch.observe(obj);
-                    obj.baz = undefined;
-                    return jsonpatch.generate(observer);
-                })();
+                var objFactory = function() {
+                    return {foo: "bar"};
+                };
 
-                var patchesJson = (function() {
-                    var obj = {foo: "bar"};
-                    var mirror = JSON.parse(JSON.stringify(obj));
+                var objChanger = function(obj) {
                     obj.baz = undefined;
-                    return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)));
-                })();
+                };
 
-                expect(patches).toReallyEqual([]);
-                expect(patches).toReallyEqual(patchesJson);
+                var genereatedPatches = getPatchesUsingGenerate(objFactory, objChanger);
+                var comparedPatches = getPatchesUsingCompare(objFactory, objChanger);
+
+                expect(genereatedPatches).toReallyEqual([]);
+                expect(genereatedPatches).toReallyEqual(comparedPatches);
             });
 
             it('when an `undefined` property is deleted', function() {
-                var patches = (function() {
-                    var obj = {foo: undefined};
-                    var observer = jsonpatch.observe(obj);
-                    delete obj.foo;
-                    return jsonpatch.generate(observer);
-                })();
+                var objFactory = function() {
+                    return {foo: undefined};
+                };
 
-                var patchesJson = (function() {
-                    var obj = {foo: undefined};
-                    var mirror = JSON.parse(JSON.stringify(obj));
+                var objChanger = function(obj) {
                     delete obj.foo;
-                    return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)));
-                })();
+                };
 
-                expect(patches).toReallyEqual([]);
-                expect(patches).toReallyEqual(patchesJson);
+                var genereatedPatches = getPatchesUsingGenerate(objFactory, objChanger);
+                var comparedPatches = getPatchesUsingCompare(objFactory, objChanger);
+
+                expect(genereatedPatches).toReallyEqual([]);
+                expect(genereatedPatches).toReallyEqual(comparedPatches);
             });
         });
 
         describe("should generate add, when", function () {
 
             it('`undefined` property is set to something', function() {
-                var patches = (function() {
-                    var obj = {foo: undefined};
-                    var observer = jsonpatch.observe(obj);
-                    obj.foo = "something";
-                    return jsonpatch.generate(observer);
-                })();
+                var objFactory = function() {
+                    return {foo: undefined};
+                };
 
-                var patchesJson = (function() {
-                    var obj = {foo: undefined};
-                    var mirror = JSON.parse(JSON.stringify(obj));
+                var objChanger = function(obj) {
                     obj.foo = "something";
-                    return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)));
-                })();
+                };
 
-                expect(patches).toReallyEqual([{ op : 'add', path : '/foo', value : 'something'}]);
-                expect(patches).toReallyEqual(patchesJson);
+                var genereatedPatches = getPatchesUsingGenerate(objFactory, objChanger);
+                var comparedPatches = getPatchesUsingCompare(objFactory, objChanger);
+
+                expect(genereatedPatches).toReallyEqual([{ op : 'add', path : '/foo', value : 'something'}]);
+                expect(genereatedPatches).toReallyEqual(comparedPatches);
             });
         });
 
         describe("should generate remove, when", function () {
 
             it('value is set to `undefined`', function() {
-                var patches = (function() {
-                    var obj = {foo: "bar"};
-                    var observer = jsonpatch.observe(obj);
-                    obj.foo = undefined;
-                    return jsonpatch.generate(observer);
-                })();
+                var objFactory = function() {
+                    return {foo: "bar"};
+                };
 
-                var patchesJson = (function() {
-                    var obj = {foo: "bar"};
-                    var mirror = JSON.parse(JSON.stringify(obj));
+                var objChanger = function(obj) {
                     obj.foo = undefined;
-                    return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)));
-                })();
+                };
 
-                expect(patches).toReallyEqual([{op : 'remove', path : '/foo'}]);
-                expect(patches).toReallyEqual(patchesJson);
+                var genereatedPatches = getPatchesUsingGenerate(objFactory, objChanger);
+                var comparedPatches = getPatchesUsingCompare(objFactory, objChanger);
+
+                expect(genereatedPatches).toReallyEqual([{op : 'remove', path : '/foo'}]);
+                expect(genereatedPatches).toReallyEqual(comparedPatches);
             });
         });
 
         describe("should generate replace, when", function(){
-            
+
             it('array element is set to `undefined`', function() {
-                var patches = (function() {
-                    var obj = {foo: [0,1,2]};
-                    var observer = jsonpatch.observe(obj);
-                    obj.foo[1] = undefined;
-                    return jsonpatch.generate(observer);
-                })();
+                var objFactory = function() {
+                    return {foo: [0,1,2]};
+                };
 
-                var patchesJson = (function() {
-                    var obj = {foo: [0,1,2]};
-                    var mirror = JSON.parse(JSON.stringify(obj));
+                var objChanger = function(obj) {
                     obj.foo[1] = undefined;
-                    return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)));
-                })();
+                };
 
-                expect(patches).toReallyEqual([{op : 'replace', path : '/foo/1', value : null}]);
-                expect(patches).toReallyEqual(patchesJson);
+                var genereatedPatches = getPatchesUsingGenerate(objFactory, objChanger);
+                var comparedPatches = getPatchesUsingCompare(objFactory, objChanger);
+
+                expect(genereatedPatches).toReallyEqual([{op : 'replace', path : '/foo/1', value : null}]);
+                expect(genereatedPatches).toReallyEqual(comparedPatches);
             });
             it('`undefined` array element is set to something', function() {
-                var patches = (function() {
-                    var obj = {foo: [0,undefined,2]};
-                    var observer = jsonpatch.observe(obj);
-                    obj.foo[1] = 1;
-                    return jsonpatch.generate(observer);
-                })();
+                var objFactory = function() {
+                    return {foo: [0,undefined,2]};
+                };
 
-                var patchesJson = (function() {
-                    var obj = {foo: [0,undefined,2]};
-                    var mirror = JSON.parse(JSON.stringify(obj));
+                var objChanger = function(obj) {
                     obj.foo[1] = 1;
-                    return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)));
-                })();
+                };
 
-                expect(patches).toReallyEqual([{ op : 'replace', path : '/foo/1', value : 1 }]);
-                expect(patches).toReallyEqual(patchesJson);
+                var genereatedPatches = getPatchesUsingGenerate(objFactory, objChanger);
+                var comparedPatches = getPatchesUsingCompare(objFactory, objChanger);
+
+                expect(genereatedPatches).toReallyEqual([{ op : 'replace', path : '/foo/1', value : 1 }]);
+                expect(genereatedPatches).toReallyEqual(comparedPatches);
             });
         });
     });
