@@ -60,7 +60,7 @@ describe("duplex", function () {
    * @param obj
    * @returns {boolean}
    */
-        toReallyEqualInJson: function (expected) {
+        toEqualInJson: function (expected) {
           return JSON.stringify(this.actual) == JSON.stringify(expected);
         },
         toReallyEqual: function (expected) {
@@ -233,7 +233,7 @@ describe("duplex", function () {
         phoneNumbers:[ {number:"12345"} ]};
 
       jsonpatch.apply(obj2,patches);
-      expect(obj2).toReallyEqualInJson(obj);
+      expect(obj2).toEqualInJson(obj);
     });
 
     it('should generate remove', function() {
@@ -251,7 +251,7 @@ describe("duplex", function () {
         phoneNumbers:[ {number:"12345"}, {number:"4234"} ]};
 
       jsonpatch.apply(obj2,patches);
-      expect(obj2).toReallyEqualInJson(obj);
+      expect(obj2).toEqualInJson(obj);
     });
 
     it('should generate remove (array indexes should be sorted descending)', function() {
@@ -271,7 +271,7 @@ describe("duplex", function () {
 
       obj2 = { items: ["a", "b", "c"]};
       jsonpatch.apply(obj2,patches);
-      expect(obj).toReallyEqualInJson(obj2);
+      expect(obj).toEqualInJson(obj2);
     });
 
     it('should not generate the same patch twice (replace)', function() {
