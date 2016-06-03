@@ -412,7 +412,7 @@ describe("duplex", function () {
                 expect(patches).toReallyEqual(patchesJson);
             });
 
-            it('when a property is deleted', function() {
+            it('when an `undefined` property is deleted', function() {
                 var patches = (function() {
                     var obj = {foo: undefined};
                     var observer = jsonpatch.observe(obj);
