@@ -11,6 +11,9 @@ if(typeof jsonpatch === 'undefined') {
     jsonpatch = require('./../../src/json-patch.js');
   }
 }
+if(typeof _ === 'undefined') {
+  _ = require('./../lib/underscore.min.js');
+}
 
 function triggerMouseup(elem) {
   if (typeof document !== 'undefined') {
