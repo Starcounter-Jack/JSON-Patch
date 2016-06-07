@@ -250,11 +250,15 @@ As `undefined` is not a valid value for any JSON node, it's also not valid value
 However, to play nicer with natural JavaScipt objects `jsonpatch` can be applied to an object that contains `undefined`, in such case we will treat it as JS does. `.apply` will handle JSON Patches with `value: undefined` as any other falsy value. `.generate`, `.compare`, `.observe` methods will also produce JSON Patches with `undefined`s, but only for (non valid) JSON documents that contains it.
 
 
-## :no_entry_sign: `undefined`s (JS to JSON projection)
+## `undefined`s (JS to JSON projection)
 
-~~As `undefined` is not a valid value for any JSON node, it's also not valid value o JSON Patch operation object value property. Therefore `jsonpatch` will not generate JSON Patches that sets anything to `undefined`.~~
+As `undefined` type does not exist in JSON, it's also not a valid value of JSON Patch operation. Therefore `jsonpatch` will not generate JSON Patches that sets anything to `undefined`.
 
-~~However, to play nicer with natural JavaScipt objects `jsonpatch` can be applied to an object that contains `undefined`, in such case we will use it as native `JSON.stringify` - we will treat them as non-existing nodes, and map to `null` for array elements.~~
+Whenever a value is set to `undefined` in JS, JSON-Patch methods `generate` and `compare` will treat it similarly to how JavaScript method [`JSON.stringify` (MDN)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) treats them:
+
+> If `undefined` (...) is encountered during conversion it is either omitted (when it is found in an object) or censored to `null` (when it is found in an array).
+
+See the [ECMAScript spec](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-json.stringify) for details.
 
 ## Changelog
 

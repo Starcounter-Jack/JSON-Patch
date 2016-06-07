@@ -290,11 +290,15 @@ module jsonpatch {
   }
 
   function deepClone(obj:any) {
-    if (typeof obj === "object") {
-      return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
-    }
-    else {
-      return obj; //no need to clone primitives
+    switch (typeof obj) {
+      case "object":
+        return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+
+      case "undefined":
+        return null; //this is how JSON.stringify behaves for array items
+
+      default:
+        return obj; //no need to clone primitives
     }
   }
 
@@ -400,7 +404,7 @@ module jsonpatch {
     for (var t = oldKeys.length - 1; t >= 0; t--) {
       var key = oldKeys[t];
       var oldVal = mirror[key];
-      if (obj.hasOwnProperty(key)) {
+      if (obj.hasOwnProperty(key) && !(obj[key] === undefined && _isArray(obj) === false)) {
         var newVal = obj[key];
         if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
           _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
@@ -424,7 +428,7 @@ module jsonpatch {
 
     for (var t = 0; t < newKeys.length; t++) {
       var key = newKeys[t];
-      if (!mirror.hasOwnProperty(key)) {
+      if (!mirror.hasOwnProperty(key) && obj[key] !== undefined) {
         patches.push({op: "add", path: path + "/" + escapePathComponent(key), value: deepClone(obj[key])});
       }
     }
