@@ -11,8 +11,8 @@ With JSON-Patch, you can:
 
 ## Why you should use JSON-Patch
 
-JSON-Patch [(RFC6902)](http://tools.ietf.org/html/rfc6902) is a standard format that 
-allows you to update a JSON document by sending the changes rather than the whole document. 
+JSON-Patch [(RFC6902)](http://tools.ietf.org/html/rfc6902) is a standard format that
+allows you to update a JSON document by sending the changes rather than the whole document.
 JSON Patch plays well with the HTTP PATCH verb (method) and REST style programming.
 
 Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) about it.
@@ -30,11 +30,11 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 
 <img width="904" alt="screenshot 2015-10-22 20 35 58" src="https://cloud.githubusercontent.com/assets/566463/10674708/b6f80d14-78fc-11e5-82c6-658510f31f63.png">
 
-Tested on 22.10.2015. Compared libraries: 
+Tested on 22.10.2015. Compared libraries:
 
 - [Starcounter-Jack/JSON-Patch](https://github.com/Starcounter-Jack/JSON-Patch) 0.5.4
-- [bruth/jsonpatch-js](https://github.com/bruth/jsonpatch-js) 0.5.0 
-- [dharmafly/jsonpatch.js](https://github.com/dharmafly/jsonpatch.js) master branch 
+- [bruth/jsonpatch-js](https://github.com/bruth/jsonpatch-js) 0.5.0
+- [dharmafly/jsonpatch.js](https://github.com/dharmafly/jsonpatch.js) master branch
 - [jiff](https://www.npmjs.com/package/jiff) 0.7.2 browserified
 - [json8-patch](https://www.npmjs.com/package/json8-patch) 0.3.2 browserified
 
@@ -73,7 +73,7 @@ include `json-patch-duplex.js` if you also want to generate patches.
 
 ### In Node.js
 
-Call require to get the instance: 
+Call require to get the instance:
 
 ```js
 var jsonpatch = require('fast-json-patch')
@@ -154,11 +154,10 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 ### In Node.js
 
 1. Go to directory where you have cloned the repo
-2. Install Jasmine Node.js module by running command `npm install jasmine-node -g`
-3. Testing **json-patch.js**
- - Run command `jasmine-node --matchall --config duplex no test/spec/coreSpec.js`
-4. Testing **json-patch-duplex.js**
- - Run command `jasmine-node --matchall --config duplex yes test/spec/coreSpec.js test/spec/duplexSpec.js`
+2. Install dev dependencies (Jasmine Node.js module) by running command `npm install`
+3. Run test `npm run test`
+ - Testing **json-patch.js** only: `npm run test-core`
+ - Testing **json-patch0duplex.js** only: `npm run test-duplex`
 
 ## API
 

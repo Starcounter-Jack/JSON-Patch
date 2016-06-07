@@ -14,7 +14,7 @@ Make sure that you commit changes to both `ts` and `js` files.
 
 1. Don't break too much. See [how many projects depend on this](https://www.npmjs.com/browse/depended/fast-json-patch).
 2. Make sure that the browser tests pass in Chrome, Firefox, Edge and IE
-3. Make sure that the NodeJS tests pass
+3. Make sure that the NodeJS tests pass `npm install && npm run test`
 4. Call `grunt uglify`. This updates the minified files in the `dist` directory.
 5. Call `git status` to verify that the only pending changes in the repo are the result of the previous step
 5. Call `grunt bump:patch`, `grunt bump:minor` or `grunt bump:major`. This command:
