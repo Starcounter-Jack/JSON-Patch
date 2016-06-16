@@ -8,6 +8,27 @@ You can build TypeScript to JavaScript using the [`TypeScript compiler`](https:/
 
 Make sure that you commit changes to both `ts` and `js` files.
 
+## Testing
+
+### In a web browser
+
+1. Testing **json-patch.js**
+ - Load `test/SpecRunner.html` in your web browser
+2. Testing **json-patch-duplex.js**
+ - Load `test/SpecRunnerDuplex.html` in your web browser
+
+Each of the test suite files contains *Jasmine* unit test suite and *Benchmark.js* performance test suite.
+
+To run *Benchmark.js* performance tests, press "Run Tests" button.
+
+### In Node.js
+
+1. Go to directory where you have cloned the repo
+2. Install dev dependencies (Jasmine Node.js module) by running command `npm install`
+3. Run test `npm run test`
+ - Testing **json-patch.js** only: `npm run test-core`
+ - Testing **json-patch0duplex.js** only: `npm run test-duplex`
+
 ## Releasing a new version
 
 **The release is done from `master` branch.**

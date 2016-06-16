@@ -137,28 +137,6 @@ else {
 }
 ```
 
-
-## Testing
-
-### In a web browser
-
-1. Testing **json-patch.js**
- - Load `test/SpecRunner.html` in your web browser
-2. Testing **json-patch-duplex.js**
- - Load `test/SpecRunnerDuplex.html` in your web browser
-
-Each of the test suite files contains *Jasmine* unit test suite and *Benchmark.js* performance test suite.
-
-To run *Benchmark.js* performance tests, press "Run Tests" button.
-
-### In Node.js
-
-1. Go to directory where you have cloned the repo
-2. Install dev dependencies (Jasmine Node.js module) by running command `npm install`
-3. Run test `npm run test`
- - Testing **json-patch.js** only: `npm run test-core`
- - Testing **json-patch0duplex.js** only: `npm run test-duplex`
-
 ## API
 
 #### jsonpatch.apply (`obj` Object, `patches` Array, `validate` Boolean) : boolean
