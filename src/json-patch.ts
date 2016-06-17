@@ -78,7 +78,7 @@ module jsonpatch {
   /* The operations applicable to an object */
   var objOps = {
     add: function (obj, key) {
-      obj[key] = this.value;
+      obj[key] = deepClone(this.value);
       return true;
     },
     remove: function (obj, key) {
@@ -86,7 +86,7 @@ module jsonpatch {
       return true;
     },
     replace: function (obj, key) {
-      obj[key] = this.value;
+      obj[key] = deepClone(this.value);
       return true;
     },
     move: function (obj, key, tree) {
@@ -119,7 +119,7 @@ module jsonpatch {
   /* The operations applicable to an array. Many are the same as for the object */
   var arrOps = {
     add: function (arr, i) {
-      arr.splice(i, 0, this.value);
+      arr.splice(i, 0, deepClone(this.value));
       return true;
     },
     remove: function (arr, i) {
@@ -127,7 +127,7 @@ module jsonpatch {
       return true;
     },
     replace: function (arr, i) {
-      arr[i] = this.value;
+      arr[i] = deepClone(this.value);
       return true;
     },
     move: objOps.move,
@@ -142,7 +142,7 @@ module jsonpatch {
       rootOps.remove.call(this, obj);
       for (var key in this.value) {
         if (this.value.hasOwnProperty(key)) {
-          obj[key] = this.value[key];
+          obj[key] = deepClone(this.value[key]);
         }
       }
       return true;
@@ -160,7 +160,7 @@ module jsonpatch {
         {op: "remove", path: this.path}
       ]);
       apply(obj, [
-        {op: "add", path: this.path, value: this.value}
+        {op: "add", path: this.path, value: deepClone(this.value)}
       ]);
       return true;
     },
@@ -173,6 +173,15 @@ module jsonpatch {
       this.value = obj;
     }
   };
+
+  function deepClone(obj:any) {
+    if (typeof obj === "object") {
+      return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+    }
+    else {
+      return obj; //no need to clone primitives
+    }
+  }
 
   var _isArray;
   if (Array.isArray) { //standards; http://jsperf.com/isarray-shim/4

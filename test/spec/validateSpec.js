@@ -1,3 +1,13 @@
+
+if(typeof jsonpatch === 'undefined') {
+  if(process.env.duplex === 'yes') { //required by `jasmine-node` test runner in Node.js
+    jsonpatch = require('./../../src/json-patch-duplex.js');
+  }
+  else {
+    jsonpatch = require('./../../src/json-patch.js');
+  }
+}
+
 describe("validate", function() {
   it('should return an empty array if the patch is valid', function() {
     var patch = [
@@ -324,5 +334,31 @@ describe("validate", function() {
       }
 
       expect(ex.name).toBe("OPERATION_VALUE_REQUIRED");
+  });
+
+  it('should not modify patch value of type array (issue #76)', function () {
+    var patches = [
+      {op: 'add', path: '/foo', value: []},
+      {op: 'add', path: '/foo/-', value: 1}
+    ];
+    jsonpatch.validate(patches, {});
+
+    expect(patches).toEqual([
+      {op: 'add', path: '/foo', value: []},
+      {op: 'add', path: '/foo/-', value: 1}
+    ]);
+  });
+
+  it('should not modify patch value of type object (issue #76)', function () {
+    var patches = [
+      {op: 'add', path: '/foo', value: {}},
+      {op: 'add', path: '/foo/bar', value: 1}
+    ];
+    jsonpatch.validate(patches, {});
+
+    expect(patches).toEqual([
+      {op: 'add', path: '/foo', value: {}},
+      {op: 'add', path: '/foo/bar', value: 1}
+    ]);
   });
 });
