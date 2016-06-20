@@ -3,6 +3,7 @@ Makefile
 doc/
 examples/
 test/
+.travis.yml
 
 # Mac OS X
 .DS_Store

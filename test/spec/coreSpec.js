@@ -8,6 +8,9 @@ if(typeof jsonpatch === 'undefined') {
     jsonpatch = require('./../../src/json-patch.js');
   }
 }
+if(typeof _ === 'undefined') {
+  _ = require('./../lib/underscore.min.js');
+}
 
 describe("core", function () {
   it('should apply add', function() {

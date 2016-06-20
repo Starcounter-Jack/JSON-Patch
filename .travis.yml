@@ -1,0 +1,20 @@
+language: node_js
+sudo: required
+dist: trusty
+before_script:
+  - npm install
+  - 'export PATH=$PWD/node_modules/.bin:$PATH'
+branches:
+  only:
+    - gh-pages
+    - /.*/
+node_js: 4
+addons:
+  firefox: latest
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
+script:
+  - xvfb-run npm run test

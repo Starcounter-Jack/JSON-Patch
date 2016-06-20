@@ -12,19 +12,25 @@ var __extends = (this && this.__extends) || function (d, b) {
 var OriginalError = Error;
 var jsonpatch;
 (function (jsonpatch) {
-    var _objectKeys = (function () {
-        if (Object.keys)
-            return Object.keys;
-        return function (o) {
-            var keys = [];
-            for (var i in o) {
-                if (o.hasOwnProperty(i)) {
-                    keys.push(i);
-                }
+    var _objectKeys = function (obj) {
+        if (_isArray(obj)) {
+            var keys = new Array(obj.length);
+            for (var k = 0; k < keys.length; k++) {
+                keys[k] = "" + k;
             }
             return keys;
-        };
-    })();
+        }
+        if (Object.keys) {
+            return Object.keys(obj);
+        }
+        var keys = [];
+        for (var i in obj) {
+            if (obj.hasOwnProperty(i)) {
+                keys.push(i);
+            }
+        }
+        return keys;
+    };
     function _equals(a, b) {
         switch (typeof a) {
             case 'undefined': //backward compatibility, but really I think we should return false

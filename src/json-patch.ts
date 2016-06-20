@@ -6,21 +6,31 @@
  */
 
 var OriginalError = Error;
-module jsonpatch {
-  var _objectKeys = (function () {
-    if (Object.keys)
-      return Object.keys;
 
-    return function (o) { //IE8
-      var keys = [];
-      for (var i in o) {
-        if (o.hasOwnProperty(i)) {
-          keys.push(i);
-        }
+module jsonpatch {
+  var _objectKeys = function (obj) {
+    if (_isArray(obj)) {
+      var keys = new Array(obj.length);
+
+      for (var k = 0; k < keys.length; k++) {
+        keys[k] = "" + k;
       }
+
       return keys;
     }
-  })();
+
+    if (Object.keys) {
+      return Object.keys(obj);
+    }
+
+    var keys = [];
+    for (var i in obj) {
+      if (obj.hasOwnProperty(i)) {
+        keys.push(i);
+      }
+    }
+    return keys;
+  };
 
   function _equals(a, b) {
     switch (typeof a) {
@@ -311,7 +321,7 @@ module jsonpatch {
         }
 
         return false;
-    }
+   }
 
   /**
    * Validates a single operation. Called from `jsonpatch.validate`. Throws `JsonPatchError` in case of an error.
