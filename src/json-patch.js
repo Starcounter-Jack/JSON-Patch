@@ -75,12 +75,12 @@ var jsonpatch;
         remove: function (obj, key) {
             var removed = obj[key];
             delete obj[key];
-            return { removed: removed };
+            return removed;
         },
         replace: function (obj, key) {
             var removed = obj[key];
             obj[key] = this.value;
-            return { removed: removed };
+            return removed;
         },
         move: function (obj, key, tree) {
             var getOriginalDestination = { op: "_get", path: this.path };
@@ -96,7 +96,7 @@ var jsonpatch;
             apply(tree, [
                 { op: "add", path: this.path, value: temp.value }
             ]);
-            return { removed: original };
+            return original;
         },
         copy: function (obj, key, tree) {
             var temp = { op: "_get", path: this.from };
@@ -106,7 +106,7 @@ var jsonpatch;
             ]);
         },
         test: function (obj, key) {
-            return { testResult: _equals(obj[key], this.value) };
+            return _equals(obj[key], this.value);
         },
         _get: function (obj, key) {
             this.value = obj[key];
@@ -116,16 +116,17 @@ var jsonpatch;
     var arrOps = {
         add: function (arr, i) {
             arr.splice(i, 0, this.value);
-            return true;
+            // this may be needed when using '-' in an array
+            return i;
         },
         remove: function (arr, i) {
             var removedList = arr.splice(i, 1);
-            return { removed: removedList[0] };
+            return removedList[0];
         },
         replace: function (arr, i) {
             var removed = arr[i];
             arr[i] = this.value;
-            return { removed: removed };
+            return removed;
         },
         move: objOps.move,
         copy: objOps.copy,
@@ -151,7 +152,7 @@ var jsonpatch;
                     objOps.remove.call(this, obj, key);
                 }
             }
-            return { removed: removed };
+            return removed;
         },
         replace: function (obj) {
             var removed = apply(obj, [
@@ -165,7 +166,7 @@ var jsonpatch;
         move: objOps.move,
         copy: objOps.copy,
         test: function (obj) {
-            return { testResult: (JSON.stringify(obj) === JSON.stringify(this.value)) };
+            return (JSON.stringify(obj) === JSON.stringify(this.value));
         },
         _get: function (obj) {
             this.value = obj;
@@ -195,13 +196,15 @@ var jsonpatch;
         }
         return true;
     }
-    /// Apply a json-patch operation on an object tree
-    /// Returns an array of results of operations.
-    /// Each element can either have boolean testResult property (if op == 'test')
-    /// removed property with removed object (operations that remove things)
-    /// or just be undefined
+    /**
+     * Apply a json-patch operation on an object tree
+     * Returns an array of results of operations.
+     * Each element can either be a boolean (if op == 'test') or
+     * the removed object (operations that remove things)
+     * or just be undefined
+     */
     function apply(tree, patches, validate) {
-        var results = [], p = 0, plen = patches.length, patch, key;
+        var results = new Array(patches.length), p = 0, plen = patches.length, patch, key;
         while (p < plen) {
             patch = patches[p];
             p++;
@@ -230,7 +233,7 @@ var jsonpatch;
                 t++;
                 if (key === undefined) {
                     if (t >= len) {
-                        results.push(rootOps[patch.op].call(patch, obj, key, tree)); // Apply patch
+                        results[p - 1] = rootOps[patch.op].call(patch, obj, key, tree); // Apply patch
                         break;
                     }
                 }
@@ -248,7 +251,7 @@ var jsonpatch;
                         if (validate && patch.op === "add" && key > obj.length) {
                             throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", p - 1, patch.path, patch);
                         }
-                        results.push(arrOps[patch.op].call(patch, obj, key, tree)); // Apply patch
+                        results[p - 1] = arrOps[patch.op].call(patch, obj, key, tree); // Apply patch
                         break;
                     }
                 }
@@ -256,7 +259,7 @@ var jsonpatch;
                     if (key && key.indexOf('~') != -1)
                         key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
                     if (t >= len) {
-                        results.push(objOps[patch.op].call(patch, obj, key, tree)); // Apply patch
+                        results[p - 1] = objOps[patch.op].call(patch, obj, key, tree); // Apply patch
                         break;
                     }
                 }

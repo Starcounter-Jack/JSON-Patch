@@ -89,12 +89,12 @@ module jsonpatch {
     remove: function (obj, key) {
       var removed = obj[key];
       delete obj[key];
-      return {removed: removed};
+      return removed;
     },
     replace: function (obj, key) {
       var removed = obj[key];
       obj[key] = this.value;
-      return {removed: removed};
+      return removed;
     },
     move: function (obj, key, tree) {
       var getOriginalDestination : any = {op: "_get", path: this.path};
@@ -112,7 +112,7 @@ module jsonpatch {
       apply(tree, [
         {op: "add", path: this.path, value: temp.value}
       ]);
-      return {removed: original};
+      return original;
     },
     copy: function (obj, key, tree) {
       var temp:any = {op: "_get", path: this.from};
@@ -122,7 +122,7 @@ module jsonpatch {
       ]);
     },
     test: function (obj, key) {
-      return {testResult: _equals(obj[key], this.value)};
+      return _equals(obj[key], this.value);
     },
     _get: function (obj, key) {
       this.value = obj[key];
@@ -134,16 +134,16 @@ module jsonpatch {
     add: function (arr, i) {
       arr.splice(i, 0, this.value);
       // this may be needed when using '-' in an array
-      return {addedAt: i};
+      return i;
     },
     remove: function (arr, i) {
       var removedList = arr.splice(i, 1);
-      return {removed: removedList[0]};
+      return removedList[0];
     },
     replace: function (arr, i) {
       var removed = arr[i];
       arr[i] = this.value;
-      return {removed: removed};
+      return removed;
     },
     move: objOps.move,
     copy: objOps.copy,
@@ -170,7 +170,7 @@ module jsonpatch {
           objOps.remove.call(this, obj, key);
         }
       }
-      return {removed: removed};
+      return removed;
     },
     replace: function (obj) {
       var removed = apply(obj, [
@@ -184,7 +184,7 @@ module jsonpatch {
     move: objOps.move,
     copy: objOps.copy,
     test: function (obj) {
-      return {testResult: (JSON.stringify(obj) === JSON.stringify(this.value))};
+      return (JSON.stringify(obj) === JSON.stringify(this.value));
     },
     _get: function (obj) {
       this.value = obj;
@@ -446,7 +446,13 @@ module jsonpatch {
     return true;
   }
 
-  /// Apply a json-patch operation on an object tree
+  /**
+   * Apply a json-patch operation on an object tree
+   * Returns an array of results of operations.
+   * Each element can either be a boolean (if op == 'test') or
+   * the removed object (operations that remove things)
+   * or just be undefined
+   */
   export function apply(tree:any, patches:any[], validate?:boolean):Array<any> {
     var results = []
         , p = 0
