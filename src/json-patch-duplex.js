@@ -136,13 +136,12 @@ var jsonpatch;
     /* The operations applicable to object root. Many are the same as for the object */
     var rootOps = {
         add: function (obj) {
-            var removed = rootOps.remove.call(this, obj);
+            rootOps.remove.call(this, obj);
             for (var key in this.value) {
                 if (this.value.hasOwnProperty(key)) {
                     obj[key] = this.value[key];
                 }
             }
-            return removed;
         },
         remove: function (obj) {
             var removed = {};

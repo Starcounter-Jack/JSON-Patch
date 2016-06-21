@@ -163,11 +163,6 @@ describe("core", function () {
       var result = jsonpatch.apply(obj, [{"op":"move", "from":"/hobby", "path":"/languages/1"}]);
       expect(result[0]).toEqual("haskell");
     });
-
-    it('return root when adding root', function () {
-      var result = jsonpatch.apply(obj, [{"op":"add", "path":"", "value": {"newRoot":"yes"}}]);
-      expect(result[0]).toEqual({name:'jack', languages: ['c#','haskell','python'], hobby:'music'});
-    });
     it('return root when removing root', function () {
       var result = jsonpatch.apply(obj, [{"op":"remove", "path":""}]);
       expect(result[0]).toEqual({name:'jack', languages: ['c#','haskell','python'], hobby:'music'});
