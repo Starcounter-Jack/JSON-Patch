@@ -85,26 +85,34 @@ module jsonpatch {
   var objOps = {
     add: function (obj, key) {
       obj[key] = this.value;
-      return true;
     },
     remove: function (obj, key) {
+      var removed = obj[key];
       delete obj[key];
-      return true;
+      return removed;
     },
     replace: function (obj, key) {
+      var removed = obj[key];
       obj[key] = this.value;
-      return true;
+      return removed;
     },
     move: function (obj, key, tree) {
+      var getOriginalDestination : any = {op: "_get", path: this.path};
+      apply(tree, [getOriginalDestination]);
+      // In case value is moved up and overwrites its ancestor
+      var original = getOriginalDestination.value === undefined ?
+          undefined : JSON.parse(JSON.stringify(getOriginalDestination.value));
+
       var temp:any = {op: "_get", path: this.from};
       apply(tree, [temp]);
+
       apply(tree, [
         {op: "remove", path: this.from}
       ]);
       apply(tree, [
         {op: "add", path: this.path, value: temp.value}
       ]);
-      return true;
+      return original;
     },
     copy: function (obj, key, tree) {
       var temp:any = {op: "_get", path: this.from};
@@ -112,7 +120,6 @@ module jsonpatch {
       apply(tree, [
         {op: "add", path: this.path, value: temp.value}
       ]);
-      return true;
     },
     test: function (obj, key) {
       return _equals(obj[key], this.value);
@@ -126,15 +133,17 @@ module jsonpatch {
   var arrOps = {
     add: function (arr, i) {
       arr.splice(i, 0, this.value);
-      return true;
+      // this may be needed when using '-' in an array
+      return i;
     },
     remove: function (arr, i) {
-      arr.splice(i, 1);
-      return true;
+      var removedList = arr.splice(i, 1);
+      return removedList[0];
     },
     replace: function (arr, i) {
+      var removed = arr[i];
       arr[i] = this.value;
-      return true;
+      return removed;
     },
     move: objOps.move,
     copy: objOps.copy,
@@ -151,24 +160,25 @@ module jsonpatch {
           obj[key] = this.value[key];
         }
       }
-      return true;
     },
     remove: function (obj) {
+      var removed = {};
       for (var key in obj) {
         if (obj.hasOwnProperty(key)) {
+          removed[key] = obj[key];
           objOps.remove.call(this, obj, key);
         }
       }
-      return true;
+      return removed;
     },
     replace: function (obj) {
-      apply(obj, [
+      var removed = apply(obj, [
         {op: "remove", path: this.path}
       ]);
       apply(obj, [
         {op: "add", path: this.path, value: this.value}
       ]);
-      return true;
+      return removed[0];
     },
     move: objOps.move,
     copy: objOps.copy,
@@ -177,31 +187,6 @@ module jsonpatch {
     },
     _get: function (obj) {
       this.value = obj;
-    }
-  };
-
-  var observeOps = {
-    add: function (patches:any[], path) {
-      var patch = {
-        op: "add",
-        path: path + escapePathComponent(this.name),
-        value: this.object[this.name]};
-      patches.push(patch);
-    },
-    'delete': function (patches:any[], path) { //single quotes needed because 'delete' is a keyword in IE8
-      var patch = {
-        op: "remove",
-        path: path + escapePathComponent(this.name)
-      };
-      patches.push(patch);
-    },
-    update: function (patches:any[], path) {
-      var patch = {
-        op: "replace",
-        path: path + escapePathComponent(this.name),
-        value: this.object[this.name]
-      };
-      patches.push(patch);
     }
   };
 
@@ -460,9 +445,15 @@ module jsonpatch {
     return true;
   }
 
-  /// Apply a json-patch operation on an object tree
-  export function apply(tree:any, patches:any[], validate?:boolean):boolean {
-    var result = false
+  /**
+   * Apply a json-patch operation on an object tree
+   * Returns an array of results of operations.
+   * Each element can either be a boolean (if op == 'test') or
+   * the removed object (operations that remove things)
+   * or just be undefined
+   */
+  export function apply(tree:any, patches:any[], validate?:boolean):Array<any> {
+    var results = []
         , p = 0
         , plen = patches.length
         , patch
@@ -498,7 +489,7 @@ module jsonpatch {
         t++;
         if(key === undefined) { //is root
           if (t >= len) {
-            result = rootOps[patch.op].call(patch, obj, key, tree); // Apply patch
+            results.push(rootOps[patch.op].call(patch, obj, key, tree)); // Apply patch
             break;
           }
         }
@@ -516,7 +507,7 @@ module jsonpatch {
             if (validate && patch.op === "add" && key > obj.length) {
               throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", p - 1, patch.path, patch);
             }
-            result = arrOps[patch.op].call(patch, obj, key, tree); // Apply patch
+            results.push(arrOps[patch.op].call(patch, obj, key, tree)); // Apply patch
             break;
           }
         }
@@ -524,14 +515,14 @@ module jsonpatch {
           if (key && key.indexOf('~') != -1)
             key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
           if (t >= len) {
-            result = objOps[patch.op].call(patch, obj, key, tree); // Apply patch
+            results.push(objOps[patch.op].call(patch, obj, key, tree)); // Apply patch
             break;
           }
         }
         obj = obj[key];
       }
     }
-    return result;
+    return results;
   }
 
   export function compare(tree1:any, tree2:any):any[] {
