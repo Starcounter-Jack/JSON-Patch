@@ -219,14 +219,6 @@ OPERATION_FROM_UNRESOLVABLE   | Cannot perform the operation from a path that do
 OPERATION_PATH_ILLEGAL_ARRAY_INDEX | Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index
 OPERATION_VALUE_OUT_OF_BOUNDS | The specified index MUST NOT be greater than the number of elements in the array
 
-
-## `undefined`s (JSON to JS extension)
-
-As `undefined` is not a valid value for any JSON node, it's also not valid value o JSON Patch operation object value property. Therefore, for valid JSON document, `jsonpatch` will not generate JSON Patches that sets anything to `undefined`.
-
-However, to play nicer with natural JavaScipt objects `jsonpatch` can be applied to an object that contains `undefined`, in such case we will treat it as JS does. `.apply` will handle JSON Patches with `value: undefined` as any other falsy value. `.generate`, `.compare`, `.observe` methods will also produce JSON Patches with `undefined`s, but only for (non valid) JSON documents that contains it.
-
-
 ## `undefined`s (JS to JSON projection)
 
 As `undefined` type does not exist in JSON, it's also not a valid value of JSON Patch operation. Therefore `jsonpatch` will not generate JSON Patches that sets anything to `undefined`.
