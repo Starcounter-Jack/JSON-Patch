@@ -148,11 +148,10 @@ Applies `patches` array on `obj`.
 If the `validate` parameter is set to `true`, the patch is extensively validated before applying.
 An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
 
-If patch was succesfully applied, returns `true`.
-
-If there was a `test` patch in `patches` array, returns the result of the test.
-
-If there was more than one patch in the array, the result of the last patch is returned.
+Returns an array of results - one item for each item in `patches`. The type of each item depends on type of operation applied
+* `test` - boolean result of the test
+* `remove`, `replace` and `move` - original object that has been removed
+* `add` (only when adding to an array) - index at which item has been inserted (useful when using `-` alias)
 
 #### jsonpatch.observe (`obj` Object, `callback` Function (optional)) : `observer` Object
 
