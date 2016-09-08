@@ -34,7 +34,7 @@
     "jsdom": "^9.2.1"
   },
   "scripts": {
-    "tsc": "tsc src/json-patch-duplex.ts && tsc src/json-patch.ts",
+    "tsc": "tsc src/json-patch-duplex.ts --noEmitHelpers && tsc src/json-patch.ts --noEmitHelpers",
     "test": "jasmine-node --matchall --config duplex yes test/spec/coreSpec.js test/spec/duplexSpec.js",
     "test-duplex": "jasmine-node --matchall --config duplex yes test/spec/duplexSpec.js",
     "test-core": "jasmine-node --matchall --config duplex no test/spec/coreSpec.js"

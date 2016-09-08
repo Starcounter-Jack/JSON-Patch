@@ -288,6 +288,13 @@ module jsonpatch {
     }
     return results;
   }
+
+  // provide scoped __extends for TypeScript's `extend` keyword so it will not provide global one during compilation
+  function __extends(d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  }
   export class JsonPatchError extends Error {
 
     constructor(public message: string, public name:string, public index?:number, public operation?:any, public tree?:any) {

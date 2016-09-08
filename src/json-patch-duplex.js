@@ -4,11 +4,6 @@
  * (c) 2013 Joachim Wester
  * MIT license
  */
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var jsonpatch;
 (function (jsonpatch) {
     var _objectKeys = function (obj) {
@@ -474,6 +469,14 @@ var jsonpatch;
         return patches;
     }
     jsonpatch.compare = compare;
+    // provide scoped __extends for TypeScript's `extend` keyword so it will not provide global one during compilation
+    function __extends(d, b) {
+        for (var p in b)
+            if (b.hasOwnProperty(p))
+                d[p] = b[p];
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    }
     var JsonPatchError = (function (_super) {
         __extends(JsonPatchError, _super);
         function JsonPatchError(message, name, index, operation, tree) {
