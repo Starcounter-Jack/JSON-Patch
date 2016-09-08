@@ -228,6 +228,8 @@ Whenever a value is set to `undefined` in JS, JSON-Patch methods `generate` and 
 
 See the [ECMAScript spec](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-json.stringify) for details.
 
+## [Contributing](CONTRIBUTING.md)
+
 ## Changelog
 
 To see the list of recent changes, see [Releases](https://github.com/Starcounter-Jack/JSON-Patch/releases).

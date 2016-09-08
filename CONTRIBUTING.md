@@ -4,7 +4,8 @@
 
 Make sure that you edit the source files in TypeScript (`*.ts`) files.
 
-You can build TypeScript to JavaScript using the [`TypeScript compiler`](https://www.typescriptlang.org/docs/tutorial.html).
+You can build TypeScript to JavaScript using the [`TypeScript compiler`](https://www.typescriptlang.org/docs/tutorial.html)
+(and run it with npm script: `npm run tsc`).
 
 Make sure that you commit changes to both `ts` and `js` files.
 
@@ -27,7 +28,7 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 2. Install dev dependencies (Jasmine Node.js module) by running command `npm install`
 3. Run test `npm run test`
  - Testing **json-patch.js** only: `npm run test-core`
- - Testing **json-patch0duplex.js** only: `npm run test-duplex`
+ - Testing **json-patch-duplex.js** only: `npm run test-duplex`
 
 ## Releasing a new version
 
