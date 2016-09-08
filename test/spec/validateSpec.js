@@ -30,11 +30,10 @@ describe("validate", function() {
     expect(error.name).toBe('OPERATION_NOT_AN_OBJECT');
   });
 
-  it('should return an error which is instance of Error and jsonpatch.Error', function() {
+  it('should return an error which is instance of Error and jsonpatch.JsonPatchError', function() {
     var error = jsonpatch.validate({});
     expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
     expect(error instanceof Error).toBe(true);
-    expect(error instanceof jsonpatch.Error).toBe(true);
     expect(error.name).toBe('SEQUENCE_NOT_AN_ARRAY');
   });
 

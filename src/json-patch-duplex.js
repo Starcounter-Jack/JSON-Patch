@@ -9,7 +9,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var OriginalError = Error;
 var jsonpatch;
 (function (jsonpatch) {
     var _objectKeys = function (obj) {
@@ -199,7 +198,7 @@ var jsonpatch;
         }
         var path = _getPathRecursive(root, obj);
         if (path === '') {
-            throw new OriginalError("Object not found in root");
+            throw new Error("Object not found in root");
         }
         return '/' + path;
     }
@@ -486,9 +485,8 @@ var jsonpatch;
             this.tree = tree;
         }
         return JsonPatchError;
-    }(OriginalError));
+    }(Error));
     jsonpatch.JsonPatchError = JsonPatchError;
-    jsonpatch.Error = JsonPatchError;
     /**
      * Recursively checks whether an object has any undefined values inside.
      */
@@ -596,6 +594,4 @@ if (typeof exports !== "undefined") {
     exports.validate = jsonpatch.validate;
     exports.validator = jsonpatch.validator;
     exports.JsonPatchError = jsonpatch.JsonPatchError;
-    exports.Error = jsonpatch.Error;
 }
-//# sourceMappingURL=json-patch-duplex.js.map

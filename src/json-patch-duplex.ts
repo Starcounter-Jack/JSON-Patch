@@ -11,8 +11,6 @@ interface HTMLElement {
 }
 
 
-var OriginalError = Error;
-
 module jsonpatch {
   var _objectKeys = function (obj) {
     if (_isArray(obj)) {
@@ -219,7 +217,7 @@ module jsonpatch {
     }
     var path = _getPathRecursive(root, obj);
     if (path === '') {
-      throw new OriginalError("Object not found in root");
+      throw new Error("Object not found in root");
     }
     return '/' + path;
   }
@@ -530,22 +528,12 @@ module jsonpatch {
     _generate(tree1, tree2, patches, '');
     return patches;
   }
+  export class JsonPatchError extends Error {
 
-  export declare class OriginalError {
-    public name:string;
-    public message:string;
-    public stack:string;
-
-    constructor(message?:string);
-  }
-
-  export class JsonPatchError extends OriginalError {
-    constructor(public message:string, public name:string, public index?:number, public operation?:any, public tree?:any) {
+    constructor(public message: string, public name:string, public index?:number, public operation?:any, public tree?:any) {
       super(message);
     }
   }
-
-  export var Error = JsonPatchError;
 
     /**
      * Recursively checks whether an object has any undefined values inside.
@@ -666,5 +654,4 @@ if (typeof exports !== "undefined") {
   exports.validate = jsonpatch.validate;
   exports.validator = jsonpatch.validator;
   exports.JsonPatchError = jsonpatch.JsonPatchError;
-  exports.Error = jsonpatch.Error;
 }
