@@ -321,10 +321,14 @@ module jsonpatch {
         if (window.addEventListener) { //standards
           window.addEventListener('mouseup', fastCheck);
           window.addEventListener('keyup', fastCheck);
+          window.addEventListener('mousedown', fastCheck);
+          window.addEventListener('keydown', fastCheck);
         }
         else { //IE8
           document.documentElement.attachEvent('onmouseup', fastCheck);
           document.documentElement.attachEvent('onkeyup', fastCheck);
+          document.documentElement.attachEvent('onmousedown', fastCheck);
+          document.documentElement.attachEvent('onkeydown', fastCheck);
         }
       }
     }
@@ -340,10 +344,14 @@ module jsonpatch {
             if (window.removeEventListener) {
                 window.removeEventListener('mouseup', fastCheck);
                 window.removeEventListener('keyup', fastCheck);
+                window.removeEventListener('mousedown', fastCheck);
+                window.removeEventListener('keydown', fastCheck);
             }
             else {
                 document.documentElement.detachEvent('onmouseup', fastCheck);
                 document.documentElement.detachEvent('onkeyup', fastCheck);
+                document.documentElement.detachEvent('onmousedown', fastCheck);
+                document.documentElement.detachEvent('onkeydown', fastCheck);
             }
         }
     };
