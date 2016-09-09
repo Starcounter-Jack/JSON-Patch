@@ -60,21 +60,35 @@ function fireEvent(obj, evt) {
     }
 }
 
+var customMatchers = {
+    /**
+     * This matcher is only needed in Chrome 28 (Chrome 28 cannot successfully compare observed objects immediately after they have been changed. Chrome 30 is unaffected)
+     * @param obj
+     * @returns {boolean}
+     */
+    toEqualInJson: function(util, customEqualityTesters) {
+        return {
+            compare: function(actual, expected) {
+                return {
+                    pass: JSON.stringify(actual) == JSON.stringify(expected)
+                }
+            }
+        }
+    },
+    toReallyEqual: function(util, customEqualityTesters) {
+        return {
+            compare: function(actual, expected) {
+                return {
+                    pass: _.isEqual(actual, expected)
+                }
+            }
+        }
+    }
+};
+
 describe("duplex", function() {
     beforeEach(function() {
-        this.addMatchers({
-            /**
-             * This matcher is only needed in Chrome 28 (Chrome 28 cannot successfully compare observed objects immediately after they have been changed. Chrome 30 is unaffected)
-             * @param obj
-             * @returns {boolean}
-             */
-            toEqualInJson: function(expected) {
-                return JSON.stringify(this.actual) == JSON.stringify(expected);
-            },
-            toReallyEqual: function(expected) {
-                return _.isEqual(this.actual, expected);
-            },
-        });
+        jasmine.addMatchers(customMatchers);
     });
 
     describe("toReallyEqual", function() {
@@ -766,7 +780,7 @@ describe("duplex", function() {
     });
 
     describe('callback', function() {
-        it('should generate replace', function() {
+        it('should generate replace', function(done) {
             var patches;
 
             obj = {
@@ -781,6 +795,7 @@ describe("duplex", function() {
 
             jsonpatch.observe(obj, function(_patches) {
                 patches = _patches;
+                patchesChanged();
             });
             obj.firstName = "Joachim";
             obj.lastName = "Wester";
@@ -789,11 +804,7 @@ describe("duplex", function() {
 
             triggerKeyup();
 
-            waitsFor(function() {
-                return typeof patches === 'object';
-            }, 100);
-
-            runs(function() {
+            function patchesChanged() {
                 obj2 = {
                     firstName: "Albert",
                     lastName: "Einstein",
@@ -806,10 +817,12 @@ describe("duplex", function() {
 
                 jsonpatch.apply(obj2, patches);
                 expect(obj2).toReallyEqual(obj);
-            });
+                done();
+            }
+
         });
 
-        it('should generate replace (double change, shallow object)', function() {
+        it('should generate replace (double change, shallow object)', function(done) {
             var lastPatches, called = 0;
 
             obj = {
@@ -825,52 +838,51 @@ describe("duplex", function() {
             jsonpatch.observe(obj, function(patches) {
                 called++;
                 lastPatches = patches;
+                patchesChanged(called);
             });
             obj.firstName = "Marcin";
 
             triggerKeyup();
+            // ugly migration from Jasmine 1.x to > 2.0
+            function patchesChanged(time) {
+                switch (time) {
+                    case 1:
+                        expect(called).toReallyEqual(1);
+                        expect(lastPatches).toReallyEqual([{
+                            op: 'replace',
+                            path: '/firstName',
+                            value: 'Marcin'
+                        }]);
 
-            waitsFor(function() {
-                return called > 0;
-            }, 100, 'firstName change to Marcin');
+                        obj.lastName = "Warp";
+                        triggerKeyup();
+                        break;
+                    case 2:
+                        expect(called).toReallyEqual(2);
+                        expect(lastPatches).toReallyEqual([{
+                            op: 'replace',
+                            path: '/lastName',
+                            value: 'Warp'
+                        }]); //first patch should NOT be reported again here
 
-            runs(function() {
-                expect(called).toReallyEqual(1);
-                expect(lastPatches).toReallyEqual([{
-                    op: 'replace',
-                    path: '/firstName',
-                    value: 'Marcin'
-                }]);
+                        expect(obj).toReallyEqual({
+                            firstName: "Marcin",
+                            lastName: "Warp",
+                            phoneNumbers: [{
+                                number: "12345"
+                            }, {
+                                number: "45353"
+                            }]
+                        }); //objects should be still the same
 
-                obj.lastName = "Warp";
-                triggerKeyup();
-            });
+                        done();
+                        break;
 
-            waitsFor(function() {
-                return called > 1;
-            }, 100, 'lastName change to Warp');
-
-            runs(function() {
-                expect(called).toReallyEqual(2);
-                expect(lastPatches).toReallyEqual([{
-                    op: 'replace',
-                    path: '/lastName',
-                    value: 'Warp'
-                }]); //first patch should NOT be reported again here
-
-                expect(obj).toReallyEqual({
-                    firstName: "Marcin",
-                    lastName: "Warp",
-                    phoneNumbers: [{
-                        number: "12345"
-                    }, {
-                        number: "45353"
-                    }]
-                }); //objects should be still the same
-            });
+                }
+            }
         });
 
-        it('should generate replace (double change, deep object)', function() {
+        it('should generate replace (double change, deep object)', function(done) {
             var lastPatches, called = 0;
 
             obj = {
@@ -886,52 +898,51 @@ describe("duplex", function() {
             jsonpatch.observe(obj, function(patches) {
                 called++;
                 lastPatches = patches;
+                patchesChanged(called);
             });
             obj.phoneNumbers[0].number = "123";
 
             triggerKeyup();
 
-            waitsFor(function() {
-                return called > 0;
-            }, 100, 'phoneNumbers[0].number change to 123');
+            // ugly migration from Jasmine 1.x to > 2.0
+            function patchesChanged(time) {
+                switch (time) {
+                    case 1:
+                        expect(called).toReallyEqual(1);
+                        expect(lastPatches).toReallyEqual([{
+                            op: 'replace',
+                            path: '/phoneNumbers/0/number',
+                            value: '123'
+                        }]);
 
-            runs(function() {
-                expect(called).toReallyEqual(1);
-                expect(lastPatches).toReallyEqual([{
-                    op: 'replace',
-                    path: '/phoneNumbers/0/number',
-                    value: '123'
-                }]);
+                        obj.phoneNumbers[1].number = "456";
+                        triggerKeyup();
+                        break;
+                    case 2:
 
-                obj.phoneNumbers[1].number = "456";
-                triggerKeyup();
-            });
+                        expect(called).toReallyEqual(2);
+                        expect(lastPatches).toReallyEqual([{
+                            op: 'replace',
+                            path: '/phoneNumbers/1/number',
+                            value: '456'
+                        }]); //first patch should NOT be reported again here
 
-            waitsFor(function() {
-                return called > 1;
-            }, 100, 'phoneNumbers[1].number change to 456');
-
-            runs(function() {
-                expect(called).toReallyEqual(2);
-                expect(lastPatches).toReallyEqual([{
-                    op: 'replace',
-                    path: '/phoneNumbers/1/number',
-                    value: '456'
-                }]); //first patch should NOT be reported again here
-
-                expect(obj).toReallyEqual({
-                    firstName: "Albert",
-                    lastName: "Einstein",
-                    phoneNumbers: [{
-                        number: "123"
-                    }, {
-                        number: "456"
-                    }]
-                }); //objects should be still the same
-            });
+                        expect(obj).toReallyEqual({
+                            firstName: "Albert",
+                            lastName: "Einstein",
+                            phoneNumbers: [{
+                                number: "123"
+                            }, {
+                                number: "456"
+                            }]
+                        }); //objects should be still the same
+                        done();
+                        break;
+                }
+            }
         });
 
-        it('generate should execute callback synchronously', function() {
+        it('generate should execute callback synchronously', function(done) {
             var lastPatches, called = 0,
                 res;
 
@@ -951,29 +962,31 @@ describe("duplex", function() {
             });
             obj.phoneNumbers[0].number = "123";
 
-            waits(100);
-            expect(called).toReallyEqual(0);
+            setTimeout(function(){
+                expect(called).toReallyEqual(0);
 
-            res = jsonpatch.generate(observer);
-            expect(called).toReallyEqual(1);
-            expect(lastPatches).toReallyEqual([{
-                op: 'replace',
-                path: '/phoneNumbers/0/number',
-                value: '123'
-            }]);
-            expect(lastPatches).toReallyEqual(res);
+                res = jsonpatch.generate(observer);
+                expect(called).toReallyEqual(1);
+                expect(lastPatches).toReallyEqual([{
+                    op: 'replace',
+                    path: '/phoneNumbers/0/number',
+                    value: '123'
+                }]);
+                expect(lastPatches).toReallyEqual(res);
 
-            res = jsonpatch.generate(observer);
-            expect(called).toReallyEqual(1);
-            expect(lastPatches).toReallyEqual([{
-                op: 'replace',
-                path: '/phoneNumbers/0/number',
-                value: '123'
-            }]);
-            expect(res).toReallyEqual([]);
+                res = jsonpatch.generate(observer);
+                expect(called).toReallyEqual(1);
+                expect(lastPatches).toReallyEqual([{
+                    op: 'replace',
+                    path: '/phoneNumbers/0/number',
+                    value: '123'
+                }]);
+                expect(res).toReallyEqual([]);
+                done();
+            },100);
         });
 
-        it('should unobserve then observe again', function() {
+        it('should unobserve then observe again', function(done) {
             var called = 0;
 
             obj = {
@@ -994,9 +1007,8 @@ describe("duplex", function() {
 
             triggerKeyup();
 
-            waits(20);
-
-            runs(function() {
+            // ugly migration from Jasmine 1.x to > 2.0
+            setTimeout(function(){
                 expect(called).toReallyEqual(1);
 
                 jsonpatch.unobserve(obj, observer);
@@ -1004,29 +1016,26 @@ describe("duplex", function() {
                 obj.firstName = 'Wilfred';
 
                 triggerKeyup();
-            });
 
-            waits(20);
+                setTimeout(function(){
+                    expect(called).toReallyEqual(1);
 
-            runs(function() {
-                expect(called).toReallyEqual(1);
+                    observer = jsonpatch.observe(obj, function(patches) {
+                        called++;
+                    });
 
-                observer = jsonpatch.observe(obj, function(patches) {
-                    called++;
-                });
+                    obj.firstName = 'Megan';
+                    triggerKeyup();
 
-                obj.firstName = 'Megan';
-                triggerKeyup();
-            });
-
-            waits(20);
-
-            runs(function() {
-                expect(called).toReallyEqual(2);
-            });
+                    setTimeout(function(){
+                        expect(called).toReallyEqual(2);
+                        done();
+                    }, 20);
+                },20);
+            }, 20);
         });
 
-        it('should unobserve then observe again (deep value)', function() {
+        it('should unobserve then observe again (deep value)', function(done) {
             var called = 0;
 
             obj = {
@@ -1046,10 +1055,8 @@ describe("duplex", function() {
             obj.phoneNumbers[1].number = '555';
 
             triggerKeyup();
-
-            waits(20);
-
-            runs(function() {
+            // ugly migration from Jasmine 1.x to > 2.0
+            setTimeout(function(){
                 expect(called).toReallyEqual(1);
 
                 jsonpatch.unobserve(obj, observer);
@@ -1057,30 +1064,27 @@ describe("duplex", function() {
                 obj.phoneNumbers[1].number = '556';
 
                 triggerKeyup();
-            });
 
-            waits(20);
+                setTimeout(function(){
+                    expect(called).toReallyEqual(1);
 
-            runs(function() {
-                expect(called).toReallyEqual(1);
+                    observer = jsonpatch.observe(obj, function(patches) {
+                        called++;
+                    });
 
-                observer = jsonpatch.observe(obj, function(patches) {
-                    called++;
-                });
+                    obj.phoneNumbers[1].number = '557';
 
-                obj.phoneNumbers[1].number = '557';
+                    triggerKeyup();
 
-                triggerKeyup();
-            });
-
-            waits(20);
-
-            runs(function() {
-                expect(called).toReallyEqual(2);
-            });
+                    setTimeout(function(){
+                        expect(called).toReallyEqual(2);
+                        done();
+                    }, 20);
+                }, 20);
+            }, 20);
         });
 
-        it('calling unobserve should deliver pending changes synchronously', function() {
+        it('calling unobserve should deliver pending changes synchronously', function(done) {
             var lastPatches = '';
 
             obj = {
@@ -1105,60 +1109,56 @@ describe("duplex", function() {
 
             obj.firstName = 'Jonathan';
 
-            waits(20);
-
-            runs(function() {
+            // ugly migration from Jasmine 1.x to > 2.0
+            setTimeout(function(){
                 expect(lastPatches[0].value).toBe('Malvin');
-            });
+                done();
+            }, 20);
         });
 
-        it("should handle callbacks that calls observe() and unobserve() internally", function() {
+        it("should handle callbacks that calls observe() and unobserve() internally", function(done) {
 
             var obj = {
                 foo: 'bar'
             };
 
             var observer;
-
-            var callback = jasmine.createSpy('callback');
-            callback.plan = function() {
+            var callbackCalled, count = 0;
+            var callback = jasmine.createSpy('callback', function() {
                 jsonpatch.unobserve(obj, observer);
 
                 jsonpatch.observe(obj, callback);
-            };
+                callbackCalled(++count);
+            }).and.callThrough();
 
             observer = jsonpatch.observe(obj, callback);
 
-            expect(callback.calls.length).toReallyEqual(0);
+            expect(callback.calls.count()).toReallyEqual(0);
 
             obj.foo = 'bazz';
 
             triggerKeyup();
 
-            waitsFor(function() {
-                return callback.calls.length > 0;
-            }, 'callback calls', 1000);
+            // ugly migration from Jasmine 1.x to > 2.0
+            function callbackCalled(time) {
+                switch (time) {
+                    case 1:
+                        expect(callback.calls.count()).toReallyEqual(1);
 
-            runs(function() {
-                expect(callback.calls.length).toReallyEqual(1);
+                        obj.foo = 'bazinga';
 
-                callback.reset();
+                        triggerKeyup();
+                        break;
+                    case 2:
+                        expect(callback.calls.count()).toReallyEqual(2);
+                        done();
+                        break;
+                }
+            }
 
-                obj.foo = 'bazinga';
-
-                triggerKeyup();
-            });
-
-            waitsFor(function() {
-                return callback.calls.length > 0;
-            }, 'callback calls', 1000);
-
-            runs(function() {
-                expect(callback.calls.length).toReallyEqual(1);
-            });
         });
 
-        it('should generate patch after mouse up event', function() {
+        it('should generate patch after mouse up event', function(done) {
             obj = {
                 lastName: "Einstein"
             };
@@ -1176,6 +1176,7 @@ describe("duplex", function() {
                     path: '/lastName',
                     value: 'Hawking'
                 }]);
+                done();
             }, 100);
         });
 
@@ -1276,7 +1277,7 @@ describe("duplex", function() {
 
     describe("Registering multiple observers with the same callback", function() {
 
-        it("should register only one observer", function() {
+        it("should register only one observer", function(done) {
 
             var obj = {
                 foo: 'bar'
@@ -1287,20 +1288,16 @@ describe("duplex", function() {
             jsonpatch.observe(obj, callback);
             jsonpatch.observe(obj, callback);
 
-            expect(callback.calls.length).toReallyEqual(0);
+            expect(callback.calls.count()).toReallyEqual(0);
 
             obj.foo = 'bazz';
 
             triggerKeyup()
 
-            waitsFor(function() {
-                return callback.calls.length > 0;
-            }, 'callback call', 1000);
-
-            runs(function() {
-                expect(callback.calls.length).toReallyEqual(1);
-            });
-
+            setTimeout(function() {
+                expect(callback.calls.count()).toReallyEqual(1);
+                done();
+            }, 100);
         });
 
         it("should return the same observer if callback has been already registered)", function() {
@@ -1335,7 +1332,7 @@ describe("duplex", function() {
 
         });
 
-        it('should not call callback on mouse events after unobserve', function() {
+        it('should not call callback on mouse events after unobserve', function(done) {
             var called = 0;
 
             obj = {
@@ -1356,9 +1353,8 @@ describe("duplex", function() {
 
             triggerKeyup();
 
-            waits(20);
-
-            runs(function() {
+            // ugly migration from Jasmine 1.x to > 2.0
+            setTimeout(function() {
                 expect(called).toReallyEqual(1);
 
                 jsonpatch.unobserve(obj, observer);
@@ -1366,13 +1362,12 @@ describe("duplex", function() {
                 obj.firstName = 'Wilfred';
 
                 triggerMouseup();
-            });
 
-            waits(20);
-
-            runs(function() {
-                expect(called).toReallyEqual(1);
-            });
+                setTimeout(function(){
+                    expect(called).toReallyEqual(1);
+                    done();
+                }, 20)
+            }, 20);
         });
     });
 

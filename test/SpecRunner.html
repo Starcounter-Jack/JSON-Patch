@@ -1,46 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Jasmine Spec Runner</title>
+  <meta charset="utf-8">
+  <title>Jasmine Spec Runner v2.5.0</title>
 
-  <link rel="shortcut icon" type="image/png" href="lib/jasmine/jasmine_favicon.png">
-  <link rel="stylesheet" type="text/css" href="lib/jasmine/jasmine.css">
-  <script src="lib/jasmine/jasmine.js"></script>
-  <script src="lib/jasmine/jasmine-html.js"></script>
+  <link rel="shortcut icon" type="image/png" href="lib/jasmine-2.5.0/jasmine_favicon.png">
+  <link rel="stylesheet" href="lib/jasmine-2.5.0/jasmine.css">
 
+  <script src="spec/json-patch-tests/tests.json"></script>
+  <script src="spec/json-patch-tests/spec_tests.json"></script>
+
+  <script src="spec/jsonPatchTestsSpec.js"></script>
   <script>
-    (function () {
-      var jasmineEnv = jasmine.getEnv();
-      jasmineEnv.updateInterval = 1000;
-
-      var htmlReporter = new jasmine.HtmlReporter();
-
-      jasmineEnv.addReporter(htmlReporter);
-
-      jasmineEnv.specFilter = function (spec) {
-        return htmlReporter.specFilter(spec);
-      };
-
-      var currentWindowOnload = window.onload;
-
-      //load JSON Patch Tests (https://github.com/json-patch/json-patch-tests)
-      window.onload = function () {
-        if (currentWindowOnload) {
-          currentWindowOnload();
-        }
-        loadJsonTestSuite("tests.json", "spec/json-patch-tests/tests.json", function () {
-          loadJsonTestSuite("spec_tests.json", "spec/json-patch-tests/spec_tests.json", function () {
-            execJasmine();
+  (function() {
+      window.beforeJasmineExecute = function(done){
+          loadJsonTestSuite("tests.json", "spec/json-patch-tests/tests.json", function () {
+              loadJsonTestSuite("spec_tests.json", "spec/json-patch-tests/spec_tests.json", function () {
+                  done();
+              });
           });
-        });
       };
 
-      function execJasmine() {
-        jasmineEnv.execute();
-      }
-
-    })();
+  })();
   </script>
+  <script src="lib/jasmine-2.5.0/jasmine.js"></script>
+  <script src="lib/jasmine-2.5.0/jasmine-html.js"></script>
+  <!-- <script src="lib/jasmine-2.5.0/boot.js"></script> -->
+  <script src="lib/jasmine-custom-boot.js"></script>
 
   <!-- include Benchmark.js -->
   <script src="lib/benchmark.js/vendor/lodash/dist/lodash.compat.js"></script>
