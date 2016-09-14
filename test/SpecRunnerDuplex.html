@@ -7,9 +7,6 @@
   <link rel="shortcut icon" type="image/png" href="lib/jasmine-2.5.0/jasmine_favicon.png">
   <link rel="stylesheet" href="lib/jasmine-2.5.0/jasmine.css">
 
-  <script src="spec/json-patch-tests/tests.json"></script>
-  <script src="spec/json-patch-tests/spec_tests.json"></script>
-
   <script src="lib/jasmine-2.5.0/jasmine.js"></script>
   <script src="lib/jasmine-2.5.0/jasmine-html.js"></script>
   <!-- <script src="lib/jasmine-2.5.0/boot.js"></script> -->
@@ -27,6 +24,7 @@
 
   <!-- include spec files here... -->
   <script src="../src/json-patch-duplex.js"></script>
+  <!-- Dynamically load https://github.com/json-patch/json-patch-tests test suite -->
   <script src="spec/jsonPatchTestsSpec.js"></script>
   <script src="spec/coreSpec.js"></script>
   <script src="spec/validateSpec.js"></script>

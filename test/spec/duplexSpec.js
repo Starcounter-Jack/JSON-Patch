@@ -10,7 +10,7 @@ if (typeof jsonpatchduplex !== 'undefined') {
     jsonpatch = jsonpatchduplex;
 }
 if (typeof jsonpatch === 'undefined') {
-    if (process.env.duplex === 'yes') { //required by `jasmine-node` test runner in Node.js
+    if (process.env.DUPLEX === 'yes') { //required by `jasmine-node` test runner in Node.js
         jsonpatch = require('./../../src/json-patch-duplex.js');
     } else {
         jsonpatch = require('./../../src/json-patch.js');

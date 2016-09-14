@@ -13,7 +13,7 @@ var loadJsonTestSuite;
 if (typeof XMLHttpRequest === 'undefined') {
     var jsonfile = require("jsonfile");
     loadJsonTestSuite = function (url, callback) {
-        return jsonfile.readFileSync(url);
+        return jsonfile.readFileSync('test/'+url);
     };
 } else {
     loadJsonTestSuite = function(url, callback) {
