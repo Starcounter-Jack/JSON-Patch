@@ -10,19 +10,6 @@
   <script src="spec/json-patch-tests/tests.json"></script>
   <script src="spec/json-patch-tests/spec_tests.json"></script>
 
-  <script src="spec/jsonPatchTestsSpec.js"></script>
-  <script>
-  (function() {
-      window.beforeJasmineExecute = function(done){
-          loadJsonTestSuite("tests.json", "spec/json-patch-tests/tests.json", function () {
-              loadJsonTestSuite("spec_tests.json", "spec/json-patch-tests/spec_tests.json", function () {
-                  done();
-              });
-          });
-      };
-
-  })();
-  </script>
   <script src="lib/jasmine-2.5.0/jasmine.js"></script>
   <script src="lib/jasmine-2.5.0/jasmine-html.js"></script>
   <!-- <script src="lib/jasmine-2.5.0/boot.js"></script> -->
@@ -39,9 +26,9 @@
 
   <!-- include spec files here... -->
   <script src="../src/json-patch.js"></script>
+  <script src="spec/jsonPatchTestsSpec.js"></script>
   <script src="spec/coreSpec.js"></script>
   <script src="spec/validateSpec.js"></script>
-  <script src="spec/jsonPatchTestsSpec.js"></script>
 
 
 </head>

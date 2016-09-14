@@ -1,14 +1,27 @@
-function loadJsonTestSuite(name, url, callback) {
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState == 4) {
-      var json = JSON.parse(xhr.responseText);
-      executeJsonTestSuite(name, json);
-      callback();
+var JSONtests = [
+    {
+        name: "tests.json",
+        path: "spec/json-patch-tests/tests.json"
+    },
+    {
+        name: "spec_tests.json",
+        path: "spec/json-patch-tests/spec_tests.json"
     }
-  }
-  xhr.open('GET', url, true);
-  xhr.send();
+];
+
+var loadJsonTestSuite;
+if (typeof XMLHttpRequest === 'undefined') {
+    var jsonfile = require("jsonfile");
+    loadJsonTestSuite = function (url, callback) {
+        return jsonfile.readFileSync(url);
+    };
+} else {
+    loadJsonTestSuite = function(url, callback) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', url, false);
+      xhr.send();
+      return JSON.parse(xhr.responseText);
+    }
 }
 
 if (typeof Array.prototype.forEach != 'function') {
@@ -19,44 +32,45 @@ if (typeof Array.prototype.forEach != 'function') {
   };
 }
 
-function executeJsonTestSuite(name, tests) {
-  describe("json-patch-tests", function () {
-    describe(name, function () {
-      tests.forEach(function (test) {
-        if (test.disabled) {
-          return;
-        }
-        var testName = test.comment || test.error || JSON.stringify(test.patch);
-        if (test.expected) {
-          it("should succeed: " + testName, function () {
-            jsonpatch.apply(test.doc, test.patch, true);
-            expect(test.doc).toEqual(test.expected)
-          });
-        }
-        else if (test.error || test.patch[0].op === "test") {
-          it("should throw an error: " + testName, function () {
-            var errors = 0;
-            try {
-              var res = jsonpatch.apply(test.doc, test.patch, true);
-              if (res[res.length-1] === false) {
-                throw new Error("Test failed");
-              }
+describe("json-patch-tests", function () {
+  JSONtests.forEach(function (jsonTest) {
+    describe(jsonTest.name, function () {
+        loadJsonTestSuite(jsonTest.path).forEach(function(test){
+
+            if (test.disabled) {
+              return;
             }
-            catch (e) {
-              errors++;
+            var testName = test.comment || test.error || JSON.stringify(test.patch);
+            if (test.expected) {
+              it("should succeed: " + testName, function () {
+                jsonpatch.apply(test.doc, test.patch, true);
+                expect(test.doc).toEqual(test.expected)
+              });
             }
-            if (test.error) {
-              expect(errors).toBe(1);
+            else if (test.error || test.patch[0].op === "test") {
+              it("should throw an error: " + testName, function () {
+                var errors = 0;
+                try {
+                  var res = jsonpatch.apply(test.doc, test.patch, true);
+                  if (res[res.length-1] === false) {
+                    throw new Error("Test failed");
+                  }
+                }
+                catch (e) {
+                  errors++;
+                }
+                if (test.error) {
+                  expect(errors).toBe(1);
+                }
+                else {
+                  expect(errors).toBe(0);
+                }
+              });
             }
             else {
-              expect(errors).toBe(0);
+              throw new Error("invalid test case");
             }
-          });
-        }
-        else {
-          throw new Error("invalid test case");
-        }
-      });
+        });
     });
   });
-}
+});
