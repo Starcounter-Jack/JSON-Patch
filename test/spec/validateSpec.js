@@ -425,6 +425,22 @@ describe("validate", function() {
         expect(ex.name).toBe("OPERATION_PATH_INVALID");
     });
 
+    it('should throw OPERATION_PATH_INVALID when applying patch with an invalid path. Issue #77.', function() {
+        var a = {};
+        var ex = null;
+
+        try {
+            jsonpatch.apply(a, [{
+                op: "replace",
+                value: "",
+                path: "foo" // no preceding "/"
+            }], true);
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.name).toBe("OPERATION_PATH_INVALID");
+    });
+
     it('should throw OPERATION_OP_INVALID when applying patch without operation', function() {
         var a = {};
         var ex = null;
