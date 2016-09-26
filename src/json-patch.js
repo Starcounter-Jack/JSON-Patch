@@ -316,6 +316,10 @@ var jsonpatch;
         else if (typeof operation.path !== 'string') {
             throw new JsonPatchError('Operation `path` property is not a string', 'OPERATION_PATH_INVALID', index, operation, tree);
         }
+        else if (operation.path.indexOf('/') !== 0 && operation.path.length > 0) {
+            // paths that aren't emptystring should start with "/"
+            throw new JsonPatchError('Operation `path` property must start with "/"', 'OPERATION_PATH_INVALID', index, operation, tree);
+        }
         else if ((operation.op === 'move' || operation.op === 'copy') && typeof operation.from !== 'string') {
             throw new JsonPatchError('Operation `from` property is not present (applicable in `move` and `copy` operations)', 'OPERATION_FROM_REQUIRED', index, operation, tree);
         }
