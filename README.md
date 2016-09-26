@@ -208,7 +208,7 @@ Error name                    | Error message
 SEQUENCE_NOT_AN_ARRAY         | Patch sequence must be an array
 OPERATION_NOT_AN_OBJECT       | Operation is not an object
 OPERATION_OP_INVALID          | Operation `op` property is not one of operations defined in RFC-6902
-OPERATION_PATH_INVALID        | Operation `path` property is not a string
+OPERATION_PATH_INVALID        | Operation `path` property is not a valid string
 OPERATION_FROM_REQUIRED       | Operation `from` property is not present (applicable in `move` and `copy` operations)
 OPERATION_VALUE_REQUIRED      | Operation `value` property is not present, or `undefined` (applicable in `add`, `replace` and `test` operations)
 OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED  | Operation `value` property object has at least one `undefined` value (applicable in `add`, `replace` and `test` operations)
