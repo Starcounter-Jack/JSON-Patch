@@ -1311,6 +1311,17 @@ describe("duplex", function() {
                 value: null
             }]);
         });
+
+        it('should not remove undefined', function() {
+            var objA = {
+                user: undefined
+            };
+            var objB = {
+                user: undefined
+            };
+
+            expect(jsonpatch.compare(objA, objB)).toReallyEqual([]);
+        })
     });
 
 
