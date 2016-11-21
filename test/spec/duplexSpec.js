@@ -1322,6 +1322,21 @@ describe("duplex", function() {
 
             expect(jsonpatch.compare(objA, objB)).toReallyEqual([]);
         })
+
+        it("should replace 0 with empty string", function () {
+            var objA = {
+                user: 0
+            };
+            var objB = {
+                user: ''
+            };
+
+            expect(jsonpatch.compare(objA, objB)).toReallyEqual([{
+                op: "replace",
+                path: "/user",
+                value: ''
+            }]);
+        });
     });
 
 

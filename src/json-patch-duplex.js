@@ -353,7 +353,7 @@ var jsonpatch;
                     _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
                 }
                 else {
-                    if (oldVal != newVal) {
+                    if (oldVal !== newVal) {
                         changed = true;
                         patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: deepClone(newVal) });
                     }
