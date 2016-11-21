@@ -395,7 +395,7 @@ module jsonpatch {
     for (var t = oldKeys.length - 1; t >= 0; t--) {
       var key = oldKeys[t];
       var oldVal = mirror[key];
-      if (obj.hasOwnProperty(key) && !(obj[key] === undefined && _isArray(obj) === false && oldVal !== undefined)) {
+      if (obj.hasOwnProperty(key) && !(obj[key] === undefined && oldVal !== undefined && _isArray(obj) === false)) {
         var newVal = obj[key];
         if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
           _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
@@ -589,7 +589,7 @@ module jsonpatch {
     else if (typeof operation.path !== 'string') {
       throw new JsonPatchError('Operation `path` property is not a string', 'OPERATION_PATH_INVALID', index, operation, tree);
     }
-    
+
     else if (operation.path.indexOf('/') !== 0 && operation.path.length > 0) {
       // paths that aren't emptystring should start with "/"
       throw new JsonPatchError('Operation `path` property must start with "/"', 'OPERATION_PATH_INVALID', index, operation, tree);
