@@ -4,6 +4,8 @@
 
 Make sure that you edit the source files in TypeScript (`*.ts`) files.
 
+To install the TypeScript compiler, run `npm install -g tsc`.
+
 You can build TypeScript to JavaScript using the [`TypeScript compiler`](https://www.typescriptlang.org/docs/tutorial.html)
 (and run it with npm script: `npm run tsc`).
 
