@@ -204,14 +204,14 @@ var jsonpatch;
             this.obj = obj;
         }
         return Mirror;
-    }());
+    })();
     var ObserverInfo = (function () {
         function ObserverInfo(callback, observer) {
             this.callback = callback;
             this.observer = observer;
         }
         return ObserverInfo;
-    }());
+    })();
     function getMirror(obj) {
         for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
             if (beforeDict[i].obj === obj) {
@@ -281,12 +281,14 @@ var jsonpatch;
                     window.addEventListener('keyup', fastCheck);
                     window.addEventListener('mousedown', fastCheck);
                     window.addEventListener('keydown', fastCheck);
+                    window.addEventListener('change', fastCheck);
                 }
                 else {
                     document.documentElement.attachEvent('onmouseup', fastCheck);
                     document.documentElement.attachEvent('onkeyup', fastCheck);
                     document.documentElement.attachEvent('onmousedown', fastCheck);
                     document.documentElement.attachEvent('onkeydown', fastCheck);
+                    document.documentElement.attachEvent('onchange', fastCheck);
                 }
             }
         }
@@ -496,7 +498,7 @@ var jsonpatch;
             this.tree = tree;
         }
         return JsonPatchError;
-    }(Error));
+    })(Error);
     jsonpatch.JsonPatchError = JsonPatchError;
     /**
      * Recursively checks whether an object has any undefined values inside.

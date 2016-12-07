@@ -1219,6 +1219,28 @@ describe("duplex", function() {
             }, 20);
         });
 
+        it('should generate patch after `change` event', function(done) {
+            obj = {
+                lastName: "Einstein"
+            };
+            var lastPatches;
+            var observer = jsonpatch.observe(obj, function(patches) {
+                lastPatches = patches;
+            });
+
+            obj.lastName = "Hawking";
+            trigger('change');
+
+            setTimeout(function() {
+                expect(lastPatches).toEqual([{
+                    op: 'replace',
+                    path: '/lastName',
+                    value: 'Hawking'
+                }]);
+                done();
+            }, 20);
+        });
+
     });
 
     describe('compare', function() {

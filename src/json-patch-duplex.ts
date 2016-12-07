@@ -323,12 +323,14 @@ module jsonpatch {
           window.addEventListener('keyup', fastCheck);
           window.addEventListener('mousedown', fastCheck);
           window.addEventListener('keydown', fastCheck);
+          window.addEventListener('change', fastCheck);
         }
         else { //IE8
           document.documentElement.attachEvent('onmouseup', fastCheck);
           document.documentElement.attachEvent('onkeyup', fastCheck);
           document.documentElement.attachEvent('onmousedown', fastCheck);
           document.documentElement.attachEvent('onkeydown', fastCheck);
+          document.documentElement.attachEvent('onchange', fastCheck);
         }
       }
     }
