@@ -1,7 +1,9 @@
 JSON-Patch
 ===============
 
-A leaner and meaner implementation of JSON-Patch. Small footprint. High performance.
+> A leaner and meaner implementation of JSON-Patch. Small footprint. High performance.
+
+[![Build Status](https://travis-ci.org/Starcounter-Jack/JSON-Patch.svg?branch=master)](https://travis-ci.org/Starcounter-Jack/JSON-Patch)
 
 With JSON-Patch, you can:
 - **apply** patches
