@@ -17,4 +17,5 @@ addons:
     packages:
       - google-chrome-stable
 script:
-  - xvfb-run npm test
+  - xvfb-run npm run test
+  - xvfb-run npm run bench
