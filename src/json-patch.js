@@ -281,7 +281,7 @@ var jsonpatch;
             this.tree = tree;
         }
         return JsonPatchError;
-    }(Error));
+    })(Error);
     jsonpatch.JsonPatchError = JsonPatchError;
     /**
      * Recursively checks whether an object has any undefined values inside.
