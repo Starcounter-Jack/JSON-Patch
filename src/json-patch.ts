@@ -160,6 +160,15 @@ namespace jsonpatch {
         return false;
     }
   }
+  
+  function _deepClone(value) {
+    if (typeof value === 'object') {
+      return JSON.parse(JSON.stringify(value));
+    } else {
+      return value;
+    }
+  }
+  
   function deepClone(obj: any) {
     switch (typeof obj) {
       case "object":
@@ -172,6 +181,7 @@ namespace jsonpatch {
         return obj; //no need to clone primitives
     }
   }
+
   /* We use a Javascript hash to store each
    function. Each hash entry (property) uses
    the operation identifiers specified in rfc6902.
@@ -182,7 +192,7 @@ namespace jsonpatch {
   /* The operations applicable to an object */
   const objOps = {
     add: function (obj, key, document) {
-      obj[key] = this.value;
+      obj[key] = _deepClone(this.value);
       return {newDocument: document};
     },
     remove: function (obj, key, document) {
@@ -192,7 +202,7 @@ namespace jsonpatch {
     },
     replace: function (obj, key, document) {
       var removed = obj[key];
-      obj[key] = this.value;
+      obj[key] = _deepClone(this.value);
       return {newDocument: document, removed};
     },
     move: function (obj, key, document) {
@@ -235,7 +245,7 @@ namespace jsonpatch {
   /* The operations applicable to an array. Many are the same as for the object */
   var arrOps = {
     add: function (arr, i, document) {
-      arr.splice(i, 0, this.value);
+      arr.splice(i, 0, _deepClone(this.value));
       // this may be needed when using '-' in an array
       return {newDocument: document, index: i}
     },
@@ -245,7 +255,7 @@ namespace jsonpatch {
     },
     replace: function (arr, i, document) {
       var removed = arr[i];
-      arr[i] = this.value;
+      arr[i] = _deepClone(this.value);
       return {newDocument: document, removed};
     },
     move: objOps.move,

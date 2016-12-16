@@ -70,6 +70,16 @@ var jsonpatch;
                 return false;
         }
     }
+    
+    function _deepClone(value) {
+        if (typeof value === 'object') {
+            return JSON.parse(JSON.stringify(value));
+        }
+        else {
+            return value;
+        }
+    }
+    
     function deepClone(obj) {
         switch (typeof obj) {
             case "object":
@@ -89,7 +99,7 @@ var jsonpatch;
     /* The operations applicable to an object */
     var objOps = {
         add: function (obj, key, document) {
-            obj[key] = this.value;
+            obj[key] = _deepClone(this.value);
             return { newDocument: document };
         },
         remove: function (obj, key, document) {
@@ -99,7 +109,7 @@ var jsonpatch;
         },
         replace: function (obj, key, document) {
             var removed = obj[key];
-            obj[key] = this.value;
+            obj[key] = _deepClone(this.value);
             return { newDocument: document, removed: removed };
         },
         move: function (obj, key, document) {
@@ -130,7 +140,7 @@ var jsonpatch;
     /* The operations applicable to an array. Many are the same as for the object */
     var arrOps = {
         add: function (arr, i, document) {
-            arr.splice(i, 0, this.value);
+            arr.splice(i, 0, _deepClone(this.value));
             // this may be needed when using '-' in an array
             return { newDocument: document, index: i };
         },
@@ -140,7 +150,7 @@ var jsonpatch;
         },
         replace: function (arr, i, document) {
             var removed = arr[i];
-            arr[i] = this.value;
+            arr[i] = _deepClone(this.value);
             return { newDocument: document, removed: removed };
         },
         move: objOps.move,
