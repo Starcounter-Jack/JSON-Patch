@@ -8,7 +8,7 @@ function benchmarkResultsToConsole(suite){
     for(var testNo = 0; testNo < suite.length; testNo++){
         bench = suite[testNo];
         console.log(chalk.green.underline(bench.name) +
-            "\n Ops/sec: " + chalk.bold.bgBlue(bench.hz.toFixed(bench.hz < 100 ? 2 : 0)) +
+            "\n Ops/sec: " + chalk.bold.magenta(bench.hz.toFixed(bench.hz < 100 ? 2 : 0)) +
                 chalk.dim(' ±' + bench.stats.rme.toFixed(2) + '% ') +
                 chalk.gray('Ran ' + bench.count + ' times in ' +
                 bench.times.cycle.toFixed(3) + ' seconds.'));
