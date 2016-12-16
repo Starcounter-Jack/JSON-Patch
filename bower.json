@@ -1,6 +1,6 @@
 {
   "name": "fast-json-patch",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "homepage": "https://github.com/Starcounter-Jack/JSON-Patch",
   "description": "Fast implementation of JSON-Patch (RFC-6902) with duplex (observe changes) capabilities",
   "main": "src/json-patch-duplex.js",
