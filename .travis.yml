@@ -18,3 +18,4 @@ addons:
       - google-chrome-stable
 script:
   - xvfb-run npm run test
+  - xvfb-run npm run bench

@@ -31,6 +31,11 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 3. Run test `npm run test`
  - Testing **json-patch.js** only: `npm run test-core`
  - Testing **json-patch-duplex.js** only: `npm run test-duplex`
+4. Run test `npm run bench` (Please, consider performance when making any change)
+ - Testing **json-patch.js** only: `npm run bench-core`
+ - Testing **json-patch-duplex.js** only: `npm run bench-duplex`
+
+
 
 ## Releasing a new version
 
