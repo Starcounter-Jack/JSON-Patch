@@ -106,7 +106,9 @@ class JsonObserver {
         return proxy;
     }
     //grab tree's leaves one by one, encapsulate them into a proxy and return
-    _proxifyObjectTreeRecursively(root, path = "") {
+    _proxifyObjectTreeRecursively(root, path) {
+        if (!path)
+            path = "";
         for (var key in root) {
             if (root.hasOwnProperty(key)) {
                 var distPath = path + '/' + this.escapePathComponent(key);
