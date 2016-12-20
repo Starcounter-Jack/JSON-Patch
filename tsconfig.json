@@ -4,7 +4,7 @@
     "module": "commonjs",
     "declaration": false,
     "noImplicitAny": false,
-    "removeComments": true,
+    "removeComments": false,
     "noLib": false
 },
 "filesGlob": [

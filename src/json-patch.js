@@ -32,7 +32,7 @@ var jsonpatch;
     };
     function _equals(a, b) {
         switch (typeof a) {
-            case 'undefined':
+            case 'undefined': //backward compatibility, but really I think we should return false
             case 'boolean':
             case 'string':
             case 'number':
@@ -60,6 +60,13 @@ var jsonpatch;
                 return false;
         }
     }
+    /* We use a Javascript hash to store each
+     function. Each hash entry (property) uses
+     the operation identifiers specified in rfc6902.
+     In this way, we can map each patch operation
+     to its dedicated function in efficient way.
+     */
+    /* The operations applicable to an object */
     var objOps = {
         add: function (obj, key) {
             obj[key] = this.value;
@@ -77,6 +84,7 @@ var jsonpatch;
         move: function (obj, key, tree) {
             var getOriginalDestination = { op: "_get", path: this.path };
             apply(tree, [getOriginalDestination]);
+            // In case value is moved up and overwrites its ancestor
             var original = getOriginalDestination.value === undefined ?
                 undefined : JSON.parse(JSON.stringify(getOriginalDestination.value));
             var temp = { op: "_get", path: this.from };
@@ -103,9 +111,11 @@ var jsonpatch;
             this.value = obj[key];
         }
     };
+    /* The operations applicable to an array. Many are the same as for the object */
     var arrOps = {
         add: function (arr, i) {
             arr.splice(i, 0, this.value);
+            // this may be needed when using '-' in an array
             return i;
         },
         remove: function (arr, i) {
@@ -122,6 +132,7 @@ var jsonpatch;
         test: objOps.test,
         _get: objOps._get
     };
+    /* The operations applicable to object root. Many are the same as for the object */
     var rootOps = {
         add: function (obj) {
             rootOps.remove.call(this, obj);
@@ -168,6 +179,7 @@ var jsonpatch;
             return obj.push && typeof obj.length === 'number';
         };
     }
+    //3x faster than cached /^\d+$/.test(str)
     function isInteger(str) {
         var i = 0;
         var len = str.length;
@@ -182,15 +194,23 @@ var jsonpatch;
         }
         return true;
     }
+    /**
+     * Apply a json-patch operation on an object tree
+     * Returns an array of results of operations.
+     * Each element can either be a boolean (if op == 'test') or
+     * the removed object (operations that remove things)
+     * or just be undefined
+     */
     function apply(tree, patches, validate) {
         var results = new Array(patches.length), p = 0, plen = patches.length, patch, key;
         while (p < plen) {
             patch = patches[p];
             p++;
+            // Find the object
             var path = patch.path || "";
             var keys = path.split('/');
             var obj = tree;
-            var t = 1;
+            var t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
             var len = keys.length;
             var existingPathFragment = undefined;
             while (true) {
@@ -211,7 +231,7 @@ var jsonpatch;
                 t++;
                 if (key === undefined) {
                     if (t >= len) {
-                        results[p - 1] = rootOps[patch.op].call(patch, obj, key, tree);
+                        results[p - 1] = rootOps[patch.op].call(patch, obj, key, tree); // Apply patch
                         break;
                     }
                 }
@@ -229,15 +249,15 @@ var jsonpatch;
                         if (validate && patch.op === "add" && key > obj.length) {
                             throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", p - 1, patch.path, patch);
                         }
-                        results[p - 1] = arrOps[patch.op].call(patch, obj, key, tree);
+                        results[p - 1] = arrOps[patch.op].call(patch, obj, key, tree); // Apply patch
                         break;
                     }
                 }
                 else {
                     if (key && key.indexOf('~') != -1)
-                        key = key.replace(/~1/g, '/').replace(/~0/g, '~');
+                        key = key.replace(/~1/g, '/').replace(/~0/g, '~'); // escape chars
                     if (t >= len) {
-                        results[p - 1] = objOps[patch.op].call(patch, obj, key, tree);
+                        results[p - 1] = objOps[patch.op].call(patch, obj, key, tree); // Apply patch
                         break;
                     }
                 }
@@ -247,6 +267,7 @@ var jsonpatch;
         return results;
     }
     jsonpatch.apply = apply;
+    // provide scoped __extends for TypeScript's `extend` keyword so it will not provide global one during compilation
     function __extends(d, b) {
         for (var p in b)
             if (b.hasOwnProperty(p))
@@ -267,6 +288,9 @@ var jsonpatch;
         return JsonPatchError;
     })(Error);
     jsonpatch.JsonPatchError = JsonPatchError;
+    /**
+     * Recursively checks whether an object has any undefined values inside.
+     */
     function hasUndefined(obj) {
         if (obj === undefined) {
             return true;
@@ -280,6 +304,13 @@ var jsonpatch;
         }
         return false;
     }
+    /**
+     * Validates a single operation. Called from `jsonpatch.validate`. Throws `JsonPatchError` in case of an error.
+     * @param {object} operation - operation object (patch)
+     * @param {number} index - index of operation in the sequence
+     * @param {object} [tree] - object where the operation is supposed to be applied
+     * @param {string} [existingPathFragment] - comes along with `tree`
+     */
     function validator(operation, index, tree, existingPathFragment) {
         if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
             throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, tree);
@@ -291,6 +322,7 @@ var jsonpatch;
             throw new JsonPatchError('Operation `path` property is not a string', 'OPERATION_PATH_INVALID', index, operation, tree);
         }
         else if (operation.path.indexOf('/') !== 0 && operation.path.length > 0) {
+            // paths that aren't emptystring should start with "/"
             throw new JsonPatchError('Operation `path` property must start with "/"', 'OPERATION_PATH_INVALID', index, operation, tree);
         }
         else if ((operation.op === 'move' || operation.op === 'copy') && typeof operation.from !== 'string') {
@@ -325,13 +357,20 @@ var jsonpatch;
         }
     }
     jsonpatch.validator = validator;
+    /**
+     * Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree.
+     * If error is encountered, returns a JsonPatchError object
+     * @param sequence
+     * @param tree
+     * @returns {JsonPatchError|undefined}
+     */
     function validate(sequence, tree) {
         try {
             if (!_isArray(sequence)) {
                 throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
             }
             if (tree) {
-                tree = JSON.parse(JSON.stringify(tree));
+                tree = JSON.parse(JSON.stringify(tree)); //clone tree so that we can safely try applying operations
                 apply.call(this, tree, sequence, true);
             }
             else {
