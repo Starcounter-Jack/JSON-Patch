@@ -1,8 +1,4 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+"use strict";
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
  * json-patch-duplex.js version: 1.1.3
@@ -275,18 +271,16 @@ var jsonpatch;
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     }
-    var JsonPatchError = (function (_super) {
-        __extends(JsonPatchError, _super);
-        function JsonPatchError(message, name, index, operation, tree) {
-            _super.call(this, message);
+    class JsonPatchError extends Error {
+        constructor(message, name, index, operation, tree) {
+            super(message);
             this.message = message;
             this.name = name;
             this.index = index;
             this.operation = operation;
             this.tree = tree;
         }
-        return JsonPatchError;
-    })(Error);
+    }
     jsonpatch.JsonPatchError = JsonPatchError;
     /**
      * Recursively checks whether an object has any undefined values inside.
@@ -396,4 +390,6 @@ if (typeof exports !== "undefined") {
     exports.validator = jsonpatch.validator;
     exports.JsonPatchError = jsonpatch.JsonPatchError;
 }
+Object.defineProperty(exports, "__esModule", { value: true });
+//for ES6 import
 exports.default = jsonpatch;

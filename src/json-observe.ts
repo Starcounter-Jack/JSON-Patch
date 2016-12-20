@@ -4,6 +4,9 @@
  * (c) 2013 Joachim Wester
  * MIT license
  */
+declare var Proxy: any;
+declare var Reflect: any;
+declare var module: any;
 
 function _isArray(obj) { return Array.isArray ? Array.isArray(obj) : function (obj) { return obj.push && typeof obj.length === 'number' } };
 //3x faster than cached /^\d+$/.test(str)
@@ -63,6 +66,12 @@ class JsonObserver {
         },
         set: function (target, key, receiver) {
 
+          //https://github.com/Starcounter-Jack/JSON-Patch/issues/125
+          if(typeof receiver === 'function')
+          {            
+            return Reflect.set(target, key, receiver);
+          }
+
           var distPath = path + '/' + instance.escapePathComponent(key.toString());
           // if the new value is an object, make sure to watch it          
           if (receiver && typeof receiver === 'object' && receiver._proxy !== true) {
@@ -120,6 +129,7 @@ class JsonObserver {
           return Reflect.set(target, key, receiver);
         },
         deleteProperty: function (target, key) {
+
           //when when an `undefined` property is deleted
           if (typeof target[key] === 'undefined')
             return Reflect.deleteProperty(target, key);
@@ -148,7 +158,7 @@ class JsonObserver {
   }
 
   //this function is for aesthetic purposes
-  private proxifyObjectTree(root: any, path = ""): Proxy<Object> {
+  private proxifyObjectTree(root: any, path = ""): any {
 
     /*
     while proxyifying object tree,
@@ -226,7 +236,10 @@ class JsonObserver {
 }
 //ES5
 if(module)
+{
   module.exports = JsonObserver;
-
+  // TS Transpiler automically adds .default when referecning the package
+  module.exports.default = JsonObserver;
+}
 //ES6
 export default JsonObserver;

@@ -4,11 +4,7 @@
  * (c) 2013 Joachim Wester
  * MIT license
  */
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+"use strict";
 var jsonpatch;
 (function (jsonpatch) {
     var _objectKeys = function (obj) {
@@ -203,20 +199,18 @@ var jsonpatch;
         return '/' + path;
     }
     var beforeDict = [];
-    var Mirror = (function () {
-        function Mirror(obj) {
+    class Mirror {
+        constructor(obj) {
             this.observers = [];
             this.obj = obj;
         }
-        return Mirror;
-    })();
-    var ObserverInfo = (function () {
-        function ObserverInfo(callback, observer) {
+    }
+    class ObserverInfo {
+        constructor(callback, observer) {
             this.callback = callback;
             this.observer = observer;
         }
-        return ObserverInfo;
-    })();
+    }
     function getMirror(obj) {
         for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
             if (beforeDict[i].obj === obj) {
@@ -273,10 +267,10 @@ var jsonpatch;
         if (callback) {
             observer.callback = callback;
             observer.next = null;
-            var dirtyCheck = function () {
+            var dirtyCheck = () => {
                 generate(observer);
             };
-            var fastCheck = function () {
+            var fastCheck = () => {
                 clearTimeout(observer.next);
                 observer.next = setTimeout(dirtyCheck);
             };
@@ -299,7 +293,7 @@ var jsonpatch;
         }
         observer.patches = patches;
         observer.object = obj;
-        observer.unobserve = function () {
+        observer.unobserve = () => {
             generate(observer);
             clearTimeout(observer.next);
             removeObserverFromMirror(mirror, observer);
@@ -492,18 +486,16 @@ var jsonpatch;
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     }
-    var JsonPatchError = (function (_super) {
-        __extends(JsonPatchError, _super);
-        function JsonPatchError(message, name, index, operation, tree) {
-            _super.call(this, message);
+    class JsonPatchError extends Error {
+        constructor(message, name, index, operation, tree) {
+            super(message);
             this.message = message;
             this.name = name;
             this.index = index;
             this.operation = operation;
             this.tree = tree;
         }
-        return JsonPatchError;
-    })(Error);
+    }
     jsonpatch.JsonPatchError = JsonPatchError;
     /**
      * Recursively checks whether an object has any undefined values inside.
@@ -617,4 +609,6 @@ if (typeof exports !== "undefined") {
     exports.validator = jsonpatch.validator;
     exports.JsonPatchError = jsonpatch.JsonPatchError;
 }
+Object.defineProperty(exports, "__esModule", { value: true });
+//ES6 import support
 exports.default = jsonpatch;

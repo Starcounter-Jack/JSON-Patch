@@ -142,7 +142,26 @@ describe("duplex", function () {
             jsonpatch.apply(obj2, patches);
             expect(obj2).toReallyEqual(observedObj);
         });
+        //https://github.com/Starcounter-Jack/JSON-Patch/issues/125
+        it('should generate nothing', function () {
+            let obj = {
+                firstName: "Albert",
+                lastName: "Einstein",
+                phoneNumbers: [{
+                    number: "12345"
+                }, {
+                    number: "45353"
+                }]
+            };
+            let jsonObserver = new JsonObserver(obj);
+            let observedObj = jsonObserver.observe(true);
 
+            observedObj.firstName = function() {}
+
+            let patches = jsonObserver.generate();
+
+            expect(patches).toReallyEqual([]);
+        });
         it('should generate replace (escaped chars)', function () {
             let obj = {
                 "/name/first": "Albert",
