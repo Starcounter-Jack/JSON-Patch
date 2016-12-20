@@ -121,7 +121,9 @@ class JsonObserver {
         return this.generateProxyAtPath(root, "/");
     }
     //this function is for aesthetic purposes
-    proxifyObjectTree(root, path = "") {
+    proxifyObjectTree(root, path) {
+        if (!path)
+            path = "";
         /*
         while proxyifying object tree,
         the proxyifying operation itself is being

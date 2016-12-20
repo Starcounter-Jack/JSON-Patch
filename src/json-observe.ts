@@ -159,8 +159,9 @@ class JsonObserver {
   }
 
   //this function is for aesthetic purposes
-  private proxifyObjectTree(root: any, path = ""): any {
-
+  private proxifyObjectTree(root: any, path): any {
+    
+    if(!path) path = "";
     /*
     while proxyifying object tree,
     the proxyifying operation itself is being
