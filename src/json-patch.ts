@@ -4,9 +4,8 @@
  * (c) 2013 Joachim Wester
  * MIT license
  */
-
-
 module jsonpatch {
+  
   var _objectKeys = function (obj) {
     if (_isArray(obj)) {
       var keys = new Array(obj.length);
@@ -423,3 +422,5 @@ if (typeof exports !== "undefined") {
   exports.validator = jsonpatch.validator;
   exports.JsonPatchError = jsonpatch.JsonPatchError;
 }
+//for ES6 import
+export default jsonpatch;
