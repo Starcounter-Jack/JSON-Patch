@@ -157,8 +157,8 @@ class JsonObserver {
         }
         return this.patches.splice(0, this.patches.length);
     }
-    unobserve(deleteHistory = true) {
-        if (deleteHistory)
+    unobserve(keepHistory) {
+        if (!keepHistory)
             this.patches = [];
         return deepClone(this.cachedProxy);
     }

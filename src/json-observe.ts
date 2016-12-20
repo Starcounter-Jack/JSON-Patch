@@ -228,8 +228,8 @@ class JsonObserver {
 
     return this.patches.splice(0, this.patches.length);
   }
-  public unobserve(deleteHistory = true) {
-    if (deleteHistory) this.patches = [];
+  public unobserve(keepHistory) {
+    if (!keepHistory) this.patches = [];
 
     //return a normal, non-proxified object
     return deepClone(this.cachedProxy);
