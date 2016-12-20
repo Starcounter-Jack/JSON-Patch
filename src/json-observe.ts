@@ -159,9 +159,8 @@ class JsonObserver {
   }
 
   //this function is for aesthetic purposes
-  private proxifyObjectTree(root: any, path): any {
+  private proxifyObjectTree(root: any): any {
     
-    if(!path) path = "";
     /*
     while proxyifying object tree,
     the proxyifying operation itself is being
@@ -171,7 +170,7 @@ class JsonObserver {
     */
 
     this.disableCallback = true;
-    var proxifiedObject = this._proxifyObjectTreeRecursively(root, path);
+    var proxifiedObject = this._proxifyObjectTreeRecursively(root, "");
 
     /* OK you can record now */
     this.disableCallback = false;
@@ -207,12 +206,12 @@ class JsonObserver {
       }
     } (this);
   }
-  public observe(record = false, cb = null) {
+  public observe(record, cb) {
     if (!record && !cb) {
       throw new Error('You need to either record changes or pass a defaultCallback');
     }
     this.isRecording = record;
-    this.userCallback = cb;
+    if(cb) this.userCallback = cb;
     return this.cachedProxy = this.proxifyObjectTree(deepClone(this.originalObject));
   }
   public generate() {

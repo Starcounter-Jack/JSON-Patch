@@ -112,11 +112,9 @@ class JsonObserver {
         }
         return this.generateProxyAtPath(root, "/");
     }
-    proxifyObjectTree(root, path) {
-        if (!path)
-            path = "";
+    proxifyObjectTree(root) {
         this.disableCallback = true;
-        var proxifiedObject = this._proxifyObjectTreeRecursively(root, path);
+        var proxifiedObject = this._proxifyObjectTreeRecursively(root, "");
         this.disableCallback = false;
         return proxifiedObject;
     }
@@ -144,12 +142,13 @@ class JsonObserver {
             };
         }(this);
     }
-    observe(record = false, cb = null) {
+    observe(record, cb) {
         if (!record && !cb) {
             throw new Error('You need to either record changes or pass a defaultCallback');
         }
         this.isRecording = record;
-        this.userCallback = cb;
+        if (cb)
+            this.userCallback = cb;
         return this.cachedProxy = this.proxifyObjectTree(deepClone(this.originalObject));
     }
     generate() {
