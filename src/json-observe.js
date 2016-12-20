@@ -1,7 +1,6 @@
 "use strict";
 function _isArray(obj) { return Array.isArray ? Array.isArray(obj) : function (obj) { return obj.push && typeof obj.length === 'number'; }; }
 ;
-//3x faster than cached /^\d+$/.test(str)
 function isInteger(str) {
     var i = 0;
     var len = str.length;
@@ -19,11 +18,11 @@ function isInteger(str) {
 function deepClone(obj) {
     switch (typeof obj) {
         case "object":
-            return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+            return JSON.parse(JSON.stringify(obj));
         case "undefined":
-            return null; //this is how JSON.stringify behaves for array items
+            return null;
         default:
-            return obj; //no need to clone primitives
+            return obj;
     }
 }
 class JsonObserver {
@@ -35,29 +34,25 @@ class JsonObserver {
     generateProxyAtPath(obj, path) {
         if (!obj)
             return obj;
-        path = path === '/' ? '' : path; //root
+        path = path === '/' ? '' : path;
         var instance = this;
         let proxy = new Proxy(obj, {
             get: (target, propKey, receiver) => {
                 if (propKey.toString() === '_proxy')
-                    return true; //to distinguish proxies
+                    return true;
                 return Reflect.get(target, propKey, receiver);
             },
             set: function (target, key, receiver) {
-                //https://github.com/Starcounter-Jack/JSON-Patch/issues/125
                 if (typeof receiver === 'function') {
                     return Reflect.set(target, key, receiver);
                 }
                 var distPath = path + '/' + instance.escapePathComponent(key.toString());
-                // if the new value is an object, make sure to watch it          
                 if (receiver && typeof receiver === 'object' && receiver._proxy !== true) {
                     receiver = instance.generateProxyAtPath(receiver, distPath);
                 }
                 if (typeof receiver === 'undefined') {
                     if (target.hasOwnProperty(key)) {
-                        // when array element is set to `undefined`, should generate replace to `null` 
                         if (_isArray(target)) {
-                            //undefined array elements are JSON.stringified to `null`
                             instance.defaultCallback({ op: 'replace', path: distPath, value: null });
                             return Reflect.set(target, key, receiver);
                         }
@@ -94,10 +89,8 @@ class JsonObserver {
                 return Reflect.set(target, key, receiver);
             },
             deleteProperty: function (target, key) {
-                //when when an `undefined` property is deleted
                 if (typeof target[key] === 'undefined')
                     return Reflect.deleteProperty(target, key);
-                // else {
                 var distPath = path + '/' + instance.escapePathComponent(key.toString());
                 instance.defaultCallback({ op: 'remove', path: distPath });
                 return Reflect.deleteProperty(target, key);
@@ -105,7 +98,6 @@ class JsonObserver {
         });
         return proxy;
     }
-    //grab tree's leaves one by one, encapsulate them into a proxy and return
     _proxifyObjectTreeRecursively(root, path) {
         if (!path)
             path = "";
@@ -120,20 +112,11 @@ class JsonObserver {
         }
         return this.generateProxyAtPath(root, "/");
     }
-    //this function is for aesthetic purposes
     proxifyObjectTree(root, path) {
         if (!path)
             path = "";
-        /*
-        while proxyifying object tree,
-        the proxyifying operation itself is being
-        recorded, which in an unwanted behavior,
-        that's why we disable recording through this
-        inital process;
-        */
         this.disableCallback = true;
         var proxifiedObject = this._proxifyObjectTreeRecursively(root, path);
-        /* OK you can record now */
         this.disableCallback = false;
         return proxifiedObject;
     }
@@ -150,8 +133,6 @@ class JsonObserver {
         this.userCallback;
         this.defaultCallback = function (sender) {
             return function (event) {
-                //don't duplicate exact same events
-                //if(sender.patches.length > 0 && this.equalsEvents(sender.patches[sender.patches.length - 1], event)) return;
                 if (!sender.disableCallback) {
                     if (sender.isRecording) {
                         sender.patches.push(event);
@@ -175,28 +156,17 @@ class JsonObserver {
         if (!this.isRecording) {
             throw new Error('You should set record to true to get patches later');
         }
-        /*
-        TODO: here, we could remove duplicates.
-        But we can't just UNINQE the array.
-        because consider [change1, change2, change1]
-        assuming all changes are on the same path,
-        both change1's are neccessary.
-        */
         return this.patches.splice(0, this.patches.length);
     }
     unobserve(deleteHistory = true) {
         if (deleteHistory)
             this.patches = [];
-        //return a normal, non-proxified object
         return deepClone(this.cachedProxy);
     }
 }
-//ES5
 if (module) {
     module.exports = JsonObserver;
-    // TS Transpiler automically adds .default when referecning the package
     module.exports.default = JsonObserver;
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-//ES6
 exports.default = JsonObserver;
