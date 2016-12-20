@@ -23,7 +23,7 @@ console.log("Benchmark: Proxy");
 var suite = new Benchmark.Suite;
 suite.add('generate operation', function() {
 
-    let obj = {
+    var obj = {
         firstName: "Albert",
         lastName: "Einstein",
         phoneNumbers: [{
@@ -33,8 +33,8 @@ suite.add('generate operation', function() {
         }]
     };
 
-    let jsonObserver = new JsonObserver(obj);
-    let observedObj = jsonObserver.observe(true);
+    var jsonObserver = new JsonObserver(obj);
+    var observedObj = jsonObserver.observe(true);
 
     patches = jsonObserver.generate();    
 
@@ -57,7 +57,7 @@ suite.add('generate operation', function() {
     jsonpatch.apply(obj2, patches);
 });
 suite.add('compare operation', function() {
-    let obj = {
+    var obj = {
         firstName: "Albert",
         lastName: "Einstein",
         phoneNumbers: [{
@@ -66,7 +66,7 @@ suite.add('compare operation', function() {
             number: "45353"
         }]
     };
-    let obj2 = {
+    var obj2 = {
         firstName: "Joachim",
         lastName: "Wester",
         mobileNumbers: [{
@@ -76,7 +76,7 @@ suite.add('compare operation', function() {
         }]
     };
 
-    let patches = jsonpatch.compare(obj, obj2);
+    var patches = jsonpatch.compare(obj, obj2);
 });
 
 // if we are in the browser with benchmark < 2.1.2

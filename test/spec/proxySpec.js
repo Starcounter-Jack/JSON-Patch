@@ -21,16 +21,16 @@ function trigger(eventName, elem) {
 }
 
 function getPatchesUsingGenerate(objFactory, objChanger) {
-    let obj = objFactory();
-    let jsonObserver = new JsonObserver(obj);
-    let observedObj = jsonObserver.observe(true);
+    var obj = objFactory();
+    var jsonObserver = new JsonObserver(obj);
+    var observedObj = jsonObserver.observe(true);
     objChanger(observedObj);
     return jsonObserver.generate();
 }
 
 function getPatchesUsingCompare(objFactory, objChanger) {
-    let obj = objFactory();
-    let mirror = JSON.parse(JSON.stringify(obj));
+    var obj = objFactory();
+    var mirror = JSON.parse(JSON.stringify(obj));
     objChanger(obj);
     return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)));
 }
@@ -111,7 +111,7 @@ describe("duplex", function () {
     describe("generate", function () {
 
         it('should generate replace', function () {
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -120,17 +120,17 @@ describe("duplex", function () {
                     number: "45353"
                 }]
             };
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
             observedObj.firstName = "Joachim";
             observedObj.lastName = "Wester";
             observedObj.phoneNumbers[0].number = "123";
             observedObj.phoneNumbers[1].number = "456";
 
-            let patches = jsonObserver.generate();
+            var patches = jsonObserver.generate();
 
-            let obj2 = {
+            var obj2 = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -144,7 +144,7 @@ describe("duplex", function () {
         });
         //https://github.com/Starcounter-Jack/JSON-Patch/issues/125
         it('should generate nothing', function () {
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -153,17 +153,17 @@ describe("duplex", function () {
                     number: "45353"
                 }]
             };
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
             observedObj.firstName = function() {}
 
-            let patches = jsonObserver.generate();
+            var patches = jsonObserver.generate();
 
             expect(patches).toReallyEqual([]);
         });
         it('should generate replace (escaped chars)', function () {
-            let obj = {
+            var obj = {
                 "/name/first": "Albert",
                 "/name/last": "Einstein",
                 "~phone~/numbers": [{
@@ -172,16 +172,16 @@ describe("duplex", function () {
                     number: "45353"
                 }]
             };
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
             observedObj['/name/first'] = "Joachim";
             observedObj['/name/last'] = "Wester";
             observedObj['~phone~/numbers'][0].number = "123";
             observedObj['~phone~/numbers'][1].number = "456";
 
-            let patches = jsonObserver.generate();
-            let obj2 = {
+            var patches = jsonObserver.generate();
+            var obj2 = {
                 "/name/first": "Albert",
                 "/name/last": "Einstein",
                 "~phone~/numbers": [{
@@ -230,7 +230,7 @@ describe("duplex", function () {
         });
 
         it('should generate replace (double change, shallow object)', function () {
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -240,12 +240,12 @@ describe("duplex", function () {
                 }]
             };
 
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
             observedObj.firstName = "Marcin";
 
-            let patches = jsonObserver.generate();
+            var patches = jsonObserver.generate();
 
             expect(patches).toReallyEqual([{
                 op: 'replace',
@@ -273,7 +273,7 @@ describe("duplex", function () {
         });
 
         it('should generate replace (double change, deep object)', function () {
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -283,12 +283,12 @@ describe("duplex", function () {
                 }]
             };
 
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
             observedObj.phoneNumbers[0].number = "123";
 
-            let patches = jsonObserver.generate();
+            var patches = jsonObserver.generate();
 
             expect(patches).toReallyEqual([{
                 op: 'replace',
@@ -317,14 +317,14 @@ describe("duplex", function () {
 
         it('should generate replace (changes in new array cell, primitive values)', function () {
 
-            let arr = [1];
+            var arr = [1];
 
-            let jsonObserver = new JsonObserver(arr);
+            var jsonObserver = new JsonObserver(arr);
             var observedArr = jsonObserver.observe(true);
 
             observedArr.push(2);
 
-            let patches = jsonObserver.generate();
+            var patches = jsonObserver.generate();
             expect(patches).toReallyEqual([{
                 op: 'add',
                 path: '/1',
@@ -353,12 +353,12 @@ describe("duplex", function () {
 
 
         it('should generate replace (changes in new array cell, complex values)', function () {
-            let arr = [{
+            var arr = [{
                 id: 1,
                 name: 'Ted'
             }];
 
-            let jsonObserver = new JsonObserver(arr);
+            var jsonObserver = new JsonObserver(arr);
             var observedArr = jsonObserver.observe(true);
 
             observedArr.push({
@@ -366,7 +366,7 @@ describe("duplex", function () {
                 name: 'Jerry'
             });
 
-            let patches = jsonObserver.generate();
+            var patches = jsonObserver.generate();
             expect(patches).toReallyEqual([{
                 op: 'add',
                 path: '/1',
@@ -397,14 +397,14 @@ describe("duplex", function () {
         });
 
         it('should generate add', function () {
-            let obj = {
+            var obj = {
                 lastName: "Einstein",
                 phoneNumbers: [{
                     number: "12345"
                 }]
             };
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
             observedObj.firstName = "Joachim";
             observedObj.lastName = "Wester";
@@ -413,9 +413,9 @@ describe("duplex", function () {
                 number: "456"
             });
 
-            let patches = jsonObserver.generate();
+            var patches = jsonObserver.generate();
 
-            let obj2 = {
+            var obj2 = {
                 lastName: "Einstein",
                 phoneNumbers: [{
                     number: "12345"
@@ -427,7 +427,7 @@ describe("duplex", function () {
         });
 
         it('should generate remove', function () {
-            let obj = {
+            var obj = {
                 lastName: "Einstein",
                 firstName: "Albert",
                 phoneNumbers: [{
@@ -436,16 +436,16 @@ describe("duplex", function () {
                     number: "4234"
                 }]
             };
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
             delete observedObj.firstName;
             observedObj.lastName = "Wester";
             observedObj.phoneNumbers[0].number = "123";
             observedObj.phoneNumbers.pop(1);
 
-            let patches = jsonObserver.generate();
-            let obj2 = {
+            var patches = jsonObserver.generate();
+            var obj2 = {
                 lastName: "Einstein",
                 firstName: "Albert",
                 phoneNumbers: [{
@@ -459,16 +459,16 @@ describe("duplex", function () {
         });
 
         it('should generate remove (array indexes should be sorted descending)', function () {
-            let obj = {
+            var obj = {
                 items: ["a", "b", "c"]
             };
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
             observedObj.items.pop();
             observedObj.items.pop();
 
-            let patches = jsonObserver.generate();
+            var patches = jsonObserver.generate();
 
             //array indexes must be sorted descending, otherwise there is an index collision in apply
             expect(patches).toReallyEqual([{
@@ -479,7 +479,7 @@ describe("duplex", function () {
                 path: '/items/1'
             }]);
 
-            let obj2 = {
+            var obj2 = {
                 items: ["a", "b", "c"]
             };
             jsonpatch.apply(obj2, patches);
@@ -487,15 +487,15 @@ describe("duplex", function () {
         });
 
         it('should not generate the same patch twice (replace)', function () {
-            let obj = {
+            var obj = {
                 lastName: "Einstein"
             };
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
             observedObj.lastName = "Wester";
 
-            let patches = jsonObserver.generate();
+            var patches = jsonObserver.generate();
             expect(patches).toReallyEqual([{
                 op: 'replace',
                 path: '/lastName',
@@ -507,16 +507,16 @@ describe("duplex", function () {
         });
 
         it('should not generate the same patch twice (add)', function () {
-            let obj = {
+            var obj = {
                 lastName: "Einstein"
             };
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
 
             observedObj.firstName = "Albert";
 
-            let patches = jsonObserver.generate();
+            var patches = jsonObserver.generate();
 
             expect(patches).toReallyEqual([{
                 op: 'add',
@@ -529,15 +529,15 @@ describe("duplex", function () {
         });
 
         it('should not generate the same patch twice (remove)', function () {
-            let obj = {
+            var obj = {
                 lastName: "Einstein"
             };
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
             delete observedObj.lastName;
 
-            let patches = jsonObserver.generate();
+            var patches = jsonObserver.generate();
             expect(patches).toReallyEqual([{
                 op: 'remove',
                 path: '/lastName'
@@ -548,15 +548,15 @@ describe("duplex", function () {
         });
 
         it('should ignore array properties', function () {
-            let obj = {
+            var obj = {
                 array: [1, 2, 3]
             };
 
 
-            let patches;
+            var patches;
 
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
 
             observedObj.array.value = 1;
@@ -569,33 +569,33 @@ describe("duplex", function () {
         });
 
         /*it('should not generate the same patch twice (move)', function() { //"move" is not implemented yet in jsonpatch.generate
-          let obj = { lastName: {str: "Einstein"} };
-          let jsonObserver = new JsonObserver(obj);             
-                let observedObj = jsonObserver.observe(true);
+          var obj = { lastName: {str: "Einstein"} };
+          var jsonObserver = new JsonObserver(obj);             
+                var observedObj = jsonObserver.observe(true);
 
           obj.lastName2 = obj.lastName;
           delete obj.lastName;
 
-          let patches = jsonObserver.generate();
+          var patches = jsonObserver.generate();
           expect(patches).toReallyEqual([
             { op: 'move', from: '/lastName', to: '/lastName2' }
           ]);
 
-          let patches = jsonObserver.generate();
+          var patches = jsonObserver.generate();
           expect(patches).toReallyEqual([]);
         });*/
 
         xdescribe("undefined - JS to JSON projection", function () {
             it('when value is set to `undefined`, should generate remove (undefined is JSON.stringified to no value)', function () {
-                let obj = {
+                var obj = {
                     foo: "bar"
                 };
 
-                let jsonObserver = new JsonObserver(obj);
-                let observedObj = jsonObserver.observe(true);
+                var jsonObserver = new JsonObserver(obj);
+                var observedObj = jsonObserver.observe(true);
                 observedObj.foo = undefined;
 
-                let patches = jsonObserver.generate();
+                var patches = jsonObserver.generate();
                 expect(patches).toReallyEqual([{
                     op: 'remove',
                     path: '/foo'
@@ -603,28 +603,28 @@ describe("duplex", function () {
             });
 
             it('when new property is added, and set to `undefined`, nothing should be generated (undefined is JSON.stringified to no value)', function () {
-                let obj = {
+                var obj = {
                     foo: "bar"
                 };
 
-                let jsonObserver = new JsonObserver(obj);
-                let observedObj = jsonObserver.observe(true);
+                var jsonObserver = new JsonObserver(obj);
+                var observedObj = jsonObserver.observe(true);
                 observedObj.baz = undefined;
 
-                let patches = jsonObserver.generate();
+                var patches = jsonObserver.generate();
                 expect(patches).toReallyEqual([]);
             });
 
             it('when array element is set to `undefined`, should generate replace to `null` (undefined array elements are JSON.stringified to `null`)', function () {
-                let obj = {
+                var obj = {
                     foo: [0, 1, 2]
                 };
 
-                let jsonObserver = new JsonObserver(obj);
-                let observedObj = jsonObserver.observe(true);
+                var jsonObserver = new JsonObserver(obj);
+                var observedObj = jsonObserver.observe(true);
                 observedObj.foo[1] = undefined;
 
-                let patches = jsonObserver.generate();
+                var patches = jsonObserver.generate();
                 expect(patches).toReallyEqual([{
                     op: 'replace',
                     path: '/foo/1',
@@ -633,15 +633,15 @@ describe("duplex", function () {
             });
 
             it('when `undefined` property is set to something, should generate add (undefined in JSON.stringified to no value)', function () {
-                let obj = {
+                var obj = {
                     foo: undefined
                 };
 
-                let jsonObserver = new JsonObserver(obj);
-                let observedObj = jsonObserver.observe(true);
+                var jsonObserver = new JsonObserver(obj);
+                var observedObj = jsonObserver.observe(true);
                 observedObj.foo = "something";
 
-                let patches = jsonObserver.generate();
+                var patches = jsonObserver.generate();
                 expect(patches).toReallyEqual([{
                     op: 'add',
                     path: '/foo',
@@ -649,15 +649,15 @@ describe("duplex", function () {
                 }]);
             });
             it('when `undefined` array element is set to something, should generate replace (undefined array elements are JSON.stringified to `null`)', function () {
-                let obj = {
+                var obj = {
                     foo: [0, undefined, 2]
                 };
 
-                let jsonObserver = new JsonObserver(obj);
-                let observedObj = jsonObserver.observe(true);
+                var jsonObserver = new JsonObserver(obj);
+                var observedObj = jsonObserver.observe(true);
                 observedObj.foo[1] = 1;
 
-                let patches = jsonObserver.generate();
+                var patches = jsonObserver.generate();
                 expect(patches).toReallyEqual([{
                     op: 'replace',
                     path: '/foo/1',
@@ -671,13 +671,13 @@ describe("duplex", function () {
             describe("should generate empty patch, when", function () {
 
                 it('when new property is set to `undefined`', function () {
-                    let objFactory = function () {
+                    var objFactory = function () {
                         return {
                             foo: "bar"
                         };
                     };
 
-                    let objChanger = function (obj) {
+                    var objChanger = function (obj) {
                         obj.baz = undefined;
                     };
 
@@ -689,13 +689,13 @@ describe("duplex", function () {
                 });
 
                 it('when an `undefined` property is deleted', function () {
-                    let objFactory = function () {
+                    var objFactory = function () {
                         return {
                             foo: undefined
                         };
                     };
 
-                    let objChanger = function (obj) {
+                    var objChanger = function (obj) {
                         delete obj.foo;
                     };
 
@@ -710,13 +710,13 @@ describe("duplex", function () {
             describe("should generate add, when", function () {
 
                 it('`undefined` property is set to something', function () {
-                    let objFactory = function () {
+                    var objFactory = function () {
                         return {
                             foo: undefined
                         };
                     };
 
-                    let objChanger = function (obj) {
+                    var objChanger = function (obj) {
                         obj.foo = "something";
                     };
 
@@ -735,13 +735,13 @@ describe("duplex", function () {
             describe("should generate remove, when", function () {
 
                 it('value is set to `undefined`', function () {
-                    let objFactory = function () {
+                    var objFactory = function () {
                         return {
                             foo: "bar"
                         };
                     };
 
-                    let objChanger = function (obj) {
+                    var objChanger = function (obj) {
                         obj.foo = undefined;
                     };
 
@@ -759,13 +759,13 @@ describe("duplex", function () {
             describe("should generate replace, when", function () {
 
                 it('array element is set to `undefined`', function () {
-                    let objFactory = function () {
+                    var objFactory = function () {
                         return {
                             foo: [0, 1, 2]
                         };
                     };
 
-                    let objChanger = function (obj) {
+                    var objChanger = function (obj) {
                         obj.foo[1] = undefined;
                     };
 
@@ -780,13 +780,13 @@ describe("duplex", function () {
                     expect(genereatedPatches).toReallyEqual(comparedPatches);
                 });
                 it('`undefined` array element is set to something', function () {
-                    let objFactory = function () {
+                    var objFactory = function () {
                         return {
                             foo: [0, undefined, 2]
                         };
                     };
 
-                    let objChanger = function (obj) {
+                    var objChanger = function (obj) {
                         obj.foo[1] = 1;
                     };
 
@@ -807,10 +807,10 @@ describe("duplex", function () {
     describe("apply", function () {
         // https://tools.ietf.org/html/rfc6902#appendix-A.16
         it('should add an Array Value', function () {
-            let obj = {
+            var obj = {
                 "foo": ["bar"]
             };
-            let patches = [{
+            var patches = [{
                 "op": "add",
                 "path": "/foo/-",
                 "value": ["abc", "def"]
@@ -825,9 +825,9 @@ describe("duplex", function () {
 
     describe('callback', function () {
         it('should generate replace', function () {
-            let patches;
-            let obj2;
-            let obj = {
+            var patches;
+            var obj2;
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -836,8 +836,8 @@ describe("duplex", function () {
                     number: "45353"
                 }]
             };
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true);
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true);
 
             jsonObserver.observe(true, function (_patches) {
                 patches = _patches;
@@ -877,7 +877,7 @@ describe("duplex", function () {
         it('should generate replace (double change, shallow object)', function () {
             var lastPatches, called = 0;
 
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -886,9 +886,9 @@ describe("duplex", function () {
                     number: "45353"
                 }]
             };
-            let jsonObserver = new JsonObserver(obj);
+            var jsonObserver = new JsonObserver(obj);
 
-            let observedObj = jsonObserver.observe(true, function (patches) {
+            var observedObj = jsonObserver.observe(true, function (patches) {
                 called++;
                 lastPatches = [patches];
                 patchesChanged(called);
@@ -970,7 +970,7 @@ describe("duplex", function () {
                 }
             }
 
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -979,9 +979,9 @@ describe("duplex", function () {
                     number: "45353"
                 }]
             };
-            let jsonObserver = new JsonObserver(obj);
+            var jsonObserver = new JsonObserver(obj);
 
-            let observedObj = jsonObserver.observe(true, function (patches) {
+            var observedObj = jsonObserver.observe(true, function (patches) {
                 called++;
                 lastPatches = [patches];
                 patchesChanged(called);
@@ -998,7 +998,7 @@ describe("duplex", function () {
             var lastPatches, called = 0,
                 res;
 
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -1007,8 +1007,8 @@ describe("duplex", function () {
                     number: "45353"
                 }]
             };
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true, function (patches) {
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true, function (patches) {
                 called++;
                 lastPatches = [patches];
             });
@@ -1043,7 +1043,7 @@ describe("duplex", function () {
         it('should unobserve then observe again', function (done) {
             var called = 0;
 
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -1053,8 +1053,8 @@ describe("duplex", function () {
                 }]
             };
 
-            let jsonObserver = new JsonObserver(obj);
-            let observedObj = jsonObserver.observe(true, function (patches) {
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true, function (patches) {
                 called++;
             });
 
@@ -1081,7 +1081,7 @@ describe("duplex", function () {
 
                     expect(called).toReallyEqual(1);
 
-                    let observedObj = jsonObserver.observe(true, function (patches) {
+                    var observedObj = jsonObserver.observe(true, function (patches) {
                         called++;
                     });
 
@@ -1100,7 +1100,7 @@ describe("duplex", function () {
         it('should unobserve then observe again (deep value)', function (done) {
             var called = 0;
 
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -1110,9 +1110,9 @@ describe("duplex", function () {
                 }]
             };
 
-            let jsonObserver = new JsonObserver(obj);
+            var jsonObserver = new JsonObserver(obj);
 
-            let observedObj = jsonObserver.observe(true, function (patches) {
+            var observedObj = jsonObserver.observe(true, function (patches) {
                 called++;
             });
 
@@ -1160,7 +1160,7 @@ describe("duplex", function () {
             //TODO: needs attention
             var lastPatches = '';
 
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -1170,9 +1170,9 @@ describe("duplex", function () {
                 }]
             };
 
-            let jsonObserver = new JsonObserver(obj);
+            var jsonObserver = new JsonObserver(obj);
 
-            let observedObj = jsonObserver.observe(true, function (patches) {
+            var observedObj = jsonObserver.observe(true, function (patches) {
                 lastPatches = [patches];
             });
             observedObj.firstName = 'Malvin';
@@ -1196,7 +1196,7 @@ describe("duplex", function () {
         it("should handle callbacks that calls observe() and unobserve() internally", function (done) {
 
             //TODO: needs attention
-            let obj = {
+            var obj = {
                 foo: 'bar'
             };
 
@@ -1205,8 +1205,8 @@ describe("duplex", function () {
 
             var callback = jasmine.createSpy('callback', function () {
 
-                let jsonObserver = new JsonObserver(obj);
-                let observedObj = jsonObserver.observe(true, callback);
+                var jsonObserver = new JsonObserver(obj);
+                var observedObj = jsonObserver.observe(true, callback);
 
                 jsonObserver.unobserve();
                 observedObj = jsonObserver.observe(true, callback);
@@ -1214,7 +1214,7 @@ describe("duplex", function () {
                 callbackCalled(++count);
             }).and.callThrough();
 
-            let jsonObserver = new JsonObserver(obj);
+            var jsonObserver = new JsonObserver(obj);
             var observedObj = jsonObserver.observe(true, callback);
 
             expect(callback.calls.count()).toReallyEqual(0);
@@ -1242,7 +1242,7 @@ describe("duplex", function () {
         });
         
         it('should generate patch after `mouseup` event', function(done) {
-            let obj = {
+            var obj = {
                 lastName: "Einstein"
             };
             var lastPatches;
@@ -1265,7 +1265,7 @@ describe("duplex", function () {
         });
 
         it('should generate patch after `mousedown` event', function(done) {
-            let obj = {
+            var obj = {
                 lastName: "Einstein"
             };
             var lastPatches;
@@ -1287,7 +1287,7 @@ describe("duplex", function () {
         });
 
         it('should generate patch after `keydown` event', function(done) {
-            let obj = {
+            var obj = {
                 lastName: "Einstein"
             };
             var lastPatches;
@@ -1434,14 +1434,14 @@ describe("duplex", function () {
 
         it("should register only one observer", function(done) {
 
-            let obj = {
+            var obj = {
                 foo: 'bar'
             };
 
             var callback = jasmine.createSpy('callback');
 
-            let jsonObserver = new JsonObserver(obj);             
-            let observedObj = jsonObserver.observe(true, callback);
+            var jsonObserver = new JsonObserver(obj);             
+            var observedObj = jsonObserver.observe(true, callback);
 
             jsonpatch.observe(obj, callback);
             jsonpatch.observe(obj, callback);
@@ -1459,7 +1459,7 @@ describe("duplex", function () {
         });
 
         it("should return the same observer if callback has been already registered)", function() {
-            let obj = {
+            var obj = {
                 foo: 'bar'
             };
 
@@ -1474,7 +1474,7 @@ describe("duplex", function () {
         });
 
         it("should return a different observer if callback has been unregistered and registered again", function() {
-            let obj = {
+            var obj = {
                 foo: 'bar'
             };
 
@@ -1493,7 +1493,7 @@ describe("duplex", function () {
         it('should not call callback on key and mouse events after unobserve', function(done) {
             var called = 0;
 
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -1535,7 +1535,7 @@ describe("duplex", function () {
 
     describe("compare", function () {
         it("should return patch difference between objects", function () {
-            let obj = {
+            var obj = {
                 firstName: "Albert",
                 lastName: "Einstein",
                 phoneNumbers: [{
@@ -1544,7 +1544,7 @@ describe("duplex", function () {
                     number: "45353"
                 }]
             };
-            let obj2 = {
+            var obj2 = {
                 firstName: "Joachim",
                 lastName: "Wester",
                 mobileNumbers: [{
@@ -1554,7 +1554,7 @@ describe("duplex", function () {
                 }]
             };
 
-            let patches = jsonpatch.compare(obj, obj2);
+            var patches = jsonpatch.compare(obj, obj2);
             expect(patches).toReallyEqual([{
                 "op": "remove",
                 "path": "/phoneNumbers"
@@ -1578,7 +1578,7 @@ describe("duplex", function () {
         });
 
         it("should not modify the source object", function () {
-            let obj = {
+            var obj = {
                 foo: 'bar'
             };
             jsonpatch.compare(obj, {});
