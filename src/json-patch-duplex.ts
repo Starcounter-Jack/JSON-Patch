@@ -666,7 +666,7 @@ module jsonpatch {
   }
 }
 
-declare var exports:any;
+declare var exports: any;
 
 if (typeof exports !== "undefined") {
   exports.apply = jsonpatch.apply;
@@ -678,3 +678,5 @@ if (typeof exports !== "undefined") {
   exports.validator = jsonpatch.validator;
   exports.JsonPatchError = jsonpatch.JsonPatchError;
 }
+//ES6 import support
+export default jsonpatch;

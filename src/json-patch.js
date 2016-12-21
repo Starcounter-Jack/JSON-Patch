@@ -4,6 +4,7 @@
  * (c) 2013 Joachim Wester
  * MIT license
  */
+"use strict";
 var jsonpatch;
 (function (jsonpatch) {
     var _objectKeys = function (obj) {
@@ -273,15 +274,16 @@ var jsonpatch;
     var JsonPatchError = (function (_super) {
         __extends(JsonPatchError, _super);
         function JsonPatchError(message, name, index, operation, tree) {
-            _super.call(this, message);
-            this.message = message;
-            this.name = name;
-            this.index = index;
-            this.operation = operation;
-            this.tree = tree;
+            var _this = _super.call(this, message) || this;
+            _this.message = message;
+            _this.name = name;
+            _this.index = index;
+            _this.operation = operation;
+            _this.tree = tree;
+            return _this;
         }
         return JsonPatchError;
-    })(Error);
+    }(Error));
     jsonpatch.JsonPatchError = JsonPatchError;
     /**
      * Recursively checks whether an object has any undefined values inside.
@@ -391,3 +393,6 @@ if (typeof exports !== "undefined") {
     exports.validator = jsonpatch.validator;
     exports.JsonPatchError = jsonpatch.JsonPatchError;
 }
+exports.__esModule = true;
+//for ES6 import
+exports["default"] = jsonpatch;

@@ -423,3 +423,5 @@ if (typeof exports !== "undefined") {
   exports.validator = jsonpatch.validator;
   exports.JsonPatchError = jsonpatch.JsonPatchError;
 }
+//for ES6 import
+export default jsonpatch;
