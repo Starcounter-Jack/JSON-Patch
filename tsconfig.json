@@ -1,11 +1,10 @@
 {
 "compilerOptions": {
-    "target": "es6",
+    "target": "es5",
     "module": "commonjs",
-    "declaration": false,
-    "noImplicitAny": false,
+    "noEmitHelpers": true,
     "removeComments": false,
-    "noLib": false
+    "allowSyntheticDefaultImports": true
 },
 "filesGlob": [
     "./src/*.ts"

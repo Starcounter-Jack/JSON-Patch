@@ -11,7 +11,7 @@ interface HTMLElement {
 }
 
 
-module jsonpatch {
+export module jsonpatch {
   var _objectKeys = function (obj) {
     if (_isArray(obj)) {
       var keys = new Array(obj.length);
@@ -326,11 +326,11 @@ module jsonpatch {
           window.addEventListener('change', fastCheck);
         }
         else { //IE8
-          document.documentElement.attachEvent('onmouseup', fastCheck);
-          document.documentElement.attachEvent('onkeyup', fastCheck);
-          document.documentElement.attachEvent('onmousedown', fastCheck);
-          document.documentElement.attachEvent('onkeydown', fastCheck);
-          document.documentElement.attachEvent('onchange', fastCheck);
+          (<any>document.documentElement).attachEvent('onmouseup', fastCheck);
+          (<any>document.documentElement).attachEvent('onkeyup', fastCheck);
+          (<any>document.documentElement).attachEvent('onmousedown', fastCheck);
+          (<any>document.documentElement).attachEvent('onkeydown', fastCheck);
+          (<any>document.documentElement).attachEvent('onchange', fastCheck);
         }
       }
     }
@@ -350,10 +350,10 @@ module jsonpatch {
                 window.removeEventListener('keydown', fastCheck);
             }
             else {
-                document.documentElement.detachEvent('onmouseup', fastCheck);
-                document.documentElement.detachEvent('onkeyup', fastCheck);
-                document.documentElement.detachEvent('onmousedown', fastCheck);
-                document.documentElement.detachEvent('onkeydown', fastCheck);
+                (<any>document.documentElement).detachEvent('onmouseup', fastCheck);
+                (<any>document.documentElement).detachEvent('onkeyup', fastCheck);
+                (<any>document.documentElement).detachEvent('onmousedown', fastCheck);
+                (<any>document.documentElement).detachEvent('onkeydown', fastCheck);
             }
         }
     };
@@ -668,6 +668,7 @@ module jsonpatch {
 
 declare var exports: any;
 
+
 if (typeof exports !== "undefined") {
   exports.apply = jsonpatch.apply;
   exports.observe = jsonpatch.observe;
@@ -677,6 +678,8 @@ if (typeof exports !== "undefined") {
   exports.validate = jsonpatch.validate;
   exports.validator = jsonpatch.validator;
   exports.JsonPatchError = jsonpatch.JsonPatchError;
+
+  /* TS Transpiler automatically adds
+  .default  when referencing */
+  exports.default = jsonpatch;
 }
-//ES6 import support
-export default jsonpatch;

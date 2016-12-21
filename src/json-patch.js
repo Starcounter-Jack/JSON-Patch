@@ -271,16 +271,18 @@ var jsonpatch;
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     }
-    class JsonPatchError extends Error {
-        constructor(message, name, index, operation, tree) {
-            super(message);
+    var JsonPatchError = (function (_super) {
+        __extends(JsonPatchError, _super);
+        function JsonPatchError(message, name, index, operation, tree) {
+            _super.call(this, message);
             this.message = message;
             this.name = name;
             this.index = index;
             this.operation = operation;
             this.tree = tree;
         }
-    }
+        return JsonPatchError;
+    }(Error));
     jsonpatch.JsonPatchError = JsonPatchError;
     /**
      * Recursively checks whether an object has any undefined values inside.
@@ -383,13 +385,18 @@ var jsonpatch;
         }
     }
     jsonpatch.validate = validate;
-})(jsonpatch || (jsonpatch = {}));
+
+    /* still referecing exports,
+    I guess there is no way around
+    https://github.com/Microsoft/TypeScript/issues/5341#issuecomment-149639676
+    */
+})(jsonpatch = exports.jsonpatch || (exports.jsonpatch = {}));
 if (typeof exports !== "undefined") {
     exports.apply = jsonpatch.apply;
     exports.validate = jsonpatch.validate;
     exports.validator = jsonpatch.validator;
     exports.JsonPatchError = jsonpatch.JsonPatchError;
+    /* TS Transpiler automatically adds
+    .default  when referencing */
+    exports.default = jsonpatch;
 }
-Object.defineProperty(exports, "__esModule", { value: true });
-//for ES6 import
-exports.default = jsonpatch;
