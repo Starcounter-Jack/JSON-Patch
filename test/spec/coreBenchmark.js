@@ -1,7 +1,6 @@
 var obj;
 if (typeof jsonpatch === 'undefined') {
     if (process.env.DUPLEX === 'yes' || process.argv[2] === 'DUPLEX=yes') { //required by `jasmine-node` test runner in Node.js
-        console.log('jsonpatch-duplex');
         jsonpatch = require('./../../src/json-patch-duplex.js');
     } else {
         console.log('jsonpatch-core');
@@ -13,7 +12,7 @@ if (typeof Benchmark === 'undefined') {
     var benchmarkResultsToConsole = require('./../helpers/benchmarkReporter.js').benchmarkResultsToConsole;
 }
 
-
+console.log("Benchmark: Core");
 
 var suite = new Benchmark.Suite;
 suite.add('add operation', function() {

@@ -8,7 +8,7 @@ branches:
   only:
     - gh-pages
     - /.*/
-node_js: 4
+node_js: 6
 addons:
   firefox: latest
   apt:
