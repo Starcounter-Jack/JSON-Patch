@@ -37,7 +37,7 @@
     "jsonfile": "^2.3.1"
   },
   "scripts": {
-    "tsc": "tsc src/json-patch-duplex.ts --noEmitHelpers && tsc src/json-patch.ts --noEmitHelpers",
+    "tsc": "tsc -w",
     "test": "npm run test-core && npm run test-duplex",
     "test-duplex": "jasmine DUPLEX=yes JASMINE_CONFIG_PATH=test/jasmine.json",
     "test-core": "jasmine  DUPLEX=no JASMINE_CONFIG_PATH=test/jasmine.json test/spec/jsonPatchTestsSpec.js test/spec/coreSpec.js test/spec/validateSpec.js",
