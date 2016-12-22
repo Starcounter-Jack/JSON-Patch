@@ -5,6 +5,9 @@
  * MIT license
  */
 
+if (typeof exports === 'undefined') {
+  var exports: any = {};
+}
 
 export module jsonpatch {
   var _objectKeys = function (obj) {
@@ -90,28 +93,28 @@ export module jsonpatch {
       return removed;
     },
     move: function (obj, key, tree) {
-      var getOriginalDestination : any = {op: "_get", path: this.path};
+      var getOriginalDestination: any = { op: "_get", path: this.path };
       apply(tree, [getOriginalDestination]);
       // In case value is moved up and overwrites its ancestor
       var original = getOriginalDestination.value === undefined ?
-          undefined : JSON.parse(JSON.stringify(getOriginalDestination.value));
+        undefined : JSON.parse(JSON.stringify(getOriginalDestination.value));
 
-      var temp:any = {op: "_get", path: this.from};
+      var temp: any = { op: "_get", path: this.from };
       apply(tree, [temp]);
 
       apply(tree, [
-        {op: "remove", path: this.from}
+        { op: "remove", path: this.from }
       ]);
       apply(tree, [
-        {op: "add", path: this.path, value: temp.value}
+        { op: "add", path: this.path, value: temp.value }
       ]);
       return original;
     },
     copy: function (obj, key, tree) {
-      var temp:any = {op: "_get", path: this.from};
+      var temp: any = { op: "_get", path: this.from };
       apply(tree, [temp]);
       apply(tree, [
-        {op: "add", path: this.path, value: temp.value}
+        { op: "add", path: this.path, value: temp.value }
       ]);
     },
     test: function (obj, key) {
@@ -166,10 +169,10 @@ export module jsonpatch {
     },
     replace: function (obj) {
       var removed = apply(obj, [
-        {op: "remove", path: this.path}
+        { op: "remove", path: this.path }
       ]);
       apply(obj, [
-        {op: "add", path: this.path, value: this.value}
+        { op: "add", path: this.path, value: this.value }
       ]);
       return removed[0];
     },
@@ -188,13 +191,13 @@ export module jsonpatch {
     _isArray = Array.isArray;
   }
   else { //IE8 shim
-    _isArray = function (obj:any) {
+    _isArray = function (obj: any) {
       return obj.push && typeof obj.length === 'number';
     }
   }
 
   //3x faster than cached /^\d+$/.test(str)
-  function isInteger(str:string):boolean {
+  function isInteger(str: string): boolean {
     var i = 0;
     var len = str.length;
     var charCode;
@@ -216,7 +219,7 @@ export module jsonpatch {
    * the removed object (operations that remove things)
    * or just be undefined
    */
-  export function apply(tree:any, patches:any[], validate?:boolean):Array<any> {
+  export function apply(tree: any, patches: any[], validate?: boolean): Array<any> {
     var results = new Array(patches.length)
       , p = 0
       , plen = patches.length
@@ -251,7 +254,7 @@ export module jsonpatch {
         }
 
         t++;
-        if(key === undefined) { //is root
+        if (key === undefined) { //is root
           if (t >= len) {
             results[p - 1] = rootOps[patch.op].call(patch, obj, key, tree); // Apply patch
             break;
@@ -297,29 +300,29 @@ export module jsonpatch {
   }
   export class JsonPatchError extends Error {
 
-    constructor(public message: string, public name:string, public index?:number, public operation?:any, public tree?:any) {
+    constructor(public message: string, public name: string, public index?: number, public operation?: any, public tree?: any) {
       super(message);
     }
   }
 
-    /**
-     * Recursively checks whether an object has any undefined values inside.
-     */
-    function hasUndefined(obj:any): boolean {
-        if (obj === undefined) {
-            return true;
-        }
+  /**
+   * Recursively checks whether an object has any undefined values inside.
+   */
+  function hasUndefined(obj: any): boolean {
+    if (obj === undefined) {
+      return true;
+    }
 
-        if (typeof obj == "array" || typeof obj == "object") {
-            for (var i in obj) {
-                if (hasUndefined(obj[i])) {
-                    return true;
-                }
-            }
+    if (typeof obj == "array" || typeof obj == "object") {
+      for (var i in obj) {
+        if (hasUndefined(obj[i])) {
+          return true;
         }
+      }
+    }
 
-        return false;
-   }
+    return false;
+  }
 
   /**
    * Validates a single operation. Called from `jsonpatch.validate`. Throws `JsonPatchError` in case of an error.
@@ -328,7 +331,7 @@ export module jsonpatch {
    * @param {object} [tree] - object where the operation is supposed to be applied
    * @param {string} [existingPathFragment] - comes along with `tree`
    */
-  export function validator(operation:any, index:number, tree?:any, existingPathFragment?:string) {
+  export function validator(operation: any, index: number, tree?: any, existingPathFragment?: string) {
     if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
       throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, tree);
     }
@@ -366,13 +369,13 @@ export module jsonpatch {
           throw new JsonPatchError('Cannot perform an `add` operation at the desired path', 'OPERATION_PATH_CANNOT_ADD', index, operation, tree);
         }
       }
-      else if(operation.op === 'replace' || operation.op === 'remove' || operation.op === '_get') {
+      else if (operation.op === 'replace' || operation.op === 'remove' || operation.op === '_get') {
         if (operation.path !== existingPathFragment) {
           throw new JsonPatchError('Cannot perform the operation at a path that does not exist', 'OPERATION_PATH_UNRESOLVABLE', index, operation, tree);
         }
       }
       else if (operation.op === 'move' || operation.op === 'copy') {
-        var existingValue = {op: "_get", path: operation.from, value: undefined};
+        var existingValue = { op: "_get", path: operation.from, value: undefined };
         var error = jsonpatch.validate([existingValue], tree);
         if (error && error.name === 'OPERATION_PATH_UNRESOLVABLE') {
           throw new JsonPatchError('Cannot perform the operation from a path that does not exist', 'OPERATION_FROM_UNRESOLVABLE', index, operation, tree);
@@ -388,7 +391,7 @@ export module jsonpatch {
    * @param tree
    * @returns {JsonPatchError|undefined}
    */
-  export function validate(sequence:any[], tree?:any):JsonPatchError {
+  export function validate(sequence: any[], tree?: any): JsonPatchError {
     try {
       if (!_isArray(sequence)) {
         throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
@@ -414,16 +417,11 @@ export module jsonpatch {
     }
   }
 }
+exports.apply = jsonpatch.apply;
+exports.validate = jsonpatch.validate;
+exports.validator = jsonpatch.validator;
+exports.JsonPatchError = jsonpatch.JsonPatchError;
 
-declare var exports:any;
-
-if (typeof exports !== "undefined") {
-  exports.apply = jsonpatch.apply;
-  exports.validate = jsonpatch.validate;
-  exports.validator = jsonpatch.validator;
-  exports.JsonPatchError = jsonpatch.JsonPatchError;
-
-  /* TS Transpiler automatically adds
-  .default  when referencing */
-  exports.default = jsonpatch;
-}
+/* TS Transpiler automatically adds
+.default  when referencing */
+exports.default = jsonpatch;

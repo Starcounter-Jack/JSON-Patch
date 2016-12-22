@@ -6,10 +6,13 @@
  */
 
 interface HTMLElement {
-  attachEvent : Function;
-  detachEvent : Function;
+  attachEvent: Function;
+  detachEvent: Function;
 }
 
+if (typeof exports === 'undefined') {
+  var exports: any = {};
+}
 
 export module jsonpatch {
   var _objectKeys = function (obj) {
@@ -95,28 +98,28 @@ export module jsonpatch {
       return removed;
     },
     move: function (obj, key, tree) {
-      var getOriginalDestination : any = {op: "_get", path: this.path};
+      var getOriginalDestination: any = { op: "_get", path: this.path };
       apply(tree, [getOriginalDestination]);
       // In case value is moved up and overwrites its ancestor
       var original = getOriginalDestination.value === undefined ?
-          undefined : JSON.parse(JSON.stringify(getOriginalDestination.value));
+        undefined : JSON.parse(JSON.stringify(getOriginalDestination.value));
 
-      var temp:any = {op: "_get", path: this.from};
+      var temp: any = { op: "_get", path: this.from };
       apply(tree, [temp]);
 
       apply(tree, [
-        {op: "remove", path: this.from}
+        { op: "remove", path: this.from }
       ]);
       apply(tree, [
-        {op: "add", path: this.path, value: temp.value}
+        { op: "add", path: this.path, value: temp.value }
       ]);
       return original;
     },
     copy: function (obj, key, tree) {
-      var temp:any = {op: "_get", path: this.from};
+      var temp: any = { op: "_get", path: this.from };
       apply(tree, [temp]);
       apply(tree, [
-        {op: "add", path: this.path, value: temp.value}
+        { op: "add", path: this.path, value: temp.value }
       ]);
     },
     test: function (obj, key) {
@@ -171,10 +174,10 @@ export module jsonpatch {
     },
     replace: function (obj) {
       var removed = apply(obj, [
-        {op: "remove", path: this.path}
+        { op: "remove", path: this.path }
       ]);
       apply(obj, [
-        {op: "add", path: this.path, value: this.value}
+        { op: "add", path: this.path, value: this.value }
       ]);
       return removed[0];
     },
@@ -188,12 +191,12 @@ export module jsonpatch {
     }
   };
 
-  function escapePathComponent (str) {
+  function escapePathComponent(str) {
     if (str.indexOf('/') === -1 && str.indexOf('~') === -1) return str;
     return str.replace(/~/g, '~0').replace(/\//g, '~1');
   }
 
-  function _getPathRecursive(root:Object, obj:Object):string {
+  function _getPathRecursive(root: Object, obj: Object): string {
     var found;
     for (var key in root) {
       if (root.hasOwnProperty(key)) {
@@ -211,7 +214,7 @@ export module jsonpatch {
     return '';
   }
 
-  function getPath(root:Object, obj:Object):string {
+  function getPath(root: Object, obj: Object): string {
     if (root === obj) {
       return '/';
     }
@@ -228,7 +231,7 @@ export module jsonpatch {
     obj: any;
     observers = [];
 
-    constructor(obj:any){
+    constructor(obj: any) {
       this.obj = obj;
     }
   }
@@ -237,13 +240,13 @@ export module jsonpatch {
     callback: any;
     observer: any;
 
-    constructor(callback, observer){
+    constructor(callback, observer) {
       this.callback = callback;
       this.observer = observer;
     }
   }
 
-  function getMirror(obj:any):any {
+  function getMirror(obj: any): any {
     for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
       if (beforeDict[i].obj === obj) {
         return beforeDict[i];
@@ -251,7 +254,7 @@ export module jsonpatch {
     }
   }
 
-  function getObserverFromMirror(mirror:any, callback):any {
+  function getObserverFromMirror(mirror: any, callback): any {
     for (var j = 0, jlen = mirror.observers.length; j < jlen; j++) {
       if (mirror.observers[j].callback === callback) {
         return mirror.observers[j].observer;
@@ -259,7 +262,7 @@ export module jsonpatch {
     }
   }
 
-  function removeObserverFromMirror(mirror:any, observer):any {
+  function removeObserverFromMirror(mirror: any, observer): any {
     for (var j = 0, jlen = mirror.observers.length; j < jlen; j++) {
       if (mirror.observers[j].observer === observer) {
         mirror.observers.splice(j, 1);
@@ -272,7 +275,7 @@ export module jsonpatch {
     observer.unobserve();
   }
 
-  function deepClone(obj:any) {
+  function deepClone(obj: any) {
     switch (typeof obj) {
       case "object":
         return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
@@ -285,7 +288,7 @@ export module jsonpatch {
     }
   }
 
-  export function observe(obj:any, callback):any {
+  export function observe(obj: any, callback): any {
     var patches = [];
     var root = obj;
     var observer;
@@ -298,7 +301,7 @@ export module jsonpatch {
       observer = getObserverFromMirror(mirror, callback);
     }
 
-    if(observer){
+    if (observer) {
       return observer;
     }
 
@@ -311,11 +314,11 @@ export module jsonpatch {
       observer.next = null;
 
       var dirtyCheck = () => {
-          generate(observer);
+        generate(observer);
       };
       var fastCheck = () => {
-          clearTimeout(observer.next);
-          observer.next = setTimeout(dirtyCheck);
+        clearTimeout(observer.next);
+        observer.next = setTimeout(dirtyCheck);
       };
       if (typeof window !== 'undefined') { //not Node
         if (window.addEventListener) { //standards
@@ -338,24 +341,24 @@ export module jsonpatch {
     observer.object = obj;
 
     observer.unobserve = () => {
-        generate(observer);
-        clearTimeout(observer.next);
-        removeObserverFromMirror(mirror, observer);
+      generate(observer);
+      clearTimeout(observer.next);
+      removeObserverFromMirror(mirror, observer);
 
-        if (typeof window !== 'undefined') {
-            if (window.removeEventListener) {
-                window.removeEventListener('mouseup', fastCheck);
-                window.removeEventListener('keyup', fastCheck);
-                window.removeEventListener('mousedown', fastCheck);
-                window.removeEventListener('keydown', fastCheck);
-            }
-            else {
-                (<any>document.documentElement).detachEvent('onmouseup', fastCheck);
-                (<any>document.documentElement).detachEvent('onkeyup', fastCheck);
-                (<any>document.documentElement).detachEvent('onmousedown', fastCheck);
-                (<any>document.documentElement).detachEvent('onkeydown', fastCheck);
-            }
+      if (typeof window !== 'undefined') {
+        if (window.removeEventListener) {
+          window.removeEventListener('mouseup', fastCheck);
+          window.removeEventListener('keyup', fastCheck);
+          window.removeEventListener('mousedown', fastCheck);
+          window.removeEventListener('keydown', fastCheck);
         }
+        else {
+          (<any>document.documentElement).detachEvent('onmouseup', fastCheck);
+          (<any>document.documentElement).detachEvent('onkeyup', fastCheck);
+          (<any>document.documentElement).detachEvent('onmousedown', fastCheck);
+          (<any>document.documentElement).detachEvent('onkeydown', fastCheck);
+        }
+      }
     };
 
     mirror.observers.push(new ObserverInfo(callback, observer));
@@ -372,13 +375,13 @@ export module jsonpatch {
       }
     }
     _generate(mirror.value, observer.object, observer.patches, "");
-    if(observer.patches.length) {
+    if (observer.patches.length) {
       apply(mirror.value, observer.patches);
     }
     var temp = observer.patches;
-    if(temp.length > 0) {
+    if (temp.length > 0) {
       observer.patches = [];
-      if(observer.callback) {
+      if (observer.callback) {
         observer.callback(temp);
       }
     }
@@ -405,12 +408,12 @@ export module jsonpatch {
         else {
           if (oldVal !== newVal) {
             changed = true;
-            patches.push({op: "replace", path: path + "/" + escapePathComponent(key), value: deepClone(newVal)});
+            patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: deepClone(newVal) });
           }
         }
       }
       else {
-        patches.push({op: "remove", path: path + "/" + escapePathComponent(key)});
+        patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
         deleted = true; // property has been deleted
       }
     }
@@ -422,7 +425,7 @@ export module jsonpatch {
     for (var t = 0; t < newKeys.length; t++) {
       var key = newKeys[t];
       if (!mirror.hasOwnProperty(key) && obj[key] !== undefined) {
-        patches.push({op: "add", path: path + "/" + escapePathComponent(key), value: deepClone(obj[key])});
+        patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: deepClone(obj[key]) });
       }
     }
   }
@@ -432,13 +435,13 @@ export module jsonpatch {
     _isArray = Array.isArray;
   }
   else { //IE8 shim
-    _isArray = function (obj:any) {
+    _isArray = function (obj: any) {
       return obj.push && typeof obj.length === 'number';
     }
   }
 
   //3x faster than cached /^\d+$/.test(str)
-  function isInteger(str:string):boolean {
+  function isInteger(str: string): boolean {
     var i = 0;
     var len = str.length;
     var charCode;
@@ -460,12 +463,12 @@ export module jsonpatch {
    * the removed object (operations that remove things)
    * or just be undefined
    */
-  export function apply(tree:any, patches:any[], validate?:boolean):Array<any> {
+  export function apply(tree: any, patches: any[], validate?: boolean): Array<any> {
     var results = []
-        , p = 0
-        , plen = patches.length
-        , patch
-        , key;
+      , p = 0
+      , plen = patches.length
+      , patch
+      , key;
     while (p < plen) {
       patch = patches[p];
       p++;
@@ -495,7 +498,7 @@ export module jsonpatch {
         }
 
         t++;
-        if(key === undefined) { //is root
+        if (key === undefined) { //is root
           if (t >= len) {
             results.push(rootOps[patch.op].call(patch, obj, key, tree)); // Apply patch
             break;
@@ -533,7 +536,7 @@ export module jsonpatch {
     return results;
   }
 
-  export function compare(tree1:any, tree2:any):any[] {
+  export function compare(tree1: any, tree2: any): any[] {
     var patches = [];
     _generate(tree1, tree2, patches, '');
     return patches;
@@ -548,29 +551,29 @@ export module jsonpatch {
 
   export class JsonPatchError extends Error {
 
-    constructor(public message: string, public name:string, public index?:number, public operation?:any, public tree?:any) {
+    constructor(public message: string, public name: string, public index?: number, public operation?: any, public tree?: any) {
       super(message);
     }
   }
 
-    /**
-     * Recursively checks whether an object has any undefined values inside.
-     */
-    function hasUndefined(obj:any): boolean {
-        if (obj === undefined) {
-            return true;
-        }
+  /**
+   * Recursively checks whether an object has any undefined values inside.
+   */
+  function hasUndefined(obj: any): boolean {
+    if (obj === undefined) {
+      return true;
+    }
 
-        if (typeof obj == "array" || typeof obj == "object") {
-            for (var i in obj) {
-                if (hasUndefined(obj[i])) {
-                    return true;
-                }
-            }
+    if (typeof obj == "array" || typeof obj == "object") {
+      for (var i in obj) {
+        if (hasUndefined(obj[i])) {
+          return true;
         }
+      }
+    }
 
-        return false;
-   }
+    return false;
+  }
 
   /**
    * Validates a single operation. Called from `jsonpatch.validate`. Throws `JsonPatchError` in case of an error.
@@ -579,7 +582,7 @@ export module jsonpatch {
    * @param {object} [tree] - object where the operation is supposed to be applied
    * @param {string} [existingPathFragment] - comes along with `tree`
    */
-  export function validator(operation:any, index:number, tree?:any, existingPathFragment?:string) {
+  export function validator(operation: any, index: number, tree?: any, existingPathFragment?: string) {
     if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
       throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, tree);
     }
@@ -617,13 +620,13 @@ export module jsonpatch {
           throw new JsonPatchError('Cannot perform an `add` operation at the desired path', 'OPERATION_PATH_CANNOT_ADD', index, operation, tree);
         }
       }
-      else if(operation.op === 'replace' || operation.op === 'remove' || operation.op === '_get') {
+      else if (operation.op === 'replace' || operation.op === 'remove' || operation.op === '_get') {
         if (operation.path !== existingPathFragment) {
           throw new JsonPatchError('Cannot perform the operation at a path that does not exist', 'OPERATION_PATH_UNRESOLVABLE', index, operation, tree);
         }
       }
       else if (operation.op === 'move' || operation.op === 'copy') {
-        var existingValue = {op: "_get", path: operation.from, value: undefined};
+        var existingValue = { op: "_get", path: operation.from, value: undefined };
         var error = jsonpatch.validate([existingValue], tree);
         if (error && error.name === 'OPERATION_PATH_UNRESOLVABLE') {
           throw new JsonPatchError('Cannot perform the operation from a path that does not exist', 'OPERATION_FROM_UNRESOLVABLE', index, operation, tree);
@@ -639,7 +642,7 @@ export module jsonpatch {
    * @param tree
    * @returns {JsonPatchError|undefined}
    */
-  export function validate(sequence:any[], tree?:any):JsonPatchError {
+  export function validate(sequence: any[], tree?: any): JsonPatchError {
     try {
       if (!_isArray(sequence)) {
         throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
@@ -665,21 +668,15 @@ export module jsonpatch {
     }
   }
 }
+exports.apply = jsonpatch.apply;
+exports.observe = jsonpatch.observe;
+exports.unobserve = jsonpatch.unobserve;
+exports.generate = jsonpatch.generate;
+exports.compare = jsonpatch.compare;
+exports.validate = jsonpatch.validate;
+exports.validator = jsonpatch.validator;
+exports.JsonPatchError = jsonpatch.JsonPatchError;
 
-declare var exports: any;
-
-
-if (typeof exports !== "undefined") {
-  exports.apply = jsonpatch.apply;
-  exports.observe = jsonpatch.observe;
-  exports.unobserve = jsonpatch.unobserve;
-  exports.generate = jsonpatch.generate;
-  exports.compare = jsonpatch.compare;
-  exports.validate = jsonpatch.validate;
-  exports.validator = jsonpatch.validator;
-  exports.JsonPatchError = jsonpatch.JsonPatchError;
-
-  /* TS Transpiler automatically adds
-  .default  when referencing */
-  exports.default = jsonpatch;
-}
+/* TS Transpiler automatically adds
+.default  when referencing */
+exports.default = jsonpatch;

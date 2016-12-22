@@ -5,6 +5,9 @@
  * MIT license
  */
 "use strict";
+if (typeof exports === 'undefined') {
+    var exports = {};
+}
 var jsonpatch;
 (function (jsonpatch) {
     var _objectKeys = function (obj) {
@@ -602,21 +605,15 @@ var jsonpatch;
         }
     }
     jsonpatch.validate = validate;
-    /* still referecing exports,
-    I guess there is no way around
-    https://github.com/Microsoft/TypeScript/issues/5341#issuecomment-149639676
-    */
 })(jsonpatch = exports.jsonpatch || (exports.jsonpatch = {}));
-if (typeof exports !== "undefined") {
-    exports.apply = jsonpatch.apply;
-    exports.observe = jsonpatch.observe;
-    exports.unobserve = jsonpatch.unobserve;
-    exports.generate = jsonpatch.generate;
-    exports.compare = jsonpatch.compare;
-    exports.validate = jsonpatch.validate;
-    exports.validator = jsonpatch.validator;
-    exports.JsonPatchError = jsonpatch.JsonPatchError;
-    /* TS Transpiler automatically adds
-    .default  when referencing */
-    exports.default = jsonpatch;
-}
+exports.apply = jsonpatch.apply;
+exports.observe = jsonpatch.observe;
+exports.unobserve = jsonpatch.unobserve;
+exports.generate = jsonpatch.generate;
+exports.compare = jsonpatch.compare;
+exports.validate = jsonpatch.validate;
+exports.validator = jsonpatch.validator;
+exports.JsonPatchError = jsonpatch.JsonPatchError;
+/* TS Transpiler automatically adds
+.default  when referencing */
+exports.default = jsonpatch;
