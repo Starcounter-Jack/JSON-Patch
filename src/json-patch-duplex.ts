@@ -14,7 +14,7 @@ if (typeof exports === 'undefined') {
   var exports: any = {};
 }
 
-export module jsonpatch {
+module jsonpatch {
   var _objectKeys = function (obj) {
     if (_isArray(obj)) {
       var keys = new Array(obj.length);
@@ -677,6 +677,10 @@ exports.validate = jsonpatch.validate;
 exports.validator = jsonpatch.validator;
 exports.JsonPatchError = jsonpatch.JsonPatchError;
 
-/* TS Transpiler automatically adds
-.default  when referencing */
-exports.default = jsonpatch;
+/*
+ES6 support. Since now, we have
+exports = {}, we better use `export default`,
+this will give more flexibility when
+importing the package from TS.
+*/
+export default jsonpatch; 

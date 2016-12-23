@@ -4,7 +4,6 @@
  * (c) 2013 Joachim Wester
  * MIT license
  */
-"use strict";
 if (typeof exports === 'undefined') {
     var exports = {};
 }
@@ -605,7 +604,7 @@ var jsonpatch;
         }
     }
     jsonpatch.validate = validate;
-})(jsonpatch = exports.jsonpatch || (exports.jsonpatch = {}));
+})(jsonpatch || (jsonpatch = {}));
 exports.apply = jsonpatch.apply;
 exports.observe = jsonpatch.observe;
 exports.unobserve = jsonpatch.unobserve;
@@ -614,6 +613,5 @@ exports.compare = jsonpatch.compare;
 exports.validate = jsonpatch.validate;
 exports.validator = jsonpatch.validator;
 exports.JsonPatchError = jsonpatch.JsonPatchError;
-/* TS Transpiler automatically adds
-.default  when referencing */
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = jsonpatch;

@@ -9,7 +9,7 @@ if (typeof exports === 'undefined') {
   var exports: any = {};
 }
 
-export module jsonpatch {
+module jsonpatch {
   var _objectKeys = function (obj) {
     if (_isArray(obj)) {
       var keys = new Array(obj.length);
@@ -421,7 +421,5 @@ exports.apply = jsonpatch.apply;
 exports.validate = jsonpatch.validate;
 exports.validator = jsonpatch.validator;
 exports.JsonPatchError = jsonpatch.JsonPatchError;
-
-/* TS Transpiler automatically adds
-.default  when referencing */
-exports.default = jsonpatch;
+//ES6 support
+export default jsonpatch;

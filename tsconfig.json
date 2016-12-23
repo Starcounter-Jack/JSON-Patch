@@ -4,7 +4,9 @@
     "module": "commonjs",
     "noEmitHelpers": true,
     "removeComments": false,
-    "allowSyntheticDefaultImports": true
+    /* emitting `use strict` made PuppetJS break */
+    "allowSyntheticDefaultImports": true,
+    "noImplicitUseStrict": true
 },
 "filesGlob": [
     "./src/*.ts"
