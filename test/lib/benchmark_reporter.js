@@ -1,4 +1,5 @@
 function benchmarkReporter(suite) {
+
   var table = document.createElement('table');
 
   function renderBenchmarkCol(parent, elemName, innerHTML) {
@@ -45,19 +46,30 @@ function benchmarkReporter(suite) {
 
   if (window.addEventListener) {
     window.addEventListener("load", function () {
-      var button = document.createElement('button');
-      button.innerHTML = "Run benchmark";
-      button.addEventListener("click", function () {
-        suite.run();
-      });
-      document.body.appendChild(button);
+
+      // better UI
+      var container = document.createElement('div');
+      container.className = "benchmark-container";
 
       var p = document.createElement('p');
       p.innerHTML = Benchmark.platform.toString();
-      document.body.appendChild(p);
+      container.appendChild(p);
 
-      table.id = "test_results";
-      document.body.appendChild(table);
+      table.className = "test_results";
+
+      container.appendChild(table);
+
+      var button = document.createElement('button');
+      button.innerHTML = "Run benchmark";
+
+      button.addEventListener("click", function () {
+        suite.run();
+      });
+
+      container.appendChild(button);
+
+
+      document.body.appendChild(container);
 
       renderBenchmark();
     });
