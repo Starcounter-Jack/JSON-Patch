@@ -1,4 +1,5 @@
 language: node_js
+node_js: 6
 sudo: required
 dist: trusty
 before_script:
@@ -8,7 +9,6 @@ branches:
   only:
     - gh-pages
     - /.*/
-node_js: 4
 addons:
   firefox: latest
   apt:

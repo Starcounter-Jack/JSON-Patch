@@ -281,7 +281,7 @@ var jsonpatch;
             this.tree = tree;
         }
         return JsonPatchError;
-    })(Error);
+    }(Error));
     jsonpatch.JsonPatchError = JsonPatchError;
     /**
      * Recursively checks whether an object has any undefined values inside.
@@ -390,4 +390,19 @@ if (typeof exports !== "undefined") {
     exports.validate = jsonpatch.validate;
     exports.validator = jsonpatch.validator;
     exports.JsonPatchError = jsonpatch.JsonPatchError;
+}
+else {
+    var exports = {};
+    var isBrowser = true;
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = jsonpatch;
+/*
+When in browser, setting `exports = {}`
+fools other modules into thinking they're
+running in a node environment, which breaks
+some of them. Here is super light wieght fix.
+*/
+if (isBrowser) {
+    exports = undefined;
 }
