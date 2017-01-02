@@ -10,10 +10,6 @@ interface HTMLElement {
   detachEvent: Function;
 }
 
-if (typeof exports === 'undefined') {
-  var exports: any = {};
-}
-
 module jsonpatch {
   var _objectKeys = function (obj) {
     if (_isArray(obj)) {
@@ -668,19 +664,32 @@ module jsonpatch {
     }
   }
 }
-exports.apply = jsonpatch.apply;
-exports.observe = jsonpatch.observe;
-exports.unobserve = jsonpatch.unobserve;
-exports.generate = jsonpatch.generate;
-exports.compare = jsonpatch.compare;
-exports.validate = jsonpatch.validate;
-exports.validator = jsonpatch.validator;
-exports.JsonPatchError = jsonpatch.JsonPatchError;
+declare var exports;
+
+if (typeof exports !== "undefined") {
+  exports.apply = jsonpatch.apply;
+  exports.observe = jsonpatch.observe;
+  exports.unobserve = jsonpatch.unobserve;
+  exports.generate = jsonpatch.generate;
+  exports.compare = jsonpatch.compare;
+  exports.validate = jsonpatch.validate;
+  exports.validator = jsonpatch.validator;
+  exports.JsonPatchError = jsonpatch.JsonPatchError;
+}
+else
+{
+  var exports:any = {};
+  var isBrowser = true;
+}
+export default jsonpatch; 
 
 /*
-ES6 support. Since now, we have
-exports = {}, we better use `export default`,
-this will give more flexibility when
-importing the package from TS.
+When in browser, setting `exports = {}`
+fools other modules into thinking they're
+running in a node environment, which breaks
+some of them. Here is super light wieght fix.
 */
-export default jsonpatch; 
+if(isBrowser)
+{
+  exports = undefined
+}

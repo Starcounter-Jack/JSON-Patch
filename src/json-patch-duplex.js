@@ -4,9 +4,6 @@
  * (c) 2013 Joachim Wester
  * MIT license
  */
-if (typeof exports === 'undefined') {
-    var exports = {};
-}
 var jsonpatch;
 (function (jsonpatch) {
     var _objectKeys = function (obj) {
@@ -605,13 +602,28 @@ var jsonpatch;
     }
     jsonpatch.validate = validate;
 })(jsonpatch || (jsonpatch = {}));
-exports.apply = jsonpatch.apply;
-exports.observe = jsonpatch.observe;
-exports.unobserve = jsonpatch.unobserve;
-exports.generate = jsonpatch.generate;
-exports.compare = jsonpatch.compare;
-exports.validate = jsonpatch.validate;
-exports.validator = jsonpatch.validator;
-exports.JsonPatchError = jsonpatch.JsonPatchError;
+if (typeof exports !== "undefined") {
+    exports.apply = jsonpatch.apply;
+    exports.observe = jsonpatch.observe;
+    exports.unobserve = jsonpatch.unobserve;
+    exports.generate = jsonpatch.generate;
+    exports.compare = jsonpatch.compare;
+    exports.validate = jsonpatch.validate;
+    exports.validator = jsonpatch.validator;
+    exports.JsonPatchError = jsonpatch.JsonPatchError;
+}
+else {
+    var exports = {};
+    var isBrowser = true;
+}
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = jsonpatch;
+/*
+When in browser, setting `exports = {}`
+fools other modules into thinking they're
+running in a node environment, which breaks
+some of them. Here is super light wieght fix.
+*/
+if (isBrowser) {
+    exports = undefined;
+}

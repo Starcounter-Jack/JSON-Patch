@@ -5,10 +5,6 @@
  * MIT license
  */
 
-if (typeof exports === 'undefined') {
-  var exports: any = {};
-}
-
 module jsonpatch {
   var _objectKeys = function (obj) {
     if (_isArray(obj)) {
@@ -417,9 +413,27 @@ module jsonpatch {
     }
   }
 }
-exports.apply = jsonpatch.apply;
-exports.validate = jsonpatch.validate;
-exports.validator = jsonpatch.validator;
-exports.JsonPatchError = jsonpatch.JsonPatchError;
-//ES6 support
-export default jsonpatch;
+
+if (typeof exports !== "undefined") {
+  exports.apply = jsonpatch.apply;
+  exports.validate = jsonpatch.validate;
+  exports.validator = jsonpatch.validator;
+  exports.JsonPatchError = jsonpatch.JsonPatchError;
+}
+else
+{
+  var exports:any = {};
+  var isBrowser = true;
+}
+export default jsonpatch; 
+
+/*
+When in browser, setting `exports = {}`
+fools other modules into thinking they're
+running in a node environment, which breaks
+some of them. Here is super light wieght fix.
+*/
+if(isBrowser)
+{
+  exports = undefined
+}
