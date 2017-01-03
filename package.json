@@ -43,7 +43,7 @@
     "tsc-watch": "tsc -w",
     "test": "npm run test-core && npm run test-duplex && npm run test-proxy",
     "test-duplex": "jasmine DUPLEX=yes JASMINE_CONFIG_PATH=test/jasmine.json",
-    "test-proxy": "jasmine DUPLEX=proxy JASMINE_CONFIG_PATH=test/jasmine-proxy.json",
+    "test-proxy": "jasmine DUPLEX=proxy JASMINE_CONFIG_PATH=test/jasmine.json",
     "test-core": "jasmine  DUPLEX=no JASMINE_CONFIG_PATH=test/jasmine.json test/spec/jsonPatchTestsSpec.js test/spec/coreSpec.js test/spec/validateSpec.js",
     "bench": "npm run bench-core && npm run bench-duplex && npm run bench-proxy",
     "bench-core": "node test/spec/coreBenchmark.js",

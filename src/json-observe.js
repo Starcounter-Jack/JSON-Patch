@@ -1,5 +1,12 @@
-function _isArray(obj) { return Array.isArray ? Array.isArray(obj) : function (obj) { return obj.push && typeof obj.length === 'number'; }; }
-;
+var _isArray;
+if (Array.isArray) {
+    _isArray = Array.isArray;
+}
+else {
+    _isArray = function (obj) {
+        return obj.push && typeof obj.length === 'number';
+    };
+}
 //3x faster than cached /^\d+$/.test(str)
 function isInteger(str) {
     var i = 0;
@@ -25,27 +32,37 @@ function deepClone(obj) {
             return obj; //no need to clone primitives
     }
 }
+/** Class representing a JS Object observer . */
 var JsonObserver = (function () {
     function JsonObserver(root) {
         this.originalObject = root;
         this.cachedProxy = null;
-        this.patches = [];
         this.isRecording = false;
         this.userCallback;
-        this.defaultCallback = function (sender) {
-            return function (event) {
-                //don't duplicate exact same events
-                //if(sender.patches.length > 0 && this.equalsEvents(sender.patches[sender.patches.length - 1], event)) return;
-                if (!sender.disableCallback) {
+        var sender = this;
+        /*
+        instead of setting a boolean to
+        be checked every time an operation
+        is being recording, I'm removing the
+        whole callback when it's disabled.
+        Because we are only disabling the callback
+        once in the beginning, no need to `if` every time
+        */
+        this.disableEnableCallback = function (enable) {
+            if (enable) {
+                sender.defaultCallback = function (event) {
                     if (sender.isRecording) {
                         sender.patches.push(event);
                     }
                     if (sender.userCallback) {
                         sender.userCallback(event);
                     }
-                }
-            };
-        }(this);
+                };
+            }
+            else {
+                sender.defaultCallback = function () { };
+            }
+        };
     }
     JsonObserver.prototype.escapePathComponent = function (str) {
         if (str.indexOf('/') === -1 && str.indexOf('~') === -1)
@@ -64,13 +81,17 @@ var JsonObserver = (function () {
                 return Reflect.get(target, propKey, receiver);
             },
             set: function (target, key, receiver) {
-                //https://github.com/Starcounter-Jack/JSON-Patch/issues/125
-                if (typeof receiver === 'function') {
-                    return Reflect.set(target, key, receiver);
+                /*
+                https://github.com/Starcounter-Jack/JSON-Patch/issues/125
+                TODO: I didn't remove it to benchmark it later
+                if(typeof receiver === 'function')
+                {
+                  return Reflect.set(target, key, receiver);
                 }
+                */
                 var distPath = path + '/' + instance.escapePathComponent(key.toString());
                 // if the new value is an object, make sure to watch it          
-                if (receiver && typeof receiver === 'object' && receiver._proxy !== true) {
+                if (receiver /* because `null` is in object */ && typeof receiver === 'object' && receiver._proxy !== true) {
                     receiver = instance.generateProxyAtPath(receiver, distPath);
                 }
                 if (typeof receiver === 'undefined') {
@@ -109,17 +130,18 @@ var JsonObserver = (function () {
                         return Reflect.set(target, key, receiver);
                     }
                 }
-                else
+                else {
                     instance.defaultCallback({ op: 'add', path: distPath, value: receiver });
-                return Reflect.set(target, key, receiver);
+                    return Reflect.set(target, key, receiver);
+                }
             },
             deleteProperty: function (target, key) {
-                //when when an `undefined` property is deleted
-                if (typeof target[key] === 'undefined')
+                //when when an `undefined` property is deleted, record nothing
+                if (typeof target[key] === 'undefined') {
                     return Reflect.deleteProperty(target, key);
+                }
                 // else {
-                var distPath = path + '/' + instance.escapePathComponent(key.toString());
-                instance.defaultCallback({ op: 'remove', path: distPath });
+                instance.defaultCallback({ op: 'remove', path: path + '/' + instance.escapePathComponent(key.toString()) });
                 return Reflect.deleteProperty(target, key);
             }
         });
@@ -127,12 +149,10 @@ var JsonObserver = (function () {
     };
     //grab tree's leaves one by one, encapsulate them into a proxy and return
     JsonObserver.prototype._proxifyObjectTreeRecursively = function (root, path) {
-        if (!path)
-            path = "";
         for (var key in root) {
             if (root.hasOwnProperty(key)) {
-                var distPath = path + '/' + this.escapePathComponent(key);
                 if (typeof root[key] === 'object') {
+                    var distPath = path + '/' + this.escapePathComponent(key);
                     root[key] = this.generateProxyAtPath(root[key], distPath);
                     this._proxifyObjectTreeRecursively(root[key], distPath);
                 }
@@ -147,44 +167,56 @@ var JsonObserver = (function () {
         the proxyifying operation itself is being
         recorded, which in an unwanted behavior,
         that's why we disable recording through this
-        inital process;
+        initial process;
         */
-        this.disableCallback = true;
+        this.disableEnableCallback(false);
         var proxifiedObject = this._proxifyObjectTreeRecursively(root, "");
         /* OK you can record now */
-        this.disableCallback = false;
+        this.disableEnableCallback(true);
         return proxifiedObject;
     };
-    JsonObserver.prototype.equalsEvents = function (op1, op2) {
-        if (op1.value && op2.value)
-            return op1.op === op2.code && op1.path === op2.path && op1.value === op2.value;
-        return op1.op === op2.code && op1.path === op2.path;
-    };
-    JsonObserver.prototype.observe = function (record, cb) {
-        if (!record && !cb) {
+    /**
+     * Proxifies the object that was passed in the constructor and returns a proxified mirror of it.
+     * @param {boolean} record - whether to record object changes to a later-retrievable patches array.
+     * @param {function} [callback] - this will be synchronously called with every object change.
+     */
+    JsonObserver.prototype.observe = function (record, callback) {
+        if (!record && !callback) {
             throw new Error('You need to either record changes or pass a defaultCallback');
         }
         this.isRecording = record;
-        if (cb)
-            this.userCallback = cb;
+        if (callback)
+            this.userCallback = callback;
+        /*
+        I moved it here to remove it from `unobserve`,
+        this will also make the constructor faster, why initiate
+        the array before they decide to actually observe with recording?
+        They might need to use only a callback.
+        */
+        if (record)
+            this.patches = [];
         return this.cachedProxy = this.proxifyObjectTree(deepClone(this.originalObject));
     };
+    /**
+     * If the observed is set to record, it will synchronously return all the patches and empties patches array.
+     */
     JsonObserver.prototype.generate = function () {
         if (!this.isRecording) {
             throw new Error('You should set record to true to get patches later');
         }
         /*
         TODO: here, we could remove duplicates.
-        But we can't just UNINQE the array.
+        But we can't just UNIQUE the array.
         because consider [change1, change2, change1]
         assuming all changes are on the same path,
-        both change1's are neccessary.
+        both change1's are necessary.
         */
         return this.patches.splice(0, this.patches.length);
     };
-    JsonObserver.prototype.unobserve = function (keepHistory) {
-        if (!keepHistory)
-            this.patches = [];
+    /**
+     * Synchronously de-proxifies the last state of the object and returns it unobserved.
+     */
+    JsonObserver.prototype.unobserve = function () {
         //return a normal, non-proxified object
         return deepClone(this.cachedProxy);
     };
@@ -193,7 +225,7 @@ var JsonObserver = (function () {
 //ES5
 if (module) {
     module.exports = JsonObserver;
-    // TS Transpiler automically adds .default when referecning the package
+    // TS Transpiler automatically adds .default when referencing the package
     module.exports.default = JsonObserver;
 }
 else {
@@ -206,7 +238,7 @@ exports.default = JsonObserver;
 When in browser, setting `exports = {}`
 fools other modules into thinking they're
 running in a node environment, which breaks
-some of them. Here is super light wieght fix.
+some of them. Here is super light weight fix.
 */
 if (isBrowser) {
     exports = undefined;

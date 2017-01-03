@@ -5,7 +5,8 @@ if (typeof window === 'undefined') {
     global.document = doc.defaultView.document;
 }
 
-if (typeof jsonpatch === 'undefined' || !jsonpatch.compare /* in jsonpatch is loaded without compare, we need to load duplex */) {
+/* we need json-patch-duplex for jsonpatch.compare */
+if (typeof jsonpatch === 'undefined' || !jsonpatch.compare /* if jsonpatch is loaded without compare, we need to load duplex */) {
     jsonpatch = require('./../../src/json-patch-duplex.js');
 }
 if (typeof JsonObserver === 'undefined') {
@@ -142,6 +143,7 @@ describe("duplex", function () {
             jsonpatch.apply(obj2, patches);
             expect(obj2).toReallyEqual(observedObj);
         });
+        /*
         //https://github.com/Starcounter-Jack/JSON-Patch/issues/125
         it('should generate nothing', function () {
             var obj = {
@@ -162,6 +164,7 @@ describe("duplex", function () {
 
             expect(patches).toReallyEqual([]);
         });
+        */
         it('should generate replace (escaped chars)', function () {
             var obj = {
                 "/name/first": "Albert",
@@ -1063,7 +1066,7 @@ describe("duplex", function () {
             // ugly migration from Jasmine 1.x to > 2.0
             setTimeout(function () {
 
-                // an ugly walkaround
+                // an ugly walk around
                 jasmine.addMatchers(customMatchers);
 
                 expect(called).toReallyEqual(1);
