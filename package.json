@@ -23,6 +23,7 @@
   },
   "license": "MIT",
   "main": "./src/json-patch-duplex.js",
+  "typings": "./src/json-patch-duplex.ts",
   "engines": {
     "node": ">= 0.4.0"
   },
