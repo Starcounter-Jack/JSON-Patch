@@ -370,7 +370,11 @@ module jsonpatch {
         break;
       }
     }
-    _generate(mirror.value, observer.object, observer.patches, "");
+	var object = observer.object;
+	if (typeof object.toJSON === "function"){
+		object = object.toJSON();
+	}
+    _generate(mirror.value, object, observer.patches, "");
     if (observer.patches.length) {
       apply(mirror.value, observer.patches);
     }
