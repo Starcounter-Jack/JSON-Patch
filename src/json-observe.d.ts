@@ -1,6 +1,6 @@
 /** Class representing a JS Object observer  */
 declare class JsonObserver {
-    private deepClone(obj);
+    private static deepClone(obj);
     private originalObject;
     private exposedObject;
     private cachedProxy;
@@ -18,7 +18,7 @@ declare class JsonObserver {
     * @param {boolean} enable - true will enable, false will disable.
     */
     switchObserverOn: Function;
-    private escapePathComponent(str);
+    private static escapePathComponent(str);
     private generateProxyAtPath(obj, path);
     private _proxifyObjectTreeRecursively(root, path);
     private proxifyObjectTree(root);

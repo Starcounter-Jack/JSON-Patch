@@ -11,7 +11,7 @@ declare var module: any;
 /** Class representing a JS Object observer  */
 class JsonObserver {
 
-  private deepClone(obj: any) {
+  private static deepClone(obj: any) {
     switch (typeof obj) {
       case "object":
         return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
@@ -43,7 +43,7 @@ class JsonObserver {
    */
   public switchObserverOn: Function; 
 
-  private escapePathComponent(str) {
+  private static escapePathComponent(str) {
     if (str.indexOf('/') === -1 && str.indexOf('~') === -1) return str;
     return str.replace(/~/g, '~0').replace(/\//g, '~1');
   }
@@ -62,7 +62,7 @@ class JsonObserver {
         },
         set: function (target, key, receiver) {
 
-          let distPath = path + '/' + instance.escapePathComponent(key.toString());
+          let distPath = path + '/' + JsonObserver.escapePathComponent(key.toString());
           // if the new value is an object, make sure to watch it          
           if (receiver /* because `null` is in object */ && typeof receiver === 'object' && receiver._proxy !== true) {
             receiver = instance.generateProxyAtPath(receiver, distPath);
@@ -111,7 +111,7 @@ class JsonObserver {
         },
         deleteProperty: function (target, key) {
           if (typeof target[key] !== 'undefined') {
-            instance.defaultCallback({ op: 'remove', path: path + '/' + instance.escapePathComponent(key.toString()) });
+            instance.defaultCallback({ op: 'remove', path: path + '/' + JsonObserver.escapePathComponent(key.toString()) });
           }
           // else {
           return Reflect.deleteProperty(target, key);
@@ -125,7 +125,7 @@ class JsonObserver {
     for (var key in root) {
       if (root.hasOwnProperty(key)) {
         if (typeof root[key] === 'object') {
-          var distPath = path + '/' + this.escapePathComponent(key);
+          var distPath = path + '/' + JsonObserver.escapePathComponent(key);
           root[key] = this.generateProxyAtPath(root[key], distPath);
           this._proxifyObjectTreeRecursively(root[key], distPath);
         }
@@ -146,6 +146,7 @@ class JsonObserver {
     */
 
     this.switchObserverOff();
+    
     var proxifiedObject = this._proxifyObjectTreeRecursively(root, "");
 
     /* OK you can record now */
@@ -202,7 +203,7 @@ class JsonObserver {
     They might need to use only a callback.
     */
     if (record) this.patches = [];
-    return this.cachedProxy = this.proxifyObjectTree(this.deepClone(this.originalObject));
+    return this.cachedProxy = this.proxifyObjectTree(JsonObserver.deepClone(this.originalObject));
   }
   /**
    * If the observed is set to record, it will synchronously return all the patches and empties patches array.
@@ -226,7 +227,7 @@ class JsonObserver {
    */
   public unobserve() {
     //return a normal, non-proxified object
-    return this.deepClone(this.cachedProxy);
+    return JsonObserver.deepClone(this.cachedProxy);
   }
 }
 export default JsonObserver;
