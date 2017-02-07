@@ -10,7 +10,7 @@ if (typeof jsonpatch === 'undefined' || !jsonpatch.compare /* if jsonpatch is lo
     jsonpatch = require('./../../src/json-patch-duplex.js');
 }
 if (typeof JsonObserver === 'undefined') {
-    JsonObserver = require('./../../src/json-observe');
+    JsonObserver = require('./../../src/json-observe').default;
 }
 if (typeof _ === 'undefined') {
     var _ = require('underscore');
