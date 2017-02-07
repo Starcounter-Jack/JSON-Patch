@@ -19,8 +19,8 @@ JSON Patch plays well with the HTTP PATCH verb (method) and REST style programmi
 Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) about it.
 
 ## Footprint
-1.22 KB minified and gzipped (3 KB minified)
-Optional 1.04 KB minified and gzipped (2 KB minified) ES6-Proxy-based observing.
+* 1.22 KB minified and gzipped (3 KB minified)
+* Optional 1.04 KB minified and gzipped (2 KB minified) ES6-Proxy-based observing.
 
 ## Performance 
 
@@ -70,8 +70,11 @@ $ bower install fast-json-patch --save
 
 ### In a web browser
 
-Include `json-patch.js` if you want support for applying patches **or**
-include `json-patch-duplex.js` if you also want to generate patches.
+- Include `dist/json-patch.min.js` if you want support for applying patches, 
+- Include `dist/json-patch-duplex.min.js` if you also want to generate patches,
+- Include `dist/json-observe.min.js` if you want the ES6-Proxy version.
+
+**You can use rawgit.com as a CDN**
 
 ### In Node.js
 
@@ -80,7 +83,7 @@ Call require to get the instance:
 ```js
 var jsonpatch = require('fast-json-patch');
 ```
-And if you aim to use ES6-Proxy version
+And if you aim to use ES6-Proxy version:
 ```js
 var JsonObserver = require('fast-json-patch').JsonObserver;
 ```
@@ -144,7 +147,7 @@ observedObject = observer.observe(true, function(patch) {
 });
 observedObject.firstName = "Albert";
 ```
-###Comparing two object trees:
+### Comparing two object trees:
 
 ```js
 var objA = {user: {firstName: "Albert", lastName: "Einstein"}};
@@ -153,7 +156,7 @@ var diff = jsonpatch.compare(objA, objB));
 //diff == [{op: "replace", path: "/user/lastName", value: "Collins"}]
 ```
 
-Validating a sequence of patches:
+### Validating a sequence of patches:
 
 ```js
 var obj = {user: {firstName: "Albert"}};
