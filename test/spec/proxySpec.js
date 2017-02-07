@@ -1100,6 +1100,71 @@ describe("duplex", function () {
             }, 20);
         });
 
+         it('shouldn\'t omit patches when unobserved', function () {
+            var called = 0;
+
+            var obj = {
+                firstName: "Albert",
+                lastName: "Einstein",
+                phoneNumbers: [{
+                    number: "12345"
+                }, {
+                    number: "45353"
+                }]
+            };
+
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true, function (patches) {
+                called++;
+            });
+
+            observedObj.firstName = 'Malvin';            
+            expect(called).toReallyEqual(1);
+
+            observedObj.firstName = 'Ronaldo';       
+            expect(called).toReallyEqual(2);
+
+            jsonObserver.switchObserverOff();
+
+            observedObj.firstName = 'Messi';       
+            expect(called).toReallyEqual(2);
+        });
+
+        it('should omit patches when unobserved then observed', function () {
+            var called = 0;
+
+            var obj = {
+                firstName: "Albert",
+                lastName: "Einstein",
+                phoneNumbers: [{
+                    number: "12345"
+                }, {
+                    number: "45353"
+                }]
+            };
+
+            var jsonObserver = new JsonObserver(obj);
+            var observedObj = jsonObserver.observe(true, function (patches) {
+                called++;
+            });
+
+            observedObj.firstName = 'Malvin';            
+            expect(called).toReallyEqual(1);
+
+            observedObj.firstName = 'Ronaldo';       
+            expect(called).toReallyEqual(2);
+
+            jsonObserver.switchObserverOff();
+
+            observedObj.firstName = 'Messi';       
+            expect(called).toReallyEqual(2);
+
+            jsonObserver.switchObserverOn();
+
+            observedObj.firstName = 'Carlos';       
+            expect(called).toReallyEqual(3);
+        });
+
         it('should unobserve then observe again (deep value)', function (done) {
             var called = 0;
 

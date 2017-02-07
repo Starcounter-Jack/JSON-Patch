@@ -6,7 +6,8 @@
     "removeComments": false,
     /* emitting `use strict` made PuppetJS break */
     "allowSyntheticDefaultImports": true,
-    "noImplicitUseStrict": true
+    "noImplicitUseStrict": true,
+    "declaration": true
 },
 "filesGlob": [
     "./src/*.ts"
