@@ -23,8 +23,8 @@
     "url": "http://www.starcounter.com/"
   },
   "license": "MIT",
-  "typings": "./src/json-patch-duplex.ts",
-  "main": "./src/json-patch-duplex.js",
+  "typings": "./src/typings.ts",
+  "main": "./src/exporter.js",
   "engines": {
     "node": ">= 0.4.0"
   },

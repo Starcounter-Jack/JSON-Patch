@@ -10,5 +10,9 @@
     "declaration": true
 },
 "filesGlob": [
-    "./src/*.ts"
+    "./src/json-*.ts"
+],
+"exclude": [
+        "node_modules",
+        "./src/typings.ts"
 ]}
