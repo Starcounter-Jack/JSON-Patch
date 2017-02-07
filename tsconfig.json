@@ -3,10 +3,7 @@
     "target": "es5",
     "module": "commonjs",
     "noEmitHelpers": true,
-    "removeComments": false,
-    /* emitting `use strict` made PuppetJS break */
-    "allowSyntheticDefaultImports": true,
-    "noImplicitUseStrict": true
+    "removeComments": false
 },
 "filesGlob": [
     "./src/*.ts"

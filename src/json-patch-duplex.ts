@@ -370,10 +370,6 @@ module jsonpatch {
         break;
       }
     }
-	var object = observer.object;
-	if (typeof object.toJSON === "function"){
-		object = object.toJSON();
-	}
     _generate(mirror.value, object, observer.patches, "");
     if (observer.patches.length) {
       apply(mirror.value, observer.patches);
@@ -390,6 +386,9 @@ module jsonpatch {
 
   // Dirty check if obj is different from mirror, generate patches and update mirror
   function _generate(mirror, obj, patches, path) {
+    if (typeof obj.toJSON === "function"){
+        obj = obj.toJSON();
+    }
     var newKeys = _objectKeys(obj);
     var oldKeys = _objectKeys(mirror);
     var changed = false;
