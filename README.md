@@ -196,40 +196,49 @@ Returns an array of results - one item for each item in `patches`. The type of e
 ## Object observing
 ### ES6-Proxy version 
 #### constructor: JsonObserver( `root` Object ):  JsonObserver
+
 Available in *json-observe.js* 
+
 Creates an instance of `JsonObserver` around your object of interest `root`, for later `observe`, `unobserve`, `switchCallbackOff`, `switchCallbackOn` calls.
 Returns `JsonObserver`.
 
 #### JsonObserver.observe(`record` boolean, [`callback` Function]): Proxy
+
 Available in *json-observe.js* 
+
 Sets up a deep proxy observer on `root` that listens for changes in the tree. When changes are detected, the optional
 callback is called with the generated patches array as the parameter. 
 
 **record**: if set to `false`, all changes are will be pass through the callback and no history will be kept. If set to `true` patches history will be kept until you call `generate`, this will return the patches and deletes them.
 
 Returns `Proxy` a mirror of your object.
+
 ##### Note 1: you must either set `record` to `true` or pass a callback. 
 ##### Note 2: you have to use the return value of this function as your object of interest. Changes to the original object will go unnoticed. 
 
 #### JsonObserver.generate () :  Array
 
 Available in *json-observe.js*
+
 If there are pending changes in `root`, it returns them synchronously and clears history. 
 If there are no pending changes in `root`, returns an empty array (length 0).
 
 #### JsonObserver.unobserve () : Object
 
 Available in *json-observe.js*
+
 Destroys the observer set up on `root` and returns the final state of your object, unobserved.
 
 #### JsonObserver.SwitchCallbackOff () : void
 
 Available in *json-observe.js*
+
 Disables patches omitting (to both callback and patches array). However, the object will be updated if you change it. 
 
 #### JsonObserver.SwitchCallbackOn () : void
 
 Available in *json-observe.js*
+
 Enables patches omitting (to both callback and patches array). Starting from the moment you call it. 
 
 ### Dirty checking version 
