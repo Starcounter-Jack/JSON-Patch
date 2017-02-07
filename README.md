@@ -1,7 +1,6 @@
-JSON-Patch
+JSON-Patch 
 ===============
-
-> A leaner and meaner implementation of JSON-Patch. Small footprint. High performance.
+> A leaner and meaner implementation of JSON-Patch. Small footprint. High performance. **With opt-in ES6 Proxies version**.
 
 [![Build Status](https://travis-ci.org/Starcounter-Jack/JSON-Patch.svg?branch=master)](https://travis-ci.org/Starcounter-Jack/JSON-Patch)
 
@@ -21,8 +20,9 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 
 ## Footprint
 1.22 KB minified and gzipped (3 KB minified)
+Optional 1.04 KB minified and gzipped (2 KB minified) ES6-Proxy-based observing.
 
-## Performance
+## Performance 
 
 ##### [`add` benchmark](http://jsperf.com/json-patch-benchmark/2)
 
@@ -46,7 +46,7 @@ We aim the tests to be fair. Our library puts performance as the #1 priority, wh
 * Allows you to apply patches on object trees for incoming traffic.
 * Allows you to freely manipulate object trees and then generate patches for outgoing traffic.
 * Tested in IE 8-11, Firefox, Chrome, Safari and Node.js
-
+* **NEW** It supports ES6 proxies. (Not in IE and Oprah Mini). 
 
 ## Install
 
@@ -78,12 +78,24 @@ include `json-patch-duplex.js` if you also want to generate patches.
 Call require to get the instance:
 
 ```js
-var jsonpatch = require('fast-json-patch')
+var jsonpatch = require('fast-json-patch');
+```
+And if you aim to use ES6-Proxy version
+```js
+var JsonObserver = require('fast-json-patch').JsonObserver;
 ```
 
+Or in ES6 and TS:
+```js
+import jsonpatch from 'fast-json-patch';
+```
+And if you aim to use ES6-Proxy version
+```js
+import { JsonObserver } from 'fast-json-patch';
+```
 ## Usage
 
-Applying patches:
+### Applying patches:
 
 ```js
 var myobj = { firstName:"Albert", contactDetails: { phoneNumbers: [ ] } };
@@ -95,7 +107,7 @@ var patches = [
 jsonpatch.apply( myobj, patches );
 // myobj == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
 ```
-Generating patches:
+### Generating patches using dirty checking:
 
 ```js
 var myobj = { firstName:"Joachim", lastName:"Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
@@ -109,7 +121,30 @@ var patches = jsonpatch.generate(observer);
 //   { op:"replace", path="/contactDetails/phoneNumbers/0/number", value:"123"},
 //   { op:"add", path="/contactDetails/phoneNumbers/1", value:{number:"456"}}];
 ```
-Comparing two object trees:
+### Generating patches using ES6 proxies version:
+```js
+var myobj = { firstName:"Joachim", lastName:"Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
+observer = new JsonObserver( myobj );
+observedObject = observer.observe(true);
+observedObject.firstName = "Albert";
+observedObject.contactDetails.phoneNumbers[0].number = "123";
+observedObject.contactDetails.phoneNumbers.push({number:"456"});
+var patches = observer.generate();
+// patches  == [
+//   { op:"replace", path="/firstName", value:"Albert"},
+//   { op:"replace", path="/contactDetails/phoneNumbers/0/number", value:"123"},
+//   { op:"add", path="/contactDetails/phoneNumbers/1", value:{number:"456"}}];
+```
+### Receiving patches using ES6 proxies version and a callback:
+```js
+var myobj = { firstName:"Joachim", lastName:"Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
+observer = new JsonObserver( myobj );
+observedObject = observer.observe(true, function(patch) {
+    // patch == { op:"replace", path="/firstName", value:"Albert"}
+});
+observedObject.firstName = "Albert";
+```
+###Comparing two object trees:
 
 ```js
 var objA = {user: {firstName: "Albert", lastName: "Einstein"}};
@@ -139,7 +174,7 @@ else {
 }
 ```
 
-## API
+## API 
 
 #### jsonpatch.apply (`obj` Object, `patches` Array, `validate` Boolean) : boolean
 
@@ -155,11 +190,51 @@ Returns an array of results - one item for each item in `patches`. The type of e
 * `remove`, `replace` and `move` - original object that has been removed
 * `add` (only when adding to an array) - index at which item has been inserted (useful when using `-` alias)
 
-#### jsonpatch.observe (`obj` Object, `callback` Function (optional)) : `observer` Object
+## Object observing
+### ES6-Proxy version 
+#### constructor: JsonObserver( `root` Object ):  JsonObserver
+Available in *json-observe.js* 
+Creates an instance of `JsonObserver` around your object of interest `root`, for later `observe`, `unobserve`, `switchCallbackOff`, `switchCallbackOn` calls.
+Returns `JsonObserver`.
+
+#### JsonObserver.observe(`record` boolean, [`callback` Function]): Proxy
+Available in *json-observe.js* 
+Sets up a deep proxy observer on `root` that listens for changes in the tree. When changes are detected, the optional
+callback is called with the generated patches array as the parameter. 
+
+**record**: if set to `false`, all changes are will be pass through the callback and no history will be kept. If set to `true` patches history will be kept until you call `generate`, this will return the patches and deletes them.
+
+Returns `Proxy` a mirror of your object.
+##### Note 1: you must either set `record` to `true` or pass a callback. 
+##### Note 2: you have to use the return value of this function as your object of interest. Changes to the original object will go unnoticed. 
+
+#### JsonObserver.generate () :  Array
+
+Available in *json-observe.js*
+If there are pending changes in `root`, it returns them synchronously and clears history. 
+If there are no pending changes in `root`, returns an empty array (length 0).
+
+#### JsonObserver.unobserve () : Object
+
+Available in *json-observe.js*
+Destroys the observer set up on `root` and returns the final state of your object, unobserved.
+
+#### JsonObserver.SwitchCallbackOff () : void
+
+Available in *json-observe.js*
+Disables patches omitting (to both callback and patches array). However, the object will be updated if you change it. 
+
+#### JsonObserver.SwitchCallbackOn () : void
+
+Available in *json-observe.js*
+Enables patches omitting (to both callback and patches array). Starting from the moment you call it. 
+
+### Dirty checking version 
+#### jsonpatch.observe (`obj` Object, [`callback` Function]) : `observer` Object
 
 Available in *json-patch-duplex.js*
 
-Sets up an deep observer on `obj` that listens for changes in object tree. When changes are detected, the optional
+Sets up a deep observer on `obj` that listens for changes in object tree. When changes are detected, the optional
 callback is called with the generated patches array as the parameter.
 
 Returns `observer`.
