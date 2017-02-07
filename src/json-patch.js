@@ -4,11 +4,6 @@
  * (c) 2013 Joachim Wester
  * MIT license
  */
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var jsonpatch;
 (function (jsonpatch) {
     var _objectKeys = function (obj) {
@@ -286,7 +281,7 @@ var jsonpatch;
             this.tree = tree;
         }
         return JsonPatchError;
-    })(Error);
+    }(Error));
     jsonpatch.JsonPatchError = JsonPatchError;
     /**
      * Recursively checks whether an object has any undefined values inside.
@@ -400,7 +395,8 @@ else {
     var exports = {};
     var isBrowser = true;
 }
-exports["default"] = jsonpatch;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = jsonpatch;
 /*
 When in browser, setting `exports = {}`
 fools other modules into thinking they're
