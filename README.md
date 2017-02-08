@@ -1,6 +1,6 @@
 JSON-Patch 
 ===============
-> A leaner and meaner implementation of JSON-Patch. Small footprint. High performance. **With opt-in ES6 Proxies version**.
+> A leaner and meaner implementation of JSON-Patch. Small footprint. High performance. With opt-in ES6 Proxies version.
 
 [![Build Status](https://travis-ci.org/Starcounter-Jack/JSON-Patch.svg?branch=master)](https://travis-ci.org/Starcounter-Jack/JSON-Patch)
 
@@ -46,7 +46,7 @@ We aim the tests to be fair. Our library puts performance as the #1 priority, wh
 * Allows you to apply patches on object trees for incoming traffic.
 * Allows you to freely manipulate object trees and then generate patches for outgoing traffic.
 * Tested in IE 8-11, Firefox, Chrome, Safari and Node.js
-* **NEW** It supports ES6 proxies. (Not in IE and Oprah Mini). 
+* It supports ES6 proxies. [Proxy on Caniuse](http://caniuse.com/#search=proxy). 
 
 ## Install
 
@@ -202,7 +202,7 @@ Available in *json-observe.js*
 Creates an instance of `JsonObserver` around your object of interest `root`, for later `observe`, `unobserve`, `switchCallbackOff`, `switchCallbackOn` calls.
 Returns `JsonObserver`.
 
-#### JsonObserver.observe(`record` boolean, [`callback` Function]): Proxy
+#### JsonObserver#observe(`record` boolean, [`callback` Function]): Proxy
 
 Available in *json-observe.js* 
 
@@ -211,31 +211,34 @@ callback is called with the generated patches array as the parameter.
 
 **record**: if set to `false`, all changes are will be pass through the callback and no history will be kept. If set to `true` patches history will be kept until you call `generate`, this will return the patches and deletes them.
 
-Returns `Proxy` a mirror of your object.
+Returns  a `Proxy` mirror of your object.
 
-##### Note 1: you must either set `record` to `true` or pass a callback. 
-##### Note 2: you have to use the return value of this function as your object of interest. Changes to the original object will go unnoticed. 
+- Note 1: you must either set `record` to `true` or pass a callback. 
+- Note 2: you have to use the return value of this function as your object of interest. Changes to the original object will go unnoticed. 
+-  Note 3: please make sure to call `JsonObserver#generate` often if you choose to record. Becuase the patches will accumulate if you don't. 
 
-#### JsonObserver.generate () :  Array
+
+#### JsonObserver#generate () :  Array
 
 Available in *json-observe.js*
 
-If there are pending changes in `root`, it returns them synchronously and clears history. 
+It returns the changes of your object since the last time it's called. You have to be recording (by setting `record` to `true` when calling `JsonObserver#observe`.
+
 If there are no pending changes in `root`, returns an empty array (length 0).
 
-#### JsonObserver.unobserve () : Object
+#### JsonObserver#unobserve () : Object
 
 Available in *json-observe.js*
 
 Destroys the observer set up on `root` and returns the final state of your object, unobserved.
 
-#### JsonObserver.SwitchCallbackOff () : void
+#### JsonObserver#switchCallbackOff () : void
 
 Available in *json-observe.js*
 
 Disables patches omitting (to both callback and patches array). However, the object will be updated if you change it. 
 
-#### JsonObserver.SwitchCallbackOn () : void
+#### JsonObserver#switchCallbackOn () : void
 
 Available in *json-observe.js*
 
