@@ -222,7 +222,7 @@ Returns  a `Proxy` mirror of your object.
 
 Available in *json-observe.js*
 
-It returns the changes of your object since the last time it's called. You have to be recording (by setting `record` to `true` when calling `JsonObserver#observe`.
+It returns the changes of your object since the last time it's called. You have to be recording (by setting `record` to `true`) when calling `JsonObserver#observe`.
 
 If there are no pending changes in `root`, returns an empty array (length 0).
 
