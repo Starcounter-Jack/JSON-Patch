@@ -15,11 +15,6 @@ if (typeof JsonObserver === 'undefined') {
 if (typeof _ === 'undefined') {
     var _ = require('underscore');
 }
-function trigger(eventName, elem) {
-    if (typeof document !== 'undefined') {
-        fireEvent((elem || document.documentElement), eventName);
-    }
-}
 
 function getPatchesUsingGenerate(objFactory, objChanger) {
     var obj = objFactory();
@@ -34,20 +29,6 @@ function getPatchesUsingCompare(objFactory, objChanger) {
     var mirror = JSON.parse(JSON.stringify(obj));
     objChanger(obj);
     return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)));
-}
-
-//http://stackoverflow.com/questions/827716/emulate-clicking-a-link-with-javascript-that-works-with-ie
-function fireEvent(obj, evt) {
-    var fireOnThis = obj;
-    if (document.createEvent) {
-        var evObj = document.createEvent(evt.indexOf('mouse') > -1 ? 'MouseEvents' : 'KeyboardEvent');
-        evObj.initEvent(evt, true, false);
-        fireOnThis.dispatchEvent(evObj);
-
-    } else if (document.createEventObject) {
-        var evObj = document.createEventObject();
-        fireOnThis.fireEvent('on' + evt, evObj);
-    }
 }
 
 var customMatchers = {
@@ -75,12 +56,11 @@ var customMatchers = {
         }
     }
 };
-
-describe("duplex", function () {
-
+describe("Custom matchers", function () {
+    
     beforeEach(function () {
         jasmine.addMatchers(customMatchers);
-    });
+    });   
 
     describe("toReallyEqual", function () {
         it('should treat deleted, undefined and null values as different', function () {
@@ -108,6 +88,12 @@ describe("duplex", function () {
             });
         });
     });
+});
+describe("proxy", function () {
+
+    beforeEach(function () {
+        jasmine.addMatchers(customMatchers);
+    });   
 
     describe("generate", function () {
 
@@ -855,9 +841,6 @@ describe("duplex", function () {
             observedObj.phoneNumbers[0].number = "123";
             observedObj.phoneNumbers[1].number = "456";
 
-
-            //useless now
-            //trigger('keyup');
             */
 
             function patchesChanged() {
@@ -898,7 +881,6 @@ describe("duplex", function () {
             });
             observedObj.firstName = "Marcin";
 
-            //trigger('keyup');
             // ugly migration from Jasmine 1.x to > 2.0
             function patchesChanged(time) {
                 switch (time) {
@@ -989,12 +971,7 @@ describe("duplex", function () {
                 lastPatches = [patches];
                 patchesChanged(called);
             });
-            observedObj.phoneNumbers[0].number = "123";
-
-            //needless now
-            //trigger('keyup');
-
-            
+            observedObj.phoneNumbers[0].number = "123";           
         });
 
         it('generate should execute callback synchronously', function (done) {
@@ -1074,8 +1051,6 @@ describe("duplex", function () {
                 observedObj = jsonObserver.unobserve();
 
                 observedObj.firstName = 'Wilfred';
-
-                //trigger('keyup');
 
                 setTimeout(function () {
 
@@ -1186,7 +1161,6 @@ describe("duplex", function () {
 
             observedObj.phoneNumbers[1].number = '555';
 
-            //trigger('keyup');
             // ugly migration from Jasmine 1.x to > 2.0
             setTimeout(function () {
                 jasmine.addMatchers(customMatchers);
@@ -1196,8 +1170,6 @@ describe("duplex", function () {
                 jsonObserver.unobserve();
 
                 observedObj.phoneNumbers[1].number = '556';
-
-                //trigger('keyup');
 
                 setTimeout(function () {
 
@@ -1260,7 +1232,7 @@ describe("duplex", function () {
             }, 20);
         });
 
-        /*
+        
         it("should handle callbacks that calls observe() and unobserve() internally", function (done) {
 
             //TODO: needs attention
@@ -1306,76 +1278,7 @@ describe("duplex", function () {
                         break;
                 }
             }
-
-        });
-        
-        it('should generate patch after `mouseup` event', function(done) {
-            var obj = {
-                lastName: "Einstein"
-            };
-            var lastPatches;
-            var observer = jsonpatch.observe(obj, function(patches) {
-                lastPatches = patches;
-            });
-
-            obj.lastName = "Hawking";
-
-            trigger('mouseup');
-
-            setTimeout(function() {
-                expect(lastPatches).toEqual([{
-                    op: 'replace',
-                    path: '/lastName',
-                    value: 'Hawking'
-                }]);
-                done();
-            });
-        });
-
-        it('should generate patch after `mousedown` event', function(done) {
-            var obj = {
-                lastName: "Einstein"
-            };
-            var lastPatches;
-            var observer = jsonpatch.observe(obj, function(patches) {
-                lastPatches = patches;
-            });
-
-            obj.lastName = "Hawking";
-            trigger('mousedown');
-
-            setTimeout(function() {
-                expect(lastPatches).toEqual([{
-                    op: 'replace',
-                    path: '/lastName',
-                    value: 'Hawking'
-                }]);
-                done();
-            }, 20);
-        });
-
-        it('should generate patch after `keydown` event', function(done) {
-            var obj = {
-                lastName: "Einstein"
-            };
-            var lastPatches;
-            var observer = jsonpatch.observe(obj, function(patches) {
-                lastPatches = patches;
-            });
-
-            obj.lastName = "Hawking";
-            trigger('keydown');
-
-            setTimeout(function() {
-                expect(lastPatches).toEqual([{
-                    op: 'replace',
-                    path: '/lastName',
-                    value: 'Hawking'
-                }]);
-                done();
-            }, 20);
-        });*/
-
+        });             
     });
 
     describe('compare', function () {
@@ -1494,113 +1397,7 @@ describe("duplex", function () {
                 value: ''
             }]);
         });
-    });
-
-    /*  
-    useless now, thanks to ES6 classes
-    describe("Registering multiple observers with the same callback", function() {
-
-        it("should register only one observer", function(done) {
-
-            var obj = {
-                foo: 'bar'
-            };
-
-            var callback = jasmine.createSpy('callback');
-
-            var jsonObserver = new JsonObserver(obj);             
-            var observedObj = jsonObserver.observe(true, callback);
-
-            jsonpatch.observe(obj, callback);
-            jsonpatch.observe(obj, callback);
-
-            expect(callback.calls.count()).toReallyEqual(0);
-
-            obj.foo = 'bazz';
-
-            trigger('keyup')
-
-            setTimeout(function() {
-                expect(callback.calls.count()).toReallyEqual(1);
-                done();
-            }, 100);
-        });
-
-        it("should return the same observer if callback has been already registered)", function() {
-            var obj = {
-                foo: 'bar'
-            };
-
-            var callback = jasmine.createSpy('callback');
-
-            var observer1 = jsonpatch.observe(obj, callback);
-            var observer2 = jsonpatch.observe(obj, callback);
-
-            expect(observer1).toBe(observer2);
-
-
-        });
-
-        it("should return a different observer if callback has been unregistered and registered again", function() {
-            var obj = {
-                foo: 'bar'
-            };
-
-            var callback = jasmine.createSpy('callback');
-
-            var observer1 = jsonpatch.observe(obj, callback);
-
-            jsonpatch.unobserve(obj, observer1);
-
-            var observer2 = jsonpatch.observe(obj, callback);
-
-            expect(observer1).not.toBe(observer2);
-
-        });
-
-        it('should not call callback on key and mouse events after unobserve', function(done) {
-            var called = 0;
-
-            var obj = {
-                firstName: "Albert",
-                lastName: "Einstein",
-                phoneNumbers: [{
-                    number: "12345"
-                }, {
-                    number: "45353"
-                }]
-            };
-
-            var observer = jsonpatch.observe(obj, function(patches) {
-                called++;
-            });
-
-            obj.firstName = 'Malvin';
-
-            trigger('keyup');
-
-            // ugly migration from Jasmine 1.x to > 2.0
-            setTimeout(function() {
-                expect(called).toReallyEqual(1);
-
-                jsonpatch.unobserve(obj, observer);
-
-                obj.firstName = 'Wilfred';
-
-                trigger('mousedown');
-                trigger('mouseup');
-                trigger('keydown');
-                trigger('keyup');
-
-                setTimeout(function() {
-                    expect(called).toReallyEqual(1);
-                    done();
-                }, 20)
-            }, 20);
-        });
-    });
-    */
-
+    });    
     describe("compare", function () {
         it("should return patch difference between objects", function () {
             var obj = {

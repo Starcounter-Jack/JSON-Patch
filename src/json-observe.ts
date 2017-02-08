@@ -44,7 +44,9 @@ class JsonObserver {
   public switchObserverOn: Function; 
 
   private static escapePathComponent(str) {
-    if (str.indexOf('/') === -1 && str.indexOf('~') === -1) return str;
+    if (str.indexOf('/') === -1 && str.indexOf('~') === -1) { 
+      return str;
+    }
     return str.replace(/~/g, '~0').replace(/\//g, '~1');
   }
   private generateProxyAtPath(obj, path) {
@@ -55,7 +57,7 @@ class JsonObserver {
     let proxy = new Proxy(obj,
       {
         get: (target, propKey, receiver) => {
-          if (propKey.toString() === '_proxy') {
+          if (propKey.toString() === '_isProxified') {
             return true; //to distinguish proxies
           }
           return Reflect.get(target, propKey, receiver);
@@ -64,7 +66,7 @@ class JsonObserver {
 
           let distPath = path + '/' + JsonObserver.escapePathComponent(key.toString());
           // if the new value is an object, make sure to watch it          
-          if (receiver /* because `null` is in object */ && typeof receiver === 'object' && receiver._proxy !== true) {
+          if (receiver /* because `null` is in object */ && typeof receiver === 'object' && receiver._isProxified !== true) {
             receiver = instance.generateProxyAtPath(receiver, distPath);
           }
 
@@ -194,15 +196,18 @@ class JsonObserver {
       throw new Error('You need to either record changes or pass a defaultCallback');
     }
     this.isRecording = record;
-    if (callback) this.userCallback = callback;
-
+    if (callback) { 
+      this.userCallback = callback;
+    }
     /* 
     I moved it here to remove it from `unobserve`,
     this will also make the constructor faster, why initiate
     the array before they decide to actually observe with recording? 
     They might need to use only a callback.
     */
-    if (record) this.patches = [];
+    if (record) { 
+      this.patches = []; 
+    }
     return this.cachedProxy = this.proxifyObjectTree(JsonObserver.deepClone(this.originalObject));
   }
   /**

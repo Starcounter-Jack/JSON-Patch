@@ -215,8 +215,8 @@ Returns  a `Proxy` mirror of your object.
 
 - Note 1: you must either set `record` to `true` or pass a callback. 
 - Note 2: you have to use the return value of this function as your object of interest. Changes to the original object will go unnoticed. 
--  Note 3: please make sure to call `JsonObserver#generate` often if you choose to record. Becuase the patches will accumulate if you don't. 
-
+- Note 3: please make sure to call `JsonObserver#generate` often if you choose to record. Because the patches will accumulate if you don't. 
+- Note 4: the returned mirror object has a property `_isProxified` set to true, you can use this to tell an object and its mirror apart. Also if your `root` object or any deep object inside it has `_isProxified` property set to `true` it won't be proxified => will not emit patches.
 
 #### JsonObserver#generate () :  Array
 
