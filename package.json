@@ -6,6 +6,7 @@
   "keywords": [
     "json",
     "patch",
+    "proxy",
     "http",
     "rest"
   ],
@@ -22,8 +23,8 @@
     "url": "http://www.starcounter.com/"
   },
   "license": "MIT",
-  "main": "./src/json-patch-duplex.js",
-  "typings": "./src/json-patch-duplex.ts",
+  "typings": "./src/typings.ts",
+  "main": "./src/exporter.js",
   "engines": {
     "node": ">= 0.4.0"
   },
@@ -41,11 +42,14 @@
   "scripts": {
     "tsc": "tsc",
     "tsc-watch": "tsc -w",
-    "test": "npm run test-core && npm run test-duplex",
+    "test": "npm run test-core && npm run test-duplex && npm run test-proxy",
     "test-duplex": "jasmine DUPLEX=yes JASMINE_CONFIG_PATH=test/jasmine.json",
+    "test-proxy": "jasmine DUPLEX=proxy JASMINE_CONFIG_PATH=test/jasmine.json",
     "test-core": "jasmine  DUPLEX=no JASMINE_CONFIG_PATH=test/jasmine.json test/spec/jsonPatchTestsSpec.js test/spec/coreSpec.js test/spec/validateSpec.js",
-    "bench": "npm run bench-core && npm run bench-duplex",
+    "bench": "npm run bench-core && npm run bench-duplex && npm run bench-proxy",
     "bench-core": "node test/spec/coreBenchmark.js",
-    "bench-duplex": "node test/spec/coreBenchmark.js DUPLEX=yes && node test/spec/duplexBenchmark.js"
-  }
+    "bench-duplex": "node test/spec/coreBenchmark.js DUPLEX=yes && node test/spec/duplexBenchmark.js",
+    "bench-proxy": "node test/spec/coreBenchmark.js DUPLEX=yes && node test/spec/proxyBenchmark.js"
+  },
+  "dependencies": {}
 }

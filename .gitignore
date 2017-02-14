@@ -5,5 +5,8 @@
 node_modules/*
 npm-debug.log
 
+#VSCode spell check
+.vscode/cSpell.json
+
 # WebStorm
 .idea
