@@ -524,6 +524,49 @@ describe("duplex", function() {
             expect(patches.length).toReallyEqual(0);
         });
 
+        it('should respect toJSON', function(){
+            var a = {};
+            a.self = a;
+            var obj = {
+                a: a,
+                b: 3,
+                toJSON: function(){ 
+                    return {
+                        b: this.b
+                    }; 
+                }
+            };
+            
+            var observer = jsonpatch.observe(obj);
+            obj.b = 5;
+            patches = jsonpatch.generate(observer);
+            expect(patches.length).toReallyEqual(1);
+        });
+        
+        it('should respect toJSON in nested objects', function(){
+            var a = {};
+            a.self = a;
+            var outer = {
+                obj: {
+                    a: a,
+                    b: 3,
+                    toJSON: function(){ 
+                        return {
+                            b: this.b
+                        }; 
+                    }
+                }
+            };
+            
+            var observer = jsonpatch.observe(outer);
+            outer.obj.b = 5;
+            patches = jsonpatch.generate(observer);
+            
+            expect(patches.length).toReallyEqual(1);
+            expect(patches[0].path).toReallyEqual("/obj/b")
+            expect(patches[0].value).toReallyEqual(5);
+        });
+        
         /*it('should not generate the same patch twice (move)', function() { //"move" is not implemented yet in jsonpatch.generate
           obj = { lastName: {str: "Einstein"} };
           var observer = jsonpatch.observe(obj);
