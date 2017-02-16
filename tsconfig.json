@@ -1,13 +1,16 @@
 {
-"compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "noEmitHelpers": true,
-    "removeComments": false,
-    /* emitting `use strict` made PuppetJS break */
-    "allowSyntheticDefaultImports": true,
-    "noImplicitUseStrict": true
-},
-"filesGlob": [
-    "./src/*.ts"
-]}
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "noEmitHelpers": true,
+        "declaration": true,
+        "outDir": "dist",
+        "removeComments": false,
+        /* emitting `use strict` made PuppetJS break */
+        "allowSyntheticDefaultImports": true,
+        "noImplicitUseStrict": true
+    },
+    "include": [
+        "src/**/*.ts"
+    ]
+}
