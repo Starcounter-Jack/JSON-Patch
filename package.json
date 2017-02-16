@@ -42,6 +42,7 @@
   "scripts": {
     "tsc": "tsc",
     "tsc-watch": "tsc -w",
+    "uglify": "grunt uglify",
     "test": "npm run test-core && npm run test-duplex",
     "test-duplex": "jasmine DUPLEX=yes JASMINE_CONFIG_PATH=test/jasmine.json",
     "test-core": "jasmine  DUPLEX=no JASMINE_CONFIG_PATH=test/jasmine.json test/spec/jsonPatchTestsSpec.js test/spec/coreSpec.js test/spec/validateSpec.js",
