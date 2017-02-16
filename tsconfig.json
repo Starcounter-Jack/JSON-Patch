@@ -4,7 +4,6 @@
         "module": "commonjs",
         "noEmitHelpers": true,
         "declaration": true,
-        "outDir": "dist",
         "removeComments": false,
         /* emitting `use strict` made PuppetJS break */
         "allowSyntheticDefaultImports": true,
