@@ -351,7 +351,7 @@ var jsonpatch;
             var oldVal = mirror[key];
             if (obj.hasOwnProperty(key) && !(obj[key] === undefined && oldVal !== undefined && _isArray(obj) === false)) {
                 var newVal = obj[key];
-                if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
+                if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null && oldVal !== newVal) {
                     _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
                 }
                 else {
