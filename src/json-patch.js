@@ -273,13 +273,12 @@ var jsonpatch;
     var JsonPatchError = (function (_super) {
         __extends(JsonPatchError, _super);
         function JsonPatchError(message, name, index, operation, tree) {
-            var _this = _super.call(this, message) || this;
-            _this.message = message;
-            _this.name = name;
-            _this.index = index;
-            _this.operation = operation;
-            _this.tree = tree;
-            return _this;
+            _super.call(this, message);
+            this.message = message;
+            this.name = name;
+            this.index = index;
+            this.operation = operation;
+            this.tree = tree;
         }
         return JsonPatchError;
     }(Error));

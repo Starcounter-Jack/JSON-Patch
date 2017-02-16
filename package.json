@@ -36,7 +36,7 @@
     "jasmine": "^2.5.1",
     "jsdom": "^9.5.0",
     "jsonfile": "^2.3.1",
-    "typescript": "^2.1.6",
+    "typescript": "~2.0.0",
     "underscore": "^1.8.3"
   },
   "scripts": {
