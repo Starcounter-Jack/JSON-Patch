@@ -4,6 +4,7 @@ doc/
 examples/
 test/
 .travis.yml
+*.ts
 
 # Mac OS X
 .DS_Store
