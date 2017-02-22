@@ -100,6 +100,34 @@ suite.add('compare operation', {
     }
 });
 
+suite.add('compare operation same but deep objects', {
+    setup: function(){
+        var depth = 1;
+        function shallowObj(){
+            return {
+                shallow: {
+                    firstName: "Tomek",
+                    lastName: "Wytrebowicz",
+                    mobileNumbers: [{
+                        number: "12345"
+                    }, {
+                        number: "45353"
+                    }]
+                }
+            };
+        }
+        var obj = shallowObj();
+        var node = obj;
+        while(depth-- > 0){
+            node.nested = shallowObj();
+            node = node.nested;
+        }
+        var obj2 = obj;
+    },
+    fn: function() {
+        var patches = jsonpatch.compare(obj, obj2);
+    }
+});
 
 // if we are in the browser with benchmark < 2.1.2
 if(typeof benchmarkReporter !== 'undefined'){
