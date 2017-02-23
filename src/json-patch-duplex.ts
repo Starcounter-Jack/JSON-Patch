@@ -386,6 +386,10 @@ module jsonpatch {
 
   // Dirty check if obj is different from mirror, generate patches and update mirror
   function _generate(mirror, obj, patches, path) {
+    if (obj === mirror) {
+      return;
+    }
+
     var newKeys = _objectKeys(obj);
     var oldKeys = _objectKeys(mirror);
     var changed = false;
@@ -398,7 +402,7 @@ module jsonpatch {
       var oldVal = mirror[key];
       if (obj.hasOwnProperty(key) && !(obj[key] === undefined && oldVal !== undefined && _isArray(obj) === false)) {
         var newVal = obj[key];
-        if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null && oldVal !== newVal) {
+        if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
           _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
         }
         else {
