@@ -341,6 +341,10 @@ var jsonpatch;
     jsonpatch.generate = generate;
     // Dirty check if obj is different from mirror, generate patches and update mirror
     function _generate(mirror, obj, patches, path) {
+        if (obj === mirror) {
+            return;
+        }
+
         if (typeof obj.toJSON === "function") {
             obj = obj.toJSON();
         }
