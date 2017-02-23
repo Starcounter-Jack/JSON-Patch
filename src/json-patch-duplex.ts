@@ -1,6 +1,6 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * json-patch-duplex.js version: 1.1.4
+ * json-patch-duplex.js version: 1.1.6
  * (c) 2013 Joachim Wester
  * MIT license
  */
@@ -388,6 +388,10 @@ module jsonpatch {
   function _generate(mirror, obj, patches, path) {
     if (obj === mirror) {
       return;
+    }
+
+    if (typeof obj.toJSON === "function"){
+        obj = obj.toJSON();
     }
 
     var newKeys = _objectKeys(obj);
