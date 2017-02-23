@@ -48,6 +48,7 @@
     "test-core": "jasmine  DUPLEX=no JASMINE_CONFIG_PATH=test/jasmine.json test/spec/jsonPatchTestsSpec.js test/spec/coreSpec.js test/spec/validateSpec.js",
     "bench": "npm run bench-core && npm run bench-duplex",
     "bench-core": "node test/spec/coreBenchmark.js",
-    "bench-duplex": "node test/spec/coreBenchmark.js DUPLEX=yes && node test/spec/duplexBenchmark.js"
+    "bench-duplex": "node test/spec/coreBenchmark.js DUPLEX=yes && node test/spec/duplexBenchmark.js",
+    "bench-duplex-only": "node test/spec/duplexBenchmark.js"
   }
 }
