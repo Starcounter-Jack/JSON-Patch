@@ -343,6 +343,7 @@ var jsonpatch;
     function _generate(mirror, obj, patches, path) {
         if (obj === mirror) {
             return;
+        }
 
         if (typeof obj.toJSON === "function") {
             obj = obj.toJSON();
