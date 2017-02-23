@@ -102,7 +102,8 @@ suite.add('compare operation', {
 
 suite.add('compare operation same but deep objects', {
     setup: function(){
-        var depth = 1;
+        var depth = 10;
+        
         function shallowObj(){
             return {
                 shallow: {
