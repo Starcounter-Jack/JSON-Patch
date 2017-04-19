@@ -5,6 +5,7 @@ examples/
 test/
 .travis.yml
 *.ts
+!*.d.ts
 
 # Mac OS X
 .DS_Store
