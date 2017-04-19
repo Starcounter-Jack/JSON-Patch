@@ -55,4 +55,3 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 11. Call `npm publish` to push the new version to NPM. [Read more](https://docs.npmjs.com/getting-started/publishing-npm-packages)
 12. Call `npm view fast-json-patch dist-tags` to verify that the new version was published in NPM.
 13. Explain the changes (at least an summary of the commit log) in [GitHub Releases](https://github.com/Starcounter-Jack/JSON-Patch/releases).
-14. Merge `master` branch to `gh-pages` branch to update the static website.
