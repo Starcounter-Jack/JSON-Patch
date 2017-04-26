@@ -99,7 +99,7 @@ Generating patches:
 
 ```js
 var myobj = { firstName:"Joachim", lastName:"Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
-observer = jsonpatch.observe( myobj );
+var observer = jsonpatch.observe( myobj );
 myobj.firstName = "Albert";
 myobj.contactDetails.phoneNumbers[0].number = "123";
 myobj.contactDetails.phoneNumbers.push({number:"456"});
