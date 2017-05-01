@@ -513,9 +513,11 @@ var jsonpatch;
         if (obj === undefined) {
             return true;
         }
-        if (typeof obj == "array" || typeof obj == "object") {
-            for (var i in obj) {
-                if (hasUndefined(obj[i])) {
+        if (obj && (_isArray(obj) || typeof obj === "object")) {
+            var objKeys = _objectKeys(obj);
+            var objKeysLength = objKeys.length;
+            for (var i = 0; i < objKeysLength; i++) {
+                if (hasUndefined(obj[objKeys[i]])) {
                     return true;
                 }
             }

@@ -567,15 +567,16 @@ module jsonpatch {
     if (obj === undefined) {
       return true;
     }
+    if (obj && (_isArray(obj) || typeof obj === "object")) {
+      var objKeys = _objectKeys(obj);
+      var objKeysLength = objKeys.length;
 
-    if (typeof obj == "array" || typeof obj == "object") {
-      for (var i in obj) {
-        if (hasUndefined(obj[i])) {
+      for (var i = 0; i < objKeysLength; i++) {
+        if (hasUndefined(obj[objKeys[i]])) {
           return true;
         }
       }
     }
-
     return false;
   }
 
