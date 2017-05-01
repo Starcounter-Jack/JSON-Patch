@@ -234,6 +234,9 @@ var jsonpatch;
             }
         }
     }
+    /**
+     * Detach an observer from an object
+     */
     function unobserve(root, observer) {
         observer.unobserve();
     }
@@ -248,6 +251,9 @@ var jsonpatch;
                 return obj; //no need to clone primitives
         }
     }
+    /**
+     * Observes changes made to an object, which can then be retieved using generate
+     */
     function observe(obj, callback) {
         var patches = [];
         var root = obj;
@@ -317,6 +323,9 @@ var jsonpatch;
         return observer;
     }
     jsonpatch.observe = observe;
+    /**
+     * Generate an array of patches from an observer
+     */
     function generate(observer) {
         var mirror;
         for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
@@ -479,6 +488,9 @@ var jsonpatch;
         return results;
     }
     jsonpatch.apply = apply;
+    /**
+     * Create an array of patches from the differences in two objects
+     */
     function compare(tree1, tree2) {
         var patches = [];
         _generate(tree1, tree2, patches, '');
@@ -513,7 +525,7 @@ var jsonpatch;
         if (obj === undefined) {
             return true;
         }
-        if (typeof obj == "array" || typeof obj == "object") {
+        if (typeof obj == "object") {
             for (var i in obj) {
                 if (hasUndefined(obj[i])) {
                     return true;

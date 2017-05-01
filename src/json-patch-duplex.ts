@@ -11,6 +11,61 @@ interface HTMLElement {
 }
 
 module jsonpatch {
+  export type Patch<T> = AddPatch<T> | RemovePatch | ReplacePatch<T> | MovePatch | CopyPatch | TestPatch<T>;
+
+  export interface PatchBase {
+    path: string;
+  }
+
+  export interface AddPatch<T> extends PatchBase {
+    op: 'add';
+    value: T;
+  }
+
+  export interface RemovePatch extends PatchBase {
+    op: 'remove';
+  }
+
+  export interface ReplacePatch<T> extends PatchBase {
+    op: 'replace';
+    value: T;
+  }
+
+  export interface MovePatch extends PatchBase {
+    op: 'move';
+    from: string;
+  }
+
+  export interface CopyPatch extends PatchBase {
+    op: 'copy';
+    from: string;
+  }
+
+  export interface TestPatch<T> extends PatchBase {
+    op: 'test';
+    value: T;
+  }
+
+  export type JsonPatchErrorName = 'SEQUENCE_NOT_AN_ARRAY' |
+    'OPERATION_NOT_AN_OBJECT' |
+    'OPERATION_OP_INVALID' |
+    'OPERATION_PATH_INVALID' |
+    'OPERATION_FROM_REQUIRED' |
+    'OPERATION_VALUE_REQUIRED' |
+    'OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED' |
+    'OPERATION_PATH_CANNOT_ADD' |
+    'OPERATION_PATH_UNRESOLVABLE' |
+    'OPERATION_FROM_UNRESOLVABLE' |
+    'OPERATION_PATH_ILLEGAL_ARRAY_INDEX' |
+    'OPERATION_VALUE_OUT_OF_BOUNDS';
+
+  export interface Observer<T> {
+    object: T;
+    patches: Patch<any>[];
+    unobserve: () => void;
+    callback: (patches: Patch<any>[]) => void;
+  }
+
   var _objectKeys = function (obj) {
     if (_isArray(obj)) {
       var keys = new Array(obj.length);
@@ -267,7 +322,10 @@ module jsonpatch {
     }
   }
 
-  export function unobserve(root, observer) {
+  /**
+   * Detach an observer from an object
+   */
+  export function unobserve<T>(root: T, observer: Observer<T>) {
     observer.unobserve();
   }
 
@@ -284,7 +342,10 @@ module jsonpatch {
     }
   }
 
-  export function observe(obj: any, callback): any {
+  /**
+   * Observes changes made to an object, which can then be retieved using generate
+   */
+  export function observe<T>(obj: any, callback?: (patches: Patch<any>[]) => void): Observer<T> {
     var patches = [];
     var root = obj;
     var observer;
@@ -362,7 +423,10 @@ module jsonpatch {
     return observer;
   }
 
-  export function generate(observer) {
+  /**
+   * Generate an array of patches from an observer
+   */
+  export function generate<T>(observer: Observer<T>): Patch<any>[] {
     var mirror;
     for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
       if (beforeDict[i].obj === observer.object) {
@@ -390,8 +454,8 @@ module jsonpatch {
       return;
     }
 
-    if (typeof obj.toJSON === "function"){
-        obj = obj.toJSON();
+    if (typeof obj.toJSON === "function") {
+      obj = obj.toJSON();
     }
 
     var newKeys = _objectKeys(obj);
@@ -467,7 +531,7 @@ module jsonpatch {
    * the removed object (operations that remove things)
    * or just be undefined
    */
-  export function apply(tree: any, patches: any[], validate?: boolean): Array<any> {
+  export function apply(tree: any, patches: Patch<any>[], validate?: boolean): any[] {
     var results = []
       , p = 0
       , plen = patches.length
@@ -540,7 +604,10 @@ module jsonpatch {
     return results;
   }
 
-  export function compare(tree1: any, tree2: any): any[] {
+  /**
+   * Create an array of patches from the differences in two objects
+   */
+  export function compare(tree1: any, tree2: any): Patch<any>[] {
     var patches = [];
     _generate(tree1, tree2, patches, '');
     return patches;
@@ -555,7 +622,7 @@ module jsonpatch {
 
   export class JsonPatchError extends Error {
 
-    constructor(public message: string, public name: string, public index?: number, public operation?: any, public tree?: any) {
+    constructor(public message: string, public name: JsonPatchErrorName, public index?: number, public operation?: any, public tree?: any) {
       super(message);
     }
   }
@@ -568,7 +635,7 @@ module jsonpatch {
       return true;
     }
 
-    if (typeof obj == "array" || typeof obj == "object") {
+    if (typeof obj == "object") {
       for (var i in obj) {
         if (hasUndefined(obj[i])) {
           return true;
@@ -586,7 +653,7 @@ module jsonpatch {
    * @param {object} [tree] - object where the operation is supposed to be applied
    * @param {string} [existingPathFragment] - comes along with `tree`
    */
-  export function validator(operation: any, index: number, tree?: any, existingPathFragment?: string) {
+  export function validator(operation: Patch<any>, index: number, tree?: any, existingPathFragment?: string) {
     if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
       throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, tree);
     }
@@ -624,13 +691,13 @@ module jsonpatch {
           throw new JsonPatchError('Cannot perform an `add` operation at the desired path', 'OPERATION_PATH_CANNOT_ADD', index, operation, tree);
         }
       }
-      else if (operation.op === 'replace' || operation.op === 'remove' || operation.op === '_get') {
+      else if (operation.op === 'replace' || operation.op === 'remove' || (<any>operation.op) === '_get') {
         if (operation.path !== existingPathFragment) {
           throw new JsonPatchError('Cannot perform the operation at a path that does not exist', 'OPERATION_PATH_UNRESOLVABLE', index, operation, tree);
         }
       }
       else if (operation.op === 'move' || operation.op === 'copy') {
-        var existingValue = { op: "_get", path: operation.from, value: undefined };
+        var existingValue: any = { op: "_get", path: operation.from, value: undefined };
         var error = jsonpatch.validate([existingValue], tree);
         if (error && error.name === 'OPERATION_PATH_UNRESOLVABLE') {
           throw new JsonPatchError('Cannot perform the operation from a path that does not exist', 'OPERATION_FROM_UNRESOLVABLE', index, operation, tree);
@@ -646,7 +713,7 @@ module jsonpatch {
    * @param tree
    * @returns {JsonPatchError|undefined}
    */
-  export function validate(sequence: any[], tree?: any): JsonPatchError {
+  export function validate(sequence: Patch<any>[], tree?: any): JsonPatchError {
     try {
       if (!_isArray(sequence)) {
         throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
@@ -684,12 +751,11 @@ if (typeof exports !== "undefined") {
   exports.validator = jsonpatch.validator;
   exports.JsonPatchError = jsonpatch.JsonPatchError;
 }
-else
-{
-  var exports:any = {};
+else {
+  var exports: any = {};
   var isBrowser = true;
 }
-export default jsonpatch; 
+export default jsonpatch;
 
 /*
 When in browser, setting `exports = {}`
@@ -697,7 +763,6 @@ fools other modules into thinking they're
 running in a node environment, which breaks
 some of them. Here is super light wieght fix.
 */
-if(isBrowser)
-{
+if (isBrowser) {
   exports = undefined
 }
