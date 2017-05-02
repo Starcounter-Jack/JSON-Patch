@@ -308,13 +308,22 @@ module jsonpatch {
     if (obj === undefined) {
       return true;
     }
-    if (obj && (_isArray(obj) || typeof obj === "object")) {
-      var objKeys = _objectKeys(obj);
-      var objKeysLength = objKeys.length;
+    if (obj) {
+      if (_isArray(obj)) {
+        for (var i = 0, len = obj.length; i < len; i++) {
+          if (hasUndefined(obj[i])) {
+            return true;
+          }
+        }
+      }
+      else if (typeof obj === "object") {
+        var objKeys = _objectKeys(obj);
+        var objKeysLength = objKeys.length;
 
-      for (var i = 0; i < objKeysLength; i++) {
-        if (hasUndefined(obj[objKeys[i]])) {
-          return true;
+        for (var i = 0; i < objKeysLength; i++) {
+          if (hasUndefined(obj[objKeys[i]])) {
+            return true;
+          }
         }
       }
     }
