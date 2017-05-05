@@ -66,9 +66,9 @@ declare module jsonpatch {
     class JsonPatchError extends Error {
         message: string;
         name: JsonPatchErrorName;
-        index: number;
-        operation: any;
-        tree: any;
+        index?: number;
+        operation?: any;
+        tree?: any;
         constructor(message: string, name: JsonPatchErrorName, index?: number, operation?: any, tree?: any);
     }
     /**
