@@ -1,0 +1,24 @@
+{
+  "name": "fast-json-patch-demos",
+  "authors": [
+    "Omar Alshaker <omar@omaralshaker.com>"
+  ],
+  "description": "A playground for Starcounter-Jack/JSON-Patch",
+  "main": "index.html",
+  "keywords": [
+    "jsonpatch",
+    "fast-json-patch"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "juicy-jsoneditor": "^1.1.1"
+  }
+}

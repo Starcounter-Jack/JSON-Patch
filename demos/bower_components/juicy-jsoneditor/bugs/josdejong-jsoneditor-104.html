@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>josdejong/jsoneditor#104</title>
+    <link rel="stylesheet" href="http://juicy.github.io/juicy-tile-list/examples/github-markdown.css">
+
+    <!-- Importing Web Component's Polyfill -->
+    <script src="//cdn.jsdelivr.net/webcomponentsjs/0.6.0/webcomponents.min.js"></script>
+
+    <!-- Importing Custom Elements -->
+    <link rel="import" href="../juicy-jsoneditor.html"> 
+    <style>
+    body {
+	    font-family: sans-serif;
+	    min-width: 200px;
+	    width: 70%;
+	    margin: 0 auto;
+	    padding: 30px;
+      height: 100%;
+	}
+	juicy-jsoneditor{
+		height: 18em;
+	}
+	#demo{
+		display: flex;
+		justify-content: space-around;
+	}
+	#examples{
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: space-between;
+		align-content: center;
+		align-items: center;
+	}
+	#examples>section{
+		width: 21em;
+		margin: 0 2em;
+	}
+	iframe{
+		float: right;
+	}
+	</style>
+</head>
+<body>
+<a href="https://github.com/Juicy/juicy-jsoneditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+<article class="markdown-body">
+	        <iframe src="http://ghbtns.com/github-btn.html?user=juicy&repo=juicy-jsoneditor&type=watch&count=true&size=medium"
+	allowtransparency="true" frameborder="0" scrolling="0" width="90" height="30"></iframe>
+    <!-- Using Custom Elements -->
+    <template bind>
+  		<h1><a href="http://github.com/josdejong/jsoneditor/issues/104">josdejong/jsoneditor#104</a></h1>
+
+  		<p>
+  			Context menu is appended to <code>document.body</code>, but <code>JSONEditor</code> container is inside ShadowDOM together with applicable CSS.
+  		</p>
+    	<juicy-jsoneditor json="{{json}}"></juicy-jsoneditor>
+    </template>
+    <script type="text/javascript">
+	    document.addEventListener("polymer-ready", function(){
+	    	json = {
+			    'array': [1, 2, 3],
+			    'boolean': true,
+			    'null': null,
+			    'number': 123,
+			    'object': {'a': 'b', 'c': 'd'},
+			    'string': 'Hello World'
+        	};
+            document.querySelector("template").model = appModel = {json: json};
+            window.json = json;
+            console.info("Play with me! I'm the `json` given to all those editors", json);
+
+        });
+    </script>
+    </article>
+</body>
+</html>

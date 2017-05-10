@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>JSON-Patch Demo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="import" href="bower_components/juicy-jsoneditor/juicy-jsoneditor.html">
+    <!-- josdejong/jsoneditor#104 workaround-->
+    <link rel="stylesheet" type="text/css" href="bower_components/jsoneditor/jsoneditor.min.css">
+    <script src="../src/json-patch-duplex.js"></script>
+</head>
+
+<body>
+
+    <div id="brand">
+        <h1>JSON-Patch playground</h1>
+    </div>
+
+    <h3>Modify default patch or add more patches to manipulate object</h3>
+
+    <template is="dom-bind">
+        <article>
+            <section>
+                <h2>Tree</h2>
+                <juicy-jsoneditor mode='code' json="{{model.tree::jsonchange}}"></juicy-jsoneditor>
+            </section>
+            <section>
+                <h2>Patches</h2>
+                <juicy-jsoneditor id='patches' mode='code' json="{{model.patches::jsonchange}}"></juicy-jsoneditor>
+            </section>
+        </article>
+        <div>
+            <button id="resetBtn">Reset</button>
+        </div>
+        <script>
+            var doc =  (document._currentScript || document.currentScript).ownerDocument;
+            var tree = {
+                "firstName": "John",
+                "lastName": "Smith",
+                "age": 25,
+                "address":
+                {
+                    "streetAddress": "21 2nd Street",
+                    "city": "New York",
+                    "state": "NY",
+                    "postalCode": "10021"
+                },
+                "phoneNumber":
+                [
+                    {
+                        "type": "home",
+                        "number": "212 555-1234"
+                    },
+                    {
+                        "type": "fax",
+                        "number": "646 555-4567"
+                    }
+                ]
+            };
+            var treeBackup = Object.assign({}, tree);
+            var patches = [{
+                op: 'replace',
+                path: '/age',
+                value: 40
+            }];
+            var output = {};
+            jsonpatch.apply(tree, patches);
+            var appModel = { tree, patches };
+            document.querySelector("template").model = appModel;
+            doc.querySelector("#patches").addEventListener('change', function () {
+                setTimeout(() => {
+                    jsonpatch.apply(tree, patches);    
+                }, 50);                            
+            });
+            doc.querySelector("#resetBtn").addEventListener('click', function () {
+                for(let key in tree) {
+                    delete tree[key];
+                }
+                Object.assign(tree, treeBackup);                           
+            });
+            
+        </script>
+    </template>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+{
+  "name": "fast-json-patch",
+  "version": "1.0.1",
+  "homepage": "https://github.com/Starcounter-Jack/JSON-Patch",
+  "description": "Fast implementation of JSON-Patch (RFC-6902) with duplex (observe changes) capabilities",
+  "main": "src/json-patch-duplex.js",
+  "keywords": [
+    "json",
+    "patch",
+    "http",
+    "rest"
+  ],
+  "license": "MIT",
+  "ignore": [
+    ".npmignore",
+    ".gitignore",
+    "test",
+    ".travis.yml",
+    "gruntfile.js",
+    "node_modules",
+    "package.json"
+  ],
+  "_release": "1.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.1",
+    "commit": "4cb41971c3d8af011cdda924e246e3dc2e2eab64"
+  },
+  "_source": "https://github.com/Starcounter-Jack/JSON-Patch.git",
+  "_target": "~1.0.0",
+  "_originalSource": "fast-json-patch"
+}

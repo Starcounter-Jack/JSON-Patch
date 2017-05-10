@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:300');
+body {
+    font-family: 'Roboto Condensed', sans-serif;
+    padding: 20px;
+    background: rgb(255,255,255);
+    background: -moz-radial-gradient(center, ellipse cover, rgba(255,255,255,1) 0%, rgba(237,237,237,1) 100%);
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(255,255,255,1) 0%,rgba(237,237,237,1) 100%);
+    background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%,rgba(237,237,237,1) 100%);
+    font-size: 1.2em;
+    box-sizing: border-box
+}
+juicy-jsoneditor {
+    height: 300px;
+}
+article {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.float {
+    float: left
+}
+
+section {
+    flex: 1;
+    margin-right: 20px;
+    height: 100%;
+}
+
+label {
+    margin-top: 1em;
+}

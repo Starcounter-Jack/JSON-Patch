@@ -1,0 +1,174 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>&lt;juicy-jsoneditor&gt;</title>
+    <link rel="stylesheet" href="http://juicy.github.io/juicy-tile-list/examples/github-markdown.css">
+
+    <!-- Importing Web Component's Polyfill -->
+    <script src="//cdn.jsdelivr.net/webcomponentsjs/0.6.0/webcomponents.min.js"></script>
+
+    <!-- Importing Custom Elements -->
+    <link rel="import" href="juicy-jsoneditor.html">
+
+    <style>
+        body {
+            font-family: sans-serif;
+            min-width: 200px;
+            width: 70%;
+            margin: 0 auto;
+            padding: 30px;
+            height: 100%;
+        }
+
+        juicy-jsoneditor {
+            height: 18em;
+        }
+
+        #demo {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        #examples {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-between;
+            align-content: center;
+            align-items: center;
+        }
+
+        #examples > section {
+            width: 28em;
+            margin: 0 2em 3em 2em;
+        }
+
+        #examples > section h3 {
+            margin-bottom: 5px;
+        }
+
+        #examples section .markdown-body .code {
+            line-height: 1.5;
+            padding-bottom: 10px;
+        }
+
+        iframe {
+            float: right;
+        }
+
+        div.juicy-jsoneditor {
+            margin: 20px 0px;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/Juicy/juicy-jsoneditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+    <article>
+        <iframe src="http://ghbtns.com/github-btn.html?user=juicy&repo=juicy-jsoneditor&type=watch&count=true&size=medium"
+                allowtransparency="true" frameborder="0" scrolling="0" width="90" height="30"></iframe>
+        <!-- Using Custom Elements -->
+        <template is="dom-bind">
+            <div class="markdown-body">
+                <h1>&lt;juicy-jsoneditor&gt;</h1>
+                <p>
+                    Polymer Element that wraps <a href="https://github.com/josdejong/jsoneditor">josdejong/jsoneditor</a>
+                </p>
+                <p>
+                    Play with <code>json</code> variable in your console, to experience two-way binding with <code>&lt;juicy-jsoneditor&gt;</code>.
+                </p>
+                <p>
+                    Please note, that <code>.json</code> itself does not have deep two-way binding, as <a href="https://github.com/josdejong/jsoneditor">josdejong/jsoneditor</a> does not notify on changes, just replaces entire object, so we mock it only on root level.
+                </p>
+            </div>
+            <div class="juicy-jsoneditor">
+                <juicy-jsoneditor json="{{model.json::jsonchange}}"></juicy-jsoneditor>
+            </div>
+            <div class="markdown-body">
+                <h2>Examples</h2>
+            </div>
+            <section id="examples">
+                <section>
+                    <div class="markdown-body">
+                        <h3>With <code>name</code> attribute</h3>
+                        <div class="code">
+                            <code>&lt;juicy-jsoneditor json="{&zwj;{json::change}}" name="MyName"&gt;&lt;/juicy-jsoneditor&gt;</code>
+                        </div>
+                    </div>
+                    <juicy-jsoneditor json="{{model.json::jsonchange}}" name="MyName"></juicy-jsoneditor>
+                </section>
+                <section>
+                    <div class="markdown-body">
+                        <h3>With <code>modes</code> attribute</h3>
+                        <div class="code">
+                            <code>&lt;juicy-jsoneditor json="{&zwj;{json::change}}" modes="['code', 'form', 'text', 'tree', 'view']"&gt;&lt;/juicy-jsoneditor&gt;</code>
+                        </div>
+                    </div>
+                    <juicy-jsoneditor json="{{model.json::change}}" modes='["code", "form", "text", "tree", "view"]'></juicy-jsoneditor>
+                </section>
+                <section>
+                    <div class="markdown-body">
+                        <h3>With <code>search</code> attribute set to <code>false</code></h3>
+                        <div class="code">
+                            <code>&lt;juicy-jsoneditor json="{&zwj;{json::change}}" search="false"&gt;&lt;/juicy-jsoneditor&gt;</code>
+                        </div>
+                    </div>
+                    <juicy-jsoneditor json="{{model.json::change}}" search="false"></juicy-jsoneditor>
+                </section>
+
+
+                <section>
+                    <div class="markdown-body">
+                        <h3>With <code>mode</code> attribute</h3>
+                        <div class="code">
+                            <code>&lt;juicy-jsoneditor json="{&zwj;{json::change}}" mode="text"&gt;&lt;/juicy-jsoneditor&gt;</code>
+                        </div>
+                    </div>
+                    <juicy-jsoneditor json="{{model.json::change}}" mode="text"></juicy-jsoneditor>
+                </section>
+                <section>
+                    <div class="markdown-body">
+                        <h3>With <code>indentation</code> attribute</h3>
+                        <div class="code">
+                            <code>&lt;juicy-jsoneditor json="{&zwj;{json::change}}" mode="text" indentation="4"&gt;&lt;/juicy-jsoneditor&gt;</code>
+                        </div>
+                    </div>
+                    <juicy-jsoneditor json="{{model.json::change}}" mode="text" indentation="4"></juicy-jsoneditor>
+                </section>
+                <section>
+                    <div class="markdown-body">
+                        <h3>In <code>code</code> mode without any <code>json</code> content</h3>
+                        <div class="code">
+                            <code>&lt;juicy-jsoneditor mode="code"&gt;&lt;/juicy-jsoneditor&gt;</code>
+                        </div>
+                    </div>
+                    <juicy-jsoneditor mode="code"></juicy-jsoneditor>
+                </section>
+                <section>
+                    <div class="markdown-body">
+                        <h3>In <code>tree</code> mode without any <code>json</code> content</h3>
+                        <div class="code">
+                            <code>&lt;juicy-jsoneditor mode="tree"&gt;&lt;/juicy-jsoneditor&gt;</code>
+                        </div>
+                    </div>
+                    <juicy-jsoneditor mode="tree"></juicy-jsoneditor>
+                </section>
+            </section>
+        </template>
+        <script type="text/javascript">
+            var json = {
+                'array': [1, 2, 3],
+                'boolean': true,
+                'null': null,
+                'number': 123,
+                'object': { 'a': 'b', 'c': 'd' },
+                'string': 'Hello World'
+            };
+            var appModel = {json: json};
+
+            document.querySelector("template").model = appModel;
+            window.json = json;
+            console.info("Play with me! I'm the `json` given to all those editors", json);
+        </script>
+    </article>
+</body>
+</html>
