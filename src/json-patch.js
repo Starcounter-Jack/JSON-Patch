@@ -190,6 +190,62 @@ var jsonpatch;
         return true;
     }
     /**
+       * Apply a single json-patch on an object tree
+       * Returns the result object.
+       */
+    function applyPatch(tree, patch, validate) {
+        if (validate === void 0) { validate = false; }
+        if (validate && typeof tree !== 'object') {
+            throw new TypeError('Tree has to be an object');
+        }
+        // on root
+        if (patch.path === "") {
+            if (patch.op === 'add' || patch.op === 'replace') {
+                // a primitive value, just return it
+                if (typeof patch.value !== 'object') {
+                    return patch.value;
+                }
+                else if (typeof patch.value === 'object') {
+                    // conflicting types [] vs {} just return the new value
+                    if (_isArray(tree) !== _isArray(patch.value)) {
+                        return patch.value;
+                    }
+                    else {
+                        apply(tree, [patch], validate);
+                        return tree;
+                    }
+                }
+            }
+            else if (patch.op === 'move' || patch.op === 'copy') {
+                // get the value by json-pointer in `from` field
+                var temp = { op: "_get", path: patch.from };
+                apply(tree, [temp]);
+                // to cover conflicting types and primitive values 
+                var newTree = applyPatch(tree, { op: 'replace', path: '', value: temp.value });
+                return newTree;
+            }
+            else {
+                if (patch.op === 'test') {
+                    return _equals(tree, patch.value);
+                }
+                else {
+                    return null;
+                }
+            }
+        }
+        else {
+            if (patch.op === 'test') {
+                var results = apply(tree, [patch], validate);
+                return results[0];
+            }
+            else {
+                apply(tree, [patch], validate);
+                return tree;
+            }
+        }
+    }
+    jsonpatch.applyPatch = applyPatch;
+    /**
      * Apply a json-patch operation on an object tree
      * Returns an array of results of operations.
      * Each element can either be a boolean (if op == 'test') or
@@ -399,6 +455,7 @@ var jsonpatch;
 if (typeof exports !== "undefined") {
     exports.apply = jsonpatch.apply;
     exports.validate = jsonpatch.validate;
+    exports.applyPatch = jsonpatch.applyPatch;
     exports.validator = jsonpatch.validator;
     exports.JsonPatchError = jsonpatch.JsonPatchError;
 }

@@ -524,6 +524,58 @@ module jsonpatch {
     return true;
   }
 
+  
+  /**
+   * Apply a single json-patch on an object tree
+   * Returns the result object.
+   */
+  export function applyPatch(tree: any, patch: any, validate = false): any {
+    if (validate && typeof tree !== 'object') {
+      throw new TypeError('Tree has to be an object');
+    }
+    // on root
+    if (patch.path === "") {
+      if (patch.op === 'add' || patch.op === 'replace') {// same for add or replace 
+        // a primitive value, just return it
+        if (typeof patch.value !== 'object') {
+          return patch.value;
+        } else if (typeof patch.value === 'object') {
+          // conflicting types [] vs {} just return the new value
+          if (_isArray(tree) !== _isArray(patch.value)) {
+            return patch.value;
+            //same type, use original apply
+          } else {
+            apply(tree, [patch], validate);
+            return tree;
+          }
+        }
+      } else if (patch.op === 'move' || patch.op === 'copy') { // it's a move or copy to root
+        // get the value by json-pointer in `from` field
+        var temp: any = { op: "_get", path: patch.from };
+        apply(tree, [temp]);
+        // to cover conflicting types and primitive values 
+        var newTree = applyPatch(tree, { op: 'replace', path: '', value: temp.value })
+        return newTree;
+      } else { // it's a remove or test on root
+        if (patch.op === 'test') {
+          return _equals(tree, patch.value);
+        } else { // a remove on root
+          return null;
+        }
+      }
+    } else {  // test operation (even if not on root) needs to return a boolean
+      if (patch.op === 'test') {
+        var results = apply(tree, [patch], validate);
+        return results[0];
+      }
+      else { // just use original apply and return
+        apply(tree, [patch], validate);
+        return tree;
+      }
+
+    }
+  }
+  
   /**
    * Apply a json-patch operation on an object tree
    * Returns an array of results of operations.
@@ -752,6 +804,7 @@ declare var exports;
 
 if (typeof exports !== "undefined") {
   exports.apply = jsonpatch.apply;
+  exports.applyPatch = jsonpatch.applyPatch;
   exports.observe = jsonpatch.observe;
   exports.unobserve = jsonpatch.unobserve;
   exports.generate = jsonpatch.generate;

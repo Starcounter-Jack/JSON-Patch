@@ -52,6 +52,11 @@ declare module jsonpatch {
      */
     function generate<T>(observer: Observer<T>): Patch<any>[];
     /**
+     * Apply a single json-patch on an object tree
+     * Returns the result object.
+     */
+    function applyPatch(tree: any, patch: any, validate?: boolean): any;
+    /**
      * Apply a json-patch operation on an object tree
      * Returns an array of results of operations.
      * Each element can either be a boolean (if op == 'test') or

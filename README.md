@@ -83,7 +83,7 @@ var jsonpatch = require('fast-json-patch')
 
 ## Usage
 
-Applying patches:
+#### Applying patches:
 
 ```js
 var myobj = { firstName:"Albert", contactDetails: { phoneNumbers: [ ] } };
@@ -95,6 +95,24 @@ var patches = [
 jsonpatch.apply( myobj, patches );
 // myobj == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
 ```
+
+#### Applying patches on root:
+
+Applying patches on root is a little tricky, for that you can't replace your root object with an object of a different type in place (eg. can't replace `{item: "item 1"}` with `[{item: "item 1"}]`) on the root level, because the original document is an object `{}` and the new value is an array `[]`, nor can you do the opposite (`[] => {}`), obviously. See https://github.com/Starcounter-Jack/JSON-Patch/issues/147.
+
+However, you can use `applyPatch` method to over come this issue, because it returns the result object, and this allows it to change types.
+
+Example:
+
+```js
+var myobj = { firstName:"Albert", contactDetails: { phoneNumbers: [ ] } };
+var patch = {op:"replace", path:'', value: [{item: "item 1"}] };
+var newObj = jsonpatch.applyPatch( myobj, patch );
+// newObj == [{item: "item 1"}]
+```
+`applyPatch` accepts a single patch instead of a sequence, and returns the object after applying your patch. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
+
+
 Generating patches:
 
 ```js
@@ -154,6 +172,14 @@ Returns an array of results - one item for each item in `patches`. The type of e
 * `test` - boolean result of the test
 * `remove`, `replace` and `move` - original object that has been removed
 * `add` (only when adding to an array) - index at which item has been inserted (useful when using `-` alias)
+
+#### jsonpatch.applyPatch (`obj` Object, `patch` Patch, `validate` Boolean) : boolean
+
+Available in *json-patch.js* and *json-patch-duplex.js*
+
+Applies a single `patch` on `obj`.
+
+Returns the modified object.
 
 #### jsonpatch.observe (`obj` Object, `callback` Function (optional)) : `observer` Object
 
