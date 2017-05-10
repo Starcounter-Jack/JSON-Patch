@@ -57,7 +57,8 @@ module jsonpatch {
     'OPERATION_PATH_UNRESOLVABLE' |
     'OPERATION_FROM_UNRESOLVABLE' |
     'OPERATION_PATH_ILLEGAL_ARRAY_INDEX' |
-    'OPERATION_VALUE_OUT_OF_BOUNDS';
+    'OPERATION_VALUE_OUT_OF_BOUNDS' |
+    'TEST_OPERATION_FAILED';
 
   export interface Observer<T> {
     object: T;
@@ -526,20 +527,22 @@ module jsonpatch {
 
   
   /**
-   * Apply a single json-patch on an object tree
-   * Returns the result object.
-   */
-  export function applyPatch(tree: any, patch: any, validate = false): any {
-    if (validate && typeof tree !== 'object') {
-      throw new TypeError('Tree has to be an object');
+     * Apply a single json-patch on an object tree
+     * Returns the result object.
+     */
+  export function applyPatch<T>(tree: T, patch: Patch<any>): T;
+  export function applyPatch<T>(tree: T, patch: Patch<any>, validate: boolean): T;
+  export function applyPatch<T>(tree: T, patch: Patch<any>, validate = false): T {
+    if (typeof validate !== 'boolean') {
+      validate = false;
     }
     // on root
     if (patch.path === "") {
       if (patch.op === 'add' || patch.op === 'replace') {// same for add or replace 
         // a primitive value, just return it
-        if (typeof patch.value !== 'object') {
+        if (typeof patch.value !== 'object' || patch.value === null) {
           return patch.value;
-        } else if (typeof patch.value === 'object') {
+        } else {
           // conflicting types [] vs {} just return the new value
           if (_isArray(tree) !== _isArray(patch.value)) {
             return patch.value;
@@ -551,22 +554,36 @@ module jsonpatch {
         }
       } else if (patch.op === 'move' || patch.op === 'copy') { // it's a move or copy to root
         // get the value by json-pointer in `from` field
-        var temp: any = { op: "_get", path: patch.from };
+        const temp: any = { op: "_get", path: patch.from };
         apply(tree, [temp]);
         // to cover conflicting types and primitive values 
-        var newTree = applyPatch(tree, { op: 'replace', path: '', value: temp.value })
+        const newTree = applyPatch(tree, { op: 'replace', path: '', value: temp.value })
         return newTree;
       } else { // it's a remove or test on root
         if (patch.op === 'test') {
-          return _equals(tree, patch.value);
-        } else { // a remove on root
+          if(_equals(tree, patch.value)) {
+            return tree;
+          } else {
+            throw new JsonPatchError('Test operation failed', 'TEST_OPERATION_FAILED', 0, patch, tree);
+          }
+        } else if(patch.op === 'remove')  { // a remove on root
           return null;
+        } else { /* bad operation */
+          if(validate) {
+              throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, patch, tree);
+          } else {
+            return tree;
+          }
         }
       }
     } else {  // test operation (even if not on root) needs to return a boolean
       if (patch.op === 'test') {
-        var results = apply(tree, [patch], validate);
-        return results[0];
+        const results = apply(tree, [patch], validate);
+        if(results[0]) {
+          return tree;
+        } else {
+          throw new JsonPatchError('Test operation failed', 'TEST_OPERATION_FAILED', 0, patch, tree);
+        }
       }
       else { // just use original apply and return
         apply(tree, [patch], validate);

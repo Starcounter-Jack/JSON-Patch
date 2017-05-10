@@ -32,7 +32,7 @@ declare module jsonpatch {
         op: 'test';
         value: T;
     }
-    type JsonPatchErrorName = 'SEQUENCE_NOT_AN_ARRAY' | 'OPERATION_NOT_AN_OBJECT' | 'OPERATION_OP_INVALID' | 'OPERATION_PATH_INVALID' | 'OPERATION_FROM_REQUIRED' | 'OPERATION_VALUE_REQUIRED' | 'OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED' | 'OPERATION_PATH_CANNOT_ADD' | 'OPERATION_PATH_UNRESOLVABLE' | 'OPERATION_FROM_UNRESOLVABLE' | 'OPERATION_PATH_ILLEGAL_ARRAY_INDEX' | 'OPERATION_VALUE_OUT_OF_BOUNDS';
+    type JsonPatchErrorName = 'SEQUENCE_NOT_AN_ARRAY' | 'OPERATION_NOT_AN_OBJECT' | 'OPERATION_OP_INVALID' | 'OPERATION_PATH_INVALID' | 'OPERATION_FROM_REQUIRED' | 'OPERATION_VALUE_REQUIRED' | 'OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED' | 'OPERATION_PATH_CANNOT_ADD' | 'OPERATION_PATH_UNRESOLVABLE' | 'OPERATION_FROM_UNRESOLVABLE' | 'OPERATION_PATH_ILLEGAL_ARRAY_INDEX' | 'OPERATION_VALUE_OUT_OF_BOUNDS' | 'TEST_OPERATION_FAILED';
     interface Observer<T> {
         object: T;
         patches: Patch<any>[];
@@ -52,10 +52,11 @@ declare module jsonpatch {
      */
     function generate<T>(observer: Observer<T>): Patch<any>[];
     /**
-     * Apply a single json-patch on an object tree
-     * Returns the result object.
-     */
-    function applyPatch(tree: any, patch: any, validate?: boolean): any;
+       * Apply a single json-patch on an object tree
+       * Returns the result object.
+       */
+    function applyPatch<T>(tree: T, patch: Patch<any>): T;
+    function applyPatch<T>(tree: T, patch: Patch<any>, validate: boolean): T;
     /**
      * Apply a json-patch operation on an object tree
      * Returns an array of results of operations.

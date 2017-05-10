@@ -112,6 +112,20 @@ var newObj = jsonpatch.applyPatch( myobj, patch );
 ```
 `applyPatch` accepts a single patch instead of a sequence, and returns the object after applying your patch. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
 
+#### Using `applyPatch` with `reduce`
+
+If you have an array of patches, you can simple reduce them using `applyPatch` as your reducer:
+
+```js
+var myobj = { firstName:"Albert", contactDetails: { phoneNumbers: [ ] } };
+var patches = [
+   {op:"replace", path:"/firstName", value:"Joachim" },
+   {op:"add", path:"/lastName", value:"Wester" },
+   {op:"add", path:"/contactDetails/phoneNumbers/0", value:{ number:"555-123" }  }
+   ];
+var newObj = patches.reduce( applyPatch, myobj );
+// newObj == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
+```
 
 Generating patches:
 
@@ -127,6 +141,7 @@ var patches = jsonpatch.generate(observer);
 //   { op:"replace", path="/contactDetails/phoneNumbers/0/number", value:"123"},
 //   { op:"add", path="/contactDetails/phoneNumbers/1", value:{number:"456"}}];
 ```
+
 Comparing two object trees:
 
 ```js

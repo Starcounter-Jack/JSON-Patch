@@ -388,29 +388,29 @@ describe('root replacement with applyPatch', function () {
                     "hello": "world"
                 }
             });
-            expect(result).toEqual(true);
+            expect(result).toEqual(obj);
         });
         it('should `test` against root (on a json document of type object) - and return false', function () {
             var obj = {
                 "hello": "world"
             };
-            var result = jsonpatch.applyPatch(obj, {
+            expect(()=> jsonpatch.applyPatch(obj, {
                 "op": "test",
                 "path": "",
                 "value": 1
-            });
-            expect(result).toEqual(false);
+            })).toThrow();
+
         });
         it('should `test` against root (on a json document of type array) - and return false', function () {
             var obj = [{
                 "hello": "world"
             }];
-            var result = jsonpatch.applyPatch(obj, {
+           
+            expect(()=> jsonpatch.applyPatch(obj, {
                 "op": "test",
                 "path": "",
                 "value": 1
-            });
-            expect(result).toEqual(false);
+            })).toThrow();
         });
     });
 })
@@ -615,12 +615,12 @@ describe("core - using applyPatch", function() {
             value: {
                 bar: [1, 2, 5, 4]
             }
-        })).toBe(true);
-        expect(jsonpatch.applyPatch(obj, {
+        })).toEqual(obj);
+        expect(() => jsonpatch.applyPatch(obj, {
             op: 'test',
             path: '/foo',
             value: [1, 2]
-        })).toBe(false);
+        })).toThrow();
         expect(jsonpatch.applyPatch(obj, {
             op: 'test',
             path: '/bar',
@@ -630,38 +630,38 @@ describe("core - using applyPatch", function() {
                 c: null,
                 a: 'a'
             }
-        })).toBe(true);
+        })).toEqual(obj);
         expect(jsonpatch.applyPatch(obj, {
             op: 'test',
             path: '/bar',
             value: obj.bar
-        })).toBe(true);
+        })).toEqual(obj);
         expect(jsonpatch.applyPatch(obj, {
             op: 'test',
             path: '/bar/a',
             value: 'a'
-        })).toBe(true);
+        })).toEqual(obj);
         expect(jsonpatch.applyPatch(obj, {
             op: 'test',
             path: '/bar/b',
             value: 42
-        })).toBe(true);
+        })).toEqual(obj);
         expect(jsonpatch.applyPatch(obj, {
             op: 'test',
             path: '/bar/c',
             value: null
-        })).toBe(true);
+        })).toEqual(obj);
         expect(jsonpatch.applyPatch(obj, {
             op: 'test',
             path: '/bar/d',
             value: true
-        })).toBe(true);
-        expect(jsonpatch.applyPatch(obj, {
+        })).toEqual(obj);
+        expect(() => jsonpatch.applyPatch(obj, {
             op: 'test',
             path: '/bar/d',
             value: false
-        })).toBe(false);
-        expect(jsonpatch.applyPatch(obj, {
+        })).toThrow();
+        expect(() => jsonpatch.applyPatch(obj, {
             op: 'test',
             path: '/bar',
             value: {
@@ -671,7 +671,7 @@ describe("core - using applyPatch", function() {
                 a: 'a',
                 foo: 'bar'
             }
-        })).toBe(false);
+        })).toThrow();
     });
 
 
@@ -685,12 +685,12 @@ describe("core - using applyPatch", function() {
             value: {
                 "hello": "world"
             }
-        })).toBe(true);
-        expect(jsonpatch.applyPatch(obj, {
+        })).toEqual(obj);
+        expect(() => jsonpatch.applyPatch(obj, {
             op: 'test',
             path: '',
             value: 1
-        })).toBe(false);
+        })).toThrow();
     });
 
 

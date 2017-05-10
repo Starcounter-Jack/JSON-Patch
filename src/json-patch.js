@@ -189,23 +189,19 @@ var jsonpatch;
         }
         return true;
     }
-    /**
-       * Apply a single json-patch on an object tree
-       * Returns the result object.
-       */
     function applyPatch(tree, patch, validate) {
         if (validate === void 0) { validate = false; }
-        if (validate && typeof tree !== 'object') {
-            throw new TypeError('Tree has to be an object');
+        if (typeof validate !== 'boolean') {
+            validate = false;
         }
         // on root
         if (patch.path === "") {
             if (patch.op === 'add' || patch.op === 'replace') {
                 // a primitive value, just return it
-                if (typeof patch.value !== 'object') {
+                if (typeof patch.value !== 'object' || patch.value === null) {
                     return patch.value;
                 }
-                else if (typeof patch.value === 'object') {
+                else {
                     // conflicting types [] vs {} just return the new value
                     if (_isArray(tree) !== _isArray(patch.value)) {
                         return patch.value;
@@ -226,17 +222,35 @@ var jsonpatch;
             }
             else {
                 if (patch.op === 'test') {
-                    return _equals(tree, patch.value);
+                    if (_equals(tree, patch.value)) {
+                        return tree;
+                    }
+                    else {
+                        throw new JsonPatchError('Test operation failed', 'TEST_OPERATION_FAILED', 0, patch, tree);
+                    }
+                }
+                else if (patch.op === 'remove') {
+                    return null;
                 }
                 else {
-                    return null;
+                    if (validate) {
+                        throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, patch, tree);
+                    }
+                    else {
+                        return tree;
+                    }
                 }
             }
         }
         else {
             if (patch.op === 'test') {
                 var results = apply(tree, [patch], validate);
-                return results[0];
+                if (results[0]) {
+                    return tree;
+                }
+                else {
+                    throw new JsonPatchError('Test operation failed', 'TEST_OPERATION_FAILED', 0, patch, tree);
+                }
             }
             else {
                 apply(tree, [patch], validate);
