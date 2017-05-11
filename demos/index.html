@@ -59,7 +59,7 @@
                     }
                 ]
             };
-            var treeBackup = Object.assign({}, tree);
+            var treeBackup = JSON.parse(JSON.stringify(tree));
             var patches = [{
                 op: 'replace',
                 path: '/age',
