@@ -110,7 +110,7 @@ var patch = {op:"replace", path:'', value: [{item: "item 1"}] };
 var newObj = jsonpatch.applyPatch( myobj, patch );
 // newObj == [{item: "item 1"}]
 ```
-`applyPatch` accepts a single patch instead of a sequence, and returns the object after applying your patch. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
+`applyPatch` accepts a single operation object instead of a sequence, and returns the object after applying it. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
 
 #### Using `applyPatch` with `reduce`
 
@@ -192,7 +192,7 @@ Returns an array of results - one item for each item in `patches`. The type of e
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
-Applies a single `patch` on `obj`.
+Applies single operation object `patch` on `obj`.
 
 Returns the modified object.
 

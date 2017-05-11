@@ -56,7 +56,7 @@ declare module jsonpatch {
        * Returns the result object.
        */
     function applyPatch<T>(tree: T, patch: Patch<any>): T;
-    function applyPatch<T>(tree: T, patch: Patch<any>, validate: boolean): T;
+    function applyPatch<T>(tree: T, patch: Patch<any>, validate: boolean, touchOriginalTree: boolean): T;
     /**
      * Apply a json-patch operation on an object tree
      * Returns an array of results of operations.

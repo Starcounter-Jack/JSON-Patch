@@ -531,34 +531,21 @@ module jsonpatch {
      * Returns the result object.
      */
   export function applyPatch<T>(tree: T, patch: Patch<any>): T;
-  export function applyPatch<T>(tree: T, patch: Patch<any>, validate: boolean): T;
-  export function applyPatch<T>(tree: T, patch: Patch<any>, validate = false): T {
-    if (typeof validate !== 'boolean') {
+  export function applyPatch<T>(tree: T, patch: Patch<any>, validate: boolean, touchOriginalTree: boolean): T;
+  export function applyPatch<T>(tree: T, patch: Patch<any>, validate = false, touchOriginalTree = true): T {
+    if (typeof validate !== 'boolean') { // if validate is not a boolean, it's being called from `reduce`
       validate = false;
+      touchOriginalTree = true;
     }
     // on root
     if (patch.path === "") {
       if (patch.op === 'add' || patch.op === 'replace') {// same for add or replace 
-        // a primitive value, just return it
-        if (typeof patch.value !== 'object' || patch.value === null) {
-          return patch.value;
-        } else {
-          // conflicting types [] vs {} just return the new value
-          if (_isArray(tree) !== _isArray(patch.value)) {
-            return patch.value;
-            //same type, use original apply
-          } else {
-            apply(tree, [patch], validate);
-            return tree;
-          }
-        }
+        return patch.value;
       } else if (patch.op === 'move' || patch.op === 'copy') { // it's a move or copy to root
         // get the value by json-pointer in `from` field
         const temp: any = { op: "_get", path: patch.from };
         apply(tree, [temp]);
-        // to cover conflicting types and primitive values 
-        const newTree = applyPatch(tree, { op: 'replace', path: '', value: temp.value })
-        return newTree;
+        return temp.value;
       } else { // it's a remove or test on root
         if (patch.op === 'test') {
           if(_equals(tree, patch.value)) {
@@ -576,7 +563,7 @@ module jsonpatch {
           }
         }
       }
-    } else {  // test operation (even if not on root) needs to return a boolean
+    } else {  // test operation 
       if (patch.op === 'test') {
         const results = apply(tree, [patch], validate);
         if(results[0]) {
@@ -585,11 +572,15 @@ module jsonpatch {
           throw new JsonPatchError('Test operation failed', 'TEST_OPERATION_FAILED', 0, patch, tree);
         }
       }
-      else { // just use original apply and return
-        apply(tree, [patch], validate);
-        return tree;
+      else {
+        if(typeof tree === 'object' && tree !== null) {          
+          !touchOriginalTree && (tree = deepClone(tree)); // keep the original tree untouched
+          apply(tree, [patch], validate);
+          return tree;
+        } else { // tree is a primitive or null;
+          return tree;
+        }       
       }
-
     }
   }
   

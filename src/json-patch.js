@@ -55,6 +55,16 @@ var jsonpatch;
                 return false;
         }
     }
+    function deepClone(obj) {
+        switch (typeof obj) {
+            case "object":
+                return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+            case "undefined":
+                return null; //this is how JSON.stringify behaves for array items
+            default:
+                return obj; //no need to clone primitives
+        }
+    }
     /* We use a Javascript hash to store each
      function. Each hash entry (property) uses
      the operation identifiers specified in rfc6902.
@@ -189,36 +199,23 @@ var jsonpatch;
         }
         return true;
     }
-    function applyPatch(tree, patch, validate) {
+    function applyPatch(tree, patch, validate, touchOriginalTree) {
         if (validate === void 0) { validate = false; }
+        if (touchOriginalTree === void 0) { touchOriginalTree = true; }
         if (typeof validate !== 'boolean') {
             validate = false;
+            touchOriginalTree = true;
         }
         // on root
         if (patch.path === "") {
             if (patch.op === 'add' || patch.op === 'replace') {
-                // a primitive value, just return it
-                if (typeof patch.value !== 'object' || patch.value === null) {
-                    return patch.value;
-                }
-                else {
-                    // conflicting types [] vs {} just return the new value
-                    if (_isArray(tree) !== _isArray(patch.value)) {
-                        return patch.value;
-                    }
-                    else {
-                        apply(tree, [patch], validate);
-                        return tree;
-                    }
-                }
+                return patch.value;
             }
             else if (patch.op === 'move' || patch.op === 'copy') {
                 // get the value by json-pointer in `from` field
                 var temp = { op: "_get", path: patch.from };
                 apply(tree, [temp]);
-                // to cover conflicting types and primitive values 
-                var newTree = applyPatch(tree, { op: 'replace', path: '', value: temp.value });
-                return newTree;
+                return temp.value;
             }
             else {
                 if (patch.op === 'test') {
@@ -253,8 +250,14 @@ var jsonpatch;
                 }
             }
             else {
-                apply(tree, [patch], validate);
-                return tree;
+                if (typeof tree === 'object' && tree !== null) {
+                    !touchOriginalTree && (tree = deepClone(tree)); // keep the original tree untouched
+                    apply(tree, [patch], validate);
+                    return tree;
+                }
+                else {
+                    return tree;
+                }
             }
         }
     }
