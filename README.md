@@ -86,68 +86,69 @@ var jsonpatch = require('fast-json-patch')
 #### Applying patches:
 
 ```js
-var myobj = { firstName:"Albert", contactDetails: { phoneNumbers: [ ] } };
-var patches = [
-   {op:"replace", path:"/firstName", value:"Joachim" },
-   {op:"add", path:"/lastName", value:"Wester" },
-   {op:"add", path:"/contactDetails/phoneNumbers/0", value:{ number:"555-123" }  }
-   ];
-jsonpatch.apply( myobj, patches );
-// myobj == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
+var document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
+var patch = [
+  { op: "replace", path: "/firstName", value: "Joachim" },
+  { op: "add", path: "/lastName", value: "Wester" },
+  { op: "add", path: "/contactDetails/phoneNumbers/0", value: { number: "555-123" }  }
+];
+jsonpatch.apply(document, patch);
+// document == { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [{number:"555-123"}] } };
 ```
 
-#### Applying patches on root:
+#### Applying operations on root:
 
-Applying patches on root is a little tricky, for that you can't replace your root object with an object of a different type in place (eg. can't replace `{item: "item 1"}` with `[{item: "item 1"}]`) on the root level, because the original document is an object `{}` and the new value is an array `[]`, nor can you do the opposite (`[] => {}`), obviously. See https://github.com/Starcounter-Jack/JSON-Patch/issues/147.
+Applying operations on root is a little tricky, for that you can't replace your root object with an object of a different type in place (eg. can't replace `{item: "item 1"}` with `[{item: "item 1"}]`) on the root level, because the original document is an object `{}` and the new value is an array `[]`, nor can you do the opposite (`[] => {}`), obviously. See https://github.com/Starcounter-Jack/JSON-Patch/issues/147.
 
-However, you can use `applyPatch` method to over come this issue, because it returns the result object, and this allows it to change types.
+However, you can use `applyOperation` method to over come this issue, because it returns the result object, and this allows it to change types.
 
 Example:
 
 ```js
-var myobj = { firstName:"Albert", contactDetails: { phoneNumbers: [ ] } };
-var patch = {op:"replace", path:'', value: [{item: "item 1"}] };
-var newObj = jsonpatch.applyPatch( myobj, patch );
-// newObj == [{item: "item 1"}]
+var document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
+var operation = { op: "replace", path:'', value: [{item: "item 1"}] };
+var updatedDoument = jsonpatch.applyOperation(document, operation);
+// updatedDoument == [{item: "item 1"}]
 ```
-`applyPatch` accepts a single operation object instead of a sequence, and returns the object after applying it. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
+`applyOperation` accepts a single operation object instead of a sequence, and returns the object after applying it. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
 
-#### Using `applyPatch` with `reduce`
+#### Using `applyOperation` with `reduce`
 
-If you have an array of patches, you can simple reduce them using `applyPatch` as your reducer:
+If you have an array of operations, you can simple reduce them using `applyOperation` as your reducer:
 
 ```js
-var myobj = { firstName:"Albert", contactDetails: { phoneNumbers: [ ] } };
-var patches = [
-   {op:"replace", path:"/firstName", value:"Joachim" },
-   {op:"add", path:"/lastName", value:"Wester" },
-   {op:"add", path:"/contactDetails/phoneNumbers/0", value:{ number:"555-123" }  }
-   ];
-var newObj = patches.reduce( applyPatch, myobj );
-// newObj == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
+var document = { firstName: "Albert", contactDetails: { phoneNumbers: [ ] } };
+var patch = [
+  { op:"replace", path: "/firstName", value: "Joachim" },
+  { op:"add", path: "/lastName", value: "Wester" },
+  { op:"add", path: "/contactDetails/phoneNumbers/0", value: { number: "555-123" } }
+];
+var updatedDocument = patch.reduce(applyOperation, document);
+// updatedDocument == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
 ```
 
 Generating patches:
 
 ```js
-var myobj = { firstName:"Joachim", lastName:"Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
-var observer = jsonpatch.observe( myobj );
-myobj.firstName = "Albert";
-myobj.contactDetails.phoneNumbers[0].number = "123";
-myobj.contactDetails.phoneNumbers.push({number:"456"});
-var patches = jsonpatch.generate(observer);
-// patches  == [
-//   { op:"replace", path="/firstName", value:"Albert"},
-//   { op:"replace", path="/contactDetails/phoneNumbers/0/number", value:"123"},
-//   { op:"add", path="/contactDetails/phoneNumbers/1", value:{number:"456"}}];
+var document = { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
+var observer = jsonpatch.observe(document);
+document.firstName = "Albert";
+document.contactDetails.phoneNumbers[0].number = "123";
+document.contactDetails.phoneNumbers.push({ number:"456" });
+var patch = jsonpatch.generate(observer);
+// patch  == [
+//   { op: "replace", path: "/firstName", value: "Albert"},
+//   { op: "replace", path: "/contactDetails/phoneNumbers/0/number", value: "123" },
+//   { op: "add", path: "/contactDetails/phoneNumbers/1", value: {number:"456"}}
+// ];
 ```
 
 Comparing two object trees:
 
 ```js
-var objA = {user: {firstName: "Albert", lastName: "Einstein"}};
-var objB = {user: {firstName: "Albert", lastName: "Collins"}};
-var diff = jsonpatch.compare(objA, objB));
+var documentA = {user: {firstName: "Albert", lastName: "Einstein"}};
+var documentB = {user: {firstName: "Albert", lastName: "Collins"}};
+var diff = jsonpatch.compare(documentA, documentB));
 //diff == [{op: "replace", path: "/user/lastName", value: "Collins"}]
 ```
 
@@ -174,7 +175,7 @@ else {
 
 ## API
 
-#### jsonpatch.apply (`obj` Object, `patches` Array, `validate` Boolean) : boolean
+#### `jsonpatch.apply(document: any, patch: Operation[], validate: boolean = false): any[]`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
@@ -188,24 +189,24 @@ Returns an array of results - one item for each item in `patches`. The type of e
 * `remove`, `replace` and `move` - original object that has been removed
 * `add` (only when adding to an array) - index at which item has been inserted (useful when using `-` alias)
 
-#### jsonpatch.applyPatch (`obj` Object, `patch` Patch, `validate` Boolean) : boolean
+#### `jsonpatch.applyOperation<T>(document: T, operation: Operation, validate: boolean = false, mutateDocument: boolean = false): T`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
-Applies single operation object `patch` on `obj`.
+Applies single operation object `operation` on `document`.
 
-Returns the modified object.
+Returns the modified document.
 
-#### jsonpatch.observe (`obj` Object, `callback` Function (optional)) : `observer` Object
+#### `jsonpatch.observe(document: any, callback?: Function): Observer`
 
 Available in *json-patch-duplex.js*
 
-Sets up an deep observer on `obj` that listens for changes in object tree. When changes are detected, the optional
+Sets up an deep observer on `document` that listens for changes in object tree. When changes are detected, the optional
 callback is called with the generated patches array as the parameter.
 
 Returns `observer`.
 
-#### jsonpatch.generate (`obj` Object, `observer` Object) : `patches` Array
+#### `jsonpatch.generate(document: any, observer: Observer): Operation[]`
 
 Available in *json-patch-duplex.js*
 
@@ -214,27 +215,27 @@ method, it will be triggered synchronously as well.
 
 If there are no pending changes in `obj`, returns an empty array (length 0).
 
-#### jsonpatch.unobserve (`obj` Object, `observer` Object) : void
+#### `jsonpatch.unobserve(document: any, observer: Observer): void`
 
 Available in *json-patch-duplex.js*
 
-Destroys the observer set up on `obj`.
+Destroys the observer set up on `document`.
 
 Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). Note: this is different that ES6/7 `Object.unobserve`, which delivers remaining changes asynchronously.
 
-#### jsonpatch.compare (`obj1` Object, `obj2` Object) : `patches` Array
+#### `jsonpatch.compare(document1: any, document2: any): Operation[]`
 
 Available in *json-patch-duplex.js*
 
-Compares object trees `obj1` and `obj2` and returns the difference relative to `obj1` as a patches array.
+Compares object trees `document1` and `document2` and returns the difference relative to `document1` as a patches array.
 
 If there are no differences, returns an empty array (length 0).
 
-#### jsonpatch.validate (`patches` Array, `tree` Object (optional)) : `error` JsonPatchError
+#### `jsonpatch.validate(patch: Operation[], document?: any): JsonPatchError`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
-Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree.
+Validates a sequence of operations. If `document` parameter is provided, the sequence is additionally validated against the object tree.
 
 If there are no errors, returns undefined. If there is an errors, returns a JsonPatchError object with the following properties:
 
