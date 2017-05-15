@@ -370,7 +370,7 @@ namespace jsonpatch {
     let operation: Operation;
     let key: string | number;
     while (p < plen) {
-      operation = operation[p];
+      operation = patch[p];
       p++;
       // Find the object
       var path = operation.path || "";
