@@ -4,55 +4,84 @@
  * (c) 2013 Joachim Wester
  * MIT license
  */
-declare module jsonpatch {
-    type Patch<T> = AddPatch<T> | RemovePatch | ReplacePatch<T> | MovePatch | CopyPatch | TestPatch<T>;
-    interface PatchBase {
+declare namespace jsonpatch {
+    type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any>;
+    interface BaseOperation {
         path: string;
     }
-    interface AddPatch<T> extends PatchBase {
+    interface AddOperation<T> extends BaseOperation {
         op: 'add';
         value: T;
     }
-    interface RemovePatch extends PatchBase {
+    interface RemoveOperation extends BaseOperation {
         op: 'remove';
     }
-    interface ReplacePatch<T> extends PatchBase {
+    interface ReplaceOperation<T> extends BaseOperation {
         op: 'replace';
         value: T;
     }
-    interface MovePatch extends PatchBase {
+    interface MoveOperation extends BaseOperation {
         op: 'move';
         from: string;
     }
-    interface CopyPatch extends PatchBase {
+    interface CopyOperation extends BaseOperation {
         op: 'copy';
         from: string;
     }
-    interface TestPatch<T> extends PatchBase {
+    interface TestOperation<T> extends BaseOperation {
         op: 'test';
         value: T;
     }
+    /** DEPRECATED. Use `Operation` */
+    type Patch<T> = Operation;
+    /** DEPRECATED. Use `AddOperation` */
+    type AddPatch<T> = AddOperation<T>;
+    /** DEPRECATED. Use `RemoveOperation` */
+    type RemovePatch = RemoveOperation;
+    /** DEPRECATED. Use `ReplaceOperation` */
+    type ReplacePatch<T> = ReplaceOperation<T>;
+    /** DEPRECATED. Use `MoveOperation` */
+    type MovePatch = MoveOperation;
+    /** DEPRECATED. Use `CopyOperation` */
+    type CopyPatch = CopyOperation;
+    /** DEPRECATED. Use `TestOperation` */
+    type TestPatch<T> = TestOperation<T>;
     type JsonPatchErrorName = 'SEQUENCE_NOT_AN_ARRAY' | 'OPERATION_NOT_AN_OBJECT' | 'OPERATION_OP_INVALID' | 'OPERATION_PATH_INVALID' | 'OPERATION_FROM_REQUIRED' | 'OPERATION_VALUE_REQUIRED' | 'OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED' | 'OPERATION_PATH_CANNOT_ADD' | 'OPERATION_PATH_UNRESOLVABLE' | 'OPERATION_FROM_UNRESOLVABLE' | 'OPERATION_PATH_ILLEGAL_ARRAY_INDEX' | 'OPERATION_VALUE_OUT_OF_BOUNDS' | 'TEST_OPERATION_FAILED';
     /**
-       * Apply a single json-patch on an object tree
-       * Returns the result object.
-       */
-    function applyPatch<T>(tree: T, patch: Patch<any>): T;
-    function applyPatch<T>(tree: T, patch: Patch<any>, validate: boolean, touchOriginalTree: boolean): T;
+     * Apply a single JSON Patch Operation on a JSON document.
+     * Returns the updated document.
+     * Suitable as a reducer.
+     *
+     * @param document The document to patch
+     * @param operation The operation to apply
+     * @return The updated document
+     */
+    function applyOperation<T>(document: T, operation: Operation): T;
     /**
-     * Apply a json-patch operation on an object tree
+     * Apply a single JSON Patch Operation on a JSON document.
+     * Returns the updated document.
+     *
+     * @param document The document to patch
+     * @param operation The operation to apply
+     * @param validate Whether to validate the operation
+     * @param mutateDocument Whether to mutate the original document or clone it before applying
+     * @return The updated document
+     */
+    function applyOperation<T>(document: T, operation: Operation, validate: boolean, mutateDocument: boolean): T;
+    /**
+     * Apply a JSON Patch on a JSON document.
      * Returns an array of results of operations.
      * Each element can either be a boolean (if op == 'test') or
      * the removed object (operations that remove things)
      * or just be undefined
      */
-    function apply(tree: any, patches: Patch<any>[], validate?: boolean): any[];
+    function apply(document: any, patch: Operation[], validate?: boolean): any[];
     class JsonPatchError extends Error {
         message: string;
         name: JsonPatchErrorName;
-        index?: number;
-        operation?: any;
-        tree?: any;
+        index: number;
+        operation: any;
+        tree: any;
         constructor(message: string, name: JsonPatchErrorName, index?: number, operation?: any, tree?: any);
     }
     /**
@@ -62,14 +91,14 @@ declare module jsonpatch {
      * @param {object} [tree] - object where the operation is supposed to be applied
      * @param {string} [existingPathFragment] - comes along with `tree`
      */
-    function validator(operation: Patch<any>, index: number, tree?: any, existingPathFragment?: string): void;
+    function validator(operation: Operation, index: number, document?: any, existingPathFragment?: string): void;
     /**
-     * Validates a sequence of operations. If `tree` parameter is provided, the sequence is additionally validated against the object tree.
+     * Validates a sequence of operations. If `operation` parameter is provided, the sequence is additionally validated against the object tree.
      * If error is encountered, returns a JsonPatchError object
-     * @param sequence
-     * @param tree
+     * @param patch
+     * @param document
      * @returns {JsonPatchError|undefined}
      */
-    function validate(sequence: Patch<any>[], tree?: any): JsonPatchError;
+    function validate(patch: Operation[], document?: any): JsonPatchError | undefined;
 }
 export default jsonpatch;
