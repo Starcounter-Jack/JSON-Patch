@@ -25,7 +25,7 @@ suite.add('add operation', {
         };
     },
     fn: function() {
-        jsonpatch.apply(obj, [{
+        jsonpatch.applyPatch(obj, [{
             op: 'add',
             path: '/bar',
             value: [1, 2, 3, 4]
@@ -43,7 +43,7 @@ suite.add('remove operation', {
         };
     },
     fn: function() {
-        jsonpatch.apply(obj, [{
+        jsonpatch.applyPatch(obj, [{
             op: 'remove',
             path: '/bar'
         }]);
@@ -59,7 +59,7 @@ suite.add('replace operation', {
         };
     },
     fn: function() {
-        jsonpatch.apply(obj, [{
+        jsonpatch.applyPatch(obj, [{
             op: 'replace',
             path: '/foo',
             value: [1, 2, 3, 4]
@@ -77,7 +77,7 @@ suite.add('move operation', {
         };
     },
     fn: function() {
-        jsonpatch.apply(obj, [{
+        jsonpatch.applyPatch(obj, [{
             op: 'move',
             from: '/baz/0',
             path: '/bar/0'
@@ -95,7 +95,7 @@ suite.add('copy operation', {
         };
     },
     fn: function() {
-        jsonpatch.apply(obj, [{
+        jsonpatch.applyPatch(obj, [{
             op: 'copy',
             from: '/baz/0',
             path: '/bar/0'
@@ -112,7 +112,7 @@ suite.add('test operation', {
         };
     },
     fn: function() {
-        jsonpatch.apply(obj, [{
+        jsonpatch.applyPatch(obj, [{
             op: 'test',
             path: '/baz',
             value: [{

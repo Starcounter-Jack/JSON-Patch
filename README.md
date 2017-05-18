@@ -92,29 +92,24 @@ var patch = [
   { op: "add", path: "/lastName", value: "Wester" },
   { op: "add", path: "/contactDetails/phoneNumbers/0", value: { number: "555-123" }  }
 ];
-jsonpatch.apply(document, patch);
+document = jsonpatch.applyPatch(document, patch).document;
 // document == { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [{number:"555-123"}] } };
 ```
 
-#### Applying operations on root:
+##### For apply individual operations you can use `applyOperation`
 
-Applying operations on root is a little tricky, for that you can't replace your root object with an object of a different type in place (eg. can't replace `{item: "item 1"}` with `[{item: "item 1"}]`) on the root level, because the original document is an object `{}` and the new value is an array `[]`, nor can you do the opposite (`[] => {}`), obviously. See https://github.com/Starcounter-Jack/JSON-Patch/issues/147.
-
-However, you can use `applyOperation` method to over come this issue, because it returns the result object, and this allows it to change types.
-
-Example:
+`applyOperation` accepts a single operation object instead of a sequence, and returns the object after applying the operation. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
 
 ```js
 var document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
-var operation = { op: "replace", path:'', value: [{item: "item 1"}] };
-var updatedDoument = jsonpatch.applyOperation(document, operation);
-// updatedDoument == [{item: "item 1"}]
+var operation = { op: "replace", path: "/firstName", value: "Joachim" };
+document = jsonpatch.applyOperation(document, operation).document;
+// document == { firstName: "Joachim", contactDetails: { phoneNumbers: [] }}
 ```
-`applyOperation` accepts a single operation object instead of a sequence, and returns the object after applying it. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
 
-#### Using `applyOperation` with `reduce`
+#### Using `applyReducer` with `reduce`
 
-If you have an array of operations, you can simple reduce them using `applyOperation` as your reducer:
+If you have an array of operations, you can simple reduce them using `applyReducer` as your reducer:
 
 ```js
 var document = { firstName: "Albert", contactDetails: { phoneNumbers: [ ] } };
@@ -123,7 +118,7 @@ var patch = [
   { op:"add", path: "/lastName", value: "Wester" },
   { op:"add", path: "/contactDetails/phoneNumbers/0", value: { number: "555-123" } }
 ];
-var updatedDocument = patch.reduce(applyOperation, document);
+var updatedDocument = patch.reduce(applyReducer, document);
 // updatedDocument == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
 ```
 
@@ -175,16 +170,17 @@ else {
 
 ## API
 
-#### `jsonpatch.apply(document: any, patch: Operation[], validate: boolean = false): any[]`
+#### `jsonpatch.applyPatch<T>(document: any, patch: Operation[], validate: boolean = false): any[]`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
-Applies `patches` array on `obj`.
+Applies `patch` array on `obj`.
 
 If the `validate` parameter is set to `true`, the patch is extensively validated before applying.
 An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
 
-Returns an array of results - one item for each item in `patches`. The type of each item depends on type of operation applied
+Returns an array of objects - one item for each item in `patches`, each item is an object `{newDocument, result}`. The type of `result` depends on type of operation applied.
+
 * `test` - boolean result of the test
 * `remove`, `replace` and `move` - original object that has been removed
 * `add` (only when adding to an array) - index at which item has been inserted (useful when using `-` alias)
@@ -195,7 +191,40 @@ Available in *json-patch.js* and *json-patch-duplex.js*
 
 Applies single operation object `operation` on `document`.
 
-Returns the modified document.
+Returns the a result object `{newDocument, result}`.
+
+#### `jsonpatch.applyReducer<T>(document: T, operation: Operation): T`
+
+Available in *json-patch.js* and *json-patch-duplex.js*
+
+**Ideal for `patch.reduce(jsonpatch.applyReducer, document)`**.
+
+Applies single operation object `operation` on `document`.
+
+Returns the a modified document.
+
+Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails.
+
+
+#### `jsonpatch.escapePath(path: string): string`
+
+Available in *json-patch.js* and *json-patch-duplex.js*
+
+Returns the escaped path.
+
+#### `jsonpatch.unEscapePath(path: string): string`
+
+Available in *json-patch.js* and *json-patch-duplex.js*
+
+Returns the unescaped path.
+
+#### `jsonpatch.getValueByPointer(document: object, pointer: string)`
+
+Available in *json-patch.js* and *json-patch-duplex.js*
+
+Retrieves a value from a JSON document by a JSON pointer.
+
+Returns the value.
 
 #### `jsonpatch.observe(document: any, callback?: Function): Observer`
 
@@ -261,6 +290,20 @@ OPERATION_PATH_UNRESOLVABLE   | Cannot perform the operation at a path that does
 OPERATION_FROM_UNRESOLVABLE   | Cannot perform the operation from a path that does not exist
 OPERATION_PATH_ILLEGAL_ARRAY_INDEX | Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index
 OPERATION_VALUE_OUT_OF_BOUNDS | The specified index MUST NOT be greater than the number of elements in the array
+TEST_OPERATION_FAILED | When operation is `test` and the test fails, applies to `applyReducer`.
+
+
+#### `jsonpatch.escapePath(path: string): string`
+
+Available in *json-patch.js* and *json-patch-duplex.js*
+
+Escapes a json pointer `path`.
+
+#### `jsonpatch.unEscapePath(path: string): string`
+
+Available in *json-patch.js* and *json-patch-duplex.js*
+
+Unescapes a json pointer `path`.
 
 ## `undefined`s (JS to JSON projection)
 

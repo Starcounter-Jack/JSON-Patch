@@ -6,6 +6,10 @@
  */
 declare namespace jsonpatch {
     type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any>;
+    interface OperationResult {
+        result: any;
+        newDocument: any;
+    }
     interface BaseOperation {
         path: string;
     }
@@ -48,6 +52,66 @@ declare namespace jsonpatch {
     type TestPatch<T> = TestOperation<T>;
     type JsonPatchErrorName = 'SEQUENCE_NOT_AN_ARRAY' | 'OPERATION_NOT_AN_OBJECT' | 'OPERATION_OP_INVALID' | 'OPERATION_PATH_INVALID' | 'OPERATION_FROM_REQUIRED' | 'OPERATION_VALUE_REQUIRED' | 'OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED' | 'OPERATION_PATH_CANNOT_ADD' | 'OPERATION_PATH_UNRESOLVABLE' | 'OPERATION_FROM_UNRESOLVABLE' | 'OPERATION_PATH_ILLEGAL_ARRAY_INDEX' | 'OPERATION_VALUE_OUT_OF_BOUNDS' | 'TEST_OPERATION_FAILED';
     /**
+    * Escapes a json pointer path
+    * @param path The raw pointer
+    * @return the Escaped path
+    */
+    function escapePath(path: string): string;
+    /**
+     * Unescapes a json pointer path
+     * @param path The escaped pointer
+     * @return The unescaped path
+     */
+    function unEscapePath(path: string): string;
+    /**
+     * Retrieves a value from a JSON document by a JSON pointer.
+     * Returns the value.
+     *
+     * @param document The document to get the value from
+     * @param pointer an escaped JSON pointer
+     * @return The retrieved value
+     */
+    function getValueByPointer(document: any, pointer: any): any;
+    /**
+     * Apply a single JSON Patch Operation on a JSON document.
+     * Returns {newDocument, result} of the operation.
+     *
+     * @param document The document to patch
+     * @param operation The operation to apply
+     * @param validate Whether to validate the operation
+     * @param mutateDocument Whether to mutate the original document or clone it before applying
+     * @return `{newDocument, result}` after the operation
+     */
+    function applyOperation<T>(document: T, operation: Operation): OperationResult;
+    /**
+     * Apply a single JSON Patch Operation on a JSON document.
+     * Returns the {newDocument, result} of the operation.
+     *
+     * @param document The document to patch
+     * @param operation The operation to apply
+     * @param validate Whether to validate the operation
+     * @param mutateDocument Whether to mutate the original document or clone it before applying
+     * @return `{newDocument, result}` after the operation
+     */
+    function applyOperation<T>(document: any, operation: Operation, validate: boolean, mutateDocument: boolean): OperationResult;
+    /**
+     * Apply a JSON Patch on a JSON document.
+     * Returns an array of results of operations.
+     * Each element can either be a boolean (if op == 'test') or
+     * the removed object (operations that remove things)
+     * or just be undefined
+     */
+    function applyPatch(document: any, patch: Operation[], validate?: boolean): OperationResult[];
+    /**
+     * Apply a JSON Patch on a JSON document.
+     * Returns an array of results of operations.
+     * Each element can either be a boolean (if op == 'test') or
+     * the removed object (operations that remove things)
+     * or just be undefined
+     * @deprecated
+     */
+    function apply(document: any, patch: Operation[], validate?: boolean): any[];
+    /**
      * Apply a single JSON Patch Operation on a JSON document.
      * Returns the updated document.
      * Suitable as a reducer.
@@ -56,49 +120,30 @@ declare namespace jsonpatch {
      * @param operation The operation to apply
      * @return The updated document
      */
-    function applyOperation<T>(document: T, operation: Operation): T;
-    /**
-     * Apply a single JSON Patch Operation on a JSON document.
-     * Returns the updated document.
-     *
-     * @param document The document to patch
-     * @param operation The operation to apply
-     * @param validate Whether to validate the operation
-     * @param mutateDocument Whether to mutate the original document or clone it before applying
-     * @return The updated document
-     */
-    function applyOperation<T>(document: T, operation: Operation, validate: boolean, mutateDocument: boolean): T;
-    /**
-     * Apply a JSON Patch on a JSON document.
-     * Returns an array of results of operations.
-     * Each element can either be a boolean (if op == 'test') or
-     * the removed object (operations that remove things)
-     * or just be undefined
-     */
-    function apply(document: any, patch: Operation[], validate?: boolean): any[];
+    function applyReducer<T>(document: T, operation: Operation): T;
     class JsonPatchError extends Error {
         message: string;
         name: JsonPatchErrorName;
-        index: number;
-        operation: any;
-        tree: any;
+        index?: number;
+        operation?: any;
+        tree?: any;
         constructor(message: string, name: JsonPatchErrorName, index?: number, operation?: any, tree?: any);
     }
     /**
      * Validates a single operation. Called from `jsonpatch.validate`. Throws `JsonPatchError` in case of an error.
      * @param {object} operation - operation object (patch)
      * @param {number} index - index of operation in the sequence
-     * @param {object} [tree] - object where the operation is supposed to be applied
-     * @param {string} [existingPathFragment] - comes along with `tree`
+     * @param {object} [document] - object where the operation is supposed to be applied
+     * @param {string} [existingPathFragment] - comes along with `documente`
      */
-    function validator(operation: Operation, index: number, document?: any, existingPathFragment?: string): void;
+    function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string): void;
     /**
-     * Validates a sequence of operations. If `operation` parameter is provided, the sequence is additionally validated against the object tree.
+     * Validates a sequence of operations. If `document` parameter is provided, the sequence is additionally validated against the object document.
      * If error is encountered, returns a JsonPatchError object
-     * @param patch
+     * @param sequence
      * @param document
      * @returns {JsonPatchError|undefined}
      */
-    function validate(patch: Operation[], document?: any): JsonPatchError | undefined;
+    function validate(sequence: Operation[], document?: any): JsonPatchError;
 }
 export default jsonpatch;

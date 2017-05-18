@@ -141,7 +141,7 @@ describe("duplex", function() {
                 }]
             };
 
-            jsonpatch.apply(obj2, patches);
+            jsonpatch.applyPatch(obj2, patches);
             expect(obj2).toReallyEqual(obj);
         });
 
@@ -173,7 +173,7 @@ describe("duplex", function() {
                 }]
             };
 
-            jsonpatch.apply(obj2, patches);
+            jsonpatch.applyPatch(obj2, patches);
             expect(obj2).toReallyEqual(obj);
         });
 
@@ -388,7 +388,7 @@ describe("duplex", function() {
                 }]
             };
 
-            jsonpatch.apply(obj2, patches);
+            jsonpatch.applyPatch(obj2, patches);
             expect(obj2).toEqualInJson(obj);
         });
 
@@ -420,7 +420,7 @@ describe("duplex", function() {
                 }]
             };
 
-            jsonpatch.apply(obj2, patches);
+            jsonpatch.applyPatch(obj2, patches);
             expect(obj2).toEqualInJson(obj);
         });
 
@@ -447,7 +447,7 @@ describe("duplex", function() {
             obj2 = {
                 items: ["a", "b", "c"]
             };
-            jsonpatch.apply(obj2, patches);
+            jsonpatch.applyPatch(obj2, patches);
             expect(obj).toEqualInJson(obj2);
         });
 
@@ -809,7 +809,7 @@ describe("duplex", function() {
                 "value": ["abc", "def"]
             }];
 
-            jsonpatch.apply(obj, patches);
+            jsonpatch.applyPatch(obj, patches);
             expect(obj).toReallyEqual({
                 "foo": ["bar", ["abc", "def"]]
             });
@@ -852,7 +852,7 @@ describe("duplex", function() {
                     }]
                 };
 
-                jsonpatch.apply(obj2, patches);
+                jsonpatch.applyPatch(obj2, patches);
                 expect(obj2).toReallyEqual(obj);
                 done();
             }

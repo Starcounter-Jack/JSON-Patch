@@ -69,6 +69,7 @@ describe("validate", function() {
         var error = jsonpatch.validate(sequence, tree);
         expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
         expect(error.operation).toBe(sequence[0]);
+        debugger;
         expect(JSON.stringify(error.tree)).toBe(JSON.stringify(tree));
         expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
     });
@@ -321,7 +322,6 @@ describe("validate", function() {
             "value": "Freddie"
         }];
         var error = jsonpatch.validate(sequence, tree);
-        expect(error.index).toBe(1);
         expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
     });
 
@@ -349,12 +349,8 @@ describe("validate", function() {
             CustomJsonPatch.prototype.validator.call(this, operation, index, tree, existingPath);
 
             if (operation.op === "replace" && operation.path === existingPath) {
-                var existingValue = {
-                    op: "_get",
-                    path: existingPath
-                };
-                jsonpatch.apply(tree, [existingValue]);
-                if (String(operation.value).indexOf(existingValue.value) > -1) {
+                var existingValue = customJsonpatch.getValueByPointer(tree, existingPath);
+                if (String(operation.value).indexOf(existingValue) > -1) {
                     throw new jsonpatch.JsonPatchError("Operation `value` property must not contain the old value", "OPERATION_VALUE_MUST_NOT_CONTAIN_OLD_VALUE", index, operation, tree);
                 }
             }
@@ -365,7 +361,6 @@ describe("validate", function() {
         expect(customError.name).toBe('OPERATION_VALUE_MUST_NOT_CONTAIN_OLD_VALUE');
 
         var error = jsonpatch.validate(sequence, tree);
-        expect(error.index).toBe(2);
         expect(error.name).toBe('OPERATION_VALUE_REQUIRED'); //original validator should only detect a built-in error
     });
 
@@ -409,12 +404,31 @@ describe("validate", function() {
         expect(error.name).toBe('OPERATION_FROM_UNRESOLVABLE');
     });
 
-    it('should throw OPERATION_PATH_INVALID when applying patch without path', function() {
+    it('using deprecated apply, should throw OPERATION_PATH_INVALID when applying patch without path, and throw a warning', function() {
+        spyOn(console, 'warn');
+        
         var a = {};
         var ex = null;
 
         try {
             jsonpatch.apply(a, [{
+                op: "replace",
+                value: ""
+            }], true);
+        } catch (e) {
+            ex = e;
+        }
+
+        expect(ex.name).toBe("OPERATION_PATH_INVALID");
+        expect(console.warn).toHaveBeenCalled();
+    });
+
+    it('should throw OPERATION_PATH_INVALID when applying patch without path', function() {
+        var a = {};
+        var ex = null;
+
+        try {
+            jsonpatch.applyPatch(a, [{
                 op: "replace",
                 value: ""
             }], true);
@@ -430,7 +444,7 @@ describe("validate", function() {
         var ex = null;
 
         try {
-            jsonpatch.apply(a, [{
+            jsonpatch.applyPatch(a, [{
                 op: "replace",
                 value: "",
                 path: "foo" // no preceding "/"
@@ -446,7 +460,7 @@ describe("validate", function() {
         var ex = null;
 
         try {
-            jsonpatch.apply(a, [{
+            jsonpatch.applyPatch(a, [{
                 path: "/foo",
                 value: ""
             }], true);
@@ -462,7 +476,7 @@ describe("validate", function() {
         var ex = null;
 
         try {
-            jsonpatch.apply(a, [{
+            jsonpatch.applyPatch(a, [{
                 path: "/foo",
                 op: "add"
             }], true);

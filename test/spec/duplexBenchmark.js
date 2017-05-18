@@ -71,7 +71,7 @@ suite.add('generate operation and re-apply', {
             }]
         };
 
-        jsonpatch.apply(obj2, patches);
+        jsonpatch.applyPatch(obj2, patches);
     }
 });
 suite.add('compare operation', {
