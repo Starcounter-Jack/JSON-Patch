@@ -6,9 +6,9 @@
  */
 declare module jsonpatch {
     type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any>;
-    interface OperationResult {
+    interface OperationResult<T> {
         result: any;
-        newDocument: any;
+        newDocument: T;
     }
     interface BaseOperation {
         path: string;
@@ -70,17 +70,17 @@ declare module jsonpatch {
      */
     function generate<T>(observer: Observer<T>): Patch<any>[];
     /**
-     * Escapes a json pointer path
-     * @param path The raw pointer
-     * @return the Escaped path
-     */
-    function escapePath(path: string): string;
+    * Escapes a json pointer path
+    * @param path The raw pointer
+    * @return the Escaped path
+    */
+    function escapePathComponent(path: string): string;
     /**
      * Unescapes a json pointer path
      * @param path The escaped pointer
      * @return The unescaped path
      */
-    function unEscapePath(path: string): string;
+    function unescapePathComponent(path: string): string;
     /**
      * Retrieves a value from a JSON document by a JSON pointer.
      * Returns the value.
@@ -89,29 +89,16 @@ declare module jsonpatch {
      * @param pointer an escaped JSON pointer
      * @return The retrieved value
      */
-    function getValueByPointer(document: any, pointer: any): any;
+    function getValueByPointer(document: any, pointer: string): any;
     /**
      * Apply a single JSON Patch Operation on a JSON document.
      * Returns {newDocument, result} of the operation.
      *
      * @param document The document to patch
      * @param operation The operation to apply
-     * @param validate Whether to validate the operation
-     * @param mutateDocument Whether to mutate the original document or clone it before applying
      * @return `{newDocument, result}` after the operation
      */
-    function applyOperation<T>(document: T, operation: Operation): OperationResult;
-    /**
-     * Apply a single JSON Patch Operation on a JSON document.
-     * Returns the {newDocument, result} of the operation.
-     *
-     * @param document The document to patch
-     * @param operation The operation to apply
-     * @param validate Whether to validate the operation
-     * @param mutateDocument Whether to mutate the original document or clone it before applying
-     * @return `{newDocument, result}` after the operation
-     */
-    function applyOperation<T>(document: any, operation: Operation, validate: boolean, mutateDocument: boolean): OperationResult;
+    function applyOperation<T>(document: T, operation: Operation): OperationResult<T>;
     /**
      * Apply a JSON Patch on a JSON document.
      * Returns an array of results of operations.
@@ -119,7 +106,7 @@ declare module jsonpatch {
      * the removed object (operations that remove things)
      * or just be undefined
      */
-    function applyPatch(document: any, patch: Operation[], validate?: boolean): OperationResult[];
+    function applyPatch<T>(document: T, patch: Operation[], validate?: boolean | Function): OperationResult<T>[];
     /**
      * Apply a JSON Patch on a JSON document.
      * Returns an array of results of operations.
@@ -162,7 +149,7 @@ declare module jsonpatch {
      * @param document
      * @returns {JsonPatchError|undefined}
      */
-    function validate(sequence: Operation[], document?: any): JsonPatchError;
+    function validate(sequence: Operation[], document?: any, externalValidator?: Function): JsonPatchError;
     /**
      * Create an array of patches from the differences in two objects
      */

@@ -98,7 +98,7 @@ document = jsonpatch.applyPatch(document, patch).document;
 
 ##### For apply individual operations you can use `applyOperation`
 
-`applyOperation` accepts a single operation object instead of a sequence, and returns the object after applying the operation. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
+`jsonpatch.applyOperation` accepts a single operation object instead of a sequence, and returns the object after applying the operation. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
 
 ```js
 var document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
@@ -170,13 +170,12 @@ else {
 
 ## API
 
-#### `jsonpatch.applyPatch<T>(document: any, patch: Operation[], validate: boolean = false): any[]`
+#### `jsonpatch.applyPatch<T>(document: any, patch: Operation[], validate: <Boolean | Function> = false): any[]`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
 Applies `patch` array on `obj`.
 
-If the `validate` parameter is set to `true`, the patch is extensively validated before applying.
 An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
 
 Returns an array of objects - one item for each item in `patches`, each item is an object `{newDocument, result}`. The type of `result` depends on type of operation applied.
@@ -185,13 +184,22 @@ Returns an array of objects - one item for each item in `patches`, each item is 
 * `remove`, `replace` and `move` - original object that has been removed
 * `add` (only when adding to an array) - index at which item has been inserted (useful when using `-` alias)
 
-#### `jsonpatch.applyOperation<T>(document: T, operation: Operation, validate: boolean = false, mutateDocument: boolean = false): T`
+See [Validation notes](#validation-notes)
+
+#### `applyOperation<T>(document: any, operation: Operation, validate: <Boolean | Function> = false, mutateDocument = true): OperationResult<T>`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
 Applies single operation object `operation` on `document`.
 
+- `document` The document to patch
+- `operation` The operation to apply
+- `validate` Whether to validate the operation
+- `mutateDocument` Whether to mutate the original document or clone it before applying
+
 Returns the a result object `{newDocument, result}`.
+
+See [Validation notes](#validation-notes)
 
 #### `jsonpatch.applyReducer<T>(document: T, operation: Operation): T`
 
@@ -206,13 +214,13 @@ Returns the a modified document.
 Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails.
 
 
-#### `jsonpatch.escapePath(path: string): string`
+#### `jsonpatch.escapePathComponent(path: string): string`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
 Returns the escaped path.
 
-#### `jsonpatch.unEscapePath(path: string): string`
+#### `jsonpatch.unescapePathComponent(path: string): string`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
@@ -260,7 +268,9 @@ Compares object trees `document1` and `document2` and returns the difference rel
 
 If there are no differences, returns an empty array (length 0).
 
-#### `jsonpatch.validate(patch: Operation[], document?: any): JsonPatchError`
+#### `jsonpatch.validate(patch: Operation[], document?: any, validator?: Function): JsonPatchError`
+
+See [Validation notes](#validation-notes)
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
@@ -293,17 +303,32 @@ OPERATION_VALUE_OUT_OF_BOUNDS | The specified index MUST NOT be greater than the
 TEST_OPERATION_FAILED | When operation is `test` and the test fails, applies to `applyReducer`.
 
 
-#### `jsonpatch.escapePath(path: string): string`
+#### `jsonpatch.escapePathComponent(path: string): string`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
 Escapes a json pointer `path`.
 
-#### `jsonpatch.unEscapePath(path: string): string`
+#### `jsonpatch.unescapePathComponent(path: string): string`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
 Unescapes a json pointer `path`.
+
+## Validation Notes
+
+Functions `applyPatch`, `applyOperation`, and `validate` accept a `validate`/ `validator` parameter:
+
+- If the `validate` parameter is set to `false`, validation will not occur.
+- If set to `true`, the patch is extensively validated before applying using jsonpatch's default validation.
+- If set to a `function` callback, the patch is validated using that function.
+
+If you pass a validator, it will be called with four parameters for each operation, `function(operation, index, tree, existingPath)` and it is expected to throw `JsonPatchError` when your conditions are not met.
+
+- `operation` The operation it self.
+- `index` `operation`'s index in the patch array (if application).  
+- `tree` The object that is supposed to be patched.
+- `existingPath` the path `operation` points to.
 
 ## `undefined`s (JS to JSON projection)
 

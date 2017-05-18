@@ -284,7 +284,7 @@ describe('core', function() {
           value: [1, 2]
         }
       ])[0]
-    ).toBe(false);
+    ).toThrow();
     expect(
       jsonpatch.apply(obj, [
         {
@@ -352,8 +352,8 @@ describe('core', function() {
           value: false
         }
       ])[0]
-    ).toBe(false);
-    expect(
+    ).toThrow();
+    expect(() =>
       jsonpatch.apply(obj, [
         {
           op: 'test',
@@ -367,7 +367,7 @@ describe('core', function() {
           }
         }
       ])[0]
-    ).toBe(false);
+    ).toThrow();
   });
 
   it('should apply test on root', function() {
@@ -385,7 +385,7 @@ describe('core', function() {
         }
       ])[0]
     ).toBe(true);
-    expect(
+    expect(() =>
       jsonpatch.apply(obj, [
         {
           op: 'test',
@@ -394,8 +394,8 @@ describe('core', function() {
             hello: 'universe'
           }
         }
-      ])[0]
-    ).toBe(false);
+      ])
+    ).toThrow();
   });
 
   it('should apply move', function() {
@@ -785,7 +785,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
         foo: 1,
         not: undefined
       };
-      expect(
+      expect(() =>
         jsonpatch.apply(obj, [
           {
             op: 'test',
@@ -793,7 +793,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
             value: 'defined'
           }
         ])[0]
-      ).toBe(false);
+      ).toThrow();
       expect(
         jsonpatch.apply(obj, [
           {
@@ -809,7 +809,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
         foo: 1,
         bar: [0, 1, undefined, 3]
       };
-      expect(
+      expect(() =>
         jsonpatch.apply(obj, [
           {
             op: 'test',
@@ -817,8 +817,8 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
             value: 'defined'
           }
         ])[0]
-      ).toBe(false);
-      expect(
+      ).toThrow();
+      expect(() =>
         jsonpatch.apply(obj, [
           {
             op: 'test',
@@ -826,7 +826,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
             value: null
           }
         ])[0]
-      ).toBe(false);
+      ).toThrow();
       expect(
         jsonpatch.apply(obj, [
           {

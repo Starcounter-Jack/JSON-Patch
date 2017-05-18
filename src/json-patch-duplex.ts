@@ -13,11 +13,11 @@ interface HTMLElement {
 module jsonpatch {
   export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any>;
 
-  export interface OperationResult {
+  export interface OperationResult<T> {
     result: any,
-    newDocument: any
+    newDocument: T;
   }
-
+  
   export interface BaseOperation {
     path: string;
   }
@@ -192,12 +192,9 @@ module jsonpatch {
       return removed;
     },
     move: function (obj, key, document) {
-      const originalValue = jsonpatch.getValueByPointer(document, this.path);
-      // In case value is moved up and overwrites its ancestor
-      var original = originalValue === undefined ?
-        undefined : JSON.parse(JSON.stringify(originalValue));
+      const originalValue = getValueByPointer(document, this.path);
 
-      const newValue = jsonpatch.getValueByPointer(document, this.from);
+      const newValue = getValueByPointer(document, this.from);
 
       applyOperation(document,
         { op: "remove", path: this.from }
@@ -207,10 +204,10 @@ module jsonpatch {
         { op: "add", path: this.path, value: newValue }
       );
 
-      return original;
+      return originalValue;
     },
     copy: function (obj, key, document) {
-      const valueToCopy = jsonpatch.getValueByPointer(document, this.from);
+      const valueToCopy = getValueByPointer(document, this.from);
       applyOperation(document,
         { op: "add", path: this.path, value: valueToCopy }
       );
@@ -251,12 +248,12 @@ module jsonpatch {
     for (var key in root) {
       if (root.hasOwnProperty(key)) {
         if (root[key] === obj) {
-          return escapePath(key) + '/';
+          return escapePathComponent(key) + '/';
         }
         else if (typeof root[key] === 'object') {
           found = _getPathRecursive(root[key], obj);
           if (found != '') {
-            return escapePath(key) + '/' + found;
+            return escapePathComponent(key) + '/' + found;
           }
         }
       }
@@ -470,17 +467,17 @@ module jsonpatch {
       if (obj.hasOwnProperty(key) && !(obj[key] === undefined && oldVal !== undefined && _isArray(obj) === false)) {
         var newVal = obj[key];
         if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
-          _generate(oldVal, newVal, patches, path + "/" + escapePath(key));
+          _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
         }
         else {
           if (oldVal !== newVal) {
             changed = true;
-            patches.push({ op: "replace", path: path + "/" + escapePath(key), value: deepClone(newVal) });
+            patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: deepClone(newVal) });
           }
         }
       }
       else {
-        patches.push({ op: "remove", path: path + "/" + escapePath(key) });
+        patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
         deleted = true; // property has been deleted
       }
     }
@@ -492,7 +489,7 @@ module jsonpatch {
     for (var t = 0; t < newKeys.length; t++) {
       var key = newKeys[t];
       if (!mirror.hasOwnProperty(key) && obj[key] !== undefined) {
-        patches.push({ op: "add", path: path + "/" + escapePath(key), value: deepClone(obj[key]) });
+        patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: deepClone(obj[key]) });
       }
     }
   }
@@ -506,7 +503,7 @@ module jsonpatch {
       return obj.push && typeof obj.length === 'number';
     }
   }
-
+  
   //3x faster than cached /^\d+$/.test(str)
   function isInteger(str: string): boolean {
     var i = 0;
@@ -523,12 +520,13 @@ module jsonpatch {
     return true;
   }
 
+
   /**
-   * Escapes a json pointer path
-   * @param path The raw pointer
-   * @return the Escaped path
-   */
-  export function escapePath(path: string): string {
+  * Escapes a json pointer path
+  * @param path The raw pointer
+  * @return the Escaped path
+  */
+  export function escapePathComponent(path: string): string {
     if (path.indexOf('/') === -1 && path.indexOf('~') === -1) return path;
     return path.replace(/~/g, '~0').replace(/\//g, '~1');
   }
@@ -537,7 +535,7 @@ module jsonpatch {
    * @param path The escaped pointer
    * @return The unescaped path
    */
-  export function unEscapePath(path: string): string {
+  export function unescapePathComponent(path: string): string {
     return path.replace(/~1/g, '/').replace(/~0/g, '~');
   }
 
@@ -549,13 +547,13 @@ module jsonpatch {
    * @param pointer an escaped JSON pointer
    * @return The retrieved value
    */
-  export function getValueByPointer(document, pointer) {
+  export function getValueByPointer(document: any, pointer: string): any {
     let pathSegments = [];
     if (pointer) { //empty string evaluates to false
-      pathSegments = pointer.substring(1).split(/\//).map(jsonpatch.unEscapePath);
+      pathSegments = pointer.substring(1).split(/\//).map(jsonpatch.unescapePathComponent);
     }
     for (let i = 0; i < pathSegments.length; i++) {
-      var subPropertyKey = pathSegments[i];
+      let subPropertyKey = pathSegments[i];
       if (!(subPropertyKey in document)) {
         return undefined;
       }
@@ -569,11 +567,9 @@ module jsonpatch {
    *
    * @param document The document to patch
    * @param operation The operation to apply
-   * @param validate Whether to validate the operation
-   * @param mutateDocument Whether to mutate the original document or clone it before applying
    * @return `{newDocument, result}` after the operation
    */
-  export function applyOperation<T>(document: T, operation: Operation): OperationResult;
+  export function applyOperation<T>(document: T, operation: Operation): OperationResult<T>;
 
   /**
    * Apply a single JSON Patch Operation on a JSON document.
@@ -581,16 +577,20 @@ module jsonpatch {
    *
    * @param document The document to patch
    * @param operation The operation to apply
-   * @param validate Whether to validate the operation
+   * @param validate `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `function` to validate on your own.
    * @param mutateDocument Whether to mutate the original document or clone it before applying
    * @return `{newDocument, result}` after the operation
    */
-  export function applyOperation<T>(document: any, operation: Operation, validate: boolean, mutateDocument: boolean): OperationResult;
-  export function applyOperation<T>(document: any, operation: Operation, validate = false, mutateDocument = true): OperationResult {
+  export function applyOperation<T>(document: any, operation: Operation, validate = false, mutateDocument = true): OperationResult<T> {
     if (validate) {
-      this.validator(operation, 0);
+      if(typeof validate !== 'boolean') {
+        validate(operation, 0);
+      }
+      else {      
+        jsonpatch.validator(operation, 0);
+      }
     }
-    const returnValue: OperationResult = { newDocument: document, result: undefined };
+    const returnValue: OperationResult<T> = { newDocument: document, result: undefined };
     /* ROOT OPERATIONS */
     if (operation.path === "") {
       if (operation.op === 'add') {
@@ -603,7 +603,7 @@ module jsonpatch {
         return returnValue;
       }
       else if (operation.op === 'move' || operation.op === 'copy') { // it's a move or copy to root
-        returnValue.newDocument = jsonpatch.getValueByPointer(document, operation.from); // get the value by json-pointer in `from` field
+        returnValue.newDocument = getValueByPointer(document, operation.from); // get the value by json-pointer in `from` field
         if (operation.op === 'move') { // report removed item
           returnValue.result = document;
         }
@@ -611,6 +611,9 @@ module jsonpatch {
       } else { // it's a remove or test on root
         if (operation.op === 'test') {
           returnValue.result = _equals(document, operation.value);
+          if(returnValue.result == false) {            
+            throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+          }
           returnValue.newDocument = document;
           return returnValue;
         } else if (operation.op === 'remove') { // a remove on root
@@ -628,7 +631,9 @@ module jsonpatch {
       }
     } /* END ROOT OPERATIONS */
     else {
-      !mutateDocument && (document = deepClone(document));
+      if (!mutateDocument) {
+        document = deepClone(document);
+      }
       const path = operation.path || "";
       const keys = path.split('/');
       let obj = document;
@@ -649,7 +654,7 @@ module jsonpatch {
               existingPathFragment = operation.path;
             }
             if (existingPathFragment !== undefined) {
-              this.validator(operation, 0, document, existingPathFragment);
+              jsonpatch.validator(operation, 0, document, existingPathFragment);
             }
           }
         }
@@ -670,16 +675,22 @@ module jsonpatch {
             }
             returnValue.result = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
             returnValue.newDocument = document;
+            if(returnValue.result === false) {
+                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            }
             return returnValue;
           }
         }
         else {
           if (key && key.indexOf('~') != -1) {
-            key = unEscapePath(key);
+            key = unescapePathComponent(key);
           }
           if (t >= len) {
             returnValue.result = objOps[operation.op].call(operation, obj, key, document); // Apply patch
             returnValue.newDocument = document;
+            if(returnValue.result === false) {
+                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            }
             return returnValue;
           }
         }
@@ -695,11 +706,11 @@ module jsonpatch {
    * the removed object (operations that remove things)
    * or just be undefined
    */
-  export function applyPatch(document: any, patch: Operation[], validate?: boolean): OperationResult[] {
-    const results: OperationResult[] = new Array(patch.length);
+  export function applyPatch<T>(document: T, patch: Operation[], validate?: boolean | Function): OperationResult<T>[] {
+    const results: OperationResult<T>[] = new Array(patch.length);
 
     for (let i = 0, length = patch.length; i < length; i++) {
-      results[i] = applyOperation.call(this, document, patch[i], validate, true);
+      results[i] = applyOperation(document, patch[i], validate, true);
       document = results[i].newDocument; // in case root was replaced
     }
     return results;
@@ -728,7 +739,7 @@ module jsonpatch {
         }
 
         if (patch[i].op == "copy" || patch[i].op == "move") {
-          value = jsonpatch.getValueByPointer(document, (<any>patch[i]).from);
+          value = getValueByPointer(document, (<any>patch[i]).from);
         }
         if (patch[i].op == "replace" || patch[i].op == "add") {
           value = (<any>patch[i]).value;
@@ -742,7 +753,7 @@ module jsonpatch {
 
       }
       else {
-        results[i] = applyOperation.call(this, document, patch[i], validate, true).result;
+        results[i] = applyOperation(document, patch[i], validate, true).result;
       }
     }
     return results;
@@ -757,9 +768,8 @@ module jsonpatch {
    * @param operation The operation to apply
    * @return The updated document
    */
-  export function applyReducer<T>(document: T, operation: Operation): T;
   export function applyReducer<T>(document: T, operation: Operation): T {
-    const operationResult: OperationResult = applyOperation.call(this, document, operation)
+    const operationResult: OperationResult<T> = applyOperation(document, operation)
     if (operationResult.result === false) { // failed test
       throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
     }
@@ -875,7 +885,7 @@ module jsonpatch {
    * @param document
    * @returns {JsonPatchError|undefined}
    */
-  export function validate(sequence: Operation[], document?: any): JsonPatchError {
+  export function validate(sequence: Operation[], document?: any, externalValidator?: Function): JsonPatchError {
     try {
       if (!_isArray(sequence)) {
         throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
@@ -883,11 +893,18 @@ module jsonpatch {
 
       if (document) {
         document = JSON.parse(JSON.stringify(document)); //clone document so that we can safely try applying operations
-        applyPatch.call(this, document, sequence, true);
+        this.applyPatch(document, sequence, true, externalValidator);
       }
       else {
-        for (var i = 0; i < sequence.length; i++) {
-          this.validator(sequence[i], i);
+        if(externalValidator) {
+          debugger;
+          for (var i = 0; i < sequence.length; i++) {
+            externalValidator(sequence[i], i);
+          }
+        } else {
+          for (var i = 0; i < sequence.length; i++) {
+            jsonpatch.validator(sequence[i], i);
+          }
         }
       }
     }
@@ -919,8 +936,8 @@ if (typeof exports !== "undefined") {
   exports.applyOperation = jsonpatch.applyOperation;
   exports.applyReducer = jsonpatch.applyReducer;
   exports.getValueByPointer = jsonpatch.getValueByPointer;
-  exports.escapePath = jsonpatch.escapePath;
-  exports.unEscapePath = jsonpatch.unEscapePath;
+  exports.escapePathComponent = jsonpatch.escapePathComponent;
+  exports.unescapePathComponent = jsonpatch.unescapePathComponent;
   exports.observe = jsonpatch.observe;
   exports.unobserve = jsonpatch.unobserve;
   exports.generate = jsonpatch.generate;

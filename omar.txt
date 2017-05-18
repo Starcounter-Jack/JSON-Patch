@@ -1,0 +1,1685 @@
+
+> fast-json-patch@1.1.10 test F:\wamp\www\starcounter\JSON-Patch
+> npm run test-core && npm run test-duplex
+
+
+> fast-json-patch@1.1.10 test-core F:\wamp\www\starcounter\JSON-Patch
+> jasmine  DUPLEX=no JASMINE_CONFIG_PATH=test/jasmine.json test/spec/jsonPatchTestsSpec.js test/spec/coreSpec.js test/spec/validateSpec.js
+
+ConsoleReporter is deprecated and will be removed in a future version.Started
+Started
+.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0mF[31mF[0mF[31mF[0m.[32m.[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0m.[32m.[0m.[32m.[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0m.[32m.[0m.[32m.[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0m.[32m.[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0m.[32m.[0mF[31mF[0mF[31mF[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0m.[32m.[0mF[31mF[0mF[31mF[0m.[32m.[0mF[31mF[0m.[32m.[0mF[31mF[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0mF[31mF[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0m.[32m.[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0mF[31mF[0m
+
+Failures:
+1) json-patch-tests tests.json should succeed: add replaces any existing field
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+2) json-patch-tests tests.json should succeed: toplevel array
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+3) json-patch-tests tests.json should succeed: toplevel object, numeric string
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+4) json-patch-tests tests.json should succeed: toplevel object, integer
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+5) json-patch-tests tests.json should succeed: Add, / target
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+6) json-patch-tests tests.json should succeed: Add composite value at top level
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+7) json-patch-tests tests.json should succeed: Add into composite value
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+8) json-patch-tests tests.json should succeed: [{"op":"add","path":"/bar","value":true}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+9) json-patch-tests tests.json should succeed: [{"op":"add","path":"/bar","value":false}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+10) json-patch-tests tests.json should succeed: [{"op":"add","path":"/bar","value":null}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+11) json-patch-tests tests.json should succeed: 0 can be an array index or object element name
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+12) json-patch-tests tests.json should succeed: [{"op":"add","path":"/1","value":"bar"}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+13) json-patch-tests tests.json should succeed: [{"op":"add","path":"/1","value":"bar"}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+14) json-patch-tests tests.json should succeed: [{"op":"add","path":"/0","value":"bar"}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+15) json-patch-tests tests.json should succeed: [{"op":"add","path":"/2","value":"bar"}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+16) json-patch-tests tests.json should succeed: test against implementation-specific numeric parsing
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+17) json-patch-tests tests.json should succeed: value in array add not flattened
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+18) json-patch-tests tests.json should succeed: [{"op":"remove","path":"/bar"}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+19) json-patch-tests tests.json should succeed: [{"op":"remove","path":"/baz/0/qux"}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+20) json-patch-tests tests.json should succeed: [{"op":"replace","path":"/foo","value":[1,2,3,4]}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+21) json-patch-tests tests.json should succeed: [{"op":"replace","path":"/baz/0/qux","value":"world"}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+22) json-patch-tests tests.json should succeed: [{"op":"replace","path":"/0","value":"bar"}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+23) json-patch-tests tests.json should succeed: [{"op":"replace","path":"/0","value":0}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+24) json-patch-tests tests.json should succeed: [{"op":"replace","path":"/0","value":true}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+25) json-patch-tests tests.json should succeed: [{"op":"replace","path":"/0","value":false}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+26) json-patch-tests tests.json should succeed: [{"op":"replace","path":"/0","value":null}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+27) json-patch-tests tests.json should succeed: value in array replace not flattened
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+28) json-patch-tests tests.json should succeed: replace whole document
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+29) json-patch-tests tests.json should succeed: spurious patch properties
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+30) json-patch-tests tests.json should throw an error: null value should be valid obj property
+  Message:
+    Expected 1 to be 0.
+  Stack:
+    Error: Expected 1 to be 0.
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+
+31) json-patch-tests tests.json should succeed: null value should be valid obj property to be replaced with something truthy
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+32) json-patch-tests tests.json should succeed: null value should be valid obj property to be moved
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+33) json-patch-tests tests.json should succeed: null value should be valid obj property to be copied
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+34) json-patch-tests tests.json should succeed: null value should be valid obj property to be removed
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+35) json-patch-tests tests.json should succeed: null value should still be valid obj property replace other value
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+36) json-patch-tests tests.json should throw an error: test should pass despite rearrangement
+  Message:
+    Expected 1 to be 0.
+  Stack:
+    Error: Expected 1 to be 0.
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+
+37) json-patch-tests tests.json should throw an error: test should pass despite (nested) rearrangement
+  Message:
+    Expected 1 to be 0.
+  Stack:
+    Error: Expected 1 to be 0.
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+
+38) json-patch-tests tests.json should throw an error: test should pass - no error
+  Message:
+    Expected 1 to be 0.
+  Stack:
+    Error: Expected 1 to be 0.
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+
+39) json-patch-tests tests.json should throw an error: Empty-string element
+  Message:
+    Expected 1 to be 0.
+  Stack:
+    Error: Expected 1 to be 0.
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+
+40) json-patch-tests tests.json should throw an error: [{"op":"test","path":"/foo","value":["bar","baz"]},{"op":"test","path":"/foo/0","value":"bar"},{"op":"test","path":"/","value":0},{"op":"test","path":"/a~1b","value":1},{"op":"test","path":"/c%d","value":2},{"op":"test","path":"/e^f","value":3},{"op":"test","path":"/g|h","value":4},{"op":"test","path":"/i\\j","value":5},{"op":"test","path":"/k\"l","value":6},{"op":"test","path":"/ ","value":7},{"op":"test","path":"/m~0n","value":8}]
+  Message:
+    Expected 1 to be 0.
+  Stack:
+    Error: Expected 1 to be 0.
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+
+41) json-patch-tests tests.json should succeed: Move to same location has no effect
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+42) json-patch-tests tests.json should succeed: [{"op":"move","from":"/foo","path":"/bar"}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+43) json-patch-tests tests.json should succeed: [{"op":"move","from":"/baz/0/qux","path":"/baz/1"}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+44) json-patch-tests tests.json should succeed: [{"op":"copy","from":"/baz/0","path":"/boo"}]
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+45) json-patch-tests tests.json should succeed: replacing the root of the document is possible with add
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+46) json-patch-tests tests.json should succeed: Adding to "/-" adds to the end of the array
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+47) json-patch-tests tests.json should succeed: Adding to "/-" adds to the end of the array, even n levels down
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+48) json-patch-tests tests.json should succeed: test remove on array
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+49) json-patch-tests tests.json should succeed: test repeated removes
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+50) json-patch-tests spec_tests.json should succeed: A.1.  Adding an Object Member
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+51) json-patch-tests spec_tests.json should succeed: A.2.  Adding an Array Element
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+52) json-patch-tests spec_tests.json should succeed: A.3.  Removing an Object Member
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+53) json-patch-tests spec_tests.json should succeed: A.4.  Removing an Array Element
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+54) json-patch-tests spec_tests.json should succeed: A.5.  Replacing a Value
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+55) json-patch-tests spec_tests.json should succeed: A.6.  Moving a Value
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+56) json-patch-tests spec_tests.json should succeed: A.7.  Moving an Array Element
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+57) json-patch-tests spec_tests.json should succeed: A.8.  Testing a Value: Success
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+58) json-patch-tests spec_tests.json should succeed: A.10.  Adding a nested Member Object
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+59) json-patch-tests spec_tests.json should succeed: A.11.  Ignoring Unrecognized Elements
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+60) json-patch-tests spec_tests.json should succeed: A.14. ~ Escape Ordering
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+61) json-patch-tests spec_tests.json should succeed: A.16. Adding an Array Value
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+
+62) validate should return an error that contains the patch and the patched object
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:80:27)
+
+63) validate should return error replacing an unexisting path
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:288:23)
+
+64) validate should return error removing an unexisting path
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:323:27)
+
+65) validate should allow adding property "b" in "a"
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:342:27)
+
+66) validate should report error because "a" does not exist
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:360:27)
+
+67) validate should return error when replacing a removed path
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:380:27)
+
+68) validate should allow to override validator to add custom validation
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:434:39)
+
+69) validate should pass replacing the tree root
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:454:27)
+
+70) validate should return error moving from an unexisting path
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:469:27)
+
+71) validate should return error copying from an unexisting path
+  Message:
+    TypeError: this.validator is not a function
+  Stack:
+    TypeError: this.validator is not a function
+        at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+        at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+        at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:484:27)
+
+72) validate using deprecated apply, should throw OPERATION_PATH_INVALID when applying patch without path, and throw a warning
+  Message:
+    Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.
+  Stack:
+    Error: Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:509:21)
+
+73) validate should throw OPERATION_PATH_INVALID when applying patch without path
+  Message:
+    Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.
+  Stack:
+    Error: Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:532:21)
+
+74) validate should throw OPERATION_PATH_INVALID when applying patch with an invalid path. Issue #77.
+  Message:
+    Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.
+  Stack:
+    Error: Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:554:21)
+
+75) validate should throw OPERATION_OP_INVALID when applying patch without operation
+  Message:
+    Expected 'TypeError' to be 'OPERATION_OP_INVALID'.
+  Stack:
+    Error: Expected 'TypeError' to be 'OPERATION_OP_INVALID'.
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:576:21)
+
+76) validate should throw OPERATION_VALUE_REQUIRED when applying patch without value
+  Message:
+    Expected 'TypeError' to be 'OPERATION_VALUE_REQUIRED'.
+  Stack:
+    Error: Expected 'TypeError' to be 'OPERATION_VALUE_REQUIRED'.
+        at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:598:21)
+
+196 specs, 76 failures
+Finished in 0.388 seconds
+
+
+
+json-patch-tests tests.json should succeed: add replaces any existing field
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: toplevel array
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: toplevel object, numeric string
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: toplevel object, integer
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: Add, / target
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: Add composite value at top level
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: Add into composite value
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"add","path":"/bar","value":true}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"add","path":"/bar","value":false}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"add","path":"/bar","value":null}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: 0 can be an array index or object element name
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"add","path":"/1","value":"bar"}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"add","path":"/1","value":"bar"}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"add","path":"/0","value":"bar"}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"add","path":"/2","value":"bar"}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: test against implementation-specific numeric parsing
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: value in array add not flattened
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"remove","path":"/bar"}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"remove","path":"/baz/0/qux"}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"replace","path":"/foo","value":[1,2,3,4]}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"replace","path":"/baz/0/qux","value":"world"}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"replace","path":"/0","value":"bar"}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"replace","path":"/0","value":0}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"replace","path":"/0","value":true}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"replace","path":"/0","value":false}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"replace","path":"/0","value":null}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: value in array replace not flattened
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: replace whole document
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: spurious patch properties
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should throw an error: null value should be valid obj property
+  Expected 1 to be 0.  Error: Expected 1 to be 0.
+      at stack (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1640:17)
+      at buildExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1610:14)
+      at Spec.Env.expectationResultFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:655:18)
+      at Spec.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:342:34)
+      at Expectation.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:599:21)
+      at Expectation.toBe (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1564:12)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+
+json-patch-tests tests.json should succeed: null value should be valid obj property to be replaced with something truthy
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: null value should be valid obj property to be moved
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: null value should be valid obj property to be copied
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: null value should be valid obj property to be removed
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: null value should still be valid obj property replace other value
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should throw an error: test should pass despite rearrangement
+  Expected 1 to be 0.  Error: Expected 1 to be 0.
+      at stack (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1640:17)
+      at buildExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1610:14)
+      at Spec.Env.expectationResultFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:655:18)
+      at Spec.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:342:34)
+      at Expectation.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:599:21)
+      at Expectation.toBe (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1564:12)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+
+json-patch-tests tests.json should throw an error: test should pass despite (nested) rearrangement
+  Expected 1 to be 0.  Error: Expected 1 to be 0.
+      at stack (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1640:17)
+      at buildExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1610:14)
+      at Spec.Env.expectationResultFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:655:18)
+      at Spec.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:342:34)
+      at Expectation.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:599:21)
+      at Expectation.toBe (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1564:12)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+
+json-patch-tests tests.json should throw an error: test should pass - no error
+  Expected 1 to be 0.  Error: Expected 1 to be 0.
+      at stack (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1640:17)
+      at buildExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1610:14)
+      at Spec.Env.expectationResultFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:655:18)
+      at Spec.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:342:34)
+      at Expectation.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:599:21)
+      at Expectation.toBe (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1564:12)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+
+json-patch-tests tests.json should throw an error: Empty-string element
+  Expected 1 to be 0.  Error: Expected 1 to be 0.
+      at stack (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1640:17)
+      at buildExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1610:14)
+      at Spec.Env.expectationResultFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:655:18)
+      at Spec.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:342:34)
+      at Expectation.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:599:21)
+      at Expectation.toBe (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1564:12)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+
+json-patch-tests tests.json should throw an error: [{"op":"test","path":"/foo","value":["bar","baz"]},{"op":"test","path":"/foo/0","value":"bar"},{"op":"test","path":"/","value":0},{"op":"test","path":"/a~1b","value":1},{"op":"test","path":"/c%d","value":2},{"op":"test","path":"/e^f","value":3},{"op":"test","path":"/g|h","value":4},{"op":"test","path":"/i\\j","value":5},{"op":"test","path":"/k\"l","value":6},{"op":"test","path":"/ ","value":7},{"op":"test","path":"/m~0n","value":8}]
+  Expected 1 to be 0.  Error: Expected 1 to be 0.
+      at stack (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1640:17)
+      at buildExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1610:14)
+      at Spec.Env.expectationResultFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:655:18)
+      at Spec.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:342:34)
+      at Expectation.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:599:21)
+      at Expectation.toBe (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1564:12)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:66:30)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+
+json-patch-tests tests.json should succeed: Move to same location has no effect
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"move","from":"/foo","path":"/bar"}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"move","from":"/baz/0/qux","path":"/baz/1"}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: [{"op":"copy","from":"/baz/0","path":"/boo"}]
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: replacing the root of the document is possible with add
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: Adding to "/-" adds to the end of the array
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: Adding to "/-" adds to the end of the array, even n levels down
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: test remove on array
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests tests.json should succeed: test repeated removes
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.1.  Adding an Object Member
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.2.  Adding an Array Element
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.3.  Removing an Object Member
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.4.  Removing an Array Element
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.5.  Replacing a Value
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.6.  Moving a Value
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.7.  Moving an Array Element
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.8.  Testing a Value: Success
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.10.  Adding a nested Member Object
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.11.  Ignoring Unrecognized Elements
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.14. ~ Escape Ordering
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+json-patch-tests spec_tests.json should succeed: A.16. Adding an Array Value
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\jsonPatchTestsSpec.js:45:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+      at attemptAsync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1980:24)
+
+validate should return an error that contains the patch and the patched object
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:80:27)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+
+validate should return error replacing an unexisting path
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:288:23)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+
+validate should return error removing an unexisting path
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:323:27)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+
+validate should allow adding property "b" in "a"
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:342:27)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+
+validate should report error because "a" does not exist
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:360:27)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+
+validate should return error when replacing a removed path
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:380:27)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+
+validate should allow to override validator to add custom validation
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:434:39)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+
+validate should pass replacing the tree root
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:454:27)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+
+validate should return error moving from an unexisting path
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:469:27)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+
+validate should return error copying from an unexisting path
+  TypeError: this.validator is not a function  TypeError: this.validator is not a function
+      at applyOperation (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:224:18)
+      at Object.applyPatch (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:349:26)
+      at Object.validate (F:\wamp\www\starcounter\JSON-Patch\src\json-patch.js:526:22)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:484:27)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+      at Spec.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:371:10)
+      at Object.fn (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:2579:37)
+
+validate using deprecated apply, should throw OPERATION_PATH_INVALID when applying patch without path, and throw a warning
+  Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.  Error: Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.
+      at stack (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1640:17)
+      at buildExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1610:14)
+      at Spec.Env.expectationResultFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:655:18)
+      at Spec.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:342:34)
+      at Expectation.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:599:21)
+      at Expectation.toBe (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1564:12)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:509:21)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+
+validate should throw OPERATION_PATH_INVALID when applying patch without path
+  Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.  Error: Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.
+      at stack (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1640:17)
+      at buildExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1610:14)
+      at Spec.Env.expectationResultFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:655:18)
+      at Spec.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:342:34)
+      at Expectation.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:599:21)
+      at Expectation.toBe (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1564:12)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:532:21)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+
+validate should throw OPERATION_PATH_INVALID when applying patch with an invalid path. Issue #77.
+  Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.  Error: Expected 'TypeError' to be 'OPERATION_PATH_INVALID'.
+      at stack (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1640:17)
+      at buildExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1610:14)
+      at Spec.Env.expectationResultFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:655:18)
+      at Spec.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:342:34)
+      at Expectation.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:599:21)
+      at Expectation.toBe (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1564:12)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:554:21)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+
+validate should throw OPERATION_OP_INVALID when applying patch without operation
+  Expected 'TypeError' to be 'OPERATION_OP_INVALID'.  Error: Expected 'TypeError' to be 'OPERATION_OP_INVALID'.
+      at stack (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1640:17)
+      at buildExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1610:14)
+      at Spec.Env.expectationResultFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:655:18)
+      at Spec.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:342:34)
+      at Expectation.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:599:21)
+      at Expectation.toBe (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1564:12)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:576:21)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+
+validate should throw OPERATION_VALUE_REQUIRED when applying patch without value
+  Expected 'TypeError' to be 'OPERATION_VALUE_REQUIRED'.  Error: Expected 'TypeError' to be 'OPERATION_VALUE_REQUIRED'.
+      at stack (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1640:17)
+      at buildExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1610:14)
+      at Spec.Env.expectationResultFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:655:18)
+      at Spec.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:342:34)
+      at Expectation.addExpectationResult (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:599:21)
+      at Expectation.toBe (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1564:12)
+      at Object.<anonymous> (F:\wamp\www\starcounter\JSON-Patch\test\spec\validateSpec.js:598:21)
+      at attemptSync (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1950:24)
+      at QueueRunner.run (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1938:9)
+      at QueueRunner.execute (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:1923:10)
+      at Spec.Env.queueRunnerFactory (F:\wamp\www\starcounter\JSON-Patch\node_modules\jasmine-core\lib\jasmine-core\jasmine.js:714:35)
+
+196 specs, 76 failures
+Finished in 0 seconds

@@ -373,13 +373,13 @@ describe('root replacement with applyOperation', function() {
       var obj = {
         hello: 'world'
       };
-      expect(
+      expect(() =>
         jsonpatch.applyOperation(obj, {
           op: 'test',
           path: '',
           value: 1
-        }).result
-      ).toBe(false);
+        })
+      ).toThrow();
     });
     it('should `test` against root (on a json document of type array) - and return false', function() {
       var obj = [
@@ -388,13 +388,13 @@ describe('root replacement with applyOperation', function() {
         }
       ];
 
-      expect(
+      expect(() =>
         jsonpatch.applyOperation(obj, {
           op: 'test',
           path: '',
           value: 1
-        }).result
-      ).toBe(false);
+        })
+      ).toThrow();
     });
   });
 });
@@ -659,13 +659,15 @@ describe('core - using applyOperation', function() {
         }
       }).newDocument
     ).toEqual(obj);
-    expect(
+    
+    expect(() =>
       jsonpatch.applyOperation(obj, {
         op: 'test',
         path: '/foo',
-        value: [1, 2]
-      }).result
-    ).toBe(false);
+        value: 1
+      })
+    ).toThrow();
+
     expect(
       jsonpatch.applyOperation(obj, {
         op: 'test',
@@ -713,14 +715,14 @@ describe('core - using applyOperation', function() {
         value: true
       }).newDocument
     ).toEqual(obj);
-    expect(
+    expect(() =>
       jsonpatch.applyOperation(obj, {
         op: 'test',
         path: '/bar/d',
         value: false
-      }).result
-    ).toBe(false);
-    expect(
+      })
+    ).toThrow();
+    expect(() =>
       jsonpatch.applyOperation(obj, {
         op: 'test',
         path: '/bar',
@@ -731,8 +733,8 @@ describe('core - using applyOperation', function() {
           a: 'a',
           foo: 'bar'
         }
-      }).result
-    ).toBe(false);
+      })
+    ).toThrow();
   });
 
   it('should apply test on root', function() {
@@ -748,13 +750,13 @@ describe('core - using applyOperation', function() {
         }
       }).newDocument
     ).toEqual(obj);
-    expect(
+    expect(() =>
       jsonpatch.applyOperation(obj, {
         op: 'test',
         path: '',
         value: 1
-      }).result
-    ).toBe(false);
+      })
+    ).toThrow();
   });
 
   it('should apply move', function() {
@@ -1167,15 +1169,15 @@ describe('core', function() {
       ])[0].result
     ).toBe(true);
 
-    expect(
+    expect(() =>
       jsonpatch.applyPatch(obj, [
         {
           op: 'test',
           path: '/foo',
           value: [1, 2]
         }
-      ])[0].result
-    ).toBe(false);
+      ])
+    ).toThrow();
 
     expect(
       jsonpatch.applyPatch(obj, [
@@ -1237,16 +1239,16 @@ describe('core', function() {
         }
       ])[0].result
     ).toBe(true);
-    expect(
+    expect(() =>
       jsonpatch.applyPatch(obj, [
         {
           op: 'test',
           path: '/bar/d',
           value: false
         }
-      ])[0].result
-    ).toBe(false);
-    expect(
+      ])
+    ).toThrow();
+    expect(() =>
       jsonpatch.applyPatch(obj, [
         {
           op: 'test',
@@ -1259,8 +1261,8 @@ describe('core', function() {
             foo: 'bar'
           }
         }
-      ])[0].result
-    ).toBe(false);
+      ])
+    ).toThrow();
   });
 
   it('should apply test on root', function() {
@@ -1278,8 +1280,7 @@ describe('core', function() {
         }
       ])[0].result
     ).toBe(true);
-    debugger;
-    expect(
+    expect(() =>
       jsonpatch.applyPatch(obj, [
         {
           op: 'test',
@@ -1288,8 +1289,8 @@ describe('core', function() {
             hello: 'universe'
           }
         }
-      ])[0].result
-    ).toBe(false);
+      ])
+    ).toThrow();
   });
 
   it('should apply move', function() {
@@ -1681,15 +1682,15 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
         foo: 1,
         not: undefined
       };
-      expect(
+      expect(() =>
         jsonpatch.applyPatch(obj, [
           {
             op: 'test',
             path: '/not',
             value: 'defined'
           }
-        ])[0].result
-      ).toBe(false);
+        ])
+      ).toThrow();
       expect(
         jsonpatch.applyPatch(obj, [
           {
@@ -1705,24 +1706,24 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
         foo: 1,
         bar: [0, 1, undefined, 3]
       };
-      expect(
+      expect(() =>
         jsonpatch.applyPatch(obj, [
           {
             op: 'test',
             path: '/bar/2',
             value: 'defined'
           }
-        ])[0].result
-      ).toBe(false);
-      expect(
+        ])
+      ).toThrow();
+      expect(() =>
         jsonpatch.applyPatch(obj, [
           {
             op: 'test',
             path: '/bar/2',
             value: null
           }
-        ])[0].result
-      ).toBe(false);
+        ])
+      ).toThrow();
       expect(
         jsonpatch.applyPatch(obj, [
           {
