@@ -12,7 +12,11 @@ interface HTMLElement {
 
 module jsonpatch {
   export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any>;
-
+  
+  export interface Validator<T> {
+    (operation: Operation, index: number, document: T, existingPathFragment: string): void;
+  }
+  
   export interface OperationResult<T> {
     result: any,
     newDocument: T;
@@ -131,38 +135,27 @@ module jsonpatch {
               return false;
           return true;
         }
-        /*
-        var bKeys = _objectKeys(b);
-        var bLength = bKeys.length;
-        // 1) do NOT compare the number of keys unless you consider `{someKey: undefined}` NOT equal to `{}`
-        if (_objectKeys(a).length !== bLength)
-          return false;
-        // 2) this is wrong anyways since it uses the `i` index instead of the actual key - ie `a[0]` instead of `a[bKeys[0]]`
-        for (var i = 0; i < bLength; i++)
-          if (!_equals(a[i], b[i]))
-            return false;
-        */
-        var aKeys = _objectKeys(a);
-        var bKeys = _objectKeys(b);
+        const aKeys = _objectKeys(a);
+        const bKeys = _objectKeys(b);
 
-        for (var key of aKeys)
+        for (let key of aKeys) {
           // check all properties of `a` to equal their `b` counterpart
           if (!_equals(a[key], b[key])) {
             return false;
           }
-        // remove the key from consideration in next step since we know it's "equal"
-        var bKeysIdx = bKeys.indexOf(key);
-        if (bKeysIdx >= 0) {
-          bKeys.splice(bKeysIdx, 1);
+          // remove the key from consideration in next step since we know it's "equal"
+          const bKeysIdx = bKeys.indexOf(key);
+          if (bKeysIdx >= 0) {
+            bKeys.splice(bKeysIdx, 1);
+          }
         }
 
-        for (var key of bKeys) {
+        for (let key of bKeys) {
           // lastly, test any untested properties of `b`
           if (!_equals(a[key], b[key])) {
             return false;
           }
         }
-
         return true;
       default:
         return false;
@@ -581,14 +574,14 @@ module jsonpatch {
    * @param mutateDocument Whether to mutate the original document or clone it before applying
    * @return `{newDocument, result}` after the operation
    */
-  export function applyOperation<T>(document: any, operation: Operation, validateOperation?: boolean | Function, mutateDocument?: boolean): OperationResult<T>;
-  export function applyOperation<T>(document: any, operation: Operation, validateOperation: boolean | Function = false, mutateDocument: boolean = true): OperationResult<T> {
+  export function applyOperation<T>(document: T, operation: Operation, validateOperation?: boolean | Validator<T>, mutateDocument?: boolean): OperationResult<T>;
+  export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true): OperationResult<T> {
     if (validateOperation) {
       if(typeof validateOperation == 'function') {
-        validateOperation(operation, 0);
+        validateOperation(operation, 0, document, operation.path);
       }
       else {      
-        jsonpatch.validator(operation, 0);
+        validator(operation, 0);
       }
     }
     const returnValue: OperationResult<T> = { newDocument: document, result: undefined };
@@ -642,8 +635,7 @@ module jsonpatch {
       let len = keys.length;
       let existingPathFragment = undefined;
       let key: string | number;
-      let i = 100;
-      while (true && i--) {
+      while (true) {
         key = keys[t];
 
         if (validateOperation) {
@@ -659,15 +651,16 @@ module jsonpatch {
                 validateOperation(operation, 0, document, existingPathFragment);
               }
               else {      
-                jsonpatch.validator(operation, 0, document, existingPathFragment);
+                validator(operation, 0, document, existingPathFragment);
               }
             }
           }
         }
         t++;
         if (_isArray(obj)) {
+          let length = (<any>obj).length;
           if (key === '-') {
-            key = obj.length;
+            key = length;
           }
           else {
             if (validate && !isInteger(key)) {
@@ -676,7 +669,7 @@ module jsonpatch {
             key = ~~key;
           }
           if (t >= len) {
-            if (validate && operation.op === "add" && key > obj.length) {
+            if (validate && operation.op === "add" && key > length) {
               throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
             }
             returnValue.result = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
@@ -714,7 +707,7 @@ module jsonpatch {
    * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
    * @return An array of `{newDocument, result}` after the patch
    */
-  export function applyPatch<T>(document: any, patch: Operation[], validateOperation?: boolean | Function): OperationResult<T>[] {
+  export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): OperationResult<T>[] {
     const results: OperationResult<any>[] = new Array(patch.length);
 
     for (let i = 0, length = patch.length; i < length; i++) {
@@ -732,7 +725,7 @@ module jsonpatch {
    * or just be undefined
    * @deprecated
    */
-  export function apply<T>(document: T, patch: Operation[], validateOperation?: boolean | Function): any[] {
+  export function apply<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): any[] {
     console.warn('jsonpatch.apply is deprecated, please use `applyPatch` for applying patch sequences, or `applyOperation` to apply individual operations.');
     const results = new Array(patch.length);
 
@@ -835,7 +828,7 @@ module jsonpatch {
    * @param {object} [document] - object where the operation is supposed to be applied
    * @param {string} [existingPathFragment] - comes along with `documente`
    */
-  export function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string) {
+  export function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string) : void {
     debugger
     if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
       throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);
@@ -896,7 +889,7 @@ module jsonpatch {
    * @param document
    * @returns {JsonPatchError|undefined}
    */
-  export function validate(sequence: Operation[], document?: any, externalValidator?: Function): JsonPatchError {
+  export function validate<T>(sequence: Operation[], document?: T, externalValidator?: Validator<T>): JsonPatchError {
     try {
       if (!_isArray(sequence)) {
         throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
@@ -913,11 +906,11 @@ module jsonpatch {
       else {
         if(externalValidator) {
           for (var i = 0; i < sequence.length; i++) {
-            externalValidator(sequence[i], i);
+            externalValidator(sequence[i], i, document, sequence[i].path);
           }
         } else {
           for (var i = 0; i < sequence.length; i++) {
-            jsonpatch.validator(sequence[i], i);
+            validator(sequence[i], i);
           }
         }
       }

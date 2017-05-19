@@ -170,7 +170,7 @@ else {
 
 ## API
 
-#### `jsonpatch.applyPatch<T>(document: any, patch: Operation[], validateOperation: <Boolean | Function> = false): any[]`
+#### `jsonpatch.applyPatch<T>(document: any, patch: Operation[], validateOperation: Boolean | Function = false): any[]`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 

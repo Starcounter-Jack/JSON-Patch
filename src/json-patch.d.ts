@@ -6,6 +6,9 @@
  */
 declare namespace jsonpatch {
     type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any>;
+    interface Validator<T> {
+        (operation: Operation, index: number, document: T, existingPathFragment: string): void;
+    }
     interface OperationResult<T> {
         result: any;
         newDocument: T;
@@ -91,7 +94,7 @@ declare namespace jsonpatch {
      * @param mutateDocument Whether to mutate the original document or clone it before applying
      * @return `{newDocument, result}` after the operation
      */
-    function applyOperation<T>(document: any, operation: Operation, validateOperation?: boolean | Function, mutateDocument?: boolean): OperationResult<T>;
+    function applyOperation<T>(document: T, operation: Operation, validateOperation?: boolean | Validator<T>, mutateDocument?: boolean): OperationResult<T>;
     /**
      * Apply a full JSON Patch array on a JSON document.
      * Returns the {newDocument, result} of the patch.
@@ -101,7 +104,7 @@ declare namespace jsonpatch {
      * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
      * @return An array of `{newDocument, result}` after the patch
      */
-    function applyPatch<T>(document: any, patch: Operation[], validateOperation?: boolean | Function): OperationResult<T>[];
+    function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): OperationResult<T>[];
     /**
      * Apply a JSON Patch on a JSON document.
      * Returns an array of results of operations.
@@ -110,7 +113,7 @@ declare namespace jsonpatch {
      * or just be undefined
      * @deprecated
      */
-    function apply<T>(document: T, patch: Operation[], validateOperation?: boolean | Function): any[];
+    function apply<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): any[];
     /**
      * Apply a single JSON Patch Operation on a JSON document.
      * Returns the updated document.
@@ -144,6 +147,6 @@ declare namespace jsonpatch {
      * @param document
      * @returns {JsonPatchError|undefined}
      */
-    function validate(sequence: Operation[], document?: any, externalValidator?: Function): JsonPatchError;
+    function validate<T>(sequence: Operation[], document?: T, externalValidator?: Validator<T>): JsonPatchError;
 }
 export default jsonpatch;
