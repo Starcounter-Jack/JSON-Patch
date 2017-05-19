@@ -352,7 +352,7 @@ namespace jsonpatch {
           returnValue.newDocument = null;
           return returnValue;
         } else { /* bad operation */
-          if (validate) {
+          if (validateOperation) {
             throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
           } else {
             returnValue.newDocument = document;
@@ -400,13 +400,13 @@ namespace jsonpatch {
             key = length;
           }
           else {
-            if (validate && !isInteger(key)) {
+            if (validateOperation && !isInteger(key)) {
               throw new JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", 0, operation.path, operation);
             }
             key = ~~key;
           }
           if (t >= len) {
-            if (validate && operation.op === "add" && key > length) {
+            if (validateOperation && operation.op === "add" && key > length) {
               throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
             }
             returnValue.result = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
@@ -611,7 +611,7 @@ namespace jsonpatch {
       }
       else if (operation.op === 'move' || operation.op === 'copy') {
         var existingValue: any = { op: "_get", path: operation.from, value: undefined };
-        var error = jsonpatch.validate([existingValue], document);
+        var error = validate([existingValue], document);
         if (error && error.name === 'OPERATION_PATH_UNRESOLVABLE') {
           throw new JsonPatchError('Cannot perform the operation from a path that does not exist', 'OPERATION_FROM_UNRESOLVABLE', index, operation, document);
         }
