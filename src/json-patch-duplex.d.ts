@@ -100,13 +100,26 @@ declare module jsonpatch {
      */
     function applyOperation<T>(document: T, operation: Operation): OperationResult<T>;
     /**
-     * Apply a JSON Patch on a JSON document.
-     * Returns an array of results of operations.
-     * Each element can either be a boolean (if op == 'test') or
-     * the removed object (operations that remove things)
-     * or just be undefined
+     * Apply a single JSON Patch Operation on a JSON document.
+     * Returns the {newDocument, result} of the operation.
+     *
+     * @param document The document to patch
+     * @param operation The operation to apply
+     * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
+     * @param mutateDocument Whether to mutate the original document or clone it before applying
+     * @return `{newDocument, result}` after the operation
      */
-    function applyPatch<T>(document: T, patch: Operation[], validate?: boolean | Function): OperationResult<T>[];
+    function applyOperation<T>(document: any, operation: Operation, validateOperation?: boolean | Function, mutateDocument?: boolean): OperationResult<T>;
+    /**
+     * Apply a full JSON Patch array on a JSON document.
+     * Returns the {newDocument, result} of the patch.
+     *
+     * @param document The document to patch
+     * @param patch The patch to apply
+     * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
+     * @return An array of `{newDocument, result}` after the patch
+     */
+    function applyPatch<T>(document: any, patch: Operation[], validateOperation?: boolean | Function): OperationResult<T>[];
     /**
      * Apply a JSON Patch on a JSON document.
      * Returns an array of results of operations.
@@ -115,7 +128,7 @@ declare module jsonpatch {
      * or just be undefined
      * @deprecated
      */
-    function apply(document: any, patch: Operation[], validate?: boolean): any[];
+    function apply<T>(document: T, patch: Operation[], validateOperation?: boolean | Function): any[];
     /**
      * Apply a single JSON Patch Operation on a JSON document.
      * Returns the updated document.

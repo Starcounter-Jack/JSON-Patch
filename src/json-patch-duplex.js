@@ -428,22 +428,12 @@ var jsonpatch;
         return document;
     }
     jsonpatch.getValueByPointer = getValueByPointer;
-    /**
-     * Apply a single JSON Patch Operation on a JSON document.
-     * Returns the {newDocument, result} of the operation.
-     *
-     * @param document The document to patch
-     * @param operation The operation to apply
-     * @param validate `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `function` to validate on your own.
-     * @param mutateDocument Whether to mutate the original document or clone it before applying
-     * @return `{newDocument, result}` after the operation
-     */
-    function applyOperation(document, operation, validate, mutateDocument) {
-        if (validate === void 0) { validate = false; }
+    function applyOperation(document, operation, validateOperation, mutateDocument) {
+        if (validateOperation === void 0) { validateOperation = false; }
         if (mutateDocument === void 0) { mutateDocument = true; }
-        if (validate) {
-            if (typeof validate !== 'boolean') {
-                validate(operation, 0);
+        if (validateOperation) {
+            if (typeof validateOperation == 'function') {
+                validateOperation(operation, 0);
             }
             else {
                 jsonpatch.validator(operation, 0);
@@ -508,7 +498,7 @@ var jsonpatch;
             var i = 100;
             while (true && i--) {
                 key = keys[t];
-                if (validate) {
+                if (validateOperation) {
                     if (existingPathFragment === undefined) {
                         if (obj[key] === undefined) {
                             existingPathFragment = keys.slice(0, t).join('/');
@@ -517,7 +507,12 @@ var jsonpatch;
                             existingPathFragment = operation.path;
                         }
                         if (existingPathFragment !== undefined) {
-                            jsonpatch.validator(operation, 0, document, existingPathFragment);
+                            if (typeof validateOperation == 'function') {
+                                validateOperation(operation, 0, document, existingPathFragment);
+                            }
+                            else {
+                                jsonpatch.validator(operation, 0, document, existingPathFragment);
+                            }
                         }
                     }
                 }
@@ -563,16 +558,18 @@ var jsonpatch;
     }
     jsonpatch.applyOperation = applyOperation;
     /**
-     * Apply a JSON Patch on a JSON document.
-     * Returns an array of results of operations.
-     * Each element can either be a boolean (if op == 'test') or
-     * the removed object (operations that remove things)
-     * or just be undefined
+     * Apply a full JSON Patch array on a JSON document.
+     * Returns the {newDocument, result} of the patch.
+     *
+     * @param document The document to patch
+     * @param patch The patch to apply
+     * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
+     * @return An array of `{newDocument, result}` after the patch
      */
-    function applyPatch(document, patch, validate) {
+    function applyPatch(document, patch, validateOperation) {
         var results = new Array(patch.length);
         for (var i = 0, length_1 = patch.length; i < length_1; i++) {
-            results[i] = applyOperation(document, patch[i], validate, true);
+            results[i] = applyOperation(document, patch[i], validateOperation);
             document = results[i].newDocument; // in case root was replaced
         }
         return results;
@@ -586,7 +583,7 @@ var jsonpatch;
      * or just be undefined
      * @deprecated
      */
-    function apply(document, patch, validate) {
+    function apply(document, patch, validateOperation) {
         console.warn('jsonpatch.apply is deprecated, please use `applyPatch` for applying patch sequences, or `applyOperation` to apply individual operations.');
         var results = new Array(patch.length);
         /* this code might be overkill, but will be removed soon, it is to prevent the breaking change of root operations */
@@ -608,7 +605,7 @@ var jsonpatch;
                 Object.keys(value_1).forEach(function (key) { return document[key] = value_1[key]; });
             }
             else {
-                results[i] = applyOperation(document, patch[i], validate, true).result;
+                results[i] = applyOperation(document, patch[i], validateOperation, true).result;
             }
         };
         for (var i = 0, length_2 = patch.length; i < length_2; i++) {
@@ -690,6 +687,7 @@ var jsonpatch;
      * @param {string} [existingPathFragment] - comes along with `documente`
      */
     function validator(operation, index, document, existingPathFragment) {
+        debugger;
         if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
             throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);
         }
@@ -749,11 +747,15 @@ var jsonpatch;
             }
             if (document) {
                 document = JSON.parse(JSON.stringify(document)); //clone document so that we can safely try applying operations
-                this.applyPatch(document, sequence, true, externalValidator);
+                if (typeof externalValidator == 'function') {
+                    applyPatch(document, sequence, externalValidator);
+                }
+                else {
+                    applyPatch(document, sequence, true);
+                }
             }
             else {
                 if (externalValidator) {
-                    debugger;
                     for (var i = 0; i < sequence.length; i++) {
                         externalValidator(sequence[i], i);
                     }

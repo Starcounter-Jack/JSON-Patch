@@ -170,7 +170,7 @@ else {
 
 ## API
 
-#### `jsonpatch.applyPatch<T>(document: any, patch: Operation[], validate: <Boolean | Function> = false): any[]`
+#### `jsonpatch.applyPatch<T>(document: any, patch: Operation[], validateOperation: <Boolean | Function> = false): any[]`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
@@ -186,7 +186,7 @@ Returns an array of objects - one item for each item in `patches`, each item is 
 
 See [Validation notes](#validation-notes)
 
-#### `applyOperation<T>(document: any, operation: Operation, validate: <Boolean | Function> = false, mutateDocument = true): OperationResult<T>`
+#### `applyOperation<T>(document: any, operation: Operation, validateOperation: <Boolean | Function> = false, mutateDocument = true): OperationResult<T>`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
@@ -194,7 +194,7 @@ Applies single operation object `operation` on `document`.
 
 - `document` The document to patch
 - `operation` The operation to apply
-- `validate` Whether to validate the operation
+- `validateOperation` Whether to validate the operation, or to pass a validator callback
 - `mutateDocument` Whether to mutate the original document or clone it before applying
 
 Returns the a result object `{newDocument, result}`.
@@ -319,7 +319,7 @@ Unescapes a json pointer `path`.
 
 Functions `applyPatch`, `applyOperation`, and `validate` accept a `validate`/ `validator` parameter:
 
-- If the `validate` parameter is set to `false`, validation will not occur.
+- If the `validateOperation` parameter is set to `false`, validation will not occur.
 - If set to `true`, the patch is extensively validated before applying using jsonpatch's default validation.
 - If set to a `function` callback, the patch is validated using that function.
 

@@ -276,15 +276,17 @@ describe('core', function() {
         }
       ])[0]
     ).toBe(true);
-    expect(
+
+    expect(() =>
       jsonpatch.apply(obj, [
         {
           op: 'test',
           path: '/foo',
           value: [1, 2]
         }
-      ])[0]
+      ])
     ).toThrow();
+
     expect(
       jsonpatch.apply(obj, [
         {
@@ -299,6 +301,7 @@ describe('core', function() {
         }
       ])[0]
     ).toBe(true);
+
     expect(
       jsonpatch.apply(obj, [
         {
@@ -308,6 +311,7 @@ describe('core', function() {
         }
       ])[0]
     ).toBe(true);
+
     expect(
       jsonpatch.apply(obj, [
         {
@@ -317,6 +321,7 @@ describe('core', function() {
         }
       ])[0]
     ).toBe(true);
+
     expect(
       jsonpatch.apply(obj, [
         {
@@ -326,6 +331,7 @@ describe('core', function() {
         }
       ])[0]
     ).toBe(true);
+
     expect(
       jsonpatch.apply(obj, [
         {
@@ -335,6 +341,7 @@ describe('core', function() {
         }
       ])[0]
     ).toBe(true);
+
     expect(
       jsonpatch.apply(obj, [
         {
@@ -344,7 +351,8 @@ describe('core', function() {
         }
       ])[0]
     ).toBe(true);
-    expect(
+
+    expect(() =>
       jsonpatch.apply(obj, [
         {
           op: 'test',
@@ -353,6 +361,7 @@ describe('core', function() {
         }
       ])[0]
     ).toThrow();
+
     expect(() =>
       jsonpatch.apply(obj, [
         {

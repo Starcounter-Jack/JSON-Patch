@@ -380,7 +380,7 @@ describe('validate', function() {
     expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
   });
 
-  xit('should allow to override validator to add custom validation', function() {
+  it('should allow to override validator to add custom validation', function() {
     var tree = {
       password: 'Elvis'
     };

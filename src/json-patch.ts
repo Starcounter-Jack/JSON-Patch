@@ -268,7 +268,6 @@ namespace jsonpatch {
 
 
 
-
   /**
   * Escapes a json pointer path
   * @param path The raw pointer
@@ -325,14 +324,15 @@ namespace jsonpatch {
    *
    * @param document The document to patch
    * @param operation The operation to apply
-   * @param validate `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `function` to validate on your own.
+   * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
    * @param mutateDocument Whether to mutate the original document or clone it before applying
    * @return `{newDocument, result}` after the operation
    */
-  export function applyOperation<T>(document: any, operation: Operation, validate = false, mutateDocument = true): OperationResult<T> {
-    if (validate) {
-      if(typeof validate !== 'boolean') {
-        validate(operation, 0);
+  export function applyOperation<T>(document: any, operation: Operation, validateOperation?: boolean | Function, mutateDocument?: boolean): OperationResult<T>;
+  export function applyOperation<T>(document: any, operation: Operation, validateOperation: boolean | Function = false, mutateDocument: boolean = true): OperationResult<T> {
+    if (validateOperation) {
+      if(typeof validateOperation == 'function') {
+        validateOperation(operation, 0);
       }
       else {      
         jsonpatch.validator(operation, 0);
@@ -393,7 +393,7 @@ namespace jsonpatch {
       while (true && i--) {
         key = keys[t];
 
-        if (validate) {
+        if (validateOperation) {
           if (existingPathFragment === undefined) {
             if (obj[key] === undefined) {
               existingPathFragment = keys.slice(0, t).join('/');
@@ -402,7 +402,12 @@ namespace jsonpatch {
               existingPathFragment = operation.path;
             }
             if (existingPathFragment !== undefined) {
-              jsonpatch.validator(operation, 0, document, existingPathFragment);
+              if(typeof validateOperation == 'function') {
+                validateOperation(operation, 0, document, existingPathFragment);
+              }
+              else {      
+                jsonpatch.validator(operation, 0, document, existingPathFragment);
+              }
             }
           }
         }
@@ -448,17 +453,19 @@ namespace jsonpatch {
   }
 
   /**
-   * Apply a JSON Patch on a JSON document.
-   * Returns an array of results of operations.
-   * Each element can either be a boolean (if op == 'test') or
-   * the removed object (operations that remove things)
-   * or just be undefined
+   * Apply a full JSON Patch array on a JSON document.
+   * Returns the {newDocument, result} of the patch.
+   *
+   * @param document The document to patch
+   * @param patch The patch to apply
+   * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
+   * @return An array of `{newDocument, result}` after the patch
    */
-  export function applyPatch<T>(document: T, patch: Operation[], validate?: boolean | Function): OperationResult<T>[] {
-    const results: OperationResult<T>[] = new Array(patch.length);
+  export function applyPatch<T>(document: any, patch: Operation[], validateOperation?: boolean | Function): OperationResult<T>[] {
+    const results: OperationResult<any>[] = new Array(patch.length);
 
     for (let i = 0, length = patch.length; i < length; i++) {
-      results[i] = applyOperation(document, patch[i], validate, true);
+      results[i] = applyOperation(document, patch[i], validateOperation);
       document = results[i].newDocument; // in case root was replaced
     }
     return results;
@@ -472,7 +479,7 @@ namespace jsonpatch {
    * or just be undefined
    * @deprecated
    */
-  export function apply(document: any, patch: Operation[], validate?: boolean): any[] {
+  export function apply<T>(document: T, patch: Operation[], validateOperation?: boolean | Function): any[] {
     console.warn('jsonpatch.apply is deprecated, please use `applyPatch` for applying patch sequences, or `applyOperation` to apply individual operations.');
     const results = new Array(patch.length);
 
@@ -501,7 +508,7 @@ namespace jsonpatch {
 
       }
       else {
-        results[i] = applyOperation(document, patch[i], validate, true).result;
+        results[i] = applyOperation(document, patch[i], validateOperation, true).result;
       }
     }
     return results;
@@ -523,6 +530,8 @@ namespace jsonpatch {
     }
     return operationResult.newDocument;
   }
+
+
 
   // provide scoped __extends for TypeScript's `extend` keyword so it will not provide global one during compilation
   function __extends(d, b) {
@@ -574,6 +583,7 @@ namespace jsonpatch {
    * @param {string} [existingPathFragment] - comes along with `documente`
    */
   export function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string) {
+    debugger
     if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
       throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);
     }
@@ -641,11 +651,14 @@ namespace jsonpatch {
 
       if (document) {
         document = JSON.parse(JSON.stringify(document)); //clone document so that we can safely try applying operations
-        this.applyPatch(document, sequence, true, externalValidator);
+        if(typeof externalValidator == 'function') {
+          applyPatch(document, sequence, externalValidator); 
+        } else {
+          applyPatch(document, sequence, true); 
+        }
       }
       else {
         if(externalValidator) {
-          debugger;
           for (var i = 0; i < sequence.length; i++) {
             externalValidator(sequence[i], i);
           }
@@ -663,7 +676,7 @@ namespace jsonpatch {
       else {
         throw e;
       }
-    }
+    }  
   }
 
 
