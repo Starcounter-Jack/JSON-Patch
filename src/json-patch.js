@@ -206,6 +206,16 @@ var jsonpatch;
         return document;
     }
     jsonpatch.getValueByPointer = getValueByPointer;
+    /**
+     * Apply a single JSON Patch Operation on a JSON document.
+     * Returns the {newDocument, result} of the operation.
+     *
+     * @param document The document to patch
+     * @param operation The operation to apply
+     * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
+     * @param mutateDocument Whether to mutate the original document or clone it before applying
+     * @return `{newDocument, result}` after the operation
+     */
     function applyOperation(document, operation, validateOperation, mutateDocument) {
         if (validateOperation === void 0) { validateOperation = false; }
         if (mutateDocument === void 0) { mutateDocument = true; }

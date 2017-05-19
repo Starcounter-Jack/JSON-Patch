@@ -95,15 +95,6 @@ declare module jsonpatch {
     function getValueByPointer(document: any, pointer: string): any;
     /**
      * Apply a single JSON Patch Operation on a JSON document.
-     * Returns {newDocument, result} of the operation.
-     *
-     * @param document The document to patch
-     * @param operation The operation to apply
-     * @return `{newDocument, result}` after the operation
-     */
-    function applyOperation<T>(document: T, operation: Operation): OperationResult<T>;
-    /**
-     * Apply a single JSON Patch Operation on a JSON document.
      * Returns the {newDocument, result} of the operation.
      *
      * @param document The document to patch

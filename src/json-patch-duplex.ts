@@ -514,6 +514,8 @@ module jsonpatch {
   }
 
 
+
+
   /**
   * Escapes a json pointer path
   * @param path The raw pointer
@@ -556,16 +558,6 @@ module jsonpatch {
   }
   /**
    * Apply a single JSON Patch Operation on a JSON document.
-   * Returns {newDocument, result} of the operation.
-   *
-   * @param document The document to patch
-   * @param operation The operation to apply
-   * @return `{newDocument, result}` after the operation
-   */
-  export function applyOperation<T>(document: T, operation: Operation): OperationResult<T>;
-
-  /**
-   * Apply a single JSON Patch Operation on a JSON document.
    * Returns the {newDocument, result} of the operation.
    *
    * @param document The document to patch
@@ -574,7 +566,6 @@ module jsonpatch {
    * @param mutateDocument Whether to mutate the original document or clone it before applying
    * @return `{newDocument, result}` after the operation
    */
-  export function applyOperation<T>(document: T, operation: Operation, validateOperation?: boolean | Validator<T>, mutateDocument?: boolean): OperationResult<T>;
   export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true): OperationResult<T> {
     if (validateOperation) {
       if(typeof validateOperation == 'function') {
@@ -828,7 +819,7 @@ module jsonpatch {
    * @param {object} [document] - object where the operation is supposed to be applied
    * @param {string} [existingPathFragment] - comes along with `documente`
    */
-  export function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string) : void {
+  export function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string) : void  {
     debugger
     if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
       throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);

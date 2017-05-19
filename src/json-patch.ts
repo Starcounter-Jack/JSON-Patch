@@ -304,16 +304,6 @@ namespace jsonpatch {
   }
   /**
    * Apply a single JSON Patch Operation on a JSON document.
-   * Returns {newDocument, result} of the operation.
-   *
-   * @param document The document to patch
-   * @param operation The operation to apply
-   * @return `{newDocument, result}` after the operation
-   */
-  export function applyOperation<T>(document: T, operation: Operation): OperationResult<T>;
-
-  /**
-   * Apply a single JSON Patch Operation on a JSON document.
    * Returns the {newDocument, result} of the operation.
    *
    * @param document The document to patch
@@ -322,7 +312,6 @@ namespace jsonpatch {
    * @param mutateDocument Whether to mutate the original document or clone it before applying
    * @return `{newDocument, result}` after the operation
    */
-  export function applyOperation<T>(document: T, operation: Operation, validateOperation?: boolean | Validator<T>, mutateDocument?: boolean): OperationResult<T>;
   export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true): OperationResult<T> {
     if (validateOperation) {
       if(typeof validateOperation == 'function') {
@@ -672,8 +661,6 @@ namespace jsonpatch {
       }
     }  
   }
-
-
 }
 
 if (typeof exports !== "undefined") {
