@@ -487,12 +487,12 @@ module jsonpatch {
     }
   }
 
-  var _isArray;
+  var _isArray: (obj: any) => obj is any[];
   if (Array.isArray) { //standards; http://jsperf.com/isarray-shim/4
     _isArray = Array.isArray;
   }
   else { //IE8 shim
-    _isArray = function (obj: any) {
+    _isArray = function (obj: any): obj is any[] {
       return obj.push && typeof obj.length === 'number';
     }
   }
@@ -649,7 +649,7 @@ module jsonpatch {
         }
         t++;
         if (_isArray(obj)) {
-          let length = (<any>obj).length;
+          let length = obj.length;
           if (key === '-') {
             key = length;
           }
@@ -834,7 +834,7 @@ module jsonpatch {
     }
 
     else if (operation.path.indexOf('/') !== 0 && operation.path.length > 0) {
-      // paths that aren't emptystring should start with "/"
+      // paths that aren't empty string should start with "/"
       throw new JsonPatchError('Operation `path` property must start with "/"', 'OPERATION_PATH_INVALID', index, operation, document);
     }
 

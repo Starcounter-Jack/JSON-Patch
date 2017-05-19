@@ -486,7 +486,7 @@ var jsonpatch;
             throw new JsonPatchError('Operation `path` property is not a string', 'OPERATION_PATH_INVALID', index, operation, document);
         }
         else if (operation.path.indexOf('/') !== 0 && operation.path.length > 0) {
-            // paths that aren't emptystring should start with "/"
+            // paths that aren't empty string should start with "/"
             throw new JsonPatchError('Operation `path` property must start with "/"', 'OPERATION_PATH_INVALID', index, operation, document);
         }
         else if ((operation.op === 'move' || operation.op === 'copy') && typeof operation.from !== 'string') {
