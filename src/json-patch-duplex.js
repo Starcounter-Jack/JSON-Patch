@@ -403,18 +403,9 @@ var jsonpatch;
      * @return The retrieved value
      */
     function getValueByPointer(document, pointer) {
-        var pathSegments = [];
-        if (pointer) {
-            pathSegments = pointer.substring(1).split(/\//).map(jsonpatch.unescapePathComponent);
-        }
-        for (var i = 0; i < pathSegments.length; i++) {
-            var subPropertyKey = pathSegments[i];
-            if (!(subPropertyKey in document)) {
-                return undefined;
-            }
-            document = document[subPropertyKey];
-        }
-        return document;
+        var getOriginalDestination = { op: "_get", path: pointer };
+        applyOperation(document, getOriginalDestination);
+        return getOriginalDestination.value;
     }
     jsonpatch.getValueByPointer = getValueByPointer;
     /**

@@ -5,7 +5,7 @@
  * MIT license
  */
 declare module jsonpatch {
-    type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any>;
+    type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any>;
     interface Validator<T> {
         (operation: Operation, index: number, document: T, existingPathFragment: string): void;
     }
@@ -37,6 +37,10 @@ declare module jsonpatch {
     }
     interface TestOperation<T> extends BaseOperation {
         op: 'test';
+        value: T;
+    }
+    interface GetOperation<T> extends BaseOperation {
+        op: '_get';
         value: T;
     }
     /** DEPRECATED. Use `Operation` */

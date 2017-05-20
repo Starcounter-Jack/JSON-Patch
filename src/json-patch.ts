@@ -6,12 +6,12 @@
  */
 
 namespace jsonpatch {
-  export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any>;
+  export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any>;
 
   export interface Validator<T> {
     (operation: Operation, index: number, document: T, existingPathFragment: string): void;
   }
-  
+
   export interface OperationResult<T> {
     result: any,
     newDocument: T;
@@ -47,6 +47,10 @@ namespace jsonpatch {
 
   export interface TestOperation<T> extends BaseOperation {
     op: 'test';
+    value: T;
+  }
+  export interface GetOperation<T> extends BaseOperation {
+    op: '_get';
     value: T;
   }
 
@@ -234,7 +238,7 @@ namespace jsonpatch {
     _get: objOps._get
   };
 
- var _isArray: (obj: any) => obj is any[];
+  var _isArray: (obj: any) => obj is any[];
   if (Array.isArray) { //standards; http://jsperf.com/isarray-shim/4
     _isArray = Array.isArray;
   }
@@ -289,18 +293,9 @@ namespace jsonpatch {
    * @return The retrieved value
    */
   export function getValueByPointer(document: any, pointer: string): any {
-    let pathSegments = [];
-    if (pointer) { //empty string evaluates to false
-      pathSegments = pointer.substring(1).split(/\//).map(jsonpatch.unescapePathComponent);
-    }
-    for (let i = 0; i < pathSegments.length; i++) {
-      let subPropertyKey = pathSegments[i];
-      if (!(subPropertyKey in document)) {
-        return undefined;
-      }
-      document = document[subPropertyKey];
-    }
-    return document;
+    var getOriginalDestination = <GetOperation<any>>{ op: "_get", path: pointer };
+    applyOperation(document, getOriginalDestination);
+    return getOriginalDestination.value;
   }
   /**
    * Apply a single JSON Patch Operation on a JSON document.
@@ -314,10 +309,10 @@ namespace jsonpatch {
    */
   export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true): OperationResult<T> {
     if (validateOperation) {
-      if(typeof validateOperation == 'function') {
+      if (typeof validateOperation == 'function') {
         validateOperation(operation, 0, document, operation.path);
       }
-      else {      
+      else {
         validator(operation, 0);
       }
     }
@@ -342,7 +337,7 @@ namespace jsonpatch {
       } else { // it's a remove or test on root
         if (operation.op === 'test') {
           returnValue.result = _equals(document, operation.value);
-          if(returnValue.result == false) {            
+          if (returnValue.result == false) {
             throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
           }
           returnValue.newDocument = document;
@@ -384,10 +379,10 @@ namespace jsonpatch {
               existingPathFragment = operation.path;
             }
             if (existingPathFragment !== undefined) {
-              if(typeof validateOperation == 'function') {
+              if (typeof validateOperation == 'function') {
                 validateOperation(operation, 0, document, existingPathFragment);
               }
-              else {      
+              else {
                 validator(operation, 0, document, existingPathFragment);
               }
             }
@@ -411,8 +406,8 @@ namespace jsonpatch {
             }
             returnValue.result = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
             returnValue.newDocument = document;
-            if(returnValue.result === false) {
-                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            if (returnValue.result === false) {
+              throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
             }
             return returnValue;
           }
@@ -424,8 +419,8 @@ namespace jsonpatch {
           if (t >= len) {
             returnValue.result = objOps[operation.op].call(operation, obj, key, document); // Apply patch
             returnValue.newDocument = document;
-            if(returnValue.result === false) {
-                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            if (returnValue.result === false) {
+              throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
             }
             return returnValue;
           }
@@ -565,7 +560,7 @@ namespace jsonpatch {
    * @param {object} [document] - object where the operation is supposed to be applied
    * @param {string} [existingPathFragment] - comes along with `documente`
    */
-  export function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string) : void  {
+  export function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string): void {
     debugger
     if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
       throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);
@@ -634,14 +629,14 @@ namespace jsonpatch {
 
       if (document) {
         document = JSON.parse(JSON.stringify(document)); //clone document so that we can safely try applying operations
-        if(typeof externalValidator == 'function') {
-          applyPatch(document, sequence, externalValidator); 
+        if (typeof externalValidator == 'function') {
+          applyPatch(document, sequence, externalValidator);
         } else {
-          applyPatch(document, sequence, true); 
+          applyPatch(document, sequence, true);
         }
       }
       else {
-        if(externalValidator) {
+        if (externalValidator) {
           for (var i = 0; i < sequence.length; i++) {
             externalValidator(sequence[i], i, document, sequence[i].path);
           }
@@ -659,7 +654,7 @@ namespace jsonpatch {
       else {
         throw e;
       }
-    }  
+    }
   }
 }
 

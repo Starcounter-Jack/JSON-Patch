@@ -11,7 +11,7 @@ interface HTMLElement {
 }
 
 module jsonpatch {
-  export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any>;
+  export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any>;
   
   export interface Validator<T> {
     (operation: Operation, index: number, document: T, existingPathFragment: string): void;
@@ -52,6 +52,11 @@ module jsonpatch {
 
   export interface TestOperation<T> extends BaseOperation {
     op: 'test';
+    value: T;
+  }
+
+  export interface GetOperation<T> extends BaseOperation {
+    op: '_get';
     value: T;
   }
 
@@ -543,18 +548,9 @@ module jsonpatch {
    * @return The retrieved value
    */
   export function getValueByPointer(document: any, pointer: string): any {
-    let pathSegments = [];
-    if (pointer) { //empty string evaluates to false
-      pathSegments = pointer.substring(1).split(/\//).map(jsonpatch.unescapePathComponent);
-    }
-    for (let i = 0; i < pathSegments.length; i++) {
-      let subPropertyKey = pathSegments[i];
-      if (!(subPropertyKey in document)) {
-        return undefined;
-      }
-      document = document[subPropertyKey];
-    }
-    return document;
+    var getOriginalDestination = <GetOperation<any>>{ op: "_get", path: pointer };
+    applyOperation(document, getOriginalDestination);
+    return getOriginalDestination.value;
   }
   /**
    * Apply a single JSON Patch Operation on a JSON document.
