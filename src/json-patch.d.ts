@@ -132,7 +132,7 @@ declare namespace jsonpatch {
      * @param {object} operation - operation object (patch)
      * @param {number} index - index of operation in the sequence
      * @param {object} [document] - object where the operation is supposed to be applied
-     * @param {string} [existingPathFragment] - comes along with `documente`
+     * @param {string} [existingPathFragment] - comes along with `document`
      */
     function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string): void;
     /**
