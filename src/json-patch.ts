@@ -130,24 +130,26 @@ namespace jsonpatch {
         const aKeys = _objectKeys(a);
         const bKeys = _objectKeys(b);
 
-        for (let key of aKeys) {
-          // check all properties of `a` to equal their `b` counterpart
-          if (!_equals(a[key], b[key])) {
-            return false;
-          }
-          // remove the key from consideration in next step since we know it's "equal"
-          const bKeysIdx = bKeys.indexOf(key);
-          if (bKeysIdx >= 0) {
-            bKeys.splice(bKeysIdx, 1);
-          }
+        for (let i = 0; i < aKeys.length; i++) {
+            const key = aKeys[i];
+            // check all properties of `a` to equal their `b` counterpart
+            if (!_equals(a[key], b[key])) {
+                return false;
+            }
+            // remove the key from consideration in next step since we know it's "equal"
+            const bKeysIdx = bKeys.indexOf(key);
+            if (bKeysIdx >= 0) {
+                bKeys.splice(bKeysIdx, 1);
+            }
         }
-
-        for (let key of bKeys) {
-          // lastly, test any untested properties of `b`
-          if (!_equals(a[key], b[key])) {
-            return false;
-          }
+        for (let i = 0; i < bKeys.length; i++) {
+            var key = bKeys[i];
+            // lastly, test any untested properties of `b`
+            if (!_equals(a[key], b[key])) {
+                return false;
+            }
         }
+        
         return true;
       default:
         return false;
@@ -190,11 +192,10 @@ namespace jsonpatch {
     move: function (obj, key, document) {
       const originalValue = getValueByPointer(document, this.path);
 
-      const newValue = getValueByPointer(document, this.from);
-
-      applyOperation(document,
+      // remove operation returns the removed value
+      const newValue = applyOperation(document,
         { op: "remove", path: this.from }
-      );
+      ).result;
 
       applyOperation(document,
         { op: "add", path: this.path, value: newValue }
@@ -334,25 +335,23 @@ namespace jsonpatch {
           returnValue.result = document;
         }
         return returnValue;
-      } else { // it's a remove or test on root
-        if (operation.op === 'test') {
-          returnValue.result = _equals(document, operation.value);
-          if (returnValue.result == false) {
-            throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
-          }
+      } else if (operation.op === 'test') { // it's a remove or test on root
+        returnValue.result = _equals(document, operation.value);
+        if (returnValue.result == false) {
+          throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+        }
+        returnValue.newDocument = document;
+        return returnValue;
+      } else if (operation.op === 'remove') { // a remove on root
+        returnValue.result = document;
+        returnValue.newDocument = null;
+        return returnValue;
+      } else { /* bad operation */
+        if (validateOperation) {
+          throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
+        } else {
           returnValue.newDocument = document;
           return returnValue;
-        } else if (operation.op === 'remove') { // a remove on root
-          returnValue.result = document;
-          returnValue.newDocument = null;
-          return returnValue;
-        } else { /* bad operation */
-          if (validateOperation) {
-            throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
-          } else {
-            returnValue.newDocument = document;
-            return returnValue;
-          }
         }
       }
     } /* END ROOT OPERATIONS */

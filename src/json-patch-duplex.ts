@@ -12,16 +12,16 @@ interface HTMLElement {
 
 module jsonpatch {
   export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any>;
-  
+
   export interface Validator<T> {
     (operation: Operation, index: number, document: T, existingPathFragment: string): void;
   }
-  
+
   export interface OperationResult<T> {
     result: any,
     newDocument: T;
   }
-  
+
   export interface BaseOperation {
     path: string;
   }
@@ -143,24 +143,26 @@ module jsonpatch {
         const aKeys = _objectKeys(a);
         const bKeys = _objectKeys(b);
 
-        for (let key of aKeys) {
-          // check all properties of `a` to equal their `b` counterpart
-          if (!_equals(a[key], b[key])) {
-            return false;
-          }
-          // remove the key from consideration in next step since we know it's "equal"
-          const bKeysIdx = bKeys.indexOf(key);
-          if (bKeysIdx >= 0) {
-            bKeys.splice(bKeysIdx, 1);
-          }
+        for (let i = 0; i < aKeys.length; i++) {
+            const key = aKeys[i];
+            // check all properties of `a` to equal their `b` counterpart
+            if (!_equals(a[key], b[key])) {
+                return false;
+            }
+            // remove the key from consideration in next step since we know it's "equal"
+            const bKeysIdx = bKeys.indexOf(key);
+            if (bKeysIdx >= 0) {
+                bKeys.splice(bKeysIdx, 1);
+            }
         }
-
-        for (let key of bKeys) {
-          // lastly, test any untested properties of `b`
-          if (!_equals(a[key], b[key])) {
-            return false;
-          }
+        for (let i = 0; i < bKeys.length; i++) {
+            var key = bKeys[i];
+            // lastly, test any untested properties of `b`
+            if (!_equals(a[key], b[key])) {
+                return false;
+            }
         }
+        
         return true;
       default:
         return false;
@@ -501,7 +503,7 @@ module jsonpatch {
       return obj.push && typeof obj.length === 'number';
     }
   }
-  
+
   //3x faster than cached /^\d+$/.test(str)
   function isInteger(str: string): boolean {
     var i = 0;
@@ -564,10 +566,10 @@ module jsonpatch {
    */
   export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true): OperationResult<T> {
     if (validateOperation) {
-      if(typeof validateOperation == 'function') {
+      if (typeof validateOperation == 'function') {
         validateOperation(operation, 0, document, operation.path);
       }
-      else {      
+      else {
         validator(operation, 0);
       }
     }
@@ -576,7 +578,6 @@ module jsonpatch {
     if (operation.path === "") {
       if (operation.op === 'add') {
         returnValue.newDocument = operation.value;
-        returnValue.result = undefined;
         return returnValue;
       } else if (operation.op === 'replace') {
         returnValue.newDocument = operation.value;
@@ -589,25 +590,22 @@ module jsonpatch {
           returnValue.result = document;
         }
         return returnValue;
-      } else { // it's a remove or test on root
-        if (operation.op === 'test') {
-          returnValue.result = _equals(document, operation.value);
-          if(returnValue.result == false) {            
-            throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
-          }
-          returnValue.newDocument = document;
+      } else if (operation.op === 'test') {
+        returnValue.result = _equals(document, operation.value);
+        if (returnValue.result == false) {
+          throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+        }
+        returnValue.newDocument = document;
+        return returnValue;
+      } else if (operation.op === 'remove') { // a remove on root
+        returnValue.result = document;
+        returnValue.newDocument = null;
+        return returnValue;
+      } else { /* bad operation */
+        if (validateOperation) {
+          throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
+        } else {
           return returnValue;
-        } else if (operation.op === 'remove') { // a remove on root
-          returnValue.result = document;
-          returnValue.newDocument = null;
-          return returnValue;
-        } else { /* bad operation */
-          if (validateOperation) {
-            throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
-          } else {
-            returnValue.newDocument = document;
-            return returnValue;
-          }
         }
       }
     } /* END ROOT OPERATIONS */
@@ -622,6 +620,13 @@ module jsonpatch {
       let len = keys.length;
       let existingPathFragment = undefined;
       let key: string | number;
+      let validateFunction;
+      if (typeof validateOperation == 'function') {
+        validateFunction = validateOperation;
+      }
+      else {
+        validateFunction = validator;
+      }
       while (true) {
         key = keys[t];
 
@@ -634,20 +639,14 @@ module jsonpatch {
               existingPathFragment = operation.path;
             }
             if (existingPathFragment !== undefined) {
-              if(typeof validateOperation == 'function') {
-                validateOperation(operation, 0, document, existingPathFragment);
-              }
-              else {      
-                validator(operation, 0, document, existingPathFragment);
-              }
+              validateFunction(operation, 0, document, existingPathFragment);
             }
           }
         }
         t++;
         if (_isArray(obj)) {
-          let length = obj.length;
           if (key === '-') {
-            key = length;
+            key = obj.length;
           }
           else {
             if (validateOperation && !isInteger(key)) {
@@ -656,13 +655,13 @@ module jsonpatch {
             key = ~~key;
           }
           if (t >= len) {
-            if (validateOperation && operation.op === "add" && key > length) {
+            if (validateOperation && operation.op === "add" && key > obj.length) {
               throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
             }
             returnValue.result = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
             returnValue.newDocument = document;
-            if(returnValue.result === false) {
-                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            if (returnValue.result === false) {
+              throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
             }
             return returnValue;
           }
@@ -674,8 +673,8 @@ module jsonpatch {
           if (t >= len) {
             returnValue.result = objOps[operation.op].call(operation, obj, key, document); // Apply patch
             returnValue.newDocument = document;
-            if(returnValue.result === false) {
-                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            if (returnValue.result === false) {
+              throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
             }
             return returnValue;
           }
@@ -701,6 +700,7 @@ module jsonpatch {
       results[i] = applyOperation(document, patch[i], validateOperation);
       document = results[i].newDocument; // in case root was replaced
     }
+    (<any>results).newDocument = document;
     return results;
   }
 
@@ -815,7 +815,7 @@ module jsonpatch {
    * @param {object} [document] - object where the operation is supposed to be applied
    * @param {string} [existingPathFragment] - comes along with `documente`
    */
-  export function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string) : void  {
+  export function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string): void {
     debugger
     if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
       throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);
@@ -881,24 +881,14 @@ module jsonpatch {
       if (!_isArray(sequence)) {
         throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
       }
-
       if (document) {
         document = JSON.parse(JSON.stringify(document)); //clone document so that we can safely try applying operations
-        if(typeof externalValidator == 'function') {
-          applyPatch(document, sequence, externalValidator); 
-        } else {
-          applyPatch(document, sequence, true); 
-        }
+        applyPatch(document, sequence, externalValidator || true);
       }
       else {
-        if(externalValidator) {
-          for (var i = 0; i < sequence.length; i++) {
-            externalValidator(sequence[i], i, document, sequence[i].path);
-          }
-        } else {
-          for (var i = 0; i < sequence.length; i++) {
-            validator(sequence[i], i);
-          }
+        externalValidator = externalValidator || validator;
+        for (var i = 0; i < sequence.length; i++) {
+          externalValidator(sequence[i], i, document, undefined);
         }
       }
     }
@@ -909,7 +899,7 @@ module jsonpatch {
       else {
         throw e;
       }
-    }  
+    }
   }
 
   /**

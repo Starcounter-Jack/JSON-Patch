@@ -45,20 +45,20 @@ var jsonpatch;
                 }
                 var aKeys = _objectKeys(a);
                 var bKeys = _objectKeys(b);
-                for (var _i = 0, aKeys_1 = aKeys; _i < aKeys_1.length; _i++) {
-                    var key = aKeys_1[_i];
+                for (var i_1 = 0; i_1 < aKeys.length; i_1++) {
+                    var key_1 = aKeys[i_1];
                     // check all properties of `a` to equal their `b` counterpart
-                    if (!_equals(a[key], b[key])) {
+                    if (!_equals(a[key_1], b[key_1])) {
                         return false;
                     }
                     // remove the key from consideration in next step since we know it's "equal"
-                    var bKeysIdx = bKeys.indexOf(key);
+                    var bKeysIdx = bKeys.indexOf(key_1);
                     if (bKeysIdx >= 0) {
                         bKeys.splice(bKeysIdx, 1);
                     }
                 }
-                for (var _a = 0, bKeys_1 = bKeys; _a < bKeys_1.length; _a++) {
-                    var key = bKeys_1[_a];
+                for (var i_2 = 0; i_2 < bKeys.length; i_2++) {
+                    var key = bKeys[i_2];
                     // lastly, test any untested properties of `b`
                     if (!_equals(a[key], b[key])) {
                         return false;
@@ -434,7 +434,6 @@ var jsonpatch;
         if (operation.path === "") {
             if (operation.op === 'add') {
                 returnValue.newDocument = operation.value;
-                returnValue.result = undefined;
                 return returnValue;
             }
             else if (operation.op === 'replace') {
@@ -449,28 +448,25 @@ var jsonpatch;
                 }
                 return returnValue;
             }
-            else {
-                if (operation.op === 'test') {
-                    returnValue.result = _equals(document, operation.value);
-                    if (returnValue.result == false) {
-                        throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
-                    }
-                    returnValue.newDocument = document;
-                    return returnValue;
+            else if (operation.op === 'test') {
+                returnValue.result = _equals(document, operation.value);
+                if (returnValue.result == false) {
+                    throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
                 }
-                else if (operation.op === 'remove') {
-                    returnValue.result = document;
-                    returnValue.newDocument = null;
-                    return returnValue;
+                returnValue.newDocument = document;
+                return returnValue;
+            }
+            else if (operation.op === 'remove') {
+                returnValue.result = document;
+                returnValue.newDocument = null;
+                return returnValue;
+            }
+            else {
+                if (validateOperation) {
+                    throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
                 }
                 else {
-                    if (validateOperation) {
-                        throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
-                    }
-                    else {
-                        returnValue.newDocument = document;
-                        return returnValue;
-                    }
+                    return returnValue;
                 }
             }
         } /* END ROOT OPERATIONS */
@@ -485,6 +481,13 @@ var jsonpatch;
             var len = keys.length;
             var existingPathFragment = undefined;
             var key = void 0;
+            var validateFunction = void 0;
+            if (typeof validateOperation == 'function') {
+                validateFunction = validateOperation;
+            }
+            else {
+                validateFunction = validator;
+            }
             while (true) {
                 key = keys[t];
                 if (validateOperation) {
@@ -496,20 +499,14 @@ var jsonpatch;
                             existingPathFragment = operation.path;
                         }
                         if (existingPathFragment !== undefined) {
-                            if (typeof validateOperation == 'function') {
-                                validateOperation(operation, 0, document, existingPathFragment);
-                            }
-                            else {
-                                validator(operation, 0, document, existingPathFragment);
-                            }
+                            validateFunction(operation, 0, document, existingPathFragment);
                         }
                     }
                 }
                 t++;
                 if (_isArray(obj)) {
-                    var length_1 = obj.length;
                     if (key === '-') {
-                        key = length_1;
+                        key = obj.length;
                     }
                     else {
                         if (validateOperation && !isInteger(key)) {
@@ -518,7 +515,7 @@ var jsonpatch;
                         key = ~~key;
                     }
                     if (t >= len) {
-                        if (validateOperation && operation.op === "add" && key > length_1) {
+                        if (validateOperation && operation.op === "add" && key > obj.length) {
                             throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
                         }
                         returnValue.result = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
@@ -558,10 +555,11 @@ var jsonpatch;
      */
     function applyPatch(document, patch, validateOperation) {
         var results = new Array(patch.length);
-        for (var i = 0, length_2 = patch.length; i < length_2; i++) {
+        for (var i = 0, length_1 = patch.length; i < length_1; i++) {
             results[i] = applyOperation(document, patch[i], validateOperation);
             document = results[i].newDocument; // in case root was replaced
         }
+        results.newDocument = document;
         return results;
     }
     jsonpatch.applyPatch = applyPatch;
@@ -577,7 +575,7 @@ var jsonpatch;
         console.warn('jsonpatch.apply is deprecated, please use `applyPatch` for applying patch sequences, or `applyOperation` to apply individual operations.');
         var results = new Array(patch.length);
         /* this code might be overkill, but will be removed soon, it is to prevent the breaking change of root operations */
-        var _loop_1 = function(i, length_3) {
+        var _loop_1 = function(i, length_2) {
             if (patch[i].path == "" && patch[i].op != "remove" && patch[i].op != "test") {
                 var value_1;
                 if (patch[i].op == "replace" || patch[i].op == "move") {
@@ -598,8 +596,8 @@ var jsonpatch;
                 results[i] = applyOperation(document, patch[i], validateOperation, true).result;
             }
         };
-        for (var i = 0, length_3 = patch.length; i < length_3; i++) {
-            _loop_1(i, length_3);
+        for (var i = 0, length_2 = patch.length; i < length_2; i++) {
+            _loop_1(i, length_2);
         }
         return results;
     }
@@ -737,23 +735,12 @@ var jsonpatch;
             }
             if (document) {
                 document = JSON.parse(JSON.stringify(document)); //clone document so that we can safely try applying operations
-                if (typeof externalValidator == 'function') {
-                    applyPatch(document, sequence, externalValidator);
-                }
-                else {
-                    applyPatch(document, sequence, true);
-                }
+                applyPatch(document, sequence, externalValidator || true);
             }
             else {
-                if (externalValidator) {
-                    for (var i = 0; i < sequence.length; i++) {
-                        externalValidator(sequence[i], i, document, sequence[i].path);
-                    }
-                }
-                else {
-                    for (var i = 0; i < sequence.length; i++) {
-                        validator(sequence[i], i);
-                    }
+                externalValidator = externalValidator || validator;
+                for (var i = 0; i < sequence.length; i++) {
+                    externalValidator(sequence[i], i, document, undefined);
                 }
             }
         }

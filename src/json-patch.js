@@ -45,20 +45,20 @@ var jsonpatch;
                 }
                 var aKeys = _objectKeys(a);
                 var bKeys = _objectKeys(b);
-                for (var _i = 0, aKeys_1 = aKeys; _i < aKeys_1.length; _i++) {
-                    var key = aKeys_1[_i];
+                for (var i_1 = 0; i_1 < aKeys.length; i_1++) {
+                    var key_1 = aKeys[i_1];
                     // check all properties of `a` to equal their `b` counterpart
-                    if (!_equals(a[key], b[key])) {
+                    if (!_equals(a[key_1], b[key_1])) {
                         return false;
                     }
                     // remove the key from consideration in next step since we know it's "equal"
-                    var bKeysIdx = bKeys.indexOf(key);
+                    var bKeysIdx = bKeys.indexOf(key_1);
                     if (bKeysIdx >= 0) {
                         bKeys.splice(bKeysIdx, 1);
                     }
                 }
-                for (var _a = 0, bKeys_1 = bKeys; _a < bKeys_1.length; _a++) {
-                    var key = bKeys_1[_a];
+                for (var i_2 = 0; i_2 < bKeys.length; i_2++) {
+                    var key = bKeys[i_2];
                     // lastly, test any untested properties of `b`
                     if (!_equals(a[key], b[key])) {
                         return false;
@@ -102,8 +102,8 @@ var jsonpatch;
         },
         move: function (obj, key, document) {
             var originalValue = getValueByPointer(document, this.path);
-            var newValue = getValueByPointer(document, this.from);
-            applyOperation(document, { op: "remove", path: this.from });
+            // remove operation returns the removed value
+            var newValue = applyOperation(document, { op: "remove", path: this.from }).result;
             applyOperation(document, { op: "add", path: this.path, value: newValue });
             return originalValue;
         },
@@ -238,28 +238,26 @@ var jsonpatch;
                 }
                 return returnValue;
             }
-            else {
-                if (operation.op === 'test') {
-                    returnValue.result = _equals(document, operation.value);
-                    if (returnValue.result == false) {
-                        throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
-                    }
-                    returnValue.newDocument = document;
-                    return returnValue;
+            else if (operation.op === 'test') {
+                returnValue.result = _equals(document, operation.value);
+                if (returnValue.result == false) {
+                    throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
                 }
-                else if (operation.op === 'remove') {
-                    returnValue.result = document;
-                    returnValue.newDocument = null;
-                    return returnValue;
+                returnValue.newDocument = document;
+                return returnValue;
+            }
+            else if (operation.op === 'remove') {
+                returnValue.result = document;
+                returnValue.newDocument = null;
+                return returnValue;
+            }
+            else {
+                if (validateOperation) {
+                    throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
                 }
                 else {
-                    if (validateOperation) {
-                        throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
-                    }
-                    else {
-                        returnValue.newDocument = document;
-                        return returnValue;
-                    }
+                    returnValue.newDocument = document;
+                    return returnValue;
                 }
             }
         } /* END ROOT OPERATIONS */

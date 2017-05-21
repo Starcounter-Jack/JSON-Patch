@@ -92,7 +92,7 @@ var patch = [
   { op: "add", path: "/lastName", value: "Wester" },
   { op: "add", path: "/contactDetails/phoneNumbers/0", value: { number: "555-123" }  }
 ];
-document = jsonpatch.applyPatch(document, patch).document;
+document = jsonpatch.applyPatch(document, patch).newDocument;
 // document == { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [{number:"555-123"}] } };
 ```
 
@@ -103,7 +103,7 @@ document = jsonpatch.applyPatch(document, patch).document;
 ```js
 var document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
 var operation = { op: "replace", path: "/firstName", value: "Joachim" };
-document = jsonpatch.applyOperation(document, operation).document;
+document = jsonpatch.applyOperation(document, operation).newDocument;
 // document == { firstName: "Joachim", contactDetails: { phoneNumbers: [] }}
 ```
 
@@ -184,6 +184,8 @@ Returns an array of objects - one item for each item in `patches`, each item is 
 * `remove`, `replace` and `move` - original object that has been removed
 * `add` (only when adding to an array) - index at which item has been inserted (useful when using `-` alias)
 
+**Note: the returned array has `newDocument` property that you can use as the final state of the patched document**.
+
 See [Validation notes](#validation-notes)
 
 #### `applyOperation<T>(document: any, operation: Operation, validateOperation: <Boolean | Function> = false, mutateDocument = true): OperationResult<T>`
@@ -212,7 +214,6 @@ Applies single operation object `operation` on `document`.
 Returns the a modified document.
 
 Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails.
-
 
 #### `jsonpatch.escapePathComponent(path: string): string`
 

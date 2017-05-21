@@ -10,16 +10,16 @@ if (typeof jsonpatch === 'undefined') {
 if (typeof _ === 'undefined') {
   _ = require('./../lib/underscore.min.js');
 }
-describe('using with patch.reduce', function() {
+describe('jsonpatch.applyReducer - using with Array#reduce', function() {
   it('should work with Array.reduce on array of patches', function() {
     var obj = {
       hello: 'world'
     };
-    var patches = [
+    var patch = [
       { op: 'replace', path: '/hello', value: 1 },
       { op: 'add', path: '/bye', value: { testing: 'isGood' } }
     ];
-    obj = patches.reduce(jsonpatch.applyReducer, obj);
+    obj = patch.reduce(jsonpatch.applyReducer, obj);
     expect(obj).toEqual({
       hello: 1,
       bye: { testing: 'isGood' }
