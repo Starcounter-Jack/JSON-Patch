@@ -42,10 +42,9 @@ describe('json-patch-tests', function() {
         var testName = test.comment || test.error || JSON.stringify(test.patch);
         if (test.expected) {
           it('should succeed: ' + testName, function() {
+            debugger;
             const results = jsonpatch.applyPatch(test.doc, test.patch, true);
-            if (results.length) {
-              test.doc = results[results.length - 1].newDocument;
-            }
+            test.doc = results.newDocument;            
             expect(test.doc).toEqual(test.expected);
           });
         } else if (test.error || test.patch[0].op === 'test') {
@@ -53,7 +52,7 @@ describe('json-patch-tests', function() {
             var errors = 0;
             try {
               var res = jsonpatch.applyPatch(test.doc, test.patch, true);
-              if (res[res.length - 1].result === false) {
+              if (res.test === false) {
                 throw new Error('Test failed');
               }
             } catch (e) {

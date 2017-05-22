@@ -170,7 +170,7 @@ else {
 
 ## API
 
-#### `jsonpatch.applyPatch<T>(document: any, patch: Operation[], validateOperation: Boolean | Function = false): any[]`
+#### `jsonpatch.applyPatch<T>(document: any, patch: Operation[], validateOperation: Boolean | Function = false): OperationResult<T>[]`
 
 Available in *json-patch.js* and *json-patch-duplex.js*
 
@@ -178,7 +178,7 @@ Applies `patch` array on `obj`.
 
 An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
 
-Returns an array of objects - one item for each item in `patches`, each item is an object `{newDocument, result}`. The type of `result` depends on type of operation applied.
+Returns an array of [`OperationResult`](#operationresult-type) objects - one item for each item in `patches`, each item is an object `{newDocument: any, test?: boolean, removed?: any}`.
 
 * `test` - boolean result of the test
 * `remove`, `replace` and `move` - original object that has been removed
@@ -186,7 +186,7 @@ Returns an array of objects - one item for each item in `patches`, each item is 
 
 **Note: the returned array has `newDocument` property that you can use as the final state of the patched document**.
 
-See [Validation notes](#validation-notes)
+- See [Validation notes](#validation-notes).
 
 #### `applyOperation<T>(document: any, operation: Operation, validateOperation: <Boolean | Function> = false, mutateDocument = true): OperationResult<T>`
 
@@ -199,9 +199,9 @@ Applies single operation object `operation` on `document`.
 - `validateOperation` Whether to validate the operation, or to pass a validator callback
 - `mutateDocument` Whether to mutate the original document or clone it before applying
 
-Returns the a result object `{newDocument, result}`.
+Returns an [`OperationResult`](#operationresult-type) object `{newDocument: any, test?: boolean, removed?: any}`.
 
-See [Validation notes](#validation-notes)
+- See [Validation notes](#validation-notes).
 
 #### `jsonpatch.applyReducer<T>(document: T, operation: Operation): T`
 
@@ -303,18 +303,20 @@ OPERATION_PATH_ILLEGAL_ARRAY_INDEX | Expected an unsigned base-10 integer value,
 OPERATION_VALUE_OUT_OF_BOUNDS | The specified index MUST NOT be greater than the number of elements in the array
 TEST_OPERATION_FAILED | When operation is `test` and the test fails, applies to `applyReducer`.
 
+## `OperationResult` Type
 
-#### `jsonpatch.escapePathComponent(path: string): string`
+Functions `applyPatch` and `applyOperation` both return `OperationResult` object. This object is:
 
-Available in *json-patch.js* and *json-patch-duplex.js*
+```ts
+{newDocument: any, test?: boolean, removed?: any}
+```
 
-Escapes a json pointer `path`.
+Where:
 
-#### `jsonpatch.unescapePathComponent(path: string): string`
+- `newDocument`: the new state of the document after the patch/operation is applied.
+- `test`: if the operation was a `test` operation. This will be its result.
+- `removed`: contains the removed, moved, or replaced values from the document after a `remove`, `move` or `replace` operation.
 
-Available in *json-patch.js* and *json-patch-duplex.js*
-
-Unescapes a json pointer `path`.
 
 ## Validation Notes
 

@@ -10,7 +10,8 @@ declare namespace jsonpatch {
         (operation: Operation, index: number, document: T, existingPathFragment: string): void;
     }
     interface OperationResult<T> {
-        result: any;
+        removed?: any;
+        test?: boolean;
         newDocument: T;
     }
     interface BaseOperation {

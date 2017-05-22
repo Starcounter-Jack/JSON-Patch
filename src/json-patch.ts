@@ -13,7 +13,8 @@ namespace jsonpatch {
   }
 
   export interface OperationResult<T> {
-    result: any,
+    removed?: any,
+    test?: boolean,
     newDocument: T;
   }
 
@@ -123,8 +124,9 @@ namespace jsonpatch {
           if (!_isArray(b) || a.length !== b.length)
             return false;
           for (var i = 0, l = a.length; i < l; i++)
-            if (!_equals(a[i], b[i]))
+            if (!_equals(a[i], b[i])) {
               return false;
+            }
           return true;
         }
         const aKeys = _objectKeys(a);
@@ -190,18 +192,21 @@ namespace jsonpatch {
       return removed;
     },
     move: function (obj, key, document) {
-      const originalValue = getValueByPointer(document, this.path);
+      let overwrittenValue = getValueByPointer(document, this.path);
 
-      // remove operation returns the removed value
-      const newValue = applyOperation(document,
+      if(overwrittenValue) {
+          overwrittenValue = deepClone(overwrittenValue);
+      }
+      
+      const originalValue = applyOperation(document,
         { op: "remove", path: this.from }
-      ).result;
+      ).removed;
 
       applyOperation(document,
-        { op: "add", path: this.path, value: newValue }
+        { op: "add", path: this.path, value: originalValue }
       );
 
-      return originalValue;
+      return overwrittenValue;
     },
     copy: function (obj, key, document) {
       const valueToCopy = getValueByPointer(document, this.from);
@@ -319,7 +324,7 @@ namespace jsonpatch {
         validator(operation, 0);
       }
     }
-    const returnValue: OperationResult<T> = { newDocument: document, result: undefined };
+    const returnValue: OperationResult<T> = { newDocument: document };
     /* ROOT OPERATIONS */
     if (operation.path === "") {
       if (operation.op === 'add') {
@@ -327,24 +332,24 @@ namespace jsonpatch {
         return returnValue;
       } else if (operation.op === 'replace') {
         returnValue.newDocument = operation.value;
-        returnValue.result = document; //document we removed
+        returnValue.removed = document; //document we removed
         return returnValue;
       }
       else if (operation.op === 'move' || operation.op === 'copy') { // it's a move or copy to root
         returnValue.newDocument = getValueByPointer(document, operation.from); // get the value by json-pointer in `from` field
         if (operation.op === 'move') { // report removed item
-          returnValue.result = document;
+          returnValue.removed = document;
         }
         return returnValue;
       } else if (operation.op === 'test') {
-        returnValue.result = _equals(document, operation.value);
-        if (returnValue.result == false) {
+        returnValue.test = _equals(document, operation.value);
+        if (returnValue.test === false) {
           throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
         }
         returnValue.newDocument = document;
         return returnValue;
       } else if (operation.op === 'remove') { // a remove on root
-        returnValue.result = document;
+        returnValue.removed = document;
         returnValue.newDocument = null;
         return returnValue;
       } else { /* bad operation */
@@ -404,10 +409,15 @@ namespace jsonpatch {
             if (validateOperation && operation.op === "add" && key > obj.length) {
               throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
             }
-            returnValue.result = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
-            returnValue.newDocument = document;
-            if (returnValue.result === false) {
-              throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            if (operation.op === 'test') {
+              returnValue.test = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
+              if (returnValue.test === false) {
+                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+              }
+            }
+            else { // any other operation
+              debugger
+              returnValue.removed = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
             }
             return returnValue;
           }
@@ -417,10 +427,15 @@ namespace jsonpatch {
             key = unescapePathComponent(key);
           }
           if (t >= len) {
-            returnValue.result = objOps[operation.op].call(operation, obj, key, document); // Apply patch
-            returnValue.newDocument = document;
-            if (returnValue.result === false) {
-              throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            if (operation.op === 'test') {
+              returnValue.test = objOps[operation.op].call(operation, obj, key, document); // Apply patch
+              if (returnValue.test === false) {
+                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+              }
+            }
+            else { // any other operation
+              debugger;
+              returnValue.removed = objOps[operation.op].call(operation, obj, key, document); // Apply patch
             }
             return returnValue;
           }
@@ -487,7 +502,9 @@ namespace jsonpatch {
 
       }
       else {
-        results[i] = applyOperation(document, patch[i], validateOperation, true).result;
+        results[i] = applyOperation(document, patch[i], validateOperation);
+        debugger;
+        results[i] = results[i].removed || results[i].test;
       }
     }
     return results;
@@ -504,7 +521,7 @@ namespace jsonpatch {
    */
   export function applyReducer<T>(document: T, operation: Operation): T {
     const operationResult: OperationResult<T> = applyOperation(document, operation)
-    if (operationResult.result === false) { // failed test
+    if (operationResult.test === false) { // failed test
       throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
     }
     return operationResult.newDocument;
@@ -562,7 +579,6 @@ namespace jsonpatch {
    * @param {string} [existingPathFragment] - comes along with `document`
    */
   export function validator(operation: Patch<any>, index: number, document?: any, existingPathFragment?: string): void {
-    debugger
     if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
       throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);
     }

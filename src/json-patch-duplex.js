@@ -39,8 +39,9 @@ var jsonpatch;
                     if (!_isArray(b) || a.length !== b.length)
                         return false;
                     for (var i = 0, l = a.length; i < l; i++)
-                        if (!_equals(a[i], b[i]))
+                        if (!_equals(a[i], b[i])) {
                             return false;
+                        }
                     return true;
                 }
                 var aKeys = _objectKeys(a);
@@ -91,11 +92,13 @@ var jsonpatch;
             return removed;
         },
         move: function (obj, key, document) {
-            var originalValue = getValueByPointer(document, this.path);
-            var newValue = getValueByPointer(document, this.from);
-            applyOperation(document, { op: "remove", path: this.from });
-            applyOperation(document, { op: "add", path: this.path, value: newValue });
-            return originalValue;
+            var overwrittenValue = getValueByPointer(document, this.path);
+            if (overwrittenValue) {
+                overwrittenValue = deepClone(overwrittenValue);
+            }
+            var originalValue = applyOperation(document, { op: "remove", path: this.from }).removed;
+            applyOperation(document, { op: "add", path: this.path, value: originalValue });
+            return overwrittenValue;
         },
         copy: function (obj, key, document) {
             var valueToCopy = getValueByPointer(document, this.from);
@@ -429,7 +432,7 @@ var jsonpatch;
                 validator(operation, 0);
             }
         }
-        var returnValue = { newDocument: document, result: undefined };
+        var returnValue = { newDocument: document };
         /* ROOT OPERATIONS */
         if (operation.path === "") {
             if (operation.op === 'add') {
@@ -438,26 +441,26 @@ var jsonpatch;
             }
             else if (operation.op === 'replace') {
                 returnValue.newDocument = operation.value;
-                returnValue.result = document; //document we removed
+                returnValue.removed = document; //document we removed
                 return returnValue;
             }
             else if (operation.op === 'move' || operation.op === 'copy') {
                 returnValue.newDocument = getValueByPointer(document, operation.from); // get the value by json-pointer in `from` field
                 if (operation.op === 'move') {
-                    returnValue.result = document;
+                    returnValue.removed = document;
                 }
                 return returnValue;
             }
             else if (operation.op === 'test') {
-                returnValue.result = _equals(document, operation.value);
-                if (returnValue.result == false) {
+                returnValue.test = _equals(document, operation.value);
+                if (returnValue.test === false) {
                     throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
                 }
                 returnValue.newDocument = document;
                 return returnValue;
             }
             else if (operation.op === 'remove') {
-                returnValue.result = document;
+                returnValue.removed = document;
                 returnValue.newDocument = null;
                 return returnValue;
             }
@@ -518,10 +521,15 @@ var jsonpatch;
                         if (validateOperation && operation.op === "add" && key > obj.length) {
                             throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
                         }
-                        returnValue.result = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
-                        returnValue.newDocument = document;
-                        if (returnValue.result === false) {
-                            throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+                        if (operation.op === 'test') {
+                            returnValue.test = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
+                            if (returnValue.test === false) {
+                                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+                            }
+                        }
+                        else {
+                            debugger;
+                            returnValue.removed = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
                         }
                         return returnValue;
                     }
@@ -531,10 +539,15 @@ var jsonpatch;
                         key = unescapePathComponent(key);
                     }
                     if (t >= len) {
-                        returnValue.result = objOps[operation.op].call(operation, obj, key, document); // Apply patch
-                        returnValue.newDocument = document;
-                        if (returnValue.result === false) {
-                            throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+                        if (operation.op === 'test') {
+                            returnValue.test = objOps[operation.op].call(operation, obj, key, document); // Apply patch
+                            if (returnValue.test === false) {
+                                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+                            }
+                        }
+                        else {
+                            debugger;
+                            returnValue.removed = objOps[operation.op].call(operation, obj, key, document); // Apply patch
                         }
                         return returnValue;
                     }
@@ -593,7 +606,9 @@ var jsonpatch;
                 Object.keys(value_1).forEach(function (key) { return document[key] = value_1[key]; });
             }
             else {
-                results[i] = applyOperation(document, patch[i], validateOperation, true).result;
+                results[i] = applyOperation(document, patch[i], validateOperation);
+                debugger;
+                results[i] = results[i].removed || results[i].test;
             }
         };
         for (var i = 0, length_2 = patch.length; i < length_2; i++) {
@@ -613,7 +628,7 @@ var jsonpatch;
      */
     function applyReducer(document, operation) {
         var operationResult = applyOperation(document, operation);
-        if (operationResult.result === false) {
+        if (operationResult.test === false) {
             throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
         }
         return operationResult.newDocument;
@@ -675,7 +690,6 @@ var jsonpatch;
      * @param {string} [existingPathFragment] - comes along with `document`
      */
     function validator(operation, index, document, existingPathFragment) {
-        debugger;
         if (typeof operation !== 'object' || operation === null || _isArray(operation)) {
             throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);
         }

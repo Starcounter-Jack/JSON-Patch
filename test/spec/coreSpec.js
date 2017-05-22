@@ -1166,7 +1166,7 @@ describe('core', function() {
             bar: [1, 2, 5, 4]
           }
         }
-      ])[0].result
+      ])[0].test
     ).toBe(true);
 
     expect(() =>
@@ -1191,7 +1191,7 @@ describe('core', function() {
             a: 'a'
           }
         }
-      ])[0].result
+      ])[0].test
     ).toBe(true);
 
     expect(
@@ -1201,7 +1201,7 @@ describe('core', function() {
           path: '/bar',
           value: obj.bar
         }
-      ])[0].result
+      ])[0].test
     ).toBe(true);
     expect(
       jsonpatch.applyPatch(obj, [
@@ -1210,7 +1210,7 @@ describe('core', function() {
           path: '/bar/a',
           value: 'a'
         }
-      ])[0].result
+      ])[0].test
     ).toBe(true);
     expect(
       jsonpatch.applyPatch(obj, [
@@ -1219,7 +1219,7 @@ describe('core', function() {
           path: '/bar/b',
           value: 42
         }
-      ])[0].result
+      ])[0].test
     ).toBe(true);
     expect(
       jsonpatch.applyPatch(obj, [
@@ -1228,7 +1228,7 @@ describe('core', function() {
           path: '/bar/c',
           value: null
         }
-      ])[0].result
+      ])[0].test
     ).toBe(true);
     expect(
       jsonpatch.applyPatch(obj, [
@@ -1237,7 +1237,7 @@ describe('core', function() {
           path: '/bar/d',
           value: true
         }
-      ])[0].result
+      ])[0].test
     ).toBe(true);
     expect(() =>
       jsonpatch.applyPatch(obj, [
@@ -1278,7 +1278,7 @@ describe('core', function() {
             hello: 'world'
           }
         }
-      ])[0].result
+      ])[0].test
     ).toBe(true);
     expect(() =>
       jsonpatch.applyPatch(obj, [
@@ -1436,7 +1436,7 @@ describe('core', function() {
           path: '/name'
         }
       ]);
-      expect(result[0].result).toEqual('jack');
+      expect(result[0].removed).toEqual('jack');
     });
     it('return removed element when replacing in object', function() {
       var result = jsonpatch.applyPatch(obj, [
@@ -1446,7 +1446,7 @@ describe('core', function() {
           value: 'john'
         }
       ]);
-      expect(result[0].result).toEqual('jack');
+      expect(result[0].removed).toEqual('jack');
     });
     it('return removed element when moving in object', function() {
       var result = jsonpatch.applyPatch(obj, [
@@ -1456,7 +1456,7 @@ describe('core', function() {
           path: '/hobby'
         }
       ]);
-      expect(result[0].result).toEqual('music');
+      expect(result[0].removed).toEqual('music');
     });
 
     it('return removed element when removing from array', function() {
@@ -1466,7 +1466,7 @@ describe('core', function() {
           path: '/languages/1'
         }
       ]);
-      expect(result[0].result).toEqual('haskell');
+      expect(result[0].removed).toEqual('haskell');
     });
     it('return removed element when replacing in array', function() {
       var result = jsonpatch.applyPatch(obj, [
@@ -1476,7 +1476,7 @@ describe('core', function() {
           value: 'erlang'
         }
       ]);
-      expect(result[0].result).toEqual('haskell');
+      expect(result[0].removed).toEqual('haskell');
     });
     it('return removed element when moving in array', function() {
       var result = jsonpatch.applyPatch(obj, [
@@ -1486,7 +1486,7 @@ describe('core', function() {
           path: '/languages/1'
         }
       ]);
-      expect(result[0].result).toEqual('haskell');
+      expect(result[0].removed).toEqual('haskell');
     });
     it('return root when removing root', function() {
       var result = jsonpatch.applyPatch(obj, [
@@ -1495,7 +1495,7 @@ describe('core', function() {
           path: ''
         }
       ]);
-      expect(result[0].result).toEqual({
+      expect(result[0].removed).toEqual({
         name: 'jack',
         languages: ['c#', 'haskell', 'python'],
         hobby: 'music'
@@ -1511,7 +1511,7 @@ describe('core', function() {
           }
         }
       ]);
-      expect(result[0].result).toEqual({
+      expect(result[0].removed).toEqual({
         name: 'jack',
         languages: ['c#', 'haskell', 'python'],
         hobby: 'music'
@@ -1525,7 +1525,7 @@ describe('core', function() {
           path: ''
         }
       ]);
-      expect(result[0].result).toEqual({
+      expect(result[0].removed).toEqual({
         name: 'jack',
         languages: ['c#', 'haskell', 'python'],
         hobby: 'music'
@@ -1698,7 +1698,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
             path: '/not',
             value: undefined
           }
-        ])[0].result
+        ])[0].test
       ).toBe(true);
     });
     it('test on array element set to `undefined`', function() {
@@ -1731,7 +1731,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
             path: '/bar/2',
             value: undefined
           }
-        ])[0].result
+        ])[0].test
       ).toBe(true);
     });
 
