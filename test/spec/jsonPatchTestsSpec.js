@@ -42,7 +42,6 @@ describe('json-patch-tests', function() {
         var testName = test.comment || test.error || JSON.stringify(test.patch);
         if (test.expected) {
           it('should succeed: ' + testName, function() {
-            debugger;
             const results = jsonpatch.applyPatch(test.doc, test.patch, true);
             test.doc = results.newDocument;            
             expect(test.doc).toEqual(test.expected);

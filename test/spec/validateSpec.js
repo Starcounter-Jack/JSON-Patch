@@ -411,7 +411,6 @@ describe('validate', function() {
             tree
           );
         }
-        debugger;
     var customError = jsonpatch.validate(sequence, tree, validator);
     expect(customError.index).toBe(0);
     expect(customError.name).toBe('OPERATION_VALUE_MUST_NOT_CONTAIN_OLD_VALUE');

@@ -180,26 +180,27 @@ module jsonpatch {
 
   /* The operations applicable to an object */
   const objOps = {
-    add: function (obj, key) {
+    add: function (obj, key, document) {
       obj[key] = this.value;
+      return {newDocument: document};
     },
-    remove: function (obj, key) {
+    remove: function (obj, key, document) {
       var removed = obj[key];
       delete obj[key];
-      return removed;
+      return {newDocument: document, removed}
     },
-    replace: function (obj, key) {
+    replace: function (obj, key, document) {
       var removed = obj[key];
       obj[key] = this.value;
-      return removed;
+      return {newDocument: document, removed};
     },
     move: function (obj, key, document) {
-      let overwrittenValue = getValueByPointer(document, this.path);
+      let removed = getValueByPointer(document, this.path);
 
-      if(overwrittenValue) {
-          overwrittenValue = deepClone(overwrittenValue);
+      if(removed) {
+          removed = deepClone(removed);
       }
-      
+
       const originalValue = applyOperation(document,
         { op: "remove", path: this.from }
       ).removed;
@@ -208,43 +209,55 @@ module jsonpatch {
         { op: "add", path: this.path, value: originalValue }
       );
 
-      return overwrittenValue;
+      return {newDocument: document, removed};
     },
     copy: function (obj, key, document) {
       const valueToCopy = getValueByPointer(document, this.from);
       applyOperation(document,
         { op: "add", path: this.path, value: valueToCopy }
       );
+      return {newDocument: document}
     },
-    test: function (obj, key) {
-      return _equals(obj[key], this.value);
+    test: function (obj, key, document) {
+      return {newDocument: document, test: _equals(obj[key], this.value)}
     },
-    _get: function (obj, key) {
+    _get: function (obj, key, document) {
       this.value = obj[key];
+      return {newDocument: document}
     }
   };
 
   /* The operations applicable to an array. Many are the same as for the object */
-  const arrOps = {
-    add: function (arr, i) {
+  var arrOps = {
+    add: function (arr, i, document) {
       arr.splice(i, 0, this.value);
       // this may be needed when using '-' in an array
-      return i;
+      return {newDocument: document, index: i}
     },
-    remove: function (arr, i) {
+    remove: function (arr, i, document) {
       var removedList = arr.splice(i, 1);
-      return removedList[0];
+      return {newDocument: document, removed: removedList[0]};
     },
-    replace: function (arr, i) {
+    replace: function (arr, i, document) {
       var removed = arr[i];
       arr[i] = this.value;
-      return removed;
+      return {newDocument: document, removed};
     },
     move: objOps.move,
     copy: objOps.copy,
     test: objOps.test,
     _get: objOps._get
   };
+
+  var _isArray: (obj: any) => obj is any[];
+  if (Array.isArray) { //standards; http://jsperf.com/isarray-shim/4
+    _isArray = Array.isArray;
+  }
+  else { //IE8 shim
+    _isArray = function (obj: any): obj is any[] {
+      return obj.push && typeof obj.length === 'number';
+    }
+  }
 
 
   function _getPathRecursive(root: Object, obj: Object): string {
@@ -579,7 +592,7 @@ module jsonpatch {
         validator(operation, 0);
       }
     }
-    const returnValue: OperationResult<T> = { newDocument: document };
+    let returnValue: OperationResult<T> = { newDocument: document };
     /* ROOT OPERATIONS */
     if (operation.path === "") {
       if (operation.op === 'add') {
@@ -664,16 +677,10 @@ module jsonpatch {
             if (validateOperation && operation.op === "add" && key > obj.length) {
               throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
             }
-            if (operation.op === 'test') {
-              returnValue.test = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
-              if (returnValue.test === false) {
-                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
-              }
-            }
-            else { // any other operation
-              debugger
-              returnValue.removed = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
-            }
+            returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
+            if (returnValue.test === false) {
+              throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            }            
             return returnValue;
           }
         }
@@ -682,16 +689,10 @@ module jsonpatch {
             key = unescapePathComponent(key);
           }
           if (t >= len) {
-            if (operation.op === 'test') {
-              returnValue.test = objOps[operation.op].call(operation, obj, key, document); // Apply patch
-              if (returnValue.test === false) {
-                throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
-              }
-            }
-            else { // any other operation
-              debugger;
-              returnValue.removed = objOps[operation.op].call(operation, obj, key, document); // Apply patch
-            }
+            returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
+            if (returnValue.test === false) {
+              throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            }            
             return returnValue;
           }
         }
@@ -758,7 +759,6 @@ module jsonpatch {
       }
       else {
         results[i] = applyOperation(document, patch[i], validateOperation);
-        debugger;
         results[i] = results[i].removed || results[i].test;
       }
     }
