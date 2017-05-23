@@ -195,6 +195,9 @@ module jsonpatch {
       return {newDocument: document, removed};
     },
     move: function (obj, key, document) {
+      /* in case move target overwrites an existing value,
+      return the removed value, this can be taxing performance-wise,
+      and is potentially unneeded */
       let removed = getValueByPointer(document, this.path);
 
       if(removed) {
@@ -680,7 +683,7 @@ module jsonpatch {
             returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
             if (returnValue.test === false) {
               throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
-            }            
+            }
             return returnValue;
           }
         }
@@ -692,7 +695,7 @@ module jsonpatch {
             returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
             if (returnValue.test === false) {
               throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
-            }            
+            }
             return returnValue;
           }
         }
@@ -889,7 +892,7 @@ module jsonpatch {
   /**
    * Validates a sequence of operations. If `document` parameter is provided, the sequence is additionally validated against the object document.
    * If error is encountered, returns a JsonPatchError object
-   * @param sequence 
+   * @param sequence
    * @param document
    * @returns {JsonPatchError|undefined}
    */

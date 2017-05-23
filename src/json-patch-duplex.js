@@ -93,6 +93,9 @@ var jsonpatch;
             return { newDocument: document, removed: removed };
         },
         move: function (obj, key, document) {
+            /* in case move target overwrites an existing value,
+            return the removed value, this can be taxing performance-wise,
+            and is potentially unneeded */
             var removed = getValueByPointer(document, this.path);
             if (removed) {
                 removed = deepClone(removed);

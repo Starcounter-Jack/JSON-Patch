@@ -333,6 +333,10 @@ If you pass a validator, it will be called with four parameters for each operati
 - `tree` The object that is supposed to be patched.
 - `existingPath` the path `operation` points to.
 
+## Overwriting and `move` Operation
+
+When the target of the move operation already exists, it is cached, deep cloned and returned as `removed` in `OperationResult`.
+
 ## `undefined`s (JS to JSON projection)
 
 As `undefined` type does not exist in JSON, it's also not a valid value of JSON Patch operation. Therefore `jsonpatch` will not generate JSON Patches that sets anything to `undefined`.

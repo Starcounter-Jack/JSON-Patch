@@ -193,6 +193,10 @@ namespace jsonpatch {
       return {newDocument: document, removed};
     },
     move: function (obj, key, document) {
+      /* in case move target overwrites an existing value, 
+      return the removed value, this can be taxing performance-wise,
+      and is potentially unneeded */
+      
       let removed = getValueByPointer(document, this.path);
 
       if(removed) {
@@ -327,9 +331,9 @@ namespace jsonpatch {
         validator(operation, 0);
       }
     }
-    let returnValue: OperationResult<T> = { newDocument: document };
     /* ROOT OPERATIONS */
     if (operation.path === "") {
+      let returnValue: OperationResult<T> = { newDocument: document };
       if (operation.op === 'add') {
         returnValue.newDocument = operation.value;
         return returnValue;
@@ -412,7 +416,7 @@ namespace jsonpatch {
             if (validateOperation && operation.op === "add" && key > obj.length) {
               throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
             }
-            returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
+            const returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
             if (returnValue.test === false) {
               throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
             }            
@@ -424,7 +428,7 @@ namespace jsonpatch {
             key = unescapePathComponent(key);
           }
           if (t >= len) {
-            returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
+            const returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
             if (returnValue.test === false) {
               throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
             }            
