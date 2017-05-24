@@ -1419,6 +1419,23 @@ describe('core', function() {
     });
   });
 
+  it('should apply copy without side effects', function() {
+    var obj = {};
+    var patchset = [
+      {op: 'add', path: '/foo', value: []},
+      {op: 'add', path: '/foo/-', value: 1},
+      {op: 'copy', from: '/foo', path: '/bar'},
+      {op: 'add', path: '/bar/-', value: 2}
+    ];
+
+    jsonpatch.apply(obj, patchset);
+
+    expect(obj).toEqual({
+      "foo": [1],
+      "bar": [1, 2],
+    });
+  });
+
   describe('returning removed elements >', function() {
     var obj;
     beforeEach(function() {
