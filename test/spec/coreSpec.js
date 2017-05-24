@@ -1436,6 +1436,25 @@ describe('core', function() {
     });
   });
 
+  it('should apply a patchset twice without side effects', function () {
+    var obj1 = {};
+    var obj2 = {};
+    var patchset = [
+      {op: 'add', path: '/foo', value: []},
+      {op: 'add', path: '/foo/-', value: 1},
+    ];
+
+    jsonpatch.apply(obj1, patchset);
+    jsonpatch.apply(obj2, patchset);
+
+    expect(obj1).toEqual({
+      "foo": [1],
+    });
+    expect(obj2).toEqual({
+      "foo": [1],
+    });
+  });
+
   describe('returning removed elements >', function() {
     var obj;
     beforeEach(function() {
