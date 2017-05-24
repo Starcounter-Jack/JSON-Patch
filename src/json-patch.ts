@@ -162,11 +162,32 @@ namespace jsonpatch {
   }
   
   function _deepClone(value) {
-    if (typeof value === 'object') {
-      return JSON.parse(JSON.stringify(value));
-    } else {
+    // from here https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
+    var clone;
+    var i;
+
+    if (typeof value !== 'object') {
       return value;
     }
+    if (!value) {
+      return value;
+    }
+
+    if ('[object Array]' === Object.prototype.toString.apply(value)) {
+      clone = [];
+      for (i = 0; i < value.length; i += 1) {
+        clone[i] = _deepClone(value[i]);
+      }
+      return clone;
+    }
+
+    clone = {};
+    for (i in value) {
+      if (value.hasOwnProperty(i)) {
+        clone[i] = _deepClone(value[i]);
+      }
+    }
+    return clone;
   }
   
   function deepClone(obj: any) {
