@@ -70,6 +70,31 @@ var jsonpatch;
                 return false;
         }
     }
+    function _deepClone(value) {
+        // from here https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
+        var clone;
+        var i;
+        if (typeof value !== 'object') {
+            return value;
+        }
+        if (!value) {
+            return value;
+        }
+        if ('[object Array]' === Object.prototype.toString.apply(value)) {
+            clone = [];
+            for (i = 0; i < value.length; i += 1) {
+                clone[i] = _deepClone(value[i]);
+            }
+            return clone;
+        }
+        clone = {};
+        for (i in value) {
+            if (value.hasOwnProperty(i)) {
+                clone[i] = _deepClone(value[i]);
+            }
+        }
+        return clone;
+    }
     /* We use a Javascript hash to store each
      function. Each hash entry (property) uses
      the operation identifiers specified in rfc6902.
@@ -79,7 +104,7 @@ var jsonpatch;
     /* The operations applicable to an object */
     var objOps = {
         add: function (obj, key, document) {
-            obj[key] = this.value;
+            obj[key] = _deepClone(this.value);
             return { newDocument: document };
         },
         remove: function (obj, key, document) {
@@ -89,7 +114,7 @@ var jsonpatch;
         },
         replace: function (obj, key, document) {
             var removed = obj[key];
-            obj[key] = this.value;
+            obj[key] = _deepClone(this.value);
             return { newDocument: document, removed: removed };
         },
         move: function (obj, key, document) {
@@ -120,7 +145,7 @@ var jsonpatch;
     /* The operations applicable to an array. Many are the same as for the object */
     var arrOps = {
         add: function (arr, i, document) {
-            arr.splice(i, 0, this.value);
+            arr.splice(i, 0, _deepClone(this.value));
             // this may be needed when using '-' in an array
             return { newDocument: document, index: i };
         },
@@ -130,7 +155,7 @@ var jsonpatch;
         },
         replace: function (arr, i, document) {
             var removed = arr[i];
-            arr[i] = this.value;
+            arr[i] = _deepClone(this.value);
             return { newDocument: document, removed: removed };
         },
         move: objOps.move,
