@@ -44,6 +44,9 @@ declare module jsonpatch {
         op: '_get';
         value: T;
     }
+    interface PatchResult<T> extends Array<OperationResult<T>> {
+        newDocument: T;
+    }
     /** DEPRECATED. Use `Operation` */
     type Patch<T> = Operation;
     /** DEPRECATED. Use `AddOperation` */
@@ -118,7 +121,7 @@ declare module jsonpatch {
      * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
      * @return An array of `{newDocument, result}` after the patch
      */
-    function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): OperationResult<T>[];
+    function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): PatchResult<T>;
     /**
      * Apply a JSON Patch on a JSON document.
      * Returns an array of results of operations.

@@ -347,7 +347,7 @@ var jsonpatch;
      * @param document The document to patch
      * @param patch The patch to apply
      * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
-     * @return An array of `{newDocument, result}` after the patch
+     * @return An array of `{newDocument, result}` after the patch, with a `newDocument` property for accessing the final state with ease.
      */
     function applyPatch(document, patch, validateOperation) {
         var results = new Array(patch.length);

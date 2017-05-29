@@ -60,6 +60,9 @@ module jsonpatch {
     op: '_get';
     value: T;
   }
+  export interface PatchResult<T> extends Array<OperationResult<T>> {
+    newDocument: T;
+  }
 
   // Aliases for BC
 
@@ -713,14 +716,14 @@ module jsonpatch {
    * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
    * @return An array of `{newDocument, result}` after the patch
    */
-  export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): OperationResult<T>[] {
-    const results: OperationResult<any>[] = new Array(patch.length);
-
+  export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): PatchResult<T> {
+    const results = new Array(patch.length) as PatchResult<T>;
+    
     for (let i = 0, length = patch.length; i < length; i++) {
       results[i] = applyOperation(document, patch[i], validateOperation);
       document = results[i].newDocument; // in case root was replaced
     }
-    (<any>results).newDocument = document;
+    results.newDocument = document;
     return results;
   }
 
