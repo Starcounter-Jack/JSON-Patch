@@ -555,6 +555,7 @@ var jsonpatch;
                         return returnValue;
                     }
                 }
+                obj[key] = obj[key] || (isNaN(parseInt(keys[t], 10)) ? {} : []);
                 obj = obj[key];
             }
         }
