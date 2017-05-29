@@ -1436,7 +1436,7 @@ describe('core', function() {
     });
   });
 
-  it('should apply a patchset twice without side effects', function () {
+  it('should apply a patchset twice without side effects with copyByValue flag enabled', function () {
     var obj1 = {};
     var obj2 = {};
     var patchset = [
@@ -1444,8 +1444,8 @@ describe('core', function() {
       {op: 'add', path: '/foo/-', value: 1},
     ];
 
-    jsonpatch.apply(obj1, patchset);
-    jsonpatch.apply(obj2, patchset);
+    jsonpatch.apply(obj1, patchset, false, true);
+    jsonpatch.apply(obj2, patchset, false, true);
 
     expect(obj1).toEqual({
       "foo": [1],

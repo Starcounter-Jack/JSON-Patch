@@ -103,8 +103,8 @@ var jsonpatch;
      */
     /* The operations applicable to an object */
     var objOps = {
-        add: function (obj, key, document) {
-            obj[key] = _deepClone(this.value);
+        add: function (obj, key, document, copyByValue) {
+            obj[key] = copyByValue ? _deepClone(this.value) : this.value;
             return { newDocument: document };
         },
         remove: function (obj, key, document) {
@@ -112,9 +112,9 @@ var jsonpatch;
             delete obj[key];
             return { newDocument: document, removed: removed };
         },
-        replace: function (obj, key, document) {
+        replace: function (obj, key, document, copyByValue) {
             var removed = obj[key];
-            obj[key] = _deepClone(this.value);
+            obj[key] = copyByValue ? _deepClone(this.value) : this.value;
             return { newDocument: document, removed: removed };
         },
         move: function (obj, key, document) {
@@ -131,7 +131,8 @@ var jsonpatch;
         },
         copy: function (obj, key, document) {
             var valueToCopy = getValueByPointer(document, this.from);
-            applyOperation(document, { op: "add", path: this.path, value: valueToCopy });
+            // enforce copy by value so further operations don't affect source (see issue #76)
+            applyOperation(document, { op: "add", path: this.path, value: _deepClone(valueToCopy) });
             return { newDocument: document };
         },
         test: function (obj, key, document) {
@@ -144,8 +145,8 @@ var jsonpatch;
     };
     /* The operations applicable to an array. Many are the same as for the object */
     var arrOps = {
-        add: function (arr, i, document) {
-            arr.splice(i, 0, _deepClone(this.value));
+        add: function (arr, i, document, copyByValue) {
+            arr.splice(i, 0, copyByValue ? _deepClone(this.value) : this.value);
             // this may be needed when using '-' in an array
             return { newDocument: document, index: i };
         },
@@ -153,9 +154,9 @@ var jsonpatch;
             var removedList = arr.splice(i, 1);
             return { newDocument: document, removed: removedList[0] };
         },
-        replace: function (arr, i, document) {
+        replace: function (arr, i, document, copyByValue) {
             var removed = arr[i];
-            arr[i] = _deepClone(this.value);
+            arr[i] = copyByValue ? _deepClone(this.value) : this.value;
             return { newDocument: document, removed: removed };
         },
         move: objOps.move,
@@ -459,11 +460,13 @@ var jsonpatch;
      * @param operation The operation to apply
      * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
      * @param mutateDocument Whether to mutate the original document or clone it before applying
+     * @param copyByValue Whether to copy operation `value` properties by value or reference
      * @return `{newDocument, result}` after the operation
      */
-    function applyOperation(document, operation, validateOperation, mutateDocument) {
+    function applyOperation(document, operation, validateOperation, mutateDocument, copyByValue) {
         if (validateOperation === void 0) { validateOperation = false; }
         if (mutateDocument === void 0) { mutateDocument = true; }
+        if (copyByValue === void 0) { copyByValue = false; }
         if (validateOperation) {
             if (typeof validateOperation == 'function') {
                 validateOperation(operation, 0, document, operation.path);
@@ -561,7 +564,7 @@ var jsonpatch;
                         if (validateOperation && operation.op === "add" && key > obj.length) {
                             throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
                         }
-                        returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
+                        returnValue = arrOps[operation.op].call(operation, obj, key, document, copyByValue); // Apply patch
                         if (returnValue.test === false) {
                             throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
                         }
@@ -573,7 +576,7 @@ var jsonpatch;
                         key = unescapePathComponent(key);
                     }
                     if (t >= len) {
-                        returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
+                        returnValue = objOps[operation.op].call(operation, obj, key, document, copyByValue); // Apply patch
                         if (returnValue.test === false) {
                             throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
                         }
@@ -592,12 +595,14 @@ var jsonpatch;
      * @param document The document to patch
      * @param patch The patch to apply
      * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
+     * @param copyByValue Whether to copy operation `value` properties by value or reference
      * @return An array of `{newDocument, result}` after the patch
      */
-    function applyPatch(document, patch, validateOperation) {
+    function applyPatch(document, patch, validateOperation, copyByValue) {
+        if (copyByValue === void 0) { copyByValue = false; }
         var results = new Array(patch.length);
         for (var i = 0, length_1 = patch.length; i < length_1; i++) {
-            results[i] = applyOperation(document, patch[i], validateOperation);
+            results[i] = applyOperation(document, patch[i], validateOperation, true, copyByValue);
             document = results[i].newDocument; // in case root was replaced
         }
         results.newDocument = document;
@@ -612,7 +617,8 @@ var jsonpatch;
      * or just be undefined
      * @deprecated
      */
-    function apply(document, patch, validateOperation) {
+    function apply(document, patch, validateOperation, copyByValue) {
+        if (copyByValue === void 0) { copyByValue = false; }
         console.warn('jsonpatch.apply is deprecated, please use `applyPatch` for applying patch sequences, or `applyOperation` to apply individual operations.');
         var results = new Array(patch.length);
         /* this code might be overkill, but will be removed soon, it is to prevent the breaking change of root operations */
@@ -634,7 +640,7 @@ var jsonpatch;
                 Object.keys(value_1).forEach(function (key) { return document[key] = value_1[key]; });
             }
             else {
-                results[i] = applyOperation(document, patch[i], validateOperation);
+                results[i] = applyOperation(document, patch[i], validateOperation, true, copyByValue);
                 results[i] = results[i].removed || results[i].test;
             }
         };
@@ -776,7 +782,7 @@ var jsonpatch;
             }
             if (document) {
                 document = JSON.parse(JSON.stringify(document)); //clone document so that we can safely try applying operations
-                applyPatch(document, sequence, externalValidator || true);
+                applyPatch(document, sequence, externalValidator || true, true);
             }
             else {
                 externalValidator = externalValidator || validator;

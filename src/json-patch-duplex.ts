@@ -212,8 +212,8 @@ module jsonpatch {
 
   /* The operations applicable to an object */
   const objOps = {
-    add: function (obj, key, document) {
-      obj[key] = _deepClone(this.value);
+    add: function (obj, key, document, copyByValue) {
+      obj[key] = copyByValue ? _deepClone(this.value) : this.value;
       return {newDocument: document};
     },
     remove: function (obj, key, document) {
@@ -221,9 +221,9 @@ module jsonpatch {
       delete obj[key];
       return {newDocument: document, removed}
     },
-    replace: function (obj, key, document) {
+    replace: function (obj, key, document, copyByValue) {
       var removed = obj[key];
-      obj[key] = _deepClone(this.value);
+      obj[key] = copyByValue ? _deepClone(this.value) : this.value;
       return {newDocument: document, removed};
     },
     move: function (obj, key, document) {
@@ -248,8 +248,9 @@ module jsonpatch {
     },
     copy: function (obj, key, document) {
       const valueToCopy = getValueByPointer(document, this.from);
+      // enforce copy by value so further operations don't affect source (see issue #76)
       applyOperation(document,
-        { op: "add", path: this.path, value: valueToCopy }
+          { op: "add", path: this.path, value: _deepClone(valueToCopy) }
       );
       return {newDocument: document}
     },
@@ -264,8 +265,8 @@ module jsonpatch {
 
   /* The operations applicable to an array. Many are the same as for the object */
   var arrOps = {
-    add: function (arr, i, document) {
-      arr.splice(i, 0, _deepClone(this.value));
+    add: function (arr, i, document, copyByValue) {
+      arr.splice(i, 0, copyByValue ? _deepClone(this.value) : this.value);
       // this may be needed when using '-' in an array
       return {newDocument: document, index: i}
     },
@@ -273,9 +274,9 @@ module jsonpatch {
       var removedList = arr.splice(i, 1);
       return {newDocument: document, removed: removedList[0]};
     },
-    replace: function (arr, i, document) {
+    replace: function (arr, i, document, copyByValue) {
       var removed = arr[i];
-      arr[i] = _deepClone(this.value);
+      arr[i] = copyByValue ? _deepClone(this.value) : this.value;
       return {newDocument: document, removed};
     },
     move: objOps.move,
@@ -616,9 +617,10 @@ module jsonpatch {
    * @param operation The operation to apply
    * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
    * @param mutateDocument Whether to mutate the original document or clone it before applying
+   * @param copyByValue Whether to copy operation `value` properties by value or reference
    * @return `{newDocument, result}` after the operation
    */
-  export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true): OperationResult<T> {
+  export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, copyByValue: boolean = false): OperationResult<T> {
     if (validateOperation) {
       if (typeof validateOperation == 'function') {
         validateOperation(operation, 0, document, operation.path);
@@ -712,7 +714,7 @@ module jsonpatch {
             if (validateOperation && operation.op === "add" && key > obj.length) {
               throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
             }
-            returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
+            returnValue = arrOps[operation.op].call(operation, obj, key, document, copyByValue); // Apply patch
             if (returnValue.test === false) {
               throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
             }
@@ -724,7 +726,7 @@ module jsonpatch {
             key = unescapePathComponent(key);
           }
           if (t >= len) {
-            returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
+            returnValue = objOps[operation.op].call(operation, obj, key, document, copyByValue); // Apply patch
             if (returnValue.test === false) {
               throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
             }
@@ -743,13 +745,14 @@ module jsonpatch {
    * @param document The document to patch
    * @param patch The patch to apply
    * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
+   * @param copyByValue Whether to copy operation `value` properties by value or reference
    * @return An array of `{newDocument, result}` after the patch
    */
-  export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): PatchResult<T> {
+  export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>, copyByValue: boolean = false): PatchResult<T> {
     const results = new Array(patch.length) as PatchResult<T>;
     
     for (let i = 0, length = patch.length; i < length; i++) {
-      results[i] = applyOperation(document, patch[i], validateOperation);
+      results[i] = applyOperation(document, patch[i], validateOperation, true, copyByValue);
       document = results[i].newDocument; // in case root was replaced
     }
     results.newDocument = document;
@@ -764,7 +767,7 @@ module jsonpatch {
    * or just be undefined
    * @deprecated
    */
-  export function apply<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): any[] {
+  export function apply<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>, copyByValue: boolean = false): any[] {
     console.warn('jsonpatch.apply is deprecated, please use `applyPatch` for applying patch sequences, or `applyOperation` to apply individual operations.');
     const results = new Array(patch.length);
 
@@ -793,7 +796,7 @@ module jsonpatch {
 
       }
       else {
-        results[i] = applyOperation(document, patch[i], validateOperation);
+        results[i] = applyOperation(document, patch[i], validateOperation, true, copyByValue);
         results[i] = results[i].removed || results[i].test;
       }
     }
@@ -935,7 +938,7 @@ module jsonpatch {
       }
       if (document) {
         document = JSON.parse(JSON.stringify(document)); //clone document so that we can safely try applying operations
-        applyPatch(document, sequence, externalValidator || true);
+        applyPatch(document, sequence, externalValidator || true, true);
       }
       else {
         externalValidator = externalValidator || validator;
