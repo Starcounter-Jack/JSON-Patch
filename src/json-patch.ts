@@ -160,48 +160,6 @@ namespace jsonpatch {
         return false;
     }
   }
-  
-  function _deepClone(value) {
-    // from here https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
-    var clone;
-    var i;
-
-    if (typeof value !== 'object') {
-      return value;
-    }
-    if (!value) {
-      return value;
-    }
-
-    if ('[object Array]' === Object.prototype.toString.apply(value)) {
-      clone = [];
-      for (i = 0; i < value.length; i += 1) {
-        clone[i] = _deepClone(value[i]);
-      }
-      return clone;
-    }
-
-    clone = {};
-    for (i in value) {
-      if (value.hasOwnProperty(i)) {
-        clone[i] = _deepClone(value[i]);
-      }
-    }
-    return clone;
-  }
-  
-  function deepClone(obj: any) {
-    switch (typeof obj) {
-      case "object":
-        return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
-
-      case "undefined":
-        return null; //this is how JSON.stringify behaves for array items
-
-      default:
-        return obj; //no need to clone primitives
-    }
-  }
 
   /* We use a Javascript hash to store each
    function. Each hash entry (property) uses
@@ -212,8 +170,8 @@ namespace jsonpatch {
 
   /* The operations applicable to an object */
   const objOps = {
-    add: function (obj, key, document, copyByValue) {
-      obj[key] = copyByValue ? _deepClone(this.value) : this.value;
+    add: function (obj, key, document) {
+      obj[key] = this.value;
       return {newDocument: document};
     },
     remove: function (obj, key, document) {
@@ -221,16 +179,16 @@ namespace jsonpatch {
       delete obj[key];
       return {newDocument: document, removed}
     },
-    replace: function (obj, key, document, copyByValue) {
+    replace: function (obj, key, document) {
       var removed = obj[key];
-      obj[key] = copyByValue ? _deepClone(this.value) : this.value;
+      obj[key] = this.value;
       return {newDocument: document, removed};
     },
     move: function (obj, key, document) {
-      /* in case move target overwrites an existing value, 
+      /* in case move target overwrites an existing value,
       return the removed value, this can be taxing performance-wise,
       and is potentially unneeded */
-      
+
       let removed = getValueByPointer(document, this.path);
 
       if(removed) {
@@ -249,9 +207,9 @@ namespace jsonpatch {
     },
     copy: function (obj, key, document) {
       const valueToCopy = getValueByPointer(document, this.from);
-      // enforce copy by value so further operations don't affect source (see issue #76)
+      // enforce copy by value so further operations don't affect source (see issue #177)
       applyOperation(document,
-        { op: "add", path: this.path, value: _deepClone(valueToCopy) }
+        { op: "add", path: this.path, value: deepClone(valueToCopy) }
       );
       return {newDocument: document}
     },
@@ -266,8 +224,8 @@ namespace jsonpatch {
 
   /* The operations applicable to an array. Many are the same as for the object */
   var arrOps = {
-    add: function (arr, i, document, copyByValue) {
-      arr.splice(i, 0, copyByValue ? _deepClone(this.value) : this.value);
+    add: function (arr, i, document) {
+      arr.splice(i, 0, this.value);
       // this may be needed when using '-' in an array
       return {newDocument: document, index: i}
     },
@@ -275,9 +233,9 @@ namespace jsonpatch {
       var removedList = arr.splice(i, 1);
       return {newDocument: document, removed: removedList[0]};
     },
-    replace: function (arr, i, document, copyByValue) {
+    replace: function (arr, i, document) {
       var removed = arr[i];
-      arr[i] = copyByValue ? _deepClone(this.value) : this.value;
+      arr[i] = this.value;
       return {newDocument: document, removed};
     },
     move: objOps.move,
@@ -317,6 +275,22 @@ namespace jsonpatch {
 
 
   /**
+   * Deeply clone the object.
+   * https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
+   * @param  {any} obj value to clone
+   * @return {any}       cloned obj
+   */
+  export function deepClone(obj: any): any {
+    switch (typeof obj) {
+      case "object":
+         return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+      case "undefined":
+         return null; //this is how JSON.stringify behaves for array items
+      default:
+         return obj; //no need to clone primitives
+    }
+  }
+  /**
   * Escapes a json pointer path
   * @param path The raw pointer
   * @return the Escaped path
@@ -350,15 +324,17 @@ namespace jsonpatch {
   /**
    * Apply a single JSON Patch Operation on a JSON document.
    * Returns the {newDocument, result} of the operation.
+   * It modifies the `document` object and `operation` - it gets the values by reference.
+   * If you would like to avoid touching your values, clone them:
+   * `jsonpatch.apply(document, jsonpatch.deepClone(operation))`.
    *
    * @param document The document to patch
    * @param operation The operation to apply
    * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
    * @param mutateDocument Whether to mutate the original document or clone it before applying
-   * @param copyByValue Whether to copy operation `value` properties by value or reference
    * @return `{newDocument, result}` after the operation
    */
-  export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, copyByValue: boolean = false): OperationResult<T> {
+  export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true): OperationResult<T> {
     if (validateOperation) {
       if (typeof validateOperation == 'function') {
         validateOperation(operation, 0, document, operation.path);
@@ -452,10 +428,10 @@ namespace jsonpatch {
             if (validateOperation && operation.op === "add" && key > obj.length) {
               throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
             }
-            const returnValue = arrOps[operation.op].call(operation, obj, key, document, copyByValue); // Apply patch
+            const returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
             if (returnValue.test === false) {
               throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
-            }            
+            }
             return returnValue;
           }
         }
@@ -464,10 +440,10 @@ namespace jsonpatch {
             key = unescapePathComponent(key);
           }
           if (t >= len) {
-            const returnValue = objOps[operation.op].call(operation, obj, key, document, copyByValue); // Apply patch
+            const returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
             if (returnValue.test === false) {
               throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
-            }            
+            }
             return returnValue;
           }
         }
@@ -479,18 +455,20 @@ namespace jsonpatch {
   /**
    * Apply a full JSON Patch array on a JSON document.
    * Returns the {newDocument, result} of the patch.
+   * It modifies the `document` object and `patch` - it gets the values by reference.
+   * If you would like to avoid touching your values, clone them:
+   * `jsonpatch.apply(document, jsonpatch.deepClone(patch))`.
    *
    * @param document The document to patch
    * @param patch The patch to apply
    * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
-   * @param copyByValue Whether to copy operation `value` properties by value or reference
    * @return An array of `{newDocument, result}` after the patch, with a `newDocument` property for accessing the final state with ease.
    */
-  export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>, copyByValue: boolean = false): PatchResult<T> {
+  export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): PatchResult<T> {
     const results = new Array(patch.length) as PatchResult<T>;
 
     for (let i = 0, length = patch.length; i < length; i++) {
-      results[i] = applyOperation(document, patch[i], validateOperation, true, copyByValue);
+      results[i] = applyOperation(document, patch[i], validateOperation);
       document = results[i].newDocument; // in case root was replaced
     }
     results.newDocument = document;
@@ -505,7 +483,7 @@ namespace jsonpatch {
    * or just be undefined
    * @deprecated
    */
-  export function apply<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>, copyByValue: boolean = false): any[] {
+  export function apply<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): any[] {
     console.warn('jsonpatch.apply is deprecated, please use `applyPatch` for applying patch sequences, or `applyOperation` to apply individual operations.');
     const results = new Array(patch.length);
 
@@ -534,7 +512,7 @@ namespace jsonpatch {
 
       }
       else {
-        results[i] = applyOperation(document, patch[i], validateOperation, true, copyByValue);
+        results[i] = applyOperation(document, patch[i], validateOperation);
         results[i] = results[i].removed || results[i].test;
       }
     }
@@ -665,7 +643,7 @@ namespace jsonpatch {
   /**
    * Validates a sequence of operations. If `document` parameter is provided, the sequence is additionally validated against the object document.
    * If error is encountered, returns a JsonPatchError object
-   * @param sequence 
+   * @param sequence
    * @param document
    * @returns {JsonPatchError|undefined}
    */
@@ -675,8 +653,8 @@ namespace jsonpatch {
         throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
       }
       if (document) {
-        document = JSON.parse(JSON.stringify(document)); //clone document so that we can safely try applying operations
-        applyPatch(document, sequence, externalValidator || true, true);
+        //clone document so that we can safely try applying operations
+        applyPatch(deepClone(document), deepClone(sequence), externalValidator || true);
       }
       else {
         externalValidator = externalValidator || validator;
@@ -702,6 +680,7 @@ if (typeof exports !== "undefined") {
   exports.applyOperation = jsonpatch.applyOperation;
   exports.applyReducer = jsonpatch.applyReducer;
   exports.getValueByPointer = jsonpatch.getValueByPointer;
+  exports.deepClone = jsonpatch.deepClone;
   exports.escapePathComponent = jsonpatch.escapePathComponent;
   exports.unescapePathComponent = jsonpatch.unescapePathComponent;
   exports.validate = jsonpatch.validate;

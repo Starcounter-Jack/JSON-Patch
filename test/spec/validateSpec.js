@@ -66,7 +66,7 @@ describe('validate', function() {
     expect(error.name).toBe('SEQUENCE_NOT_AN_ARRAY');
   });
 
-  it('should return an error that contains the patch and the patched object', function() {
+  it('should return an error that contains the cloned patch and the patched object', function() {
     var tree = {
       name: 'Elvis',
       cars: []
@@ -79,7 +79,7 @@ describe('validate', function() {
     ];
     var error = jsonpatch.validate(sequence, tree);
     expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.operation).toBe(sequence[0]);
+    expect(JSON.stringify(error.operation)).toBe(JSON.stringify(sequence[0]));
     expect(JSON.stringify(error.tree)).toBe(JSON.stringify(tree));
     expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
   });

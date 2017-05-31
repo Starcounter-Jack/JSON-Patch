@@ -659,7 +659,7 @@ describe('core - using applyOperation', function() {
         }
       }).newDocument
     ).toEqual(obj);
-    
+
     expect(() =>
       jsonpatch.applyOperation(obj, {
         op: 'test',
@@ -1419,7 +1419,7 @@ describe('core', function() {
     });
   });
 
-  it('should apply copy without side effects', function() {
+  it('should apply copy, without leaving cross-reference between nodes', function() {
     var obj = {};
     var patchset = [
       {op: 'add', path: '/foo', value: []},
@@ -1436,23 +1436,15 @@ describe('core', function() {
     });
   });
 
-  it('should apply a patchset twice without side effects with copyByValue flag enabled', function () {
+  it('should use value object as a reference', function () {
     var obj1 = {};
-    var obj2 = {};
-    var patchset = [
-      {op: 'add', path: '/foo', value: []},
-      {op: 'add', path: '/foo/-', value: 1},
+    var patch = [
+      {op: 'add', path: '/foo', value: []}
     ];
 
-    jsonpatch.apply(obj1, patchset, false, true);
-    jsonpatch.apply(obj2, patchset, false, true);
+    jsonpatch.apply(obj1, patch, false);
 
-    expect(obj1).toEqual({
-      "foo": [1],
-    });
-    expect(obj2).toEqual({
-      "foo": [1],
-    });
+    expect(obj1.foo).toBe(patch[0].value);
   });
 
   describe('returning removed elements >', function() {
@@ -1801,12 +1793,11 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
 
-    it('copy of `undefined`', function() {
+    it('copy of `undefined` as `null` (like `JSON.stringify` does)', function() {
       obj = {
         foo: undefined,
         baz: 'defined'
       };
-
       jsonpatch.applyPatch(obj, [
         {
           op: 'copy',
@@ -1817,7 +1808,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       expect(obj).toEqual({
         foo: undefined,
         baz: 'defined',
-        bar: undefined
+        bar: null
       });
 
       jsonpatch.applyPatch(obj, [
@@ -1829,8 +1820,8 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       ]);
       expect(obj).toEqual({
         foo: undefined,
-        baz: undefined,
-        bar: undefined
+        baz: null,
+        bar: null
       });
     });
   });

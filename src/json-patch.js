@@ -70,43 +70,6 @@ var jsonpatch;
                 return false;
         }
     }
-    
-    function _deepClone(value) {
-        // from here https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
-        var clone;
-        var i;
-        if (typeof value !== 'object') {
-            return value;
-        }
-        if (!value) {
-            return value;
-        }
-        if ('[object Array]' === Object.prototype.toString.apply(value)) {
-            clone = [];
-            for (i = 0; i < value.length; i += 1) {
-                clone[i] = _deepClone(value[i]);
-            }
-            return clone;
-        }
-        clone = {};
-        for (i in value) {
-            if (value.hasOwnProperty(i)) {
-                clone[i] = _deepClone(value[i]);
-            }
-        }
-        return clone;
-    }
-    
-    function deepClone(obj) {
-        switch (typeof obj) {
-            case "object":
-                return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
-            case "undefined":
-                return null; //this is how JSON.stringify behaves for array items
-            default:
-                return obj; //no need to clone primitives
-        }
-    }
     /* We use a Javascript hash to store each
      function. Each hash entry (property) uses
      the operation identifiers specified in rfc6902.
@@ -115,8 +78,8 @@ var jsonpatch;
      */
     /* The operations applicable to an object */
     var objOps = {
-        add: function (obj, key, document, copyByValue) {
-            obj[key] = copyByValue ? _deepClone(this.value) : this.value;
+        add: function (obj, key, document) {
+            obj[key] = this.value;
             return { newDocument: document };
         },
         remove: function (obj, key, document) {
@@ -124,9 +87,9 @@ var jsonpatch;
             delete obj[key];
             return { newDocument: document, removed: removed };
         },
-        replace: function (obj, key, document, copyByValue) {
+        replace: function (obj, key, document) {
             var removed = obj[key];
-            obj[key] = copyByValue ? _deepClone(this.value) : this.value;
+            obj[key] = this.value;
             return { newDocument: document, removed: removed };
         },
         move: function (obj, key, document) {
@@ -143,8 +106,8 @@ var jsonpatch;
         },
         copy: function (obj, key, document) {
             var valueToCopy = getValueByPointer(document, this.from);
-            // enforce copy by value so further operations don't affect source (see issue #76)
-            applyOperation(document, { op: "add", path: this.path, value: _deepClone(valueToCopy) });
+            // enforce copy by value so further operations don't affect source (see issue #177)
+            applyOperation(document, { op: "add", path: this.path, value: deepClone(valueToCopy) });
             return { newDocument: document };
         },
         test: function (obj, key, document) {
@@ -157,8 +120,8 @@ var jsonpatch;
     };
     /* The operations applicable to an array. Many are the same as for the object */
     var arrOps = {
-        add: function (arr, i, document, copyByValue) {
-            arr.splice(i, 0, copyByValue ? _deepClone(this.value) : this.value);
+        add: function (arr, i, document) {
+            arr.splice(i, 0, this.value);
             // this may be needed when using '-' in an array
             return { newDocument: document, index: i };
         },
@@ -166,9 +129,9 @@ var jsonpatch;
             var removedList = arr.splice(i, 1);
             return { newDocument: document, removed: removedList[0] };
         },
-        replace: function (arr, i, document, copyByValue) {
+        replace: function (arr, i, document) {
             var removed = arr[i];
-            arr[i] = copyByValue ? _deepClone(this.value) : this.value;
+            arr[i] = this.value;
             return { newDocument: document, removed: removed };
         },
         move: objOps.move,
@@ -200,6 +163,23 @@ var jsonpatch;
         }
         return true;
     }
+    /**
+     * Deeply clone the object.
+     * https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
+     * @param  {any} obj value to clone
+     * @return {any}       cloned obj
+     */
+    function deepClone(obj) {
+        switch (typeof obj) {
+            case "object":
+                return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+            case "undefined":
+                return null; //this is how JSON.stringify behaves for array items
+            default:
+                return obj; //no need to clone primitives
+        }
+    }
+    jsonpatch.deepClone = deepClone;
     /**
     * Escapes a json pointer path
     * @param path The raw pointer
@@ -237,18 +217,19 @@ var jsonpatch;
     /**
      * Apply a single JSON Patch Operation on a JSON document.
      * Returns the {newDocument, result} of the operation.
+     * It modifies the `document` object and `operation` - it gets the values by reference.
+     * If you would like to avoid touching your values, clone them:
+     * `jsonpatch.apply(document, jsonpatch.deepClone(operation))`.
      *
      * @param document The document to patch
      * @param operation The operation to apply
      * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
      * @param mutateDocument Whether to mutate the original document or clone it before applying
-     * @param copyByValue Whether to copy operation `value` properties by value or reference
      * @return `{newDocument, result}` after the operation
      */
-    function applyOperation(document, operation, validateOperation, mutateDocument, copyByValue) {
+    function applyOperation(document, operation, validateOperation, mutateDocument) {
         if (validateOperation === void 0) { validateOperation = false; }
         if (mutateDocument === void 0) { mutateDocument = true; }
-        if (copyByValue === void 0) { copyByValue = false; }
         if (validateOperation) {
             if (typeof validateOperation == 'function') {
                 validateOperation(operation, 0, document, operation.path);
@@ -346,7 +327,7 @@ var jsonpatch;
                         if (validateOperation && operation.op === "add" && key > obj.length) {
                             throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
                         }
-                        var returnValue = arrOps[operation.op].call(operation, obj, key, document, copyByValue); // Apply patch
+                        var returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
                         if (returnValue.test === false) {
                             throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
                         }
@@ -358,7 +339,7 @@ var jsonpatch;
                         key = unescapePathComponent(key);
                     }
                     if (t >= len) {
-                        var returnValue = objOps[operation.op].call(operation, obj, key, document, copyByValue); // Apply patch
+                        var returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
                         if (returnValue.test === false) {
                             throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
                         }
@@ -373,18 +354,19 @@ var jsonpatch;
     /**
      * Apply a full JSON Patch array on a JSON document.
      * Returns the {newDocument, result} of the patch.
+     * It modifies the `document` object and `patch` - it gets the values by reference.
+     * If you would like to avoid touching your values, clone them:
+     * `jsonpatch.apply(document, jsonpatch.deepClone(patch))`.
      *
      * @param document The document to patch
      * @param patch The patch to apply
      * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
-     * @param copyByValue Whether to copy operation `value` properties by value or reference
      * @return An array of `{newDocument, result}` after the patch, with a `newDocument` property for accessing the final state with ease.
      */
-    function applyPatch(document, patch, validateOperation, copyByValue) {
-        if (copyByValue === void 0) { copyByValue = false; }
+    function applyPatch(document, patch, validateOperation) {
         var results = new Array(patch.length);
         for (var i = 0, length_1 = patch.length; i < length_1; i++) {
-            results[i] = applyOperation(document, patch[i], validateOperation, true, copyByValue);
+            results[i] = applyOperation(document, patch[i], validateOperation, true);
             document = results[i].newDocument; // in case root was replaced
         }
         results.newDocument = document;
@@ -399,8 +381,7 @@ var jsonpatch;
      * or just be undefined
      * @deprecated
      */
-    function apply(document, patch, validateOperation, copyByValue) {
-        if (copyByValue === void 0) { copyByValue = false; }
+    function apply(document, patch, validateOperation) {
         console.warn('jsonpatch.apply is deprecated, please use `applyPatch` for applying patch sequences, or `applyOperation` to apply individual operations.');
         var results = new Array(patch.length);
         /* this code might be overkill, but will be removed soon, it is to prevent the breaking change of root operations */
@@ -422,7 +403,7 @@ var jsonpatch;
                 Object.keys(value_1).forEach(function (key) { return document[key] = value_1[key]; });
             }
             else {
-                results[i] = applyOperation(document, patch[i], validateOperation, true, copyByValue);
+                results[i] = applyOperation(document, patch[i], validateOperation, true);
                 results[i] = results[i].removed || results[i].test;
             }
         };
@@ -563,8 +544,8 @@ var jsonpatch;
                 throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
             }
             if (document) {
-                document = JSON.parse(JSON.stringify(document)); //clone document so that we can safely try applying operations
-                applyPatch(document, sequence, externalValidator || true, true);
+                //clone document so that we can safely try applying operations
+                applyPatch(deepClone(document), deepClone(sequence), externalValidator || true);
             }
             else {
                 externalValidator = externalValidator || validator;
@@ -590,6 +571,7 @@ if (typeof exports !== "undefined") {
     exports.applyOperation = jsonpatch.applyOperation;
     exports.applyReducer = jsonpatch.applyReducer;
     exports.getValueByPointer = jsonpatch.getValueByPointer;
+    exports.deepClone = jsonpatch.deepClone;
     exports.escapePathComponent = jsonpatch.escapePathComponent;
     exports.unescapePathComponent = jsonpatch.unescapePathComponent;
     exports.validate = jsonpatch.validate;
