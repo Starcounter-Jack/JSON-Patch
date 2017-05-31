@@ -68,7 +68,7 @@ declare namespace jsonpatch {
      * @param  {any} obj value to clone
      * @return {any}       cloned obj
      */
-    function deepClone(obj: any): any;
+    function deepClone<T>(obj: T): T;
     /**
     * Escapes a json pointer path
     * @param path The raw pointer

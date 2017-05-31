@@ -540,7 +540,7 @@ module jsonpatch {
    * @param  {any} obj value to clone
    * @return {any}       cloned obj
    */
-  export function deepClone(obj: any): any {
+  export function deepClone<T>(obj: T): T {
     switch (typeof obj) {
       case "object":
          return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
