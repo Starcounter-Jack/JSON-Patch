@@ -366,7 +366,7 @@ var jsonpatch;
     function applyPatch(document, patch, validateOperation) {
         var results = new Array(patch.length);
         for (var i = 0, length_1 = patch.length; i < length_1; i++) {
-            results[i] = applyOperation(document, patch[i], validateOperation, true);
+            results[i] = applyOperation(document, patch[i], validateOperation);
             document = results[i].newDocument; // in case root was replaced
         }
         results.newDocument = document;
@@ -403,7 +403,7 @@ var jsonpatch;
                 Object.keys(value_1).forEach(function (key) { return document[key] = value_1[key]; });
             }
             else {
-                results[i] = applyOperation(document, patch[i], validateOperation, true);
+                results[i] = applyOperation(document, patch[i], validateOperation);
                 results[i] = results[i].removed || results[i].test;
             }
         };
