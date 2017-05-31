@@ -63,6 +63,13 @@ declare namespace jsonpatch {
     type TestPatch<T> = TestOperation<T>;
     type JsonPatchErrorName = 'SEQUENCE_NOT_AN_ARRAY' | 'OPERATION_NOT_AN_OBJECT' | 'OPERATION_OP_INVALID' | 'OPERATION_PATH_INVALID' | 'OPERATION_FROM_REQUIRED' | 'OPERATION_VALUE_REQUIRED' | 'OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED' | 'OPERATION_PATH_CANNOT_ADD' | 'OPERATION_PATH_UNRESOLVABLE' | 'OPERATION_FROM_UNRESOLVABLE' | 'OPERATION_PATH_ILLEGAL_ARRAY_INDEX' | 'OPERATION_VALUE_OUT_OF_BOUNDS' | 'TEST_OPERATION_FAILED';
     /**
+     * Deeply clone the object.
+     * https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
+     * @param  {any} obj value to clone
+     * @return {any}       cloned obj
+     */
+    function deepClone(obj: any): any;
+    /**
     * Escapes a json pointer path
     * @param path The raw pointer
     * @return the Escaped path
@@ -86,6 +93,9 @@ declare namespace jsonpatch {
     /**
      * Apply a single JSON Patch Operation on a JSON document.
      * Returns the {newDocument, result} of the operation.
+     * It modifies the `document` object and `operation` - it gets the values by reference.
+     * If you would like to avoid touching your values, clone them:
+     * `jsonpatch.apply(document, jsonpatch.deepClone(operation))`.
      *
      * @param document The document to patch
      * @param operation The operation to apply
@@ -97,6 +107,9 @@ declare namespace jsonpatch {
     /**
      * Apply a full JSON Patch array on a JSON document.
      * Returns the {newDocument, result} of the patch.
+     * It modifies the `document` object and `patch` - it gets the values by reference.
+     * If you would like to avoid touching your values, clone them:
+     * `jsonpatch.apply(document, jsonpatch.deepClone(patch))`.
      *
      * @param document The document to patch
      * @param patch The patch to apply
@@ -126,9 +139,9 @@ declare namespace jsonpatch {
     class JsonPatchError extends Error {
         message: string;
         name: JsonPatchErrorName;
-        index?: number;
-        operation?: any;
-        tree?: any;
+        index: number;
+        operation: any;
+        tree: any;
         constructor(message: string, name: JsonPatchErrorName, index?: number, operation?: any, tree?: any);
     }
     /**

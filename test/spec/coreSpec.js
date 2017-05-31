@@ -659,7 +659,7 @@ describe('core - using applyOperation', function() {
         }
       }).newDocument
     ).toEqual(obj);
-    
+
     expect(() =>
       jsonpatch.applyOperation(obj, {
         op: 'test',
@@ -1419,6 +1419,34 @@ describe('core', function() {
     });
   });
 
+  it('should apply copy, without leaving cross-reference between nodes', function() {
+    var obj = {};
+    var patchset = [
+      {op: 'add', path: '/foo', value: []},
+      {op: 'add', path: '/foo/-', value: 1},
+      {op: 'copy', from: '/foo', path: '/bar'},
+      {op: 'add', path: '/bar/-', value: 2}
+    ];
+
+    jsonpatch.apply(obj, patchset);
+
+    expect(obj).toEqual({
+      "foo": [1],
+      "bar": [1, 2],
+    });
+  });
+
+  it('should use value object as a reference', function () {
+    var obj1 = {};
+    var patch = [
+      {op: 'add', path: '/foo', value: []}
+    ];
+
+    jsonpatch.apply(obj1, patch, false);
+
+    expect(obj1.foo).toBe(patch[0].value);
+  });
+
   describe('returning removed elements >', function() {
     var obj;
     beforeEach(function() {
@@ -1765,12 +1793,11 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
 
-    it('copy of `undefined`', function() {
+    it('copy of `undefined` as `null` (like `JSON.stringify` does)', function() {
       obj = {
         foo: undefined,
         baz: 'defined'
       };
-
       jsonpatch.applyPatch(obj, [
         {
           op: 'copy',
@@ -1781,7 +1808,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       expect(obj).toEqual({
         foo: undefined,
         baz: 'defined',
-        bar: undefined
+        bar: null
       });
 
       jsonpatch.applyPatch(obj, [
@@ -1793,8 +1820,8 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       ]);
       expect(obj).toEqual({
         foo: undefined,
-        baz: undefined,
-        bar: undefined
+        baz: null,
+        bar: null
       });
     });
   });

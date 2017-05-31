@@ -81,6 +81,12 @@ declare module jsonpatch {
      */
     function generate<T>(observer: Observer<T>): Patch<any>[];
     /**
+     * Deeply clone the object.
+     * @param  {any} obj value to clone
+     * @return {any}       cloned obj
+     */
+    function deepClone(obj: any): any;
+    /**
     * Escapes a json pointer path
     * @param path The raw pointer
     * @return the Escaped path
@@ -104,6 +110,9 @@ declare module jsonpatch {
     /**
      * Apply a single JSON Patch Operation on a JSON document.
      * Returns the {newDocument, result} of the operation.
+     * It modifies the `document` object and `patch` - it gets the values by reference.
+     * If you would like to avoid touching your values, clone them:
+     * `jsonpatch.applyOperation(document, jsonpatch.deepClone(operation))`.
      *
      * @param document The document to patch
      * @param operation The operation to apply
@@ -115,6 +124,9 @@ declare module jsonpatch {
     /**
      * Apply a full JSON Patch array on a JSON document.
      * Returns the {newDocument, result} of the patch.
+     * It modifies the `document` object and `patch` - it gets the values by reference.
+     * If you would like to avoid touching your values, clone them:
+     * `jsonpatch.apply(document, jsonpatch.deepClone(patch))`.
      *
      * @param document The document to patch
      * @param patch The patch to apply
@@ -127,7 +139,7 @@ declare module jsonpatch {
      * Returns an array of results of operations.
      * Each element can either be a boolean (if op == 'test') or
      * the removed object (operations that remove things)
-     * or just be undefined
+     * or just be undefined.
      * @deprecated
      */
     function apply<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): any[];
@@ -144,9 +156,9 @@ declare module jsonpatch {
     class JsonPatchError extends Error {
         message: string;
         name: JsonPatchErrorName;
-        index?: number;
-        operation?: any;
-        tree?: any;
+        index: number;
+        operation: any;
+        tree: any;
         constructor(message: string, name: JsonPatchErrorName, index?: number, operation?: any, tree?: any);
     }
     /**
