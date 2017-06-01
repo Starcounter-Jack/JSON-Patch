@@ -57,7 +57,7 @@ namespace jsonpatch {
   }
   export interface PatchResult<T> extends Array<OperationResult<T>> {
     newDocument: T;
-    rootReset: Boolean;
+    rootReset: boolean;
   }
 
   // Aliases for BC
