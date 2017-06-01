@@ -179,7 +179,7 @@ Applies `patch` array on `obj`.
 An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
 
 It modifies the `document` object and `patch` - it gets the values by reference.
-If you would like to avoid touching your values, clone them: `jsonpatch.apply(document, jsonpatch.deepClone(patch))`.
+If you would like to avoid touching your values, clone them: `jsonpatch.applyPatch(document, jsonpatch.deepClone(patch))`.
 
 Returns an array of [`OperationResult`](#operationresult-type) objects - one item for each item in `patches`, each item is an object `{newDocument: any, test?: boolean, removed?: any}`.
 
@@ -203,7 +203,7 @@ Applies single operation object `operation` on `document`.
 - `mutateDocument` Whether to mutate the original document or clone it before applying
 
 It modifies the `document` object and `operation` - it gets the values by reference.
-If you would like to avoid touching your values, clone them: `jsonpatch.apply(document, jsonpatch.deepClone(operation))`.
+If you would like to avoid touching your values, clone them: `jsonpatch.applyOperation(document, jsonpatch.deepClone(operation))`.
 
 Returns an [`OperationResult`](#operationresult-type) object `{newDocument: any, test?: boolean, removed?: any}`.
 

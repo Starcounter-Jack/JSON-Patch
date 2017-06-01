@@ -219,7 +219,7 @@ var jsonpatch;
      * Returns the {newDocument, result} of the operation.
      * It modifies the `document` object and `operation` - it gets the values by reference.
      * If you would like to avoid touching your values, clone them:
-     * `jsonpatch.apply(document, jsonpatch.deepClone(operation))`.
+     * `jsonpatch.applyOperation(document, jsonpatch.deepClone(operation))`.
      *
      * @param document The document to patch
      * @param operation The operation to apply
@@ -356,7 +356,7 @@ var jsonpatch;
      * Returns the {newDocument, result} of the patch.
      * It modifies the `document` object and `patch` - it gets the values by reference.
      * If you would like to avoid touching your values, clone them:
-     * `jsonpatch.apply(document, jsonpatch.deepClone(patch))`.
+     * `jsonpatch.applyPatch(document, jsonpatch.deepClone(patch))`.
      *
      * @param document The document to patch
      * @param patch The patch to apply
