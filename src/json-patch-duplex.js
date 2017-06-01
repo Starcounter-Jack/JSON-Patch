@@ -428,6 +428,9 @@ var jsonpatch;
      * @return The retrieved value
      */
     function getValueByPointer(document, pointer) {
+        if (pointer == '') {
+            return document;
+        }
         var getOriginalDestination = { op: "_get", path: pointer };
         applyOperation(document, getOriginalDestination);
         return getOriginalDestination.value;
@@ -457,9 +460,9 @@ var jsonpatch;
                 validator(operation, 0);
             }
         }
-        var returnValue = { newDocument: document };
         /* ROOT OPERATIONS */
         if (operation.path === "") {
+            var returnValue = { newDocument: document };
             if (operation.op === 'add') {
                 returnValue.newDocument = operation.value;
                 return returnValue;
@@ -487,6 +490,10 @@ var jsonpatch;
             else if (operation.op === 'remove') {
                 returnValue.removed = document;
                 returnValue.newDocument = null;
+                return returnValue;
+            }
+            else if (operation.op === '_get') {
+                operation.value = document;
                 return returnValue;
             }
             else {
@@ -546,7 +553,7 @@ var jsonpatch;
                         if (validateOperation && operation.op === "add" && key > obj.length) {
                             throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
                         }
-                        returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
+                        var returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
                         if (returnValue.test === false) {
                             throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
                         }
@@ -558,7 +565,7 @@ var jsonpatch;
                         key = unescapePathComponent(key);
                     }
                     if (t >= len) {
-                        returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
+                        var returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
                         if (returnValue.test === false) {
                             throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
                         }

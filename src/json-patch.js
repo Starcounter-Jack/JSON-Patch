@@ -209,6 +209,9 @@ var jsonpatch;
      * @return The retrieved value
      */
     function getValueByPointer(document, pointer) {
+        if (pointer == '') {
+            return document;
+        }
         var getOriginalDestination = { op: "_get", path: pointer };
         applyOperation(document, getOriginalDestination);
         return getOriginalDestination.value;
@@ -268,6 +271,10 @@ var jsonpatch;
             else if (operation.op === 'remove') {
                 returnValue.removed = document;
                 returnValue.newDocument = null;
+                return returnValue;
+            }
+            else if (operation.op === '_get') {
+                operation.value = document;
                 return returnValue;
             }
             else {

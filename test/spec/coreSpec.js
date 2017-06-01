@@ -10,6 +10,46 @@ if (typeof jsonpatch === 'undefined') {
 if (typeof _ === 'undefined') {
   _ = require('./../lib/underscore.min.js');
 }
+
+describe('jsonpatch.getValueByPointer', function() {
+  it('should retrieve values by JSON pointer from tree - deep object', function() {
+    var obj = {
+      person: {name: 'Marilyn'}
+    };
+    var name = jsonpatch.getValueByPointer(obj, '/person/name')
+    expect(name).toEqual('Marilyn');
+  });
+
+  it('should retrieve values by JSON pointer from tree - deep array', function() {
+    var obj = {
+      people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+    };
+    var name = jsonpatch.getValueByPointer(obj, '/people/1/name')
+    expect(name).toEqual('Monroe');
+  });
+
+  it('should retrieve values by JSON pointer from tree - root object', function() {
+    var obj = {
+      people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+    };
+    var retrievedObject = jsonpatch.getValueByPointer(obj, '');
+
+    expect(retrievedObject).toEqual({
+      people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+    });
+  });
+
+  it('should retrieve values by JSON pointer from tree - root array', function() {
+    var obj = [{
+      people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+    }];
+    var retrievedObject = jsonpatch.getValueByPointer(obj, '');
+    
+    expect(retrievedObject).toEqual([{
+      people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+    }]);
+  });
+});
 describe('jsonpatch.applyReducer - using with Array#reduce', function() {
   it('should work with Array.reduce on array of patches', function() {
     var obj = {
@@ -27,6 +67,32 @@ describe('jsonpatch.applyReducer - using with Array#reduce', function() {
   });
 });
 describe('root replacement with applyOperation', function() {
+  describe('_get operation', function () {
+    it('should get root value', function() {
+      var obj = [{
+        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+      }];
+
+      var patch = {op: '_get', path: ''};
+      
+      jsonpatch.applyOperation(obj, patch);
+      
+      expect(patch.value).toEqual([{
+        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+      }]);
+    });    
+    it('should get root value', function() {
+      var obj = {
+        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+      };
+      
+      var patch = {op: '_get', path: '/people/1/name'};
+      
+      jsonpatch.applyOperation(obj, patch);
+      
+      expect(patch.value).toEqual('Monroe');
+    });
+  });
   describe('add operation', function() {
     it('should `add` an object (on a json document of type object)) - in place', function() {
       var obj = {

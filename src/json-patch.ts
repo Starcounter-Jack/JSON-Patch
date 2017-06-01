@@ -172,17 +172,17 @@ namespace jsonpatch {
   const objOps = {
     add: function (obj, key, document) {
       obj[key] = this.value;
-      return {newDocument: document};
+      return { newDocument: document };
     },
     remove: function (obj, key, document) {
       var removed = obj[key];
       delete obj[key];
-      return {newDocument: document, removed}
+      return { newDocument: document, removed }
     },
     replace: function (obj, key, document) {
       var removed = obj[key];
       obj[key] = this.value;
-      return {newDocument: document, removed};
+      return { newDocument: document, removed };
     },
     move: function (obj, key, document) {
       /* in case move target overwrites an existing value,
@@ -191,8 +191,8 @@ namespace jsonpatch {
 
       let removed = getValueByPointer(document, this.path);
 
-      if(removed) {
-          removed = deepClone(removed);
+      if (removed) {
+        removed = deepClone(removed);
       }
 
       const originalValue = applyOperation(document,
@@ -203,7 +203,7 @@ namespace jsonpatch {
         { op: "add", path: this.path, value: originalValue }
       );
 
-      return {newDocument: document, removed};
+      return { newDocument: document, removed };
     },
     copy: function (obj, key, document) {
       const valueToCopy = getValueByPointer(document, this.from);
@@ -211,14 +211,14 @@ namespace jsonpatch {
       applyOperation(document,
         { op: "add", path: this.path, value: deepClone(valueToCopy) }
       );
-      return {newDocument: document}
+      return { newDocument: document }
     },
     test: function (obj, key, document) {
-      return {newDocument: document, test: _equals(obj[key], this.value)}
+      return { newDocument: document, test: _equals(obj[key], this.value) }
     },
     _get: function (obj, key, document) {
       this.value = obj[key];
-      return {newDocument: document}
+      return { newDocument: document }
     }
   };
 
@@ -227,16 +227,16 @@ namespace jsonpatch {
     add: function (arr, i, document) {
       arr.splice(i, 0, this.value);
       // this may be needed when using '-' in an array
-      return {newDocument: document, index: i}
+      return { newDocument: document, index: i }
     },
     remove: function (arr, i, document) {
       var removedList = arr.splice(i, 1);
-      return {newDocument: document, removed: removedList[0]};
+      return { newDocument: document, removed: removedList[0] };
     },
     replace: function (arr, i, document) {
       var removed = arr[i];
       arr[i] = this.value;
-      return {newDocument: document, removed};
+      return { newDocument: document, removed };
     },
     move: objOps.move,
     copy: objOps.copy,
@@ -283,11 +283,11 @@ namespace jsonpatch {
   export function deepClone<T>(obj: T): T {
     switch (typeof obj) {
       case "object":
-         return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+        return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
       case "undefined":
-         return null; //this is how JSON.stringify behaves for array items
+        return null; //this is how JSON.stringify behaves for array items
       default:
-         return obj; //no need to clone primitives
+        return obj; //no need to clone primitives
     }
   }
   /**
@@ -317,6 +317,9 @@ namespace jsonpatch {
    * @return The retrieved value
    */
   export function getValueByPointer(document: any, pointer: string): any {
+    if (pointer == '') {
+      return document;
+    }
     var getOriginalDestination = <GetOperation<any>>{ op: "_get", path: pointer };
     applyOperation(document, getOriginalDestination);
     return getOriginalDestination.value;
@@ -370,6 +373,9 @@ namespace jsonpatch {
       } else if (operation.op === 'remove') { // a remove on root
         returnValue.removed = document;
         returnValue.newDocument = null;
+        return returnValue;
+      } else if (operation.op === '_get') {
+        operation.value = document;
         return returnValue;
       } else { /* bad operation */
         if (validateOperation) {
