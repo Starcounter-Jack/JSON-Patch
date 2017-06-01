@@ -85,7 +85,7 @@ describe('root replacement with applyOperation', function() {
       var obj = {
         people: [{name: 'Marilyn'}, {name: 'Monroe'}]
       };
-      
+            
       var patch = {op: '_get', path: '/people/1/name'};
       
       jsonpatch.applyOperation(obj, patch);
