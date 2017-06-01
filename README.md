@@ -178,6 +178,9 @@ Applies `patch` array on `obj`.
 
 An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
 
+It modifies the `document` object and `patch` - it gets the values by reference.
+If you would like to avoid touching your values, clone them: `jsonpatch.applyPatch(document, jsonpatch.deepClone(patch))`.
+
 Returns an array of [`OperationResult`](#operationresult-type) objects - one item for each item in `patches`, each item is an object `{newDocument: any, test?: boolean, removed?: any}`.
 
 * `test` - boolean result of the test
@@ -199,6 +202,9 @@ Applies single operation object `operation` on `document`.
 - `validateOperation` Whether to validate the operation, or to pass a validator callback
 - `mutateDocument` Whether to mutate the original document or clone it before applying
 
+It modifies the `document` object and `operation` - it gets the values by reference.
+If you would like to avoid touching your values, clone them: `jsonpatch.applyOperation(document, jsonpatch.deepClone(operation))`.
+
 Returns an [`OperationResult`](#operationresult-type) object `{newDocument: any, test?: boolean, removed?: any}`.
 
 - See [Validation notes](#validation-notes).
@@ -214,6 +220,12 @@ Applies single operation object `operation` on `document`.
 Returns the a modified document.
 
 Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails.
+
+#### `jsonpatch.deepClone(value: any): any`
+
+Available in *json-patch.js* and *json-patch-duplex.js*
+
+Returns deeply cloned value.
 
 #### `jsonpatch.escapePathComponent(path: string): string`
 

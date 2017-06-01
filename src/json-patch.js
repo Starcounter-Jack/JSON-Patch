@@ -70,16 +70,6 @@ var jsonpatch;
                 return false;
         }
     }
-    function deepClone(obj) {
-        switch (typeof obj) {
-            case "object":
-                return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
-            case "undefined":
-                return null; //this is how JSON.stringify behaves for array items
-            default:
-                return obj; //no need to clone primitives
-        }
-    }
     /* We use a Javascript hash to store each
      function. Each hash entry (property) uses
      the operation identifiers specified in rfc6902.
@@ -116,7 +106,8 @@ var jsonpatch;
         },
         copy: function (obj, key, document) {
             var valueToCopy = getValueByPointer(document, this.from);
-            applyOperation(document, { op: "add", path: this.path, value: valueToCopy });
+            // enforce copy by value so further operations don't affect source (see issue #177)
+            applyOperation(document, { op: "add", path: this.path, value: deepClone(valueToCopy) });
             return { newDocument: document };
         },
         test: function (obj, key, document) {
@@ -173,6 +164,23 @@ var jsonpatch;
         return true;
     }
     /**
+     * Deeply clone the object.
+     * https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
+     * @param  {any} obj value to clone
+     * @return {any}       cloned obj
+     */
+    function deepClone(obj) {
+        switch (typeof obj) {
+            case "object":
+                return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+            case "undefined":
+                return null; //this is how JSON.stringify behaves for array items
+            default:
+                return obj; //no need to clone primitives
+        }
+    }
+    jsonpatch.deepClone = deepClone;
+    /**
     * Escapes a json pointer path
     * @param path The raw pointer
     * @return the Escaped path
@@ -209,6 +217,9 @@ var jsonpatch;
     /**
      * Apply a single JSON Patch Operation on a JSON document.
      * Returns the {newDocument, result} of the operation.
+     * It modifies the `document` object and `operation` - it gets the values by reference.
+     * If you would like to avoid touching your values, clone them:
+     * `jsonpatch.applyOperation(document, jsonpatch.deepClone(operation))`.
      *
      * @param document The document to patch
      * @param operation The operation to apply
@@ -343,6 +354,9 @@ var jsonpatch;
     /**
      * Apply a full JSON Patch array on a JSON document.
      * Returns the {newDocument, result} of the patch.
+     * It modifies the `document` object and `patch` - it gets the values by reference.
+     * If you would like to avoid touching your values, clone them:
+     * `jsonpatch.applyPatch(document, jsonpatch.deepClone(patch))`.
      *
      * @param document The document to patch
      * @param patch The patch to apply
@@ -530,8 +544,8 @@ var jsonpatch;
                 throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
             }
             if (document) {
-                document = JSON.parse(JSON.stringify(document)); //clone document so that we can safely try applying operations
-                applyPatch(document, sequence, externalValidator || true);
+                //clone document so that we can safely try applying operations
+                applyPatch(deepClone(document), deepClone(sequence), externalValidator || true);
             }
             else {
                 externalValidator = externalValidator || validator;
@@ -557,6 +571,7 @@ if (typeof exports !== "undefined") {
     exports.applyOperation = jsonpatch.applyOperation;
     exports.applyReducer = jsonpatch.applyReducer;
     exports.getValueByPointer = jsonpatch.getValueByPointer;
+    exports.deepClone = jsonpatch.deepClone;
     exports.escapePathComponent = jsonpatch.escapePathComponent;
     exports.unescapePathComponent = jsonpatch.unescapePathComponent;
     exports.validate = jsonpatch.validate;
