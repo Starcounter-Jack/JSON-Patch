@@ -13,6 +13,7 @@ declare namespace jsonpatch {
         removed?: any;
         test?: boolean;
         newDocument: T;
+        rootReset: Boolean;
     }
     interface BaseOperation {
         path: string;
@@ -46,6 +47,7 @@ declare namespace jsonpatch {
     }
     interface PatchResult<T> extends Array<OperationResult<T>> {
         newDocument: T;
+        rootReset: Boolean;
     }
     /** DEPRECATED. Use `Operation` */
     type Patch<T> = Operation;

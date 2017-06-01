@@ -16,6 +16,7 @@ namespace jsonpatch {
     removed?: any,
     test?: boolean,
     newDocument: T;
+    rootReset: Boolean
   }
 
   export interface BaseOperation {
@@ -56,6 +57,7 @@ namespace jsonpatch {
   }
   export interface PatchResult<T> extends Array<OperationResult<T>> {
     newDocument: T;
+    rootReset: Boolean;
   }
 
   // Aliases for BC
@@ -348,7 +350,7 @@ namespace jsonpatch {
     }
     /* ROOT OPERATIONS */
     if (operation.path === "") {
-      let returnValue: OperationResult<T> = { newDocument: document };
+      let returnValue: OperationResult<T> = { newDocument: document, rootReset: true };
       if (operation.op === 'add') {
         returnValue.newDocument = operation.value;
         return returnValue;
@@ -368,6 +370,7 @@ namespace jsonpatch {
         if (returnValue.test === false) {
           throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
         }
+        returnValue.rootReset = false; // a special case
         returnValue.newDocument = document;
         return returnValue;
       } else if (operation.op === 'remove') { // a remove on root
@@ -472,10 +475,12 @@ namespace jsonpatch {
    */
   export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): PatchResult<T> {
     const results = new Array(patch.length) as PatchResult<T>;
+    results.rootReset = false;
 
     for (let i = 0, length = patch.length; i < length; i++) {
       results[i] = applyOperation(document, patch[i], validateOperation);
       document = results[i].newDocument; // in case root was replaced
+      if (patch[i].path == '') { results.rootReset = true; }
     }
     results.newDocument = document;
     return results;

@@ -85,7 +85,7 @@ describe('root replacement with applyOperation', function() {
       var obj = {
         people: [{name: 'Marilyn'}, {name: 'Monroe'}]
       };
-            
+
       var patch = {op: '_get', path: '/people/1/name'};
       
       jsonpatch.applyOperation(obj, patch);
@@ -692,17 +692,20 @@ describe('core - using applyOperation', function() {
     var obj = {
       hello: 'world'
     };
-    var newObj = jsonpatch.applyOperation(obj, {
+    var result = jsonpatch.applyOperation(obj, {
       op: 'replace',
       path: '',
       value: {
         hello: 'universe'
       }
-    }).newDocument;
+    });
 
-    expect(newObj).toEqual({
+    expect(result.newDocument).toEqual({
       hello: 'universe'
     });
+
+    expect(result.rootReset).toBe(true);    
+    
   });
   it('should apply test', function() {
     obj = {
