@@ -44,7 +44,7 @@ describe('jsonpatch.getValueByPointer', function() {
       people: [{name: 'Marilyn'}, {name: 'Monroe'}]
     }];
     var retrievedObject = jsonpatch.getValueByPointer(obj, '');
-    
+
     expect(retrievedObject).toEqual([{
       people: [{name: 'Marilyn'}, {name: 'Monroe'}]
     }]);
@@ -74,23 +74,47 @@ describe('root replacement with applyOperation', function() {
       }];
 
       var patch = {op: '_get', path: ''};
-      
+
       jsonpatch.applyOperation(obj, patch);
-      
+
       expect(patch.value).toEqual([{
         people: [{name: 'Marilyn'}, {name: 'Monroe'}]
       }]);
-    });    
-    it('should get root value', function() {
+    });
+    it('should get deep value', function() {
       var obj = {
         people: [{name: 'Marilyn'}, {name: 'Monroe'}]
       };
-            
+
       var patch = {op: '_get', path: '/people/1/name'};
-      
+
       jsonpatch.applyOperation(obj, patch);
-      
+
       expect(patch.value).toEqual('Monroe');
+    });
+    it('should get deep value using deprecated apply', function() {
+       var obj = {
+        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+      };
+
+      var patch = {op: '_get', path: '/people/1/name'};
+
+      jsonpatch.apply(obj, [patch]);
+
+      expect(patch.value).toEqual('Monroe');
+    });
+    it('should get root value using deprecated apply', function() {
+      var obj = [{
+        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+      }];
+
+      var patch = {op: '_get', path: ''};
+
+      jsonpatch.apply(obj, [patch]);
+
+      expect(patch.value).toEqual([{
+        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+      }]);
     });
   });
   describe('add operation', function() {

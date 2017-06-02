@@ -499,6 +499,11 @@ namespace jsonpatch {
       if (patch[i].path == "" && patch[i].op != "remove" && patch[i].op != "test") {
         let value;
 
+        if(patch[i].op == '_get') {
+          (<GetOperation<T>>patch[i]).value = document;
+          continue;
+        }
+
         if (patch[i].op == "replace" || patch[i].op == "move") {
           results[i] = deepClone(document);
         }

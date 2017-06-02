@@ -395,6 +395,10 @@ var jsonpatch;
         var _loop_1 = function(i, length_2) {
             if (patch[i].path == "" && patch[i].op != "remove" && patch[i].op != "test") {
                 var value_1;
+                if (patch[i].op == '_get') {
+                    patch[i].value = document;
+                    return "continue";
+                }
                 if (patch[i].op == "replace" || patch[i].op == "move") {
                     results[i] = deepClone(document);
                 }
