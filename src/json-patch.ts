@@ -1,6 +1,6 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * json-patch-duplex.js version: 1.2.1
+ * json-patch-duplex.js version: 1.2.2
  * (c) 2013 Joachim Wester
  * MIT license
  */
