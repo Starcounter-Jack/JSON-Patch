@@ -243,7 +243,7 @@ var jsonpatch;
         }
         /* ROOT OPERATIONS */
         if (operation.path === "") {
-            var returnValue = { newDocument: document };
+            var returnValue = { newDocument: document, rootReset: true };
             if (operation.op === 'add') {
                 returnValue.newDocument = operation.value;
                 return returnValue;
@@ -265,6 +265,7 @@ var jsonpatch;
                 if (returnValue.test === false) {
                     throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
                 }
+                returnValue.rootReset = false; // a special case
                 returnValue.newDocument = document;
                 return returnValue;
             }
@@ -372,9 +373,13 @@ var jsonpatch;
      */
     function applyPatch(document, patch, validateOperation) {
         var results = new Array(patch.length);
+        results.rootReset = false;
         for (var i = 0, length_1 = patch.length; i < length_1; i++) {
             results[i] = applyOperation(document, patch[i], validateOperation);
             document = results[i].newDocument; // in case root was replaced
+            if (patch[i].path == '') {
+                results.rootReset = true;
+            }
         }
         results.newDocument = document;
         return results;
