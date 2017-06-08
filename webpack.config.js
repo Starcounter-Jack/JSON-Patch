@@ -3,7 +3,7 @@ const BabiliPlugin = require('babili-webpack-plugin');
 
 module.exports = [
   {
-    entry: './src/duplex.js',
+    entry: './lib/duplex.js',
     output: {
       filename: './dist/fast-json-patch.js',
       library: 'jsonpatch',
@@ -14,7 +14,7 @@ module.exports = [
     }
   },
   {
-    entry: './src/duplex.js',
+    entry: './lib/duplex.js',
     output: {
       filename: './dist/fast-json-patch.min.js',
       library: 'jsonpatch',

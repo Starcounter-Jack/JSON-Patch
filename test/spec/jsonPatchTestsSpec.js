@@ -1,5 +1,5 @@
 if(typeof jsonpatch == 'undefined') {
-  var jsonpatch = require('../../src/duplex')
+  var jsonpatch = require('../../lib/duplex')
 }
 
 var JSONtests = [

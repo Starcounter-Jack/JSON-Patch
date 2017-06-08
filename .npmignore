@@ -1,11 +1,10 @@
-README.md
 Makefile
 doc/
 examples/
 test/
 .travis.yml
 !*.d.ts
-*.md
+src/*
 
 # Mac OS X
 .DS_Store
@@ -14,6 +13,7 @@ test/
 .npmignore
 node_modules/
 npm-debug.log
+CONTRIBUTING.md
 
 # Git
 .git*
@@ -26,6 +26,3 @@ gruntfile.js
 
 # Typescript
 *.d.ts
-
-# compiled files
-src/*.js

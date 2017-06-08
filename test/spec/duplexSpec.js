@@ -6,7 +6,7 @@ if (typeof window === 'undefined') {
   GLOBAL.document = doc.defaultView.document;
 }
 if (typeof jsonpatch === 'undefined') {
-  jsonpatch = require('./../../src/duplex.js');
+  jsonpatch = require('./../../lib/duplex');
 }
 if (typeof _ === 'undefined') {
   _ = require('./../lib/underscore.min.js');

@@ -14,3 +14,4 @@ npm-debug.log
 # compiled files
 src/*.js
 dist/*
+lib/*

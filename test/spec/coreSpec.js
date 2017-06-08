@@ -1,6 +1,6 @@
 var obj;
 if (typeof jsonpatch === 'undefined') {
-  jsonpatch = require('./../../src/duplex');
+  jsonpatch = require('./../../lib/duplex');
 }
 if (typeof _ === 'undefined') {
   _ = require('./../lib/underscore.min.js');

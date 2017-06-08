@@ -22,8 +22,8 @@
     "url": "http://www.starcounter.com/"
   },
   "license": "MIT",
-  "main": "src/duplex.js",
-  "typings": "src/duplex.d.ts",
+  "main": "lib/duplex.js",
+  "typings": "lib/duplex.d.ts",
   "engines": {
     "node": ">= 0.4.0"
   },
