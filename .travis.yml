@@ -1,21 +1,7 @@
 language: node_js
-node_js: 6
-sudo: required
 dist: trusty
 before_script:
   - npm install
-  - 'export PATH=$PWD/node_modules/.bin:$PATH'
-branches:
-  only:
-    - gh-pages
-    - /.*/
-addons:
-  firefox: latest
-  apt:
-    sources:
-      - google-chrome
-    packages:
-      - google-chrome-stable
+node_js: 6
 script:
-  - xvfb-run npm run test
-  - xvfb-run npm run bench
+  - npm test
