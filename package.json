@@ -42,7 +42,7 @@
     "tsc": "tsc",
     "postinstall": "tsc",
     "tsc-watch": "tsc -w",
-    "test": "npm run test-core && npm run test-duplex",
+    "test": "npm run tsc && npm run test-core && npm run test-duplex",
     "test-duplex": "jasmine DUPLEX=yes JASMINE_CONFIG_PATH=test/jasmine.json",
     "test-core": "jasmine  DUPLEX=no JASMINE_CONFIG_PATH=test/jasmine.json test/spec/jsonPatchTestsSpec.js test/spec/coreSpec.js test/spec/validateSpec.js",
     "bench": "npm run bench-core && npm run bench-duplex",
