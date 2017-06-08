@@ -6,7 +6,7 @@ if (typeof window === 'undefined') {
 }
 
 if (typeof jsonpatch === 'undefined') {
-  jsonpatch = require('./../../src/json-patch-duplex.js');
+  jsonpatch = require('./../../src/duplex.js');
 }
 
 if (typeof Benchmark === 'undefined') {

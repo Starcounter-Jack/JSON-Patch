@@ -1,3 +1,7 @@
+if(typeof jsonpatch == 'undefined') {
+  var jsonpatch = require('../../src/duplex')
+}
+
 var JSONtests = [
   {
     name: 'tests.json',

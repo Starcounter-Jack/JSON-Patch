@@ -1,11 +1,5 @@
 if (typeof jsonpatch === 'undefined') {
-    if (process.env.DUPLEX === 'yes' || process.argv[2] === 'DUPLEX=yes') { //required by `jasmine-node` test runner in Node.js
-        console.log('jsonpatch-duplex');
-        jsonpatch = require('./../../src/json-patch-duplex.js');
-    } else {
-        console.log('jsonpatch-core');
-        jsonpatch = require('./../../src/json-patch.js');
-    }
+   jsonpatch = require('./../../src/duplex');
 }
 if (typeof Benchmark === 'undefined') {
     var Benchmark = require('benchmark');

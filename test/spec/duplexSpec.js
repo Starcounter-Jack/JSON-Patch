@@ -5,17 +5,8 @@ if (typeof window === 'undefined') {
   GLOBAL.window = doc.defaultView;
   GLOBAL.document = doc.defaultView.document;
 }
-
-if (typeof jsonpatchduplex !== 'undefined') {
-  jsonpatch = jsonpatchduplex;
-}
 if (typeof jsonpatch === 'undefined') {
-  if (process.env.DUPLEX === 'yes') {
-    //required by `jasmine-node` test runner in Node.js
-    jsonpatch = require('./../../src/json-patch-duplex.js');
-  } else {
-    jsonpatch = require('./../../src/json-patch.js');
-  }
+  jsonpatch = require('./../../src/duplex.js');
 }
 if (typeof _ === 'undefined') {
   _ = require('./../lib/underscore.min.js');

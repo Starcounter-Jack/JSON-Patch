@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>Jasmine Spec Runner v2.5.0</title>
@@ -12,6 +13,7 @@
   <!-- <script src="lib/jasmine-2.5.0/boot.js"></script> -->
   <script src="lib/jasmine-custom-boot.js"></script>
 
+
   <!-- include Benchmark.js -->
   <script src="lib/benchmark.js/vendor/lodash/dist/lodash.compat.js"></script>
   <script src="lib/benchmark.js/vendor/platform.js/platform.js"></script>
@@ -22,17 +24,18 @@
   <!-- include source files here... -->
 
   <!-- include spec files here... -->
-  <script src="../src/json-patch.js"></script>
+  <script src="../dist/fast-json-patch.js"></script>
   <!-- Dynamically load https://github.com/json-patch/json-patch-tests test suite -->
   <script src="spec/jsonPatchTestsSpec.js"></script>
   <script src="spec/coreSpec.js"></script>
-  <script src="spec/core-backward-compability.js"></script>
   <script src="spec/validateSpec.js"></script>
+  <script src="spec/duplexSpec.js"></script>
+  <script src="spec/duplexBenchmark.js"></script>
   <script src="spec/coreBenchmark.js"></script>
-
 
 </head>
 
 <body>
 </body>
+
 </html>

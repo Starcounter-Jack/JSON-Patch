@@ -6,7 +6,8 @@ JSON-Patch
 [![Build Status](https://travis-ci.org/Starcounter-Jack/JSON-Patch.svg?branch=master)](https://travis-ci.org/Starcounter-Jack/JSON-Patch)
 
 With JSON-Patch, you can:
-- **apply** patches
+- **applyPatch** to apply patches
+- **applyOperation** to apply single operations
 - **validate** a sequence of patches
 - **observe** for changes (and generate patches when a change is detected)
 - **compare** two objects (to obtain the difference)
@@ -20,7 +21,7 @@ JSON Patch plays well with the HTTP PATCH verb (method) and REST style programmi
 Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) about it.
 
 ## Footprint
-1.22 KB minified and gzipped (3 KB minified)
+4 KB minified and gzipped (12 KB minified)
 
 ## Performance
 
@@ -70,8 +71,7 @@ $ bower install fast-json-patch --save
 
 ### In a web browser
 
-Include `json-patch.js` if you want support for applying patches **or**
-include `json-patch-duplex.js` if you also want to generate patches.
+include `dist/fast-json-patch.js`.
 
 ### In Node.js
 
@@ -79,6 +79,16 @@ Call require to get the instance:
 
 ```js
 var jsonpatch = require('fast-json-patch')
+```
+
+Or you can require all API functions individually, all jsonpatch functions can be used as pure functions:
+
+```js
+const { applyOperation } = require('fast-json-patch');
+```
+Or ES6 style:
+```js
+import { applyOperation } from 'fast-json-patch'
 ```
 
 ## Usage
@@ -172,8 +182,6 @@ else {
 
 #### `jsonpatch.applyPatch<T>(document: any, patch: Operation[], validateOperation: Boolean | Function = false): OperationResult<T>[]`
 
-Available in *json-patch.js* and *json-patch-duplex.js*
-
 Applies `patch` array on `obj`.
 
 An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
@@ -193,8 +201,6 @@ Returns an array of [`OperationResult`](#operationresult-type) objects - one ite
 
 #### `applyOperation<T>(document: any, operation: Operation, validateOperation: <Boolean | Function> = false, mutateDocument = true): OperationResult<T>`
 
-Available in *json-patch.js* and *json-patch-duplex.js*
-
 Applies single operation object `operation` on `document`.
 
 - `document` The document to patch
@@ -211,8 +217,6 @@ Returns an [`OperationResult`](#operationresult-type) object `{newDocument: any,
 
 #### `jsonpatch.applyReducer<T>(document: T, operation: Operation): T`
 
-Available in *json-patch.js* and *json-patch-duplex.js*
-
 **Ideal for `patch.reduce(jsonpatch.applyReducer, document)`**.
 
 Applies single operation object `operation` on `document`.
@@ -223,33 +227,23 @@ Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails.
 
 #### `jsonpatch.deepClone(value: any): any`
 
-Available in *json-patch.js* and *json-patch-duplex.js*
-
 Returns deeply cloned value.
 
 #### `jsonpatch.escapePathComponent(path: string): string`
-
-Available in *json-patch.js* and *json-patch-duplex.js*
 
 Returns the escaped path.
 
 #### `jsonpatch.unescapePathComponent(path: string): string`
 
-Available in *json-patch.js* and *json-patch-duplex.js*
-
 Returns the unescaped path.
 
 #### `jsonpatch.getValueByPointer(document: object, pointer: string)`
-
-Available in *json-patch.js* and *json-patch-duplex.js*
 
 Retrieves a value from a JSON document by a JSON pointer.
 
 Returns the value.
 
 #### `jsonpatch.observe(document: any, callback?: Function): Observer`
-
-Available in *json-patch-duplex.js*
 
 Sets up an deep observer on `document` that listens for changes in object tree. When changes are detected, the optional
 callback is called with the generated patches array as the parameter.
@@ -258,8 +252,6 @@ Returns `observer`.
 
 #### `jsonpatch.generate(document: any, observer: Observer): Operation[]`
 
-Available in *json-patch-duplex.js*
-
 If there are pending changes in `obj`, returns them synchronously. If a `callback` was defined in `observe`
 method, it will be triggered synchronously as well.
 
@@ -267,15 +259,11 @@ If there are no pending changes in `obj`, returns an empty array (length 0).
 
 #### `jsonpatch.unobserve(document: any, observer: Observer): void`
 
-Available in *json-patch-duplex.js*
-
 Destroys the observer set up on `document`.
 
 Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). Note: this is different that ES6/7 `Object.unobserve`, which delivers remaining changes asynchronously.
 
 #### `jsonpatch.compare(document1: any, document2: any): Operation[]`
-
-Available in *json-patch-duplex.js*
 
 Compares object trees `document1` and `document2` and returns the difference relative to `document1` as a patches array.
 
@@ -284,8 +272,6 @@ If there are no differences, returns an empty array (length 0).
 #### `jsonpatch.validate(patch: Operation[], document?: any, validator?: Function): JsonPatchError`
 
 See [Validation notes](#validation-notes)
-
-Available in *json-patch.js* and *json-patch-duplex.js*
 
 Validates a sequence of operations. If `document` parameter is provided, the sequence is additionally validated against the object tree.
 
@@ -361,9 +347,7 @@ See the [ECMAScript spec](http://www.ecma-international.org/ecma-262/6.0/index.h
 
 ## Specs/tests
 
- - [for `json-patch.js`](http://starcounter-jack.github.io/JSON-Patch/test/SpecRunner.html)
- - [for `json-patch-duplex.js`](
-     http://starcounter-jack.github.io/JSON-Patch/test/SpecRunnerDuplex.html)
+ - [Run in browser](http://starcounter-jack.github.io/JSON-Patch/test/)
 
 ## [Contributing](CONTRIBUTING.md)
 

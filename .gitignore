@@ -7,3 +7,9 @@ npm-debug.log
 
 # WebStorm
 .idea
+
+# Typescript
+*.d.ts
+
+# compiled files
+src/*.js

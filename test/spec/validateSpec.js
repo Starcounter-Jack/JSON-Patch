@@ -1,3 +1,6 @@
+if(typeof jsonpatch == 'undefined') {
+  var jsonpatch = require('../../src/duplex')
+}
 describe('validate', function() {
   it('should return an empty array if the patch is valid', function() {
     var patch = [
@@ -460,31 +463,6 @@ describe('validate', function() {
     ];
     var error = jsonpatch.validate(sequence, tree);
     expect(error.name).toBe('OPERATION_FROM_UNRESOLVABLE');
-  });
-
-  it('using deprecated apply, should throw OPERATION_PATH_INVALID when applying patch without path, and throw a warning', function() {
-    spyOn(console, 'warn');
-
-    var a = {};
-    var ex = null;
-
-    try {
-      jsonpatch.apply(
-        a,
-        [
-          {
-            op: 'replace',
-            value: ''
-          }
-        ],
-        true
-      );
-    } catch (e) {
-      ex = e;
-    }
-
-    expect(ex.name).toBe('OPERATION_PATH_INVALID');
-    expect(console.warn).toHaveBeenCalled();
   });
 
   it('should throw OPERATION_PATH_INVALID when applying patch without path', function() {

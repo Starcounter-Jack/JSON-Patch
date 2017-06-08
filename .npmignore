@@ -4,8 +4,9 @@ doc/
 examples/
 test/
 .travis.yml
-*.ts
+dist/
 !*.d.ts
+*.md
 
 # Mac OS X
 .DS_Store
@@ -23,3 +24,9 @@ bower.json
 
 # grunt
 gruntfile.js
+
+# Typescript
+*.d.ts
+
+# compiled files
+src/*.js

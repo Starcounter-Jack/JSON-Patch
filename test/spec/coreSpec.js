@@ -1,11 +1,6 @@
 var obj;
 if (typeof jsonpatch === 'undefined') {
-  if (process.env.DUPLEX === 'yes') {
-    //required by `jasmine-node` test runner in Node.js
-    jsonpatch = require('./../../src/json-patch-duplex.js');
-  } else {
-    jsonpatch = require('./../../src/json-patch.js');
-  }
+  jsonpatch = require('./../../src/duplex');
 }
 if (typeof _ === 'undefined') {
   _ = require('./../lib/underscore.min.js');
@@ -91,30 +86,6 @@ describe('root replacement with applyOperation', function() {
       jsonpatch.applyOperation(obj, patch);
 
       expect(patch.value).toEqual('Monroe');
-    });
-    it('should get deep value using deprecated apply', function() {
-       var obj = {
-        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
-      };
-
-      var patch = {op: '_get', path: '/people/1/name'};
-
-      jsonpatch.apply(obj, [patch]);
-
-      expect(patch.value).toEqual('Monroe');
-    });
-    it('should get root value using deprecated apply', function() {
-      var obj = [{
-        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
-      }];
-
-      var patch = {op: '_get', path: ''};
-
-      jsonpatch.apply(obj, [patch]);
-
-      expect(patch.value).toEqual([{
-        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
-      }]);
     });
   });
   describe('add operation', function() {
@@ -967,35 +938,6 @@ describe('core - using applyOperation', function() {
 });
 
 describe('core', function() {
-  it('using apply should work and should warn deprecation', function() {
-    spyOn(console, 'warn');
-
-    obj = {
-      foo: 1,
-      baz: [
-        {
-          qux: 'hello'
-        }
-      ]
-    };
-    jsonpatch.apply(obj, [
-      {
-        op: 'add',
-        path: '/bar',
-        value: [1, 2, 3, 4]
-      }
-    ]);
-    expect(obj).toEqual({
-      foo: 1,
-      baz: [
-        {
-          qux: 'hello'
-        }
-      ],
-      bar: [1, 2, 3, 4]
-    });
-    expect(console.warn).toHaveBeenCalled();
-  });
   it('should apply add', function() {
     obj = {
       foo: 1,
@@ -1518,7 +1460,7 @@ describe('core', function() {
       {op: 'add', path: '/bar/-', value: 2}
     ];
 
-    jsonpatch.apply(obj, patchset);
+    jsonpatch.applyPatch(obj, patchset);
 
     expect(obj).toEqual({
       "foo": [1],
@@ -1532,7 +1474,7 @@ describe('core', function() {
       {op: 'add', path: '/foo', value: []}
     ];
 
-    jsonpatch.apply(obj1, patch, false);
+    jsonpatch.applyPatch(obj1, patch, false);
 
     expect(obj1.foo).toBe(patch[0].value);
   });
