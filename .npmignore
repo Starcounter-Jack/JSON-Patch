@@ -4,7 +4,6 @@ doc/
 examples/
 test/
 .travis.yml
-dist/
 !*.d.ts
 *.md
 
