@@ -81,12 +81,13 @@ Call require to get the instance:
 var jsonpatch = require('fast-json-patch')
 ```
 
-ES6 style:
+Or use ES6 style:
+
 ```js
 import { applyOperation } from 'fast-json-patch'
 ```
 
-Or you can require all API functions individually, all jsonpatch functions can be used as pure functions:
+You can also require all API functions individually, all jsonpatch functions can be used as pure functions:
 
 ```js
 const { applyOperation } = require('fast-json-patch');
@@ -196,7 +197,9 @@ Returns an array of [`OperationResult`](#operationresult-type) objects - one ite
 * `remove`, `replace` and `move` - original object that has been removed
 * `add` (only when adding to an array) - index at which item has been inserted (useful when using `-` alias)
 
-**Note: the returned array has `newDocument` property that you can use as the final state of the patched document**.
+** Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails. **
+
+** Note II: the returned array has `newDocument` property that you can use as the final state of the patched document **.
 
 - See [Validation notes](#validation-notes).
 
@@ -213,6 +216,8 @@ It modifies the `document` object and `operation` - it gets the values by refere
 If you would like to avoid touching your values, clone them: `jsonpatch.applyOperation(document, jsonpatch.deepClone(operation))`.
 
 Returns an [`OperationResult`](#operationresult-type) object `{newDocument: any, test?: boolean, removed?: any}`.
+
+** Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails. **
 
 - See [Validation notes](#validation-notes).
 

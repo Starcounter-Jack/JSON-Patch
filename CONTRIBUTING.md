@@ -42,10 +42,10 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 3. Make sure that the NodeJS tests pass `npm install && npm run test`
 4. Transpile by executing `npm run tsc`.
 5. Execute `webpack` to bundle and minify.
-7. Execute `npm version`like (`npm version [ major | minor | patch | premajor | preminor | prepatch | prerelease]`)
-8. Call `git status` to verify that the only pending changes in the repo are the result of the previous step
-9. Call `git push` to push the changes to `origin master`
-10. Call `git push --tags` to push the tag to `origin master`
-11. Call `npm publish` to push the new version to NPM. [Read more](https://docs.npmjs.com/getting-started/publishing-npm-packages)
-12. Call `npm view fast-json-patch dist-tags` to verify that the new version was published in NPM.
-13. Explain the changes (at least a summary of the commit log) in [GitHub Releases](https://github.com/Starcounter-Jack/JSON-Patch/releases).
+6. Execute `npm version`like (`npm version [ major | minor | patch | premajor | preminor | prepatch | prerelease]`)
+7. Call `git status` to verify that the only pending changes in the repo are the result of the previous step
+8. Call `git push` to push the changes to `origin master`
+9. Call `git push --tags` to push the tag to `origin master`
+10. Call `npm publish` to push the new version to NPM. [Read more](https://docs.npmjs.com/getting-started/publishing-npm-packages)
+11. Call `npm view fast-json-patch dist-tags` to verify that the new version was published in NPM.
+12. Explain the changes (at least a summary of the commit log) in [GitHub Releases](https://github.com/Starcounter-Jack/JSON-Patch/releases).
