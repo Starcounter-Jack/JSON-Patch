@@ -1,7 +1,6 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * fast-json-patch.js version: 1.2.2
- * (c) 2013 Joachim Wester
+ * (c) 2017 Joachim Wester
  * MIT license
  */
 declare var require: any;

@@ -1,7 +1,6 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * fast-json-patch.js version: 1.2.2
- * (c) 2013 Joachim Wester
+ * (c) 2017 Joachim Wester
  * MIT license
  */
 declare var require: any;
@@ -182,7 +181,7 @@ export function getValueByPointer(document: any, pointer: string): any {
 /**
  * Apply a single JSON Patch Operation on a JSON document.
  * Returns the {newDocument, result} of the operation.
- * It modifies the `document` object and `patch` - it gets the values by reference.
+ * It modifies the `document` and `operation` objects - it gets the values by reference.
  * If you would like to avoid touching your values, clone them:
  * `jsonpatch.applyOperation(document, jsonpatch._deepClone(operation))`.
  *

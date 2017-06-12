@@ -40,10 +40,9 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 1. Don't break too much. See [how many projects depend on this](https://www.npmjs.com/browse/depended/fast-json-patch).
 2. Make sure that the browser tests pass in Chrome, Firefox, Edge and IE
 3. Make sure that the NodeJS tests pass `npm install && npm run test`
-4. Modify version number in `src/duplex.ts` and `src/core.ts`.
-5. Transpile by executing `npm run tsc`.
-6. Execute `webpack` to bundle and minify.
-7. Execute `git tag x.x.x` with your new version.
+4. Transpile by executing `npm run tsc`.
+5. Execute `webpack` to bundle and minify.
+7. Execute `npm version`like (`npm version [ major | minor | patch | premajor | preminor | prepatch | prerelease]`)
 8. Call `git status` to verify that the only pending changes in the repo are the result of the previous step
 9. Call `git push` to push the changes to `origin master`
 10. Call `git push --tags` to push the tag to `origin master`

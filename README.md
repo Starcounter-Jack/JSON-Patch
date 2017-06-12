@@ -71,7 +71,7 @@ $ bower install fast-json-patch --save
 
 ### In a web browser
 
-include `dist/fast-json-patch.js`.
+Include `dist/fast-json-patch.js`.
 
 ### In Node.js
 
@@ -81,14 +81,15 @@ Call require to get the instance:
 var jsonpatch = require('fast-json-patch')
 ```
 
+ES6 style:
+```js
+import { applyOperation } from 'fast-json-patch'
+```
+
 Or you can require all API functions individually, all jsonpatch functions can be used as pure functions:
 
 ```js
 const { applyOperation } = require('fast-json-patch');
-```
-Or ES6 style:
-```js
-import { applyOperation } from 'fast-json-patch'
 ```
 
 ## Usage

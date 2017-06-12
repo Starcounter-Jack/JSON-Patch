@@ -1,3 +1,8 @@
+/*!
+ * https://github.com/Starcounter-Jack/JSON-Patch
+ * (c) 2017 Joachim Wester
+ * MIT license
+ */
 export function _objectKeys(obj) {
     if (Array.isArray(obj)) {
         var keys = new Array(obj.length);

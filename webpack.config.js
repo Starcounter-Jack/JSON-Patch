@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 const BabiliPlugin = require('babili-webpack-plugin');
+const package = require('./package.json');
 
 module.exports = [
   {
@@ -11,7 +12,10 @@ module.exports = [
     },
     resolve: {
       extensions: ['.js']
-    }
+    },
+    plugins: [
+      new webpack.BannerPlugin('fast-json-patch, version: ' + package['version'])
+    ]
   },
   {
     entry: './lib/duplex.js',
@@ -23,6 +27,8 @@ module.exports = [
     resolve: {
       extensions: ['.js']
     },
-    plugins: [new BabiliPlugin()]
+    plugins: [new BabiliPlugin(),
+    new webpack.BannerPlugin('fast-json-patch, version: ' + package['version'])
+    ]
   }
 ];
