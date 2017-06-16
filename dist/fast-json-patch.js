@@ -1,4 +1,4 @@
-/*! fast-json-patch, version: 1.2.2 */
+/*! fast-json-patch, version: 2.0.0 */
 var jsonpatch =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
