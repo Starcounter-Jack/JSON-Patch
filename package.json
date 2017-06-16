@@ -40,9 +40,7 @@
   },
   "scripts": {
     "tsc": "tsc",
-    "prepublish": "webpack",
-    "postversion": "webpack",
-    "postinstall": "tsc",
+    "prepublish": "tsc && webpack",
     "tsc-watch": "tsc -w",
     "test": "npm run tsc && npm run test-core && npm run test-duplex",
     "test-duplex": "jasmine DUPLEX=yes JASMINE_CONFIG_PATH=test/jasmine.json",
