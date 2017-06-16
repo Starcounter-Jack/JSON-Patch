@@ -24,5 +24,3 @@ bower.json
 # grunt
 gruntfile.js
 
-# Typescript
-*.d.ts
