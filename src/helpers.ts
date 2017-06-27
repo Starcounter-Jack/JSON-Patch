@@ -16,7 +16,7 @@ export function _objectKeys(obj) {
     }
     var keys = [];
     for (var i in obj) {
-        if (obj.hasOwnProperty(i)) {
+        if (Object.prototype.hasOwnProperty.call(obj, i)) {
             keys.push(i);
         }
     }
@@ -74,7 +74,7 @@ export function unescapePathComponent(path: string): string {
 export function _getPathRecursive(root: Object, obj: Object): string {
     var found;
     for (var key in root) {
-        if (root.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(root, key)) {
             if (root[key] === obj) {
                 return escapePathComponent(key) + '/';
             }

@@ -205,7 +205,7 @@ function _generate(mirror, obj, patches, path) {
   for (var t = oldKeys.length - 1; t >= 0; t--) {
     var key = oldKeys[t];
     var oldVal = mirror[key];
-    if (obj.hasOwnProperty(key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
       var newVal = obj[key];
       if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
         _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
@@ -229,7 +229,7 @@ function _generate(mirror, obj, patches, path) {
 
   for (var t = 0; t < newKeys.length; t++) {
     var key = newKeys[t];
-    if (!mirror.hasOwnProperty(key) && obj[key] !== undefined) {
+    if (!Object.prototype.hasOwnProperty.call(mirror, key) && obj[key] !== undefined) {
       patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: _deepClone(obj[key]) });
     }
   }
