@@ -82,6 +82,11 @@ var __extends = (this && this.__extends) || function (d, b) {
  * (c) 2017 Joachim Wester
  * MIT license
  */
+var _hasOwnProperty = Object.prototype.hasOwnProperty;
+function hasOwnProperty(obj, key) {
+    return _hasOwnProperty.call(obj, key);
+}
+exports.hasOwnProperty = hasOwnProperty;
 function _objectKeys(obj) {
     if (Array.isArray(obj)) {
         var keys = new Array(obj.length);
@@ -95,7 +100,7 @@ function _objectKeys(obj) {
     }
     var keys = [];
     for (var i in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, i)) {
+        if (hasOwnProperty(obj, i)) {
             keys.push(i);
         }
     }
@@ -159,7 +164,7 @@ exports.unescapePathComponent = unescapePathComponent;
 function _getPathRecursive(root, obj) {
     var found;
     for (var key in root) {
-        if (Object.prototype.hasOwnProperty.call(root, key)) {
+        if (hasOwnProperty(root, key)) {
             if (root[key] === obj) {
                 return escapePathComponent(key) + '/';
             }
@@ -876,7 +881,7 @@ function _generate(mirror, obj, patches, path) {
     for (var t = oldKeys.length - 1; t >= 0; t--) {
         var key = oldKeys[t];
         var oldVal = mirror[key];
-        if (Object.prototype.hasOwnProperty.call(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
+        if (helpers_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
             var newVal = obj[key];
             if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
                 _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key));
@@ -898,7 +903,7 @@ function _generate(mirror, obj, patches, path) {
     }
     for (var t = 0; t < newKeys.length; t++) {
         var key = newKeys[t];
-        if (!Object.prototype.hasOwnProperty.call(mirror, key) && obj[key] !== undefined) {
+        if (!helpers_1.hasOwnProperty(mirror, key) && obj[key] !== undefined) {
             patches.push({ op: "add", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(obj[key]) });
         }
     }
