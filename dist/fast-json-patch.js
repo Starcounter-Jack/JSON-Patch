@@ -1,4 +1,4 @@
-/*! fast-json-patch, version: 2.0.1 */
+/*! fast-json-patch, version: 2.0.2 */
 var jsonpatch =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -95,7 +95,7 @@ function _objectKeys(obj) {
     }
     var keys = [];
     for (var i in obj) {
-        if (obj.hasOwnProperty(i)) {
+        if (Object.prototype.hasOwnProperty.call(obj, i)) {
             keys.push(i);
         }
     }
@@ -159,7 +159,7 @@ exports.unescapePathComponent = unescapePathComponent;
 function _getPathRecursive(root, obj) {
     var found;
     for (var key in root) {
-        if (root.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(root, key)) {
             if (root[key] === obj) {
                 return escapePathComponent(key) + '/';
             }
@@ -876,7 +876,7 @@ function _generate(mirror, obj, patches, path) {
     for (var t = oldKeys.length - 1; t >= 0; t--) {
         var key = oldKeys[t];
         var oldVal = mirror[key];
-        if (obj.hasOwnProperty(key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
+        if (Object.prototype.hasOwnProperty.call(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
             var newVal = obj[key];
             if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
                 _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key));
@@ -898,7 +898,7 @@ function _generate(mirror, obj, patches, path) {
     }
     for (var t = 0; t < newKeys.length; t++) {
         var key = newKeys[t];
-        if (!mirror.hasOwnProperty(key) && obj[key] !== undefined) {
+        if (!Object.prototype.hasOwnProperty.call(mirror, key) && obj[key] !== undefined) {
             patches.push({ op: "add", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(obj[key]) });
         }
     }
