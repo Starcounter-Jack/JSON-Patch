@@ -3,6 +3,10 @@
  * (c) 2017 Joachim Wester
  * MIT license
  */
+const _hasOwnProperty = Object.prototype.hasOwnProperty;
+export function hasOwnProperty(obj, key) {
+    return _hasOwnProperty.call(obj, key);
+}
 export function _objectKeys(obj) {
     if (Array.isArray(obj)) {
         var keys = new Array(obj.length);
@@ -16,7 +20,7 @@ export function _objectKeys(obj) {
     }
     var keys = [];
     for (var i in obj) {
-        if (obj.hasOwnProperty(i)) {
+        if (hasOwnProperty(obj, i)) {
             keys.push(i);
         }
     }
@@ -74,7 +78,7 @@ export function unescapePathComponent(path: string): string {
 export function _getPathRecursive(root: Object, obj: Object): string {
     var found;
     for (var key in root) {
-        if (root.hasOwnProperty(key)) {
+        if (hasOwnProperty(root, key)) {
             if (root[key] === obj) {
                 return escapePathComponent(key) + '/';
             }

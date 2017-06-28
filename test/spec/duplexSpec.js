@@ -1722,4 +1722,16 @@ describe('duplex', function() {
       expect(obj.foo).toReallyEqual('bar');
     });
   });
+
+  it('should work with plain objects', function() {
+    // Objects without Object prototype
+    var one = Object.create(null);
+    var two = Object.create(null);
+    one.onlyOne = Object.create(null);
+    two.onlyTwo = Object.create(null);
+    one.both = Object.create(null);
+    two.both = Object.create(null);
+    // This must not throw
+    jsonpatch.compare(one, two);
+  });
 });
