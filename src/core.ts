@@ -325,6 +325,11 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
  * @return An array of `{newDocument, result}` after the patch
  */
 export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): PatchResult<T> {
+  if(validateOperation) {
+    if(!Array.isArray(patch)) {
+      throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
+    }
+  }
   const results = new Array(patch.length) as PatchResult<T>;
 
   for (let i = 0, length = patch.length; i < length; i++) {
