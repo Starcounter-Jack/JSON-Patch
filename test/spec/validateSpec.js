@@ -38,11 +38,11 @@ describe('validate', function() {
     expect(error).toBeUndefined();
   });
 
-  it('should return an error if the patch is not an array', function() {
-    var error = jsonpatch.validate({});
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('SEQUENCE_NOT_AN_ARRAY');
-    expect(error.message).toBe('Patch sequence must be an array');
+  it('applyPatch should throw an error if the patch is not an array and validate is `true`', function() {
+    expect(() =>jsonpatch.applyPatch({}, {}, true)).toThrow(new jsonpatch.JsonPatchError('Patch sequence must be an array'));
+  });
+  it('applyPatch should throw an error if the patch is not an array and validate is `true`', function() {
+    expect(() =>jsonpatch.applyPatch({}, null, true)).toThrow(new jsonpatch.JsonPatchError('Patch sequence must be an array'));
   });
 
   it('should return an empty array if the operation is a valid object', function() {
