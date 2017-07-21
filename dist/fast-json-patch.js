@@ -1,4 +1,4 @@
-/*! fast-json-patch, version: 2.0.2 */
+/*! fast-json-patch, version: 2.0.4 */
 var jsonpatch =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -485,6 +485,11 @@ exports.applyOperation = applyOperation;
  * @return An array of `{newDocument, result}` after the patch
  */
 function applyPatch(document, patch, validateOperation) {
+    if (validateOperation) {
+        if (!Array.isArray(patch)) {
+            throw new exports.JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
+        }
+    }
     var results = new Array(patch.length);
     for (var i = 0, length_1 = patch.length; i < length_1; i++) {
         results[i] = applyOperation(document, patch[i], validateOperation);
