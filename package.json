@@ -40,7 +40,7 @@
   },
   "scripts": {
     "tsc": "tsc",
-    "version": "tsc && webpack",
+    "version": "tsc && webpack && git add -A",
     "build": "tsc && webpack",
     "tsc-watch": "tsc -w",
     "test": "npm run tsc && npm run test-core && npm run test-duplex",
