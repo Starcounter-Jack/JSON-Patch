@@ -213,7 +213,7 @@ function _generate(mirror, obj, patches, path) {
       else {
         if (oldVal !== newVal) {
           changed = true;
-          patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: _deepClone(newVal) });
+          patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: _deepClone(newVal), old_value: _deepClone(oldVal) });
         }
       }
     }
@@ -230,7 +230,7 @@ function _generate(mirror, obj, patches, path) {
   for (var t = 0; t < newKeys.length; t++) {
     var key = newKeys[t];
     if (!hasOwnProperty(mirror, key) && obj[key] !== undefined) {
-      patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: _deepClone(obj[key]) });
+      patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: _deepClone(obj[key]), old_value: null });
     }
   }
 }
