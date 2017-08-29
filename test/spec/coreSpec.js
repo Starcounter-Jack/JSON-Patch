@@ -179,6 +179,29 @@ describe('root replacement with applyOperation', function() {
         }
       ]);
     });
+     it('should `add` an array prop', function() {
+      var obj = [];
+
+      var newObj = jsonpatch.applyOperation(obj, {
+        op: 'add',
+        path: '/prop',
+        value: 'arrayProp'
+      }).newDocument;
+
+      expect(newObj.prop).toEqual('arrayProp');
+    });
+    it('should `replace` an array prop', function() {
+      var obj = [];
+      obj.prop = 'oldArrayProp';
+
+      var newObj = jsonpatch.applyOperation(obj, {
+        op: 'replace',
+        path: '/prop',
+        value: 'arrayProp'
+      }).newDocument;
+
+      expect(newObj.prop).toEqual('arrayProp');
+    });
     it('should `add` an array (on a json document of type object) - and return', function() {
       var obj = {
         hello: 'world'

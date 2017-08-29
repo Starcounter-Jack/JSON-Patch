@@ -143,7 +143,11 @@ const objOps = {
 /* The operations applicable to an array. Many are the same as for the object */
 var arrOps = {
   add: function (arr, i, document) {
-    arr.splice(i, 0, this.value);
+    if(isInteger(i)) {
+      arr.splice(i, 0, this.value); 
+    } else { // array props
+      arr[i] = this.value;
+    }
     // this may be needed when using '-' in an array
     return { newDocument: document, index: i }
   },
@@ -281,8 +285,10 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
         else {
           if (validateOperation && !isInteger(key)) {
             throw new JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", 0, operation.path, operation);
+          } // only parse key when it's an integer for `arr.prop` to work
+          else if(isInteger(key)) {
+            key = ~~key;
           }
-          key = ~~key;
         }
         if (t >= len) {
           if (validateOperation && operation.op === "add" && key > obj.length) {
