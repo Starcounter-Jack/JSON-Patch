@@ -328,13 +328,17 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
  * @param document The document to patch
  * @param patch The patch to apply
  * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
+ * @param mutateDocument Whether to mutate the original document or clone it before applying
  * @return An array of `{newDocument, result}` after the patch
  */
-export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>): PatchResult<T> {
+export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>, mutateDocument: boolean = true): PatchResult<T> {
   if(validateOperation) {
     if(!Array.isArray(patch)) {
       throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
     }
+  }
+  if (!mutateDocument) {
+    document = _deepClone(document);
   }
   const results = new Array(patch.length) as PatchResult<T>;
 
