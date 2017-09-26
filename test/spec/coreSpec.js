@@ -961,6 +961,37 @@ describe('core - using applyOperation', function() {
 });
 
 describe('core', function() {
+  it("shouldn't touch original tree", function() {
+    obj = {
+      foo: 1,
+      baz: [
+        {
+          qux: 'hello'
+        }
+      ]
+    };
+    var newObj = jsonpatch.applyPatch(
+      obj,
+      [
+        {
+          op: 'add',
+          path: '/bar',
+          value: [1, 2, 3, 4]
+        }
+      ],
+      false,
+      false
+    ).newDocument;
+
+    expect(obj).toEqual({
+      foo: 1,
+      baz: [
+        {
+          qux: 'hello'
+        }
+      ]
+    });
+  });
   it('should apply add', function() {
     obj = {
       foo: 1,
