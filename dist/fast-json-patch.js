@@ -489,13 +489,18 @@ exports.applyOperation = applyOperation;
  * @param document The document to patch
  * @param patch The patch to apply
  * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
+ * @param mutateDocument Whether to mutate the original document or clone it before applying
  * @return An array of `{newDocument, result}` after the patch
  */
-function applyPatch(document, patch, validateOperation) {
+function applyPatch(document, patch, validateOperation, mutateDocument) {
+    if (mutateDocument === void 0) { mutateDocument = true; }
     if (validateOperation) {
         if (!Array.isArray(patch)) {
             throw new exports.JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
         }
+    }
+    if (!mutateDocument) {
+        document = helpers_1._deepClone(document);
     }
     var results = new Array(patch.length);
     for (var i = 0, length_1 = patch.length; i < length_1; i++) {
