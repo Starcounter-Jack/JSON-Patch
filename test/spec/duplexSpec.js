@@ -1723,6 +1723,69 @@ describe('duplex', function() {
     });
   });
 
+  describe('compare map', function(){
+    it('should return an add for an item that does not exist in the first map', function() {
+      var arrayA = [
+        ['key1', { p1: 'value1', p2: 'value1'}]
+      ];
+      var arrayB = [
+        ['key1', { p1: 'value1', p2: 'value1'}],
+        ['key2', { p1: 'value2', p2: 'value2'}]
+      ];
+
+      var mapA = new Map(arrayA);
+      var mapB = new Map(arrayB);
+
+      expect(jsonpatch.compare(mapA, mapB)).toReallyEqual([
+        {
+          op: 'add',
+          path: '/key2',
+          value: { p1: 'value2', p2: 'value2'}
+        }
+      ]);
+    });
+
+    it('should return a remove for an item that does not exist in the second map', function() {
+      var arrayA = [
+        ['key1', { p1: 'value1', p2: 'value1'}],
+        ['key2', { p1: 'value2', p2: 'value2'}]
+      ];
+      var arrayB = [
+        ['key1', { p1: 'value1', p2: 'value1'}]
+      ];
+
+      var mapA = new Map(arrayA);
+      var mapB = new Map(arrayB);
+
+      expect(jsonpatch.compare(mapA, mapB)).toReallyEqual([
+        {
+          op: 'remove',
+          path: '/key2'
+        }
+      ]);
+    });
+
+    it('should return a replace for a property that exists in both maps', function() {
+      var arrayA = [
+        ['key1', { p1: 'value1', p2: 'value1'}]
+      ];
+      var arrayB = [
+        ['key1', { p1: 'value1', p2: 'value2'}]
+      ];
+
+      var mapA = new Map(arrayA);
+      var mapB = new Map(arrayB);
+
+      expect(jsonpatch.compare(mapA, mapB)).toReallyEqual([
+        {
+          op: 'replace',
+          path: '/key1/p2',
+          value: 'value2'
+        }
+      ]);
+    });
+  });
+
   it('should work with plain objects', function() {
     // Objects without Object prototype
     var one = Object.create(null);

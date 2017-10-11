@@ -202,35 +202,62 @@ function _generate(mirror, obj, patches, path) {
 
   //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
 
-  for (var t = oldKeys.length - 1; t >= 0; t--) {
-    var key = oldKeys[t];
-    var oldVal = mirror[key];
-    if (hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
-      var newVal = obj[key];
-      if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
-        _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
+  if (obj.constructor && obj.constructor.name === 'Map') {
+    mirror.forEach((oldMVal, oldMKey) => {
+      let newMVal = obj.get(oldMKey);
+      if (newMVal) {
+        if (typeof oldMVal === "object" && oldMVal !== null && typeof newMVal === "object" && newMVal !== null) {
+          _generate(oldMVal, newMVal, patches, path + "/" + escapePathComponent(oldMKey));
+        } else if(oldMVal !== newMVal){
+          patches.push({ op: "replace", path: path + "/" + escapePathComponent(oldMKey), value: _deepClone(newMVal) });
+        }
+      } else {
+        patches.push({ op: "remove", path: path + "/" + escapePathComponent(oldMKey) });
+        deleted = true;
       }
-      else {
-        if (oldVal !== newVal) {
-          changed = true;
-          patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: _deepClone(newVal) });
+    });
+
+    if (!deleted && obj.size === mirror.size) {
+      return;
+    }
+
+    obj.forEach((newMVal, newMKey) => {
+      let oldMVal = mirror.get(newMKey);
+      if (!oldMVal) {
+        patches.push({ op: "add", path: path + "/" + escapePathComponent(newMKey), value: _deepClone(newMVal) });
+      }
+    });
+  } else {
+    for (var t = oldKeys.length - 1; t >= 0; t--) {
+      var key = oldKeys[t];
+      var oldVal = mirror[key];
+      if (hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
+        var newVal = obj[key];
+        if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
+          _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
+        }
+        else {
+          if (oldVal !== newVal) {
+            changed = true;
+            patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: _deepClone(newVal) });
+          }
         }
       }
+      else {
+        patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
+        deleted = true; // property has been deleted
+      }
     }
-    else {
-      patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
-      deleted = true; // property has been deleted
+
+    if (!deleted && newKeys.length == oldKeys.length) {
+      return;
     }
-  }
 
-  if (!deleted && newKeys.length == oldKeys.length) {
-    return;
-  }
-
-  for (var t = 0; t < newKeys.length; t++) {
-    var key = newKeys[t];
-    if (!hasOwnProperty(mirror, key) && obj[key] !== undefined) {
-      patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: _deepClone(obj[key]) });
+    for (var t = 0; t < newKeys.length; t++) {
+      var key = newKeys[t];
+      if (!hasOwnProperty(mirror, key) && obj[key] !== undefined) {
+        patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: _deepClone(obj[key]) });
+      }
     }
   }
 }
