@@ -154,7 +154,7 @@ Comparing two object trees:
 ```js
 var documentA = {user: {firstName: "Albert", lastName: "Einstein"}};
 var documentB = {user: {firstName: "Albert", lastName: "Collins"}};
-var diff = jsonpatch.compare(documentA, documentB));
+var diff = jsonpatch.compare(documentA, documentB);
 //diff == [{op: "replace", path: "/user/lastName", value: "Collins"}]
 ```
 
