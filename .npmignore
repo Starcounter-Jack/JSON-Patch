@@ -5,6 +5,7 @@ test/
 .travis.yml
 !*.d.ts
 src/*
+tsconfig.json
 
 # Mac OS X
 .DS_Store
