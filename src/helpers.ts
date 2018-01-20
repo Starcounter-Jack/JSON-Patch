@@ -15,6 +15,11 @@ export function _objectKeys(obj) {
         }
         return keys;
     }
+
+    if(obj.constructor && obj.constructor.name === 'Map'){
+        return obj.keys();
+    }
+
     if (Object.keys) {
         return Object.keys(obj);
     }
