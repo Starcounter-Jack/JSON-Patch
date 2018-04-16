@@ -10,7 +10,7 @@ With JSON-Patch, you can:
 - **applyOperation** to apply single operations
 - **validate** a sequence of patches
 - **observe** for changes (and generate patches when a change is detected)
-- **compare** two objects (to obtain the difference)
+- **compare** two objects (to obtain the difference).
 
 ## Why you should use JSON-Patch
 
