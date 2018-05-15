@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>&lt;juicy-jsoneditor&gt;</title>
+    <link rel="stylesheet" href="http://juicy.github.io/juicy-tile-list/examples/github-markdown.css">
+
+    <!-- Importing Web Component's Polyfill -->
+    <script src="//cdn.jsdelivr.net/webcomponentsjs/0.6.0/webcomponents.min.js"></script>
+
+    <!-- Importing Custom Elements -->
+    <link rel="import" href="juicy-jsoneditor.html">
+    <style>
+    body {
+      font-family: sans-serif;
+      min-width: 200px;
+      width: 70%;
+      margin: 0 auto;
+      padding: 30px;
+      height: 100%;
+  }
+  juicy-jsoneditor{
+    height: 18em;
+  }
+  #demo{
+    display: flex;
+    justify-content: space-around;
+  }
+  #examples{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+  }
+  #examples>section{
+    width: 21em;
+    margin: 0 2em;
+  }
+  </style>
+</head>
+<body><article class="markdown-body">
+    <!-- Using Custom Elements -->
+    <template bind>
+      <h1>Ace editor bug</h1>
+      <juicy-jsoneditor json="{{json}}" mode="code"></juicy-jsoneditor>
+
+    </template>
+    <script type="text/javascript">
+      document.addEventListener("polymer-ready", function(){
+        json = {
+          'array': [1, 2, 3],
+          'boolean': true,
+          'null': null,
+          'number': 123,
+          'object': {'a': 'b', 'c': 'd'},
+          'string': 'Hello World'
+          };
+            document.querySelector("template").model = appModel = {json: json};
+            window.json = json;
+            console.info("Play with me! I'm the `json` given to all those editors", json);
+
+        });
+    </script>
+    </article>
+</body>
+</html>

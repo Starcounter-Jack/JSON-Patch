@@ -1,0 +1,204 @@
+<!--
+`juicy-jsoneditor element` - Polymer wrapper for josdejong/jsoneditor.
+
+@element juicy-jsoneditor
+version: 1.1.1
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<script src="../jsoneditor/dist/jsoneditor.min.js"></script>
+<script src="../fast-json-patch/src/json-patch-duplex.js"></script>
+
+<!-- Define your custom element -->
+<dom-module id="juicy-jsoneditor">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+
+            #jsoneditorContainer {
+                height: 100%;
+            }
+        </style>
+        <div id="jsoneditorContainer"></div>
+    </template>
+    <script>
+        (function () {
+            var JSONEditorAPI = ["set", "setMode", "setName", "setText", "get", "getName", "getText"];
+            var script = document._currentScript || document.currentScript;
+
+            Polymer({
+                is: 'juicy-jsoneditor',
+                properties: {
+                    json: { type: Object, value: function() { return {}; }, observer: "jsonChanged" },
+                    mode: { type: String, observer: "modeChanged" },
+                    modes: { type: Array, value: [] },
+                    name: { type: String, observer: "nameChanged" },
+                    search: { type: Boolean, observer: "searchChanged", value: true },
+                    indentation: { type: String },
+                    history: { type: Boolean, value: false }
+                },
+                editor: null,
+                observer: null,
+                created: function () {
+                    //force context for observers
+                    this.refresh = this.refresh.bind(this);
+                },
+                attached: function () {
+                    if (this.editor) { // refresh editor when re-attached
+                        this.editor.set(this.json);
+                        this.observer = jsonpatch.observe(this.json, this.refresh);
+                    } else {
+                        var that = this;
+                        var options = {
+                            mode: this.mode,
+                            history: this.history,
+                            name: this.name,
+                            modes: this.modes,
+                            search: this.search,
+                            indentation: this.indentation,
+
+                            onChange: function editorChanged() {
+                                if (!that.editor) {
+                                    return;
+                                }
+
+                                var patches = jsonpatch.compare(that.json, that.editor.get());
+
+                                that.dispatchEvent(
+                                    new CustomEvent("change", {
+                                        detail: {
+                                            patches: patches
+                                        }
+                                    })
+                                );
+
+                                that.observer && jsonpatch.unobserve(that.json, that.observer);
+                                jsonpatch.apply(that.json, patches);
+                                that.observer = jsonpatch.observe(that.json, that.refresh);
+                            }
+                        };
+
+                        this.editor = new JSONEditor(this.$.jsoneditorContainer, options);
+                        this.editor.set(this.json);
+
+                        // Delegate JSONEditor API
+                        var apiNo = JSONEditorAPI.length;
+                        while (apiNo--) {
+                            this[JSONEditorAPI[apiNo]] = this.editor[JSONEditorAPI[apiNo]].bind(this.editor);
+                        }
+                    }
+
+                    //Adding styles bypassing Polymer scoping
+                    var url = Polymer.ResolveUrl.resolveUrl("../jsoneditor/dist/jsoneditor.min.css", script.ownerDocument.baseURI);
+                    var style = document.createElement("style");
+
+                    style.classList.add("juicy-jsoneditor-styles");
+                    style.innerHTML = ["@import url('", url, "');"].join("");
+
+                    Polymer.dom(this.root).appendChild(style);
+                },
+                detached: function () {// unobserve when detached,
+                    //so we will not have to perform any editor actions, it will get back to sync when re-attached
+                    jsonpatch.unobserve(this.json, this.observer);
+                },
+                modeChanged: function modeChanged() {
+                    this.editor && this.editor.setMode(this.mode);
+                },
+                nameChanged: function nameChanged() {
+                    this.editor && this.editor.setName(this.name);
+                },
+                searchChanged: function searchChanged() {
+                    this.search = !(this.getAttribute('search') === 'false');
+                    this.editor && this.editor.setName(this.name);
+                },
+                jsonChanged: function jsonChanged(newJson, oldJson) {
+                    // return this.refresh();
+                    this.observer && jsonpatch.unobserve(oldJson, this.observer);
+
+                    //this.observer(newJson);
+                    if (newJson) {
+                        this.observer = jsonpatch.observe(newJson, this.refresh)
+                    }
+
+                    return this.refresh();
+                },
+                refresh: function refresh() {
+                    if (!this.editor) {
+                        return;
+                    }
+
+                    var state = this.getExpandState();
+                    var r = this.editor.set(this.json);
+
+                    this.setExpandState(state);
+
+                    return r;
+                },
+                getExpandState: function (node, focused) {
+                    if (!this.editor) {
+                        return {};
+                    }
+
+                    if (!node && !this.editor.node) {
+                        return {};
+                    } else if (!node) {
+                        node = this.editor.node;
+                    }
+
+                    if (!focused) {
+                        focused = this.$.jsoneditorContainer.querySelector(":focus");
+                    }
+
+                    var r = {
+                        expanded: node.expanded,
+                        focused: node.dom.value && node.dom.value == focused
+                    };
+
+                    if (node.childs) {
+                        r.childs = [];
+
+                        for (var i = 0; i < node.childs.length; i++) {
+                            r.childs.push(this.getExpandState(node.childs[i], focused));
+                        }
+                    }
+
+                    return r;
+                },
+                setExpandState: function (state, node) {
+                    if (!node && !this.editor.node) {
+                        return;
+                    } else if (!node) {
+                        node = this.editor.node;
+                    }
+
+                    if (state.expanded) {
+                        node.expand(false);
+                    }
+
+                    if (state.focused && node.dom.value) {
+                        node.dom.value.focus();
+
+                        var range = document.createRange();
+                        var selection = window.getSelection();
+
+                        range.selectNodeContents(this.$.jsoneditorContainer.querySelector(":focus"));
+                        range.collapse(false);
+
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+
+                    if (state.childs) {
+                        for (var i = 0; i < state.childs.length; i++) {
+                            if (node.childs && node.childs[i]) {
+                                this.setExpandState(state.childs[i], node.childs[i]);
+                            }
+                        }
+                    }
+                }
+            });
+        }());
+    </script>
+</dom-module>
