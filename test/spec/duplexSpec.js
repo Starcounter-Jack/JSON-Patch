@@ -1426,8 +1426,33 @@ describe('duplex', function() {
       }, 20);
     });
   });
-
   describe('compare', function() {
+    it('Replacing a root array with an object should be handled well', function() {
+
+      const obj = {};
+      var patches = jsonpatch.compare(['jack'], obj);
+      expect(patches).toEqual([
+        {
+          op: 'replace',
+          path: '/',
+          value: obj
+        }
+      ]);
+
+    });
+    it('Replacing a deep array with an object should be handled well', function() {
+
+      const obj = {};
+      var patches = jsonpatch.compare({arr: ['jack']}, {arr: obj});
+      expect(patches).toEqual([
+        {
+          op: 'replace',
+          path: '/arr',
+          value: obj
+        }
+      ]);
+            
+    });
     it('should return an add for a property that does not exist in the first obj', function() {
       var objA = {
         user: {
