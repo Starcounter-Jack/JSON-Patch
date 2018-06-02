@@ -205,8 +205,10 @@ function _generate(mirror, obj, patches, path) {
   for (var t = oldKeys.length - 1; t >= 0; t--) {
     var key = oldKeys[t];
     var oldVal = mirror[key];
+
     if (hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
       var newVal = obj[key];
+
       if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
         _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
       }
@@ -217,9 +219,12 @@ function _generate(mirror, obj, patches, path) {
         }
       }
     }
-    else {
+    else if(Array.isArray(mirror) === Array.isArray(obj)) {
       patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
       deleted = true; // property has been deleted
+    } else {
+      patches.push({ op: "replace", path: path || '/', value: obj });
+      changed = true;
     }
   }
 
