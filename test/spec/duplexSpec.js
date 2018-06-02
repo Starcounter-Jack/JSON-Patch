@@ -1453,6 +1453,20 @@ describe('duplex', function() {
       ]);
             
     });
+    it('Replacing a two-level deep array with an object should be handled well', function() {
+
+      const obj = {};
+      var patches = jsonpatch.compare({arr: {deeperArray: ['jack']}}, {arr: {deeperArray: obj}});
+
+      expect(patches).toEqual([
+        {
+          op: 'replace',
+          path: '/arr/deeperArray',
+          value: obj
+        }
+      ]);
+            
+    });
     it('should return an add for a property that does not exist in the first obj', function() {
       var objA = {
         user: {
