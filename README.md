@@ -36,8 +36,8 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 Tested on 02.07.2018. Compared libraries:
 
 - [Starcounter-Jack/JSON-Patch](https://www.npmjs.com/package/fast-json-patch) 2.0.6
-- [bruth/jsonpatch-js](https://www.npmjs.com/package/json-patch) 3.0.1
-- [dharmafly/jsonpatch.js](https://www.npmjs.com/package/jsonpatch) 3.0.0
+- [bruth/jsonpatch-js](https://www.npmjs.com/package/json-patch) 0.7.0
+- [dharmafly/jsonpatch.js](https://www.npmjs.com/package/jsonpatch) 3.0.1
 - [jiff](https://www.npmjs.com/package/jiff) 0.7.3
 - [RFC6902](https://www.npmjs.com/package/rfc6902) 2.2.2
 
