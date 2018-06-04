@@ -223,7 +223,7 @@ function _generate(mirror, obj, patches, path) {
       patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
       deleted = true; // property has been deleted
     } else {
-      patches.push({ op: "replace", path: path || '/', value: obj });
+      patches.push({ op: "replace", path, value: obj });
       changed = true;
     }
   }

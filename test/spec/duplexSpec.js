@@ -1434,7 +1434,7 @@ describe('duplex', function() {
       expect(patches).toEqual([
         {
           op: 'replace',
-          path: '/',
+          path: '',
           value: obj
         }
       ]);
