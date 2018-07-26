@@ -327,7 +327,7 @@ describe('duplex', function() {
       expect(patches).toReallyEqual([
         {
           op: 'add',
-          path: '/1',
+          path: '/-',
           value: 2
         }
       ]);
@@ -373,7 +373,7 @@ describe('duplex', function() {
       expect(patches).toReallyEqual([
         {
           op: 'add',
-          path: '/1',
+          path: '/-',
           value: {
             id: 2,
             name: 'Jerry'

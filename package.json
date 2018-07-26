@@ -51,6 +51,7 @@
     "bench-duplex": "node test/spec/coreBenchmark.js DUPLEX=yes && node test/spec/duplexBenchmark.js"
   },
   "dependencies": {
-    "deep-equal": "^1.0.1"
+    "deep-equal": "^1.0.1",
+    "is-number": "^7.0.0"
   }
 }
