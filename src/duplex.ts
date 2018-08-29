@@ -79,7 +79,8 @@ export function observe<T>(obj: Object|Array<T>, callback?: (patches: Operation[
     mirror = new Mirror(obj);
     beforeDict.set(obj, mirror);
   } else {
-    observer = getObserverFromMirror(mirror, callback);
+    const observerInfo = getObserverFromMirror(mirror, callback);
+    observer = observerInfo && observerInfo.observer;
   }
 
   if (observer) {
