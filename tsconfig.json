@@ -3,6 +3,9 @@
         "target": "es5",
         "outDir": "lib/",
         "module": "commonjs",
+        "lib": [
+            "es2016", "dom"
+        ],
         "noEmitHelpers": false,
         "declaration": true,
         "removeComments": false,
