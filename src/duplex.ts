@@ -26,50 +26,38 @@ export interface Observer<T> {
   callback: (patches: Operation[]) => void;
 }
 
-var beforeDict = [];
+var beforeDict = new WeakMap();
 
 class Mirror {
   obj: any;
-  observers = [];
+  observers : Map<Function, ObserverInfo> = new Map();
+  value: Object | Array<any>;
 
-  constructor(obj: any) {
+  constructor(obj: Object) {
     this.obj = obj;
   }
 }
 
 class ObserverInfo {
-  callback: any;
-  observer: any;
+  callback: Function;
+  observer: ObserverInfo;
 
-  constructor(callback, observer) {
+  constructor(callback: Function, observer: ObserverInfo) {
     this.callback = callback;
     this.observer = observer;
   }
 }
 
-function getMirror(obj: any): any {
-  for (var i = 0, length = beforeDict.length; i < length; i++) {
-    if (beforeDict[i].obj === obj) {
-      return beforeDict[i];
-    }
-  }
+function getMirror(obj: Object): Mirror {
+  return beforeDict.get(obj);
 }
 
-function getObserverFromMirror(mirror: any, callback): any {
-  for (var j = 0, length = mirror.observers.length; j < length; j++) {
-    if (mirror.observers[j].callback === callback) {
-      return mirror.observers[j].observer;
-    }
-  }
+function getObserverFromMirror(mirror: Mirror, callback): ObserverInfo {
+  return mirror.observers.get(callback)
 }
 
-function removeObserverFromMirror(mirror: any, observer): any {
-  for (var j = 0, length = mirror.observers.length; j < length; j++) {
-    if (mirror.observers[j].observer === observer) {
-      mirror.observers.splice(j, 1);
-      return;
-    }
-  }
+function removeObserverFromMirror(mirror: Mirror, observer): void {
+  mirror.observers.delete(observer.callback);
 }
 
 /**
@@ -82,17 +70,17 @@ export function unobserve<T>(root: T, observer: Observer<T>) {
 /**
  * Observes changes made to an object, which can then be retrieved using generate
  */
-export function observe<T>(obj: any, callback?: (patches: Operation[]) => void): Observer<T> {
+export function observe<T>(obj: Object|Array<T>, callback?: (patches: Operation[]) => void): Observer<T> {
   var patches = [];
-  var root = obj;
   var observer;
   var mirror = getMirror(obj);
 
   if (!mirror) {
     mirror = new Mirror(obj);
-    beforeDict.push(mirror);
+    beforeDict.set(obj, mirror);
   } else {
-    observer = getObserverFromMirror(mirror, callback);
+    const observerInfo = getObserverFromMirror(mirror, callback);
+    observer = observerInfo && observerInfo.observer;
   }
 
   if (observer) {
@@ -155,7 +143,7 @@ export function observe<T>(obj: any, callback?: (patches: Operation[]) => void):
     }
   };
 
-  mirror.observers.push(new ObserverInfo(callback, observer));
+  mirror.observers.set(callback, new ObserverInfo(callback, observer));
 
   return observer;
 }
@@ -163,14 +151,8 @@ export function observe<T>(obj: any, callback?: (patches: Operation[]) => void):
 /**
  * Generate an array of patches from an observer
  */
-export function generate<T>(observer: Observer<T>): Operation[] {
-  var mirror;
-  for (var i = 0, length = beforeDict.length; i < length; i++) {
-    if (beforeDict[i].obj === observer.object) {
-      mirror = beforeDict[i];
-      break;
-    }
-  }
+export function generate<T>(observer: Observer<Object>): Operation[] {
+  var mirror = beforeDict.get(observer.object);
   _generate(mirror.value, observer.object, observer.patches, "");
   if (observer.patches.length) {
     applyPatch(mirror.value, observer.patches);
@@ -237,7 +219,7 @@ function _generate(mirror, obj, patches, path) {
 /**
  * Create an array of patches from the differences in two objects
  */
-export function compare(tree1: any, tree2: any): Operation[] {
+export function compare(tree1: Object | Array<any>, tree2: Object | Array<any>): Operation[] {
   var patches = [];
   _generate(tree1, tree2, patches, '');
   return patches;
