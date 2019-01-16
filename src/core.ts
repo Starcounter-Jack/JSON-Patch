@@ -144,7 +144,7 @@ const objOps = {
 var arrOps = {
   add: function (arr, i, document) {
     if(isInteger(i)) {
-      arr.splice(i, 0, this.value); 
+      arr.splice(i, 0, this.value);
     } else { // array props
       arr[i] = this.value;
     }
@@ -195,7 +195,7 @@ export function getValueByPointer(document: any, pointer: string): any {
  * @param mutateDocument Whether to mutate the original document or clone it before applying
  * @return `{newDocument, result}` after the operation
  */
-export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true): OperationResult<T> {
+export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, index: number = 0): OperationResult<T> {
   if (validateOperation) {
     if (typeof validateOperation == 'function') {
       validateOperation(operation, 0, document, operation.path);
@@ -224,7 +224,7 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
     } else if (operation.op === 'test') {
       returnValue.test = areEquals(document, operation.value);
       if (returnValue.test === false) {
-        throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+        throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
       }
       returnValue.newDocument = document;
       return returnValue;
@@ -237,7 +237,7 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
       return returnValue;
     } else { /* bad operation */
       if (validateOperation) {
-        throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
+        throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);
       } else {
         return returnValue;
       }
@@ -284,7 +284,7 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
         }
         else {
           if (validateOperation && !isInteger(key)) {
-            throw new JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", 0, operation.path, operation);
+            throw new JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", index, operation, document);
           } // only parse key when it's an integer for `arr.prop` to work
           else if(isInteger(key)) {
             key = ~~key;
@@ -292,11 +292,11 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
         }
         if (t >= len) {
           if (validateOperation && operation.op === "add" && key > obj.length) {
-            throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
+            throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
           }
           const returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
           if (returnValue.test === false) {
-            throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
           }
           return returnValue;
         }
@@ -308,7 +308,7 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
         if (t >= len) {
           const returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
           if (returnValue.test === false) {
-            throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
           }
           return returnValue;
         }
@@ -343,7 +343,7 @@ export function applyPatch<T>(document: T, patch: Operation[], validateOperation
   const results = new Array(patch.length) as PatchResult<T>;
 
   for (let i = 0, length = patch.length; i < length; i++) {
-    results[i] = applyOperation(document, patch[i], validateOperation);
+    results[i] = applyOperation(document, patch[i], validateOperation, mutateDocument, i);
     document = results[i].newDocument; // in case root was replaced
   }
   results.newDocument = document;
