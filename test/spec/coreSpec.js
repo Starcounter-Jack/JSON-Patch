@@ -1917,7 +1917,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
 
-    it(`should allow __proto__ modifications when the flag is set`, function() {
+    it(`should allow __proto__ modifications when the banPrototypeModifications flag is set`, function() {
       function SomeClass() {
         this.foo = 'bar';
       }
@@ -1934,9 +1934,9 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       expect(otherDoc.x).toEqual('polluted');
     });
 
-    it(`should not allow __proto__ modifications without setting the flag and should throw an error`, function() {
+    it(`should not allow __proto__ modifications without unsetting the banPrototypeModifications flag and should throw an error`, function() {
       const expectedErrorMessage =
-        'JSON-Patch: modifying `__proto_` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README';
+        'JSON-Patch: modifying `__proto__` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README';
 
       function SomeClass() {
         this.foo = 'bar';
@@ -1949,22 +1949,13 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
         { op: 'replace', path: `/__proto__/x`, value: 'polluted' }
       ];
 
-      try {
-        jsonpatch.applyPatch(doc, patch);
-      } catch (e) {
-        expect(e.message).toEqual(expectedErrorMessage);
-      }
+      expect(() => jsonpatch.applyPatch(doc, patch)).toThrow(new TypeError(expectedErrorMessage));
 
       expect(otherDoc.x).toEqual(undefined);
       expect(doc.x).toEqual(undefined);
 
       let arr = [];
-
-      try {
-        jsonpatch.applyPatch(arr, patch);
-      } catch (e) {
-        expect(e.message).toEqual(expectedErrorMessage);
-      }
+      expect(() => jsonpatch.applyPatch(arr, patch)).toThrow(new TypeError(expectedErrorMessage));
       expect(arr.x).toEqual(undefined);
     });
   });

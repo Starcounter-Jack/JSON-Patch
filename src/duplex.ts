@@ -3,15 +3,8 @@
  * (c) 2017 Joachim Wester
  * MIT license
  */
-declare var require: any;
-
-const equalsOptions = { strict: true };
-const _equals = require('deep-equal');
-const areEquals = (a: any, b: any): boolean => {
-  return _equals(a, b, equalsOptions)
-}
-import { PatchError, _deepClone, isInteger, _objectKeys, escapePathComponent, unescapePathComponent, hasUndefined, hasOwnProperty } from './helpers';
-import { applyOperation, applyPatch, getValueByPointer, Operation } from './core';
+import { _deepClone, _objectKeys, escapePathComponent, hasOwnProperty } from './helpers';
+import { applyPatch, Operation } from './core';
 
 /* export all core functions */
 export { applyOperation, applyPatch, applyReducer, getValueByPointer, Operation, validate, validator, OperationResult } from './core';

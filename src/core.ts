@@ -15,11 +15,6 @@ import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined 
 export const JsonPatchError = PatchError;
 export const deepClone = _deepClone;
 
-interface HTMLElement {
-  attachEvent: Function;
-  detachEvent: Function;
-}
-
 export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any>;
 
 export interface Validator<T> {
@@ -266,7 +261,7 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
       key = keys[t];
 
       if(banPrototypeModifications && key == '__proto__') {
-        throw new TypeError('JSON-Patch: modifying `__proto_` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
+        throw new TypeError('JSON-Patch: modifying `__proto__` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
       }
 
       if (validateOperation) {
@@ -349,6 +344,7 @@ export function applyPatch<T>(document: T, patch: Operation[], validateOperation
   const results = new Array(patch.length) as PatchResult<T>;
 
   for (let i = 0, length = patch.length; i < length; i++) {
+    // we don't need to pass mutateDocument argument because if it was true, we already deep cloned the object, we'll just pass `true`
     results[i] = applyOperation(document, patch[i], validateOperation, true, banPrototypeModifications);
     document = results[i].newDocument; // in case root was replaced
   }
