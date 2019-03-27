@@ -1440,7 +1440,7 @@ describe('duplex', function() {
       ]);
 
     });
-    it('Replacing a deep array with an object should be handled well', function() {
+    it('Replacing an array with an object should be handled well', function() {
 
       const obj = {};
       var patches = jsonpatch.compare({arr: ['jack']}, {arr: obj});
@@ -1453,7 +1453,7 @@ describe('duplex', function() {
       ]);
             
     });
-    it('Replacing a two-level deep array with an object should be handled well', function() {
+    it('Replacing an array that nested in an object with an object nested in an an object should be handled well', function() {
 
       const obj = {};
       var patches = jsonpatch.compare({arr: {deeperArray: ['jack']}}, {arr: {deeperArray: obj}});
