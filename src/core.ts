@@ -15,11 +15,6 @@ import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined 
 export const JsonPatchError = PatchError;
 export const deepClone = _deepClone;
 
-interface HTMLElement {
-  attachEvent: Function;
-  detachEvent: Function;
-}
-
 export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any>;
 
 export interface Validator<T> {
@@ -193,9 +188,10 @@ export function getValueByPointer(document: any, pointer: string): any {
  * @param operation The operation to apply
  * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
  * @param mutateDocument Whether to mutate the original document or clone it before applying
+ * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return `{newDocument, result}` after the operation
  */
-export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, index: number = 0): OperationResult<T> {
+export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, banPrototypeModifications: boolean = true, index: number = 0): OperationResult<T> {
   if (validateOperation) {
     if (typeof validateOperation == 'function') {
       validateOperation(operation, 0, document, operation.path);
@@ -264,6 +260,10 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
     while (true) {
       key = keys[t];
 
+      if(banPrototypeModifications && key == '__proto__') {
+        throw new TypeError('JSON-Patch: modifying `__proto__` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
+      }
+
       if (validateOperation) {
         if (existingPathFragment === undefined) {
           if (obj[key] === undefined) {
@@ -329,9 +329,10 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
  * @param patch The patch to apply
  * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
  * @param mutateDocument Whether to mutate the original document or clone it before applying
+ * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return An array of `{newDocument, result}` after the patch
  */
-export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>, mutateDocument: boolean = true): PatchResult<T> {
+export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>, mutateDocument: boolean = true, banPrototypeModifications: boolean = true): PatchResult<T> {
   if(validateOperation) {
     if(!Array.isArray(patch)) {
       throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
@@ -343,7 +344,8 @@ export function applyPatch<T>(document: T, patch: Operation[], validateOperation
   const results = new Array(patch.length) as PatchResult<T>;
 
   for (let i = 0, length = patch.length; i < length; i++) {
-    results[i] = applyOperation(document, patch[i], validateOperation, mutateDocument, i);
+    // we don't need to pass mutateDocument argument because if it was true, we already deep cloned the object, we'll just pass `true`
+    results[i] = applyOperation(document, patch[i], validateOperation, true, banPrototypeModifications, i);
     document = results[i].newDocument; // in case root was replaced
   }
   results.newDocument = document;

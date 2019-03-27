@@ -1426,8 +1426,47 @@ describe('duplex', function() {
       }, 20);
     });
   });
-
   describe('compare', function() {
+    it('Replacing a root array with an object should be handled well', function() {
+
+      const obj = {};
+      var patches = jsonpatch.compare(['jack'], obj);
+      expect(patches).toEqual([
+        {
+          op: 'replace',
+          path: '',
+          value: obj
+        }
+      ]);
+
+    });
+    it('Replacing an array with an object should be handled well', function() {
+
+      const obj = {};
+      var patches = jsonpatch.compare({arr: ['jack']}, {arr: obj});
+      expect(patches).toEqual([
+        {
+          op: 'replace',
+          path: '/arr',
+          value: obj
+        }
+      ]);
+            
+    });
+    it('Replacing an array that nested in an object with an object nested in an an object should be handled well', function() {
+
+      const obj = {};
+      var patches = jsonpatch.compare({arr: {deeperArray: ['jack']}}, {arr: {deeperArray: obj}});
+
+      expect(patches).toEqual([
+        {
+          op: 'replace',
+          path: '/arr/deeperArray',
+          value: obj
+        }
+      ]);
+            
+    });
     it('should return an add for a property that does not exist in the first obj', function() {
       var objA = {
         user: {

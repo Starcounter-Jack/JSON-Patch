@@ -3,15 +3,8 @@
  * (c) 2017 Joachim Wester
  * MIT license
  */
-declare var require: any;
-
-const equalsOptions = { strict: true };
-const _equals = require('deep-equal');
-const areEquals = (a: any, b: any): boolean => {
-  return _equals(a, b, equalsOptions)
-}
-import { PatchError, _deepClone, isInteger, _objectKeys, escapePathComponent, unescapePathComponent, hasUndefined, hasOwnProperty } from './helpers';
-import { applyOperation, applyPatch, getValueByPointer, Operation } from './core';
+import { _deepClone, _objectKeys, escapePathComponent, hasOwnProperty } from './helpers';
+import { applyPatch, Operation } from './core';
 
 /* export all core functions */
 export { applyOperation, applyPatch, applyReducer, getValueByPointer, Operation, validate, validator, OperationResult } from './core';
@@ -187,8 +180,10 @@ function _generate(mirror, obj, patches, path) {
   for (var t = oldKeys.length - 1; t >= 0; t--) {
     var key = oldKeys[t];
     var oldVal = mirror[key];
+
     if (hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
       var newVal = obj[key];
+
       if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
         _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
       }
@@ -199,9 +194,12 @@ function _generate(mirror, obj, patches, path) {
         }
       }
     }
-    else {
+    else if(Array.isArray(mirror) === Array.isArray(obj)) {
       patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
       deleted = true; // property has been deleted
+    } else {
+      patches.push({ op: "replace", path, value: obj });
+      changed = true;
     }
   }
 
