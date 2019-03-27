@@ -9,40 +9,44 @@ if (typeof _ === 'undefined') {
 describe('jsonpatch.getValueByPointer', function() {
   it('should retrieve values by JSON pointer from tree - deep object', function() {
     var obj = {
-      person: {name: 'Marilyn'}
+      person: { name: 'Marilyn' }
     };
-    var name = jsonpatch.getValueByPointer(obj, '/person/name')
+    var name = jsonpatch.getValueByPointer(obj, '/person/name');
     expect(name).toEqual('Marilyn');
   });
 
   it('should retrieve values by JSON pointer from tree - deep array', function() {
     var obj = {
-      people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+      people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
     };
-    var name = jsonpatch.getValueByPointer(obj, '/people/1/name')
+    var name = jsonpatch.getValueByPointer(obj, '/people/1/name');
     expect(name).toEqual('Monroe');
   });
 
   it('should retrieve values by JSON pointer from tree - root object', function() {
     var obj = {
-      people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+      people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
     };
     var retrievedObject = jsonpatch.getValueByPointer(obj, '');
 
     expect(retrievedObject).toEqual({
-      people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+      people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
     });
   });
 
   it('should retrieve values by JSON pointer from tree - root array', function() {
-    var obj = [{
-      people: [{name: 'Marilyn'}, {name: 'Monroe'}]
-    }];
+    var obj = [
+      {
+        people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
+      }
+    ];
     var retrievedObject = jsonpatch.getValueByPointer(obj, '');
 
-    expect(retrievedObject).toEqual([{
-      people: [{name: 'Marilyn'}, {name: 'Monroe'}]
-    }]);
+    expect(retrievedObject).toEqual([
+      {
+        people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
+      }
+    ]);
   });
 });
 describe('jsonpatch.applyReducer - using with Array#reduce', function() {
@@ -62,26 +66,30 @@ describe('jsonpatch.applyReducer - using with Array#reduce', function() {
   });
 });
 describe('root replacement with applyOperation', function() {
-  describe('_get operation', function () {
+  describe('_get operation', function() {
     it('should get root value', function() {
-      var obj = [{
-        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
-      }];
+      var obj = [
+        {
+          people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
+        }
+      ];
 
-      var patch = {op: '_get', path: ''};
+      var patch = { op: '_get', path: '' };
 
       jsonpatch.applyOperation(obj, patch);
 
-      expect(patch.value).toEqual([{
-        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
-      }]);
+      expect(patch.value).toEqual([
+        {
+          people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
+        }
+      ]);
     });
     it('should get deep value', function() {
       var obj = {
-        people: [{name: 'Marilyn'}, {name: 'Monroe'}]
+        people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
       };
 
-      var patch = {op: '_get', path: '/people/1/name'};
+      var patch = { op: '_get', path: '/people/1/name' };
 
       jsonpatch.applyOperation(obj, patch);
 
@@ -179,7 +187,7 @@ describe('root replacement with applyOperation', function() {
         }
       ]);
     });
-     it('should `add` an array prop', function() {
+    it('should `add` an array prop', function() {
       var obj = [];
 
       var newObj = jsonpatch.applyOperation(obj, {
@@ -1508,25 +1516,23 @@ describe('core', function() {
   it('should apply copy, without leaving cross-reference between nodes', function() {
     var obj = {};
     var patchset = [
-      {op: 'add', path: '/foo', value: []},
-      {op: 'add', path: '/foo/-', value: 1},
-      {op: 'copy', from: '/foo', path: '/bar'},
-      {op: 'add', path: '/bar/-', value: 2}
+      { op: 'add', path: '/foo', value: [] },
+      { op: 'add', path: '/foo/-', value: 1 },
+      { op: 'copy', from: '/foo', path: '/bar' },
+      { op: 'add', path: '/bar/-', value: 2 }
     ];
 
     jsonpatch.applyPatch(obj, patchset);
 
     expect(obj).toEqual({
-      "foo": [1],
-      "bar": [1, 2],
+      foo: [1],
+      bar: [1, 2]
     });
   });
 
-  it('should use value object as a reference', function () {
+  it('should use value object as a reference', function() {
     var obj1 = {};
-    var patch = [
-      {op: 'add', path: '/foo', value: []}
-    ];
+    var patch = [{ op: 'add', path: '/foo', value: [] }];
 
     jsonpatch.applyPatch(obj1, patch, false);
 
@@ -1909,6 +1915,48 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
         baz: null,
         bar: null
       });
+    });
+
+    it(`should allow __proto__ modifications when the banPrototypeModifications flag is set`, function() {
+      function SomeClass() {
+        this.foo = 'bar';
+      }
+
+      let doc = new SomeClass();
+      let otherDoc = new SomeClass();
+
+      const patch = [
+        { op: 'replace', path: `/__proto__/x`, value: 'polluted' }
+      ];
+
+      jsonpatch.applyPatch(doc, patch, false, true, false);
+
+      expect(otherDoc.x).toEqual('polluted');
+    });
+
+    it(`should not allow __proto__ modifications without unsetting the banPrototypeModifications flag and should throw an error`, function() {
+      const expectedErrorMessage =
+        'JSON-Patch: modifying `__proto__` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README';
+
+      function SomeClass() {
+        this.foo = 'bar';
+      }
+
+      let doc = new SomeClass();
+      let otherDoc = new SomeClass();
+
+      const patch = [
+        { op: 'replace', path: `/__proto__/x`, value: 'polluted' }
+      ];
+
+      expect(() => jsonpatch.applyPatch(doc, patch)).toThrow(new TypeError(expectedErrorMessage));
+
+      expect(otherDoc.x).toEqual(undefined);
+      expect(doc.x).toEqual(undefined);
+
+      let arr = [];
+      expect(() => jsonpatch.applyPatch(arr, patch)).toThrow(new TypeError(expectedErrorMessage));
+      expect(arr.x).toEqual(undefined);
     });
   });
 });

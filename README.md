@@ -182,14 +182,20 @@ else {
 
 ## API
 
-#### `jsonpatch.applyPatch<T>(document: any, patch: Operation[], validateOperation: Boolean | Function = false): OperationResult<T>[]`
+#### `function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>, mutateDocument: boolean = true, banPrototypeModifications: boolean = true): PatchResult<T>`
 
 Applies `patch` array on `obj`.
+
+- `document` The document to patch
+- `patch` a JSON-Patch array of operations to apply
+- `validateOperation` Boolean for whether to validate each operation with our default validator, or to pass a validator callback
+- `mutateDocument` Whether to mutate the original document or clone it before applying
+- `banPrototypeModifications`  Whether to ban modifications to `__proto__`, defaults to `true`.
 
 An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
 
 It modifies the `document` object and `patch` - it gets the values by reference.
-If you would like to avoid touching your values, clone them: `jsonpatch.applyPatch(document, jsonpatch.deepClone(patch))`.
+If you would like to avoid touching your `patch` array values, clone them: `jsonpatch.applyPatch(document, jsonpatch.deepClone(patch))`.
 
 Returns an array of [`OperationResult`](#operationresult-type) objects - one item for each item in `patches`, each item is an object `{newDocument: any, test?: boolean, removed?: any}`.
 
@@ -197,13 +203,13 @@ Returns an array of [`OperationResult`](#operationresult-type) objects - one ite
 * `remove`, `replace` and `move` - original object that has been removed
 * `add` (only when adding to an array) - index at which item has been inserted (useful when using `-` alias)
 
-** Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails. **
-
-** Note II: the returned array has `newDocument` property that you can use as the final state of the patched document **.
+- ** Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails. **
+- ** Note II: the returned array has `newDocument` property that you can use as the final state of the patched document **.
+- ** Note III: By default, when `banPrototypeModifications` is `true`, this method throws a `TypeError` when you attempt to modify an object's prototype.
 
 - See [Validation notes](#validation-notes).
 
-#### `applyOperation<T>(document: any, operation: Operation, validateOperation: <Boolean | Function> = false, mutateDocument = true): OperationResult<T>`
+#### `function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, banPrototypeModifications: boolean = true): OperationResult<T>`
 
 Applies single operation object `operation` on `document`.
 
@@ -211,13 +217,15 @@ Applies single operation object `operation` on `document`.
 - `operation` The operation to apply
 - `validateOperation` Whether to validate the operation, or to pass a validator callback
 - `mutateDocument` Whether to mutate the original document or clone it before applying
+- `banPrototypeModifications` Whether to ban modifications to `__proto__`, defaults to `true`.
 
 It modifies the `document` object and `operation` - it gets the values by reference.
 If you would like to avoid touching your values, clone them: `jsonpatch.applyOperation(document, jsonpatch.deepClone(operation))`.
 
 Returns an [`OperationResult`](#operationresult-type) object `{newDocument: any, test?: boolean, removed?: any}`.
 
-** Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails. **
+- ** Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails. **
+- ** Note II: By default, when `banPrototypeModifications` is `true`, this method throws a `TypeError` when you attempt to modify an object's prototype.
 
 - See [Validation notes](#validation-notes).
 
