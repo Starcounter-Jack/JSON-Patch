@@ -25,20 +25,21 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 
 ## Performance
 
-##### [`add` benchmark](https://run.perf.zone/view/JSON-Patch-Add-Operation-1500650502896)
+##### [`add` benchmark](https://run.perf.zone/view/JSON-Patch-Add-Operation-1535541298893)
 
-![image](https://user-images.githubusercontent.com/17054134/28513264-b0c8eede-7055-11e7-8204-4536d871e971.png)
+![image](https://user-images.githubusercontent.com/17054134/44784357-aa422480-ab8d-11e8-8a7e-037e692dd842.png)
 
-##### [`replace` benchmark](https://run.perf.zone/view/JSON-Patch-Replace-Operation-1500645548223)
+##### [`replace` benchmark](https://run.perf.zone/view/JSON-Patch-Replace-Operation-1535540952263)
 
-![image](https://user-images.githubusercontent.com/17054134/28513298-d8c927a0-7055-11e7-9a4e-2da024655ac0.png)
+![image](https://user-images.githubusercontent.com/17054134/44784275-5fc0a800-ab8d-11e8-8a90-e87b8d5409d0.png)
 
-Tested on 24.07.2017. Compared libraries:
+Tested on 29.08.2018. Compared libraries:
 
-- [Starcounter-Jack/JSON-Patch](https://www.npmjs.com/package/fast-json-patch) 2.0.4
-- [bruth/jsonpatch-js](https://www.npmjs.com/package/json-patch) 0.6.1
-- [dharmafly/jsonpatch.js](https://www.npmjs.com/package/jsonpatch) 3.0.0
+- [Starcounter-Jack/JSON-Patch](https://www.npmjs.com/package/fast-json-patch) 2.0.6
+- [bruth/jsonpatch-js](https://www.npmjs.com/package/json-patch) 0.7.0
+- [dharmafly/jsonpatch.js](https://www.npmjs.com/package/jsonpatch) 3.0.1
 - [jiff](https://www.npmjs.com/package/jiff) 0.7.3
+- [RFC6902](https://www.npmjs.com/package/rfc6902) 2.4.0
 
 We aim the tests to be fair. Our library puts performance as the #1 priority, while other libraries can have different priorities. If you'd like to update the benchmarks or add a library, please fork  the [perf.zone](https://perf.zone) benchmarks linked above and open an issue to include new results.
 
