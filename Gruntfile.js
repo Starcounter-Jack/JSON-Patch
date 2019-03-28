@@ -4,6 +4,18 @@ module.exports = function(grunt) {
             browserName: 'internet explorer',
             platform: 'Windows 10',
             version: '11.285'
+        },
+        {
+            browserName: 'chrome',
+            platform: 'Linux'
+        },
+        {
+            browserName: 'firefox',
+            platform: 'Linux'
+        },
+        {
+            browserName: 'safari',
+            platform: 'Linux'
         }
     ];
 
