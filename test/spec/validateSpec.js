@@ -39,11 +39,63 @@ describe('validate', function() {
   });
 
   it('applyPatch should throw an error if the patch is not an array and validate is `true`', function() {
-    expect(() =>jsonpatch.applyPatch({}, {}, true)).toThrow(new jsonpatch.JsonPatchError('Patch sequence must be an array'));
+    expect(() => jsonpatch.applyPatch({}, {}, true)).toThrow(new jsonpatch.JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY'));
   });
   it('applyPatch should throw an error if the patch is not an array and validate is `true`', function() {
-    expect(() =>jsonpatch.applyPatch({}, null, true)).toThrow(new jsonpatch.JsonPatchError('Patch sequence must be an array'));
+    expect(() => jsonpatch.applyPatch({}, null, true)).toThrow(new jsonpatch.JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY'));
   });
+  it('applyPatch should throw list the index and the object of the faulty operation in the patch', function() {
+      expect(() =>
+          jsonpatch.applyPatch(
+              {},
+              [
+                  { op: 'add', path: '/root', value: [] },
+                  { op: 'add', path: '/root/2', value: 2 } // out of bounds
+              ],
+              true
+          )
+      ).toThrow(
+          new jsonpatch.JsonPatchError(
+              'The specified index MUST NOT be greater than the number of elements in the array',
+              'OPERATION_VALUE_OUT_OF_BOUNDS',
+              1, // the index of the faulty operation
+              { op: 'add', path: '/root/2', value: 2 }, // the faulty operation
+              { root: [] } // the tree after the first operation
+          )
+      );
+  });
+  it('JsonPatchError should have a nice formatted message', function() {
+    const message = "Some error message";
+    const name = "SOME_ERROR_NAME";
+    const index = 1; // op index
+    const operation =  JSON.stringify({ op: "replace", path: '/root', value: {} }, null, 2);
+    const tree = JSON.stringify({ root: [] }, null, 2);
+
+    const expectedError = new jsonpatch.JsonPatchError(message, name, index, operation, tree);
+
+    /*
+    Some error message
+    name: SOME_ERROR_NAME
+    index: 1
+    operation: {
+      "op": "replace",
+      "path": "/root",
+      "value": {}
+    }
+    tree: {
+      "root": []
+    }"
+    */
+    const expectedFormattedErrorMessage = message
+      .concat("\nname: ")
+      .concat(name, "\nindex: ")
+      .concat(index, "\noperation: ")
+      .concat(operation, "\ntree: ")
+      .concat(tree); // don't use `` to support the loveliest browser: IE
+
+    expect(expectedError.message).toEqual(expectedFormattedErrorMessage);
+  });
+
 
   it('should return an empty array if the operation is a valid object', function() {
     var error = jsonpatch.validate([
