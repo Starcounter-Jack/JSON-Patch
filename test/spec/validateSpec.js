@@ -64,6 +64,31 @@ describe('validate', function() {
           )
       );
   });
+  it('JsonPatchError should have a nice formatted message', function() {
+    const message = "Some error message";
+    const name = "SOME_ERROR_NAME";
+    const index = 1; // op index
+    const operation =  JSON.stringify({ op: "replace", path: '/root', value: {} }, null, 2);
+    const tree = JSON.stringify({ root: [] }, null, 2);
+
+    const expectedError = new jsonpatch.JsonPatchError(message, name, index, operation, tree);
+
+    /*
+    Some error message
+    name: SOME_ERROR_NAME
+    index: 1
+    operation: {
+      "op": "replace",
+      "path": "/root",
+      "value": {}
+    }
+    tree: {
+      "root": []
+    }"
+    */
+    const expectedFormattedErrorMessage = `${message}\nname: ${name}\nindex: ${index}\noperation: ${operation}\ntree: ${tree}`
+    expect(expectedError.message).toEqual(expectedFormattedErrorMessage);
+  });
 
 
   it('should return an empty array if the operation is a valid object', function() {
