@@ -12,6 +12,10 @@ With JSON-Patch, you can:
 - **observe** for changes (and generate patches when a change is detected)
 - **compare** two objects (to obtain the difference).
 
+
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/json-patch.svg)](https://travis-ci.org/Starcounter-Jack/JSON-Patch)
+
+
 ## Why you should use JSON-Patch
 
 JSON-Patch [(RFC6902)](http://tools.ietf.org/html/rfc6902) is a standard format that
