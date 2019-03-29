@@ -209,7 +209,7 @@ Returns an array of [`OperationResult`](#operationresult-type) objects - one ite
 
 - See [Validation notes](#validation-notes).
 
-#### `function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, banPrototypeModifications: boolean = true): OperationResult<T>`
+#### `function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, banPrototypeModifications: boolean = true, index: number = 0): OperationResult<T>`
 
 Applies single operation object `operation` on `document`.
 
@@ -218,6 +218,7 @@ Applies single operation object `operation` on `document`.
 - `validateOperation` Whether to validate the operation, or to pass a validator callback
 - `mutateDocument` Whether to mutate the original document or clone it before applying
 - `banPrototypeModifications` Whether to ban modifications to `__proto__`, defaults to `true`.
+- `index` The index of the operation in your patch array. Useful for better error reporting when that operation fails to apply.
 
 It modifies the `document` object and `operation` - it gets the values by reference.
 If you would like to avoid touching your values, clone them: `jsonpatch.applyOperation(document, jsonpatch.deepClone(operation))`.
@@ -229,7 +230,7 @@ Returns an [`OperationResult`](#operationresult-type) object `{newDocument: any,
 
 - See [Validation notes](#validation-notes).
 
-#### `jsonpatch.applyReducer<T>(document: T, operation: Operation): T`
+#### `jsonpatch.applyReducer<T>(document: T, operation: Operation, index: number): T`
 
 **Ideal for `patch.reduce(jsonpatch.applyReducer, document)`**.
 

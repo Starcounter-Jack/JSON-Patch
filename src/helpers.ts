@@ -3,6 +3,9 @@
  * (c) 2017 Joachim Wester
  * MIT license
  */
+
+import { Operation } from "./core";
+
 const _hasOwnProperty = Object.prototype.hasOwnProperty;
 export function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);
@@ -145,8 +148,19 @@ export type JsonPatchErrorName = 'SEQUENCE_NOT_AN_ARRAY' |
     'OPERATION_VALUE_OUT_OF_BOUNDS' |
     'TEST_OPERATION_FAILED';
 
+function patchErrorMessageFormatter(message: String, args: Object): string {
+    const messageParts = [message];
+    for(const key in args) {
+        const value = typeof args[key] === 'object' ? JSON.stringify(args[key], null, 2) : args[key]; // pretty print
+        if(typeof value !== 'undefined') {
+            messageParts.push(`${key}: ${value}`);
+        }
+    }
+    return messageParts.join('\n');
+}
 export class PatchError extends Error {
-    constructor(public message: string, public name: JsonPatchErrorName, public index?: number, public operation?: any, public tree?: any) {
-        super(message);
+    constructor(message: string, public name: JsonPatchErrorName, public index?: number, public operation?: any, public tree?: any) {
+        super(patchErrorMessageFormatter(message, { name, index, operation, tree }));
+        this.message = patchErrorMessageFormatter(message, { name, index, operation, tree });
     }
 }
