@@ -86,7 +86,13 @@ describe('validate', function() {
       "root": []
     }"
     */
-    const expectedFormattedErrorMessage = `${message}\nname: ${name}\nindex: ${index}\noperation: ${operation}\ntree: ${tree}`
+    const expectedFormattedErrorMessage = message
+      .concat("\nname: ")
+      .concat(name, "\nindex: ")
+      .concat(index, "\noperation: ")
+      .concat(operation, "\ntree: ")
+      .concat(tree); // don't use `` to support the loveliest browser: IE
+
     expect(expectedError.message).toEqual(expectedFormattedErrorMessage);
   });
 
