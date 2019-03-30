@@ -19,6 +19,7 @@
   <script src="lib/benchmark.js/vendor/platform.js/platform.js"></script>
   <script src="lib/benchmark.js/benchmark.js"></script>
   <script src="lib/benchmark_reporter.js"></script>
+  <script src="lib/jasmine-2.5.0/jasmine-jsreporter.js"></script>
   <link rel="stylesheet" type="text/css" href="lib/benchmark_reporter.css">
 
   <!-- include source files here... -->
@@ -32,6 +33,11 @@
   <script src="spec/duplexSpec.js"></script>
   <script src="spec/duplexBenchmark.js"></script>
   <script src="spec/coreBenchmark.js"></script>
+
+  <script>
+    var jasmineEnv = jasmine.getEnv();
+    jasmineEnv.addReporter(new jasmine.JSReporter2());
+  </script>
 
 </head>
 
