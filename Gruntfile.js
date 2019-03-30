@@ -36,7 +36,8 @@ module.exports = function(grunt) {
             all: {
                 options: {
                     urls: ['http://127.0.0.1:9999/test'],
-                    browsers: browsers,
+                    browsers,
+                    public: 'public',
                     onTestComplete: function(result, callback) {
                         // Called after a unit test is done, per page, per browser
                         // 'result' param is the object returned by the test framework's reporter
