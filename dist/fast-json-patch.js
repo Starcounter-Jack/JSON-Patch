@@ -694,9 +694,11 @@ exports.unobserve = unobserve;
 /**
  * Observes changes made to an object, which can then be retrieved using generate
  */
-function observe(obj, callback) {
+function observe(obj, opts) {
+    if (opts === void 0) { opts = {}; }
     var patches = [];
     var observer;
+    var callback = opts.callback;
     var mirror = getMirror(obj);
     if (!mirror) {
         mirror = new Mirror(obj);
@@ -715,7 +717,9 @@ function observe(obj, callback) {
         observer.callback = callback;
         observer.next = null;
         var dirtyCheck = function () {
-            generate(observer);
+            generate(observer, {
+                inversible: opts.inversible
+            });
         };
         var fastCheck = function () {
             clearTimeout(observer.next);
@@ -745,7 +749,9 @@ function observe(obj, callback) {
     observer.patches = patches;
     observer.object = obj;
     observer.unobserve = function () {
-        generate(observer);
+        generate(observer, {
+            inversible: opts.inversible
+        });
         clearTimeout(observer.next);
         removeObserverFromMirror(mirror, observer);
         if (typeof window !== "undefined") {
@@ -771,9 +777,9 @@ exports.observe = observe;
 /**
  * Generate an array of patches from an observer
  */
-function generate(observer) {
+function generate(observer, opts) {
     var mirror = beforeDict.get(observer.object);
-    _generate(mirror.value, observer.object, observer.patches, "");
+    _generate(mirror.value, observer.object, observer.patches, "", opts);
     if (observer.patches.length) {
         core_1.applyPatch(mirror.value, observer.patches);
     }
@@ -788,7 +794,10 @@ function generate(observer) {
 }
 exports.generate = generate;
 // Dirty check if obj is different from mirror, generate patches and update mirror
-function _generate(mirror, obj, patches, path) {
+function _generate(mirror, obj, patches, path, opts) {
+    if (opts === void 0) { opts = {
+        inversible: false
+    }; }
     if (obj === mirror) {
         return;
     }
@@ -799,6 +808,7 @@ function _generate(mirror, obj, patches, path) {
     var oldKeys = helpers_1._objectKeys(mirror);
     var changed = false;
     var deleted = false;
+    var inversible = opts.inversible;
     //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
     for (var t = oldKeys.length - 1; t >= 0; t--) {
         var key = oldKeys[t];
@@ -812,16 +822,17 @@ function _generate(mirror, obj, patches, path) {
                 oldVal != null &&
                 typeof newVal == "object" &&
                 newVal != null) {
-                _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key));
+                _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key), opts);
             }
             else {
                 if (oldVal !== newVal) {
                     changed = true;
-                    patches.push({
-                        op: "test",
-                        path: path + "/" + helpers_1.escapePathComponent(key),
-                        value: helpers_1._deepClone(oldVal)
-                    });
+                    if (inversible)
+                        patches.push({
+                            op: "test",
+                            path: path + "/" + helpers_1.escapePathComponent(key),
+                            value: helpers_1._deepClone(oldVal)
+                        });
                     patches.push({
                         op: "replace",
                         path: path + "/" + helpers_1.escapePathComponent(key),
@@ -831,18 +842,18 @@ function _generate(mirror, obj, patches, path) {
             }
         }
         else if (Array.isArray(mirror) === Array.isArray(obj)) {
-            patches.push({
-                op: "test",
-                path: path + "/" + helpers_1.escapePathComponent(key),
-                value: helpers_1._deepClone(oldVal)
-            });
+            if (inversible)
+                patches.push({
+                    op: "test",
+                    path: path + "/" + helpers_1.escapePathComponent(key),
+                    value: helpers_1._deepClone(oldVal)
+                });
             patches.push({ op: "remove", path: path + "/" + helpers_1.escapePathComponent(key) });
-            console.log("patches are");
-            console.log(JSON.stringify(patches, null, 2));
             deleted = true; // property has been deleted
         }
         else {
-            patches.push({ op: "test", path: path, value: mirror });
+            if (inversible)
+                patches.push({ op: "test", path: path, value: mirror });
             patches.push({ op: "replace", path: path, value: obj });
             changed = true;
         }
@@ -864,9 +875,9 @@ function _generate(mirror, obj, patches, path) {
 /**
  * Create an array of patches from the differences in two objects
  */
-function compare(tree1, tree2) {
+function compare(tree1, tree2, opts) {
     var patches = [];
-    _generate(tree1, tree2, patches, "");
+    _generate(tree1, tree2, patches, "", opts);
     return patches;
 }
 exports.compare = compare;
