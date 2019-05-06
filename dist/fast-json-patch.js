@@ -721,20 +721,24 @@ function observe(obj, callback) {
             clearTimeout(observer.next);
             observer.next = setTimeout(dirtyCheck);
         };
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
+            //not Node
             if (window.addEventListener) {
-                window.addEventListener('mouseup', fastCheck);
-                window.addEventListener('keyup', fastCheck);
-                window.addEventListener('mousedown', fastCheck);
-                window.addEventListener('keydown', fastCheck);
-                window.addEventListener('change', fastCheck);
+                //standards
+                window.addEventListener("mouseup", fastCheck);
+                window.addEventListener("keyup", fastCheck);
+                window.addEventListener("mousedown", fastCheck);
+                window.addEventListener("keydown", fastCheck);
+                window.addEventListener("change", fastCheck);
             }
             else {
-                document.documentElement.attachEvent('onmouseup', fastCheck);
-                document.documentElement.attachEvent('onkeyup', fastCheck);
-                document.documentElement.attachEvent('onmousedown', fastCheck);
-                document.documentElement.attachEvent('onkeydown', fastCheck);
-                document.documentElement.attachEvent('onchange', fastCheck);
+                //IE8
+                ;
+                document.documentElement.attachEvent("onmouseup", fastCheck);
+                document.documentElement.attachEvent("onkeyup", fastCheck);
+                document.documentElement.attachEvent("onmousedown", fastCheck);
+                document.documentElement.attachEvent("onkeydown", fastCheck);
+                document.documentElement.attachEvent("onchange", fastCheck);
             }
         }
     }
@@ -744,18 +748,19 @@ function observe(obj, callback) {
         generate(observer);
         clearTimeout(observer.next);
         removeObserverFromMirror(mirror, observer);
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
             if (window.removeEventListener) {
-                window.removeEventListener('mouseup', fastCheck);
-                window.removeEventListener('keyup', fastCheck);
-                window.removeEventListener('mousedown', fastCheck);
-                window.removeEventListener('keydown', fastCheck);
+                window.removeEventListener("mouseup", fastCheck);
+                window.removeEventListener("keyup", fastCheck);
+                window.removeEventListener("mousedown", fastCheck);
+                window.removeEventListener("keydown", fastCheck);
             }
             else {
-                document.documentElement.detachEvent('onmouseup', fastCheck);
-                document.documentElement.detachEvent('onkeyup', fastCheck);
-                document.documentElement.detachEvent('onmousedown', fastCheck);
-                document.documentElement.detachEvent('onkeydown', fastCheck);
+                ;
+                document.documentElement.detachEvent("onmouseup", fastCheck);
+                document.documentElement.detachEvent("onkeyup", fastCheck);
+                document.documentElement.detachEvent("onmousedown", fastCheck);
+                document.documentElement.detachEvent("onkeydown", fastCheck);
             }
         }
     };
@@ -798,23 +803,44 @@ function _generate(mirror, obj, patches, path) {
     for (var t = oldKeys.length - 1; t >= 0; t--) {
         var key = oldKeys[t];
         var oldVal = mirror[key];
-        if (helpers_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
+        if (helpers_1.hasOwnProperty(obj, key) &&
+            !(obj[key] === undefined &&
+                oldVal !== undefined &&
+                Array.isArray(obj) === false)) {
             var newVal = obj[key];
-            if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
+            if (typeof oldVal == "object" &&
+                oldVal != null &&
+                typeof newVal == "object" &&
+                newVal != null) {
                 _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key));
             }
             else {
                 if (oldVal !== newVal) {
                     changed = true;
-                    patches.push({ op: "replace", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(newVal) });
+                    patches.push({
+                        op: "test",
+                        path: path + "/" + helpers_1.escapePathComponent(key),
+                        value: helpers_1._deepClone(oldVal)
+                    });
+                    patches.push({
+                        op: "replace",
+                        path: path + "/" + helpers_1.escapePathComponent(key),
+                        value: helpers_1._deepClone(newVal)
+                    });
                 }
             }
         }
         else if (Array.isArray(mirror) === Array.isArray(obj)) {
+            patches.push({
+                op: "test",
+                path: path + "/" + helpers_1.escapePathComponent(key),
+                value: helpers_1._deepClone(oldVal)
+            });
             patches.push({ op: "remove", path: path + "/" + helpers_1.escapePathComponent(key) });
             deleted = true; // property has been deleted
         }
         else {
+            patches.push({ op: "test", path: path, value: mirror });
             patches.push({ op: "replace", path: path, value: obj });
             changed = true;
         }
@@ -825,7 +851,11 @@ function _generate(mirror, obj, patches, path) {
     for (var t = 0; t < newKeys.length; t++) {
         var key = newKeys[t];
         if (!helpers_1.hasOwnProperty(mirror, key) && obj[key] !== undefined) {
-            patches.push({ op: "add", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(obj[key]) });
+            patches.push({
+                op: "add",
+                path: path + "/" + helpers_1.escapePathComponent(key),
+                value: helpers_1._deepClone(obj[key])
+            });
         }
     }
 }
@@ -834,7 +864,7 @@ function _generate(mirror, obj, patches, path) {
  */
 function compare(tree1, tree2) {
     var patches = [];
-    _generate(tree1, tree2, patches, '');
+    _generate(tree1, tree2, patches, "");
     return patches;
 }
 exports.compare = compare;
