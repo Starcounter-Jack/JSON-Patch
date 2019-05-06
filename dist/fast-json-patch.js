@@ -837,6 +837,8 @@ function _generate(mirror, obj, patches, path) {
                 value: helpers_1._deepClone(oldVal)
             });
             patches.push({ op: "remove", path: path + "/" + helpers_1.escapePathComponent(key) });
+            console.log("patches are");
+            console.log(JSON.stringify(patches, null, 2));
             deleted = true; // property has been deleted
         }
         else {

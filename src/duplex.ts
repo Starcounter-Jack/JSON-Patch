@@ -84,10 +84,14 @@ export function unobserve<T>(root: T, observer: Observer<T>) {
  */
 export function observe<T>(
   obj: Object | Array<T>,
-  callback?: (patches: Operation[]) => void
+  opts: {
+    callback?: (patches: Operation[]) => void
+    inversible?: boolean
+  } = {}
 ): Observer<T> {
   var patches = []
   var observer
+  var callback = opts.callback
   var mirror = getMirror(obj)
 
   if (!mirror) {
@@ -111,7 +115,9 @@ export function observe<T>(
     observer.next = null
 
     var dirtyCheck = () => {
-      generate(observer)
+      generate(observer, {
+        inversible: opts.inversible
+      })
     }
     var fastCheck = () => {
       clearTimeout(observer.next)
@@ -140,7 +146,9 @@ export function observe<T>(
   observer.object = obj
 
   observer.unobserve = () => {
-    generate(observer)
+    generate(observer, {
+      inversible: opts.inversible
+    })
     clearTimeout(observer.next)
     removeObserverFromMirror(mirror, observer)
 
@@ -167,9 +175,14 @@ export function observe<T>(
 /**
  * Generate an array of patches from an observer
  */
-export function generate<T>(observer: Observer<Object>): Operation[] {
+export function generate<T>(
+  observer: Observer<Object>,
+  opts?: {
+    inversible: boolean
+  }
+): Operation[] {
   var mirror = beforeDict.get(observer.object)
-  _generate(mirror.value, observer.object, observer.patches, "")
+  _generate(mirror.value, observer.object, observer.patches, "", opts)
   if (observer.patches.length) {
     applyPatch(mirror.value, observer.patches)
   }
@@ -184,7 +197,15 @@ export function generate<T>(observer: Observer<Object>): Operation[] {
 }
 
 // Dirty check if obj is different from mirror, generate patches and update mirror
-function _generate(mirror, obj, patches, path) {
+function _generate(
+  mirror,
+  obj,
+  patches,
+  path,
+  opts = {
+    inversible: false
+  }
+) {
   if (obj === mirror) {
     return
   }
@@ -197,7 +218,7 @@ function _generate(mirror, obj, patches, path) {
   var oldKeys = _objectKeys(mirror)
   var changed = false
   var deleted = false
-
+  var {inversible} = opts
   //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
 
   for (var t = oldKeys.length - 1; t >= 0; t--) {
@@ -224,16 +245,18 @@ function _generate(mirror, obj, patches, path) {
           oldVal,
           newVal,
           patches,
-          path + "/" + escapePathComponent(key)
+          path + "/" + escapePathComponent(key),
+          opts
         )
       } else {
         if (oldVal !== newVal) {
           changed = true
-          patches.push({
-            op: "test",
-            path: path + "/" + escapePathComponent(key),
-            value: _deepClone(oldVal)
-          })
+          if (inversible)
+            patches.push({
+              op: "test",
+              path: path + "/" + escapePathComponent(key),
+              value: _deepClone(oldVal)
+            })
           patches.push({
             op: "replace",
             path: path + "/" + escapePathComponent(key),
@@ -242,15 +265,16 @@ function _generate(mirror, obj, patches, path) {
         }
       }
     } else if (Array.isArray(mirror) === Array.isArray(obj)) {
-      patches.push({
-        op: "test",
-        path: path + "/" + escapePathComponent(key),
-        value: _deepClone(oldVal)
-      })
+      if (inversible)
+        patches.push({
+          op: "test",
+          path: path + "/" + escapePathComponent(key),
+          value: _deepClone(oldVal)
+        })
       patches.push({op: "remove", path: path + "/" + escapePathComponent(key)})
       deleted = true // property has been deleted
     } else {
-      patches.push({op: "test", path, value: mirror})
+      if (inversible) patches.push({op: "test", path, value: mirror})
       patches.push({op: "replace", path, value: obj})
       changed = true
     }
@@ -276,9 +300,12 @@ function _generate(mirror, obj, patches, path) {
  */
 export function compare(
   tree1: Object | Array<any>,
-  tree2: Object | Array<any>
+  tree2: Object | Array<any>,
+  opts?: {
+    inversible: boolean
+  }
 ): Operation[] {
   var patches = []
-  _generate(tree1, tree2, patches, "")
+  _generate(tree1, tree2, patches, "", opts)
   return patches
 }

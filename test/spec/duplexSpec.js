@@ -20,16 +20,18 @@ function trigger(eventName, elem) {
 
 function getPatchesUsingGenerate(objFactory, objChanger) {
   var obj = objFactory()
-  var observer = jsonpatch.observe(obj)
+  var observer = jsonpatch.observe(obj, {inversible: true})
   objChanger(obj)
-  return jsonpatch.generate(observer)
+  return jsonpatch.generate(observer, {inversible: true})
 }
 
 function getPatchesUsingCompare(objFactory, objChanger) {
   var obj = objFactory()
   var mirror = JSON.parse(JSON.stringify(obj))
   objChanger(obj)
-  return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)))
+  return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)), {
+    inversible: true
+  })
 }
 
 //http://stackoverflow.com/questions/827716/emulate-clicking-a-link-with-javascript-that-works-with-ie
@@ -120,13 +122,13 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
       obj.firstName = "Joachim"
       obj.lastName = "Wester"
       obj.phoneNumbers[0].number = "123"
       obj.phoneNumbers[1].number = "456"
 
-      var patches = jsonpatch.generate(observer)
+      var patches = jsonpatch.generate(observer, {inversible: true})
       obj2 = {
         firstName: "Albert",
         lastName: "Einstein",
@@ -158,13 +160,13 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
       obj["/name/first"] = "Joachim"
       obj["/name/last"] = "Wester"
       obj["~phone~/numbers"][0].number = "123"
       obj["~phone~/numbers"][1].number = "456"
 
-      var patches = jsonpatch.generate(observer)
+      var patches = jsonpatch.generate(observer, {inversible: true})
       obj2 = {
         "/name/first": "Albert",
         "/name/last": "Einstein",
@@ -198,8 +200,8 @@ describe("duplex", function() {
       person1.firstName = "Alexander"
       person2.firstName = "Lucas"
 
-      var patch1 = jsonpatch.generate(observer1)
-      var patch2 = jsonpatch.generate(observer2)
+      var patch1 = jsonpatch.generate(observer1, {inversible: true})
+      var patch2 = jsonpatch.generate(observer2, {inversible: true})
 
       expect(patch1).toReallyEqual([
         {
@@ -241,10 +243,10 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
       obj.firstName = "Marcin"
 
-      var patches = jsonpatch.generate(observer)
+      var patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "test",
@@ -259,7 +261,7 @@ describe("duplex", function() {
       ])
 
       obj.lastName = "Warp"
-      patches = jsonpatch.generate(observer) //first patch should NOT be reported again here
+      patches = jsonpatch.generate(observer, {inversible: true}) //first patch should NOT be reported again here
       expect(patches).toReallyEqual([
         {
           op: "test",
@@ -301,10 +303,10 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
       obj.phoneNumbers[0].number = "123"
 
-      var patches = jsonpatch.generate(observer)
+      var patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "test",
@@ -319,7 +321,7 @@ describe("duplex", function() {
       ])
 
       obj.phoneNumbers[1].number = "456"
-      patches = jsonpatch.generate(observer) //first patch should NOT be reported again here
+      patches = jsonpatch.generate(observer, {inversible: true}) //first patch should NOT be reported again here
       expect(patches).toReallyEqual([
         {
           op: "test",
@@ -350,10 +352,10 @@ describe("duplex", function() {
     it("should generate replace (changes in new array cell, primitive values)", function() {
       arr = [1]
 
-      var observer = jsonpatch.observe(arr)
+      var observer = jsonpatch.observe(arr, {inversible: true})
       arr.push(2)
 
-      var patches = jsonpatch.generate(observer)
+      var patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "add",
@@ -364,7 +366,7 @@ describe("duplex", function() {
 
       arr[0] = 3
 
-      var patches = jsonpatch.generate(observer)
+      var patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "test",
@@ -380,7 +382,7 @@ describe("duplex", function() {
 
       arr[1] = 4
 
-      var patches = jsonpatch.generate(observer)
+      var patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "test",
@@ -403,13 +405,13 @@ describe("duplex", function() {
         }
       ]
 
-      var observer = jsonpatch.observe(arr)
+      var observer = jsonpatch.observe(arr, {inversible: true})
       arr.push({
         id: 2,
         name: "Jerry"
       })
 
-      var patches = jsonpatch.generate(observer)
+      var patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "add",
@@ -423,7 +425,7 @@ describe("duplex", function() {
 
       arr[0].id = 3
 
-      var patches = jsonpatch.generate(observer)
+      var patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "test",
@@ -439,7 +441,7 @@ describe("duplex", function() {
 
       arr[1].id = 4
 
-      var patches = jsonpatch.generate(observer)
+      var patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "test",
@@ -463,7 +465,7 @@ describe("duplex", function() {
           }
         ]
       }
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
 
       obj.firstName = "Joachim"
       obj.lastName = "Wester"
@@ -472,7 +474,7 @@ describe("duplex", function() {
         number: "456"
       })
 
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
       obj2 = {
         lastName: "Einstein",
         phoneNumbers: [
@@ -499,14 +501,14 @@ describe("duplex", function() {
           }
         ]
       }
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
 
       delete obj.firstName
       obj.lastName = "Wester"
       obj.phoneNumbers[0].number = "123"
       obj.phoneNumbers.pop(1)
 
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
       obj2 = {
         lastName: "Einstein",
         firstName: "Albert",
@@ -528,12 +530,12 @@ describe("duplex", function() {
       obj = {
         items: ["a", "b", "c"]
       }
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
 
       obj.items.pop()
       obj.items.pop()
 
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
 
       //array indexes must be sorted descending, otherwise there is an index collision in apply
       expect(patches).toReallyEqual([
@@ -568,11 +570,11 @@ describe("duplex", function() {
       obj = {
         lastName: "Einstein"
       }
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
 
       obj.lastName = "Wester"
 
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "test",
@@ -586,7 +588,7 @@ describe("duplex", function() {
         }
       ])
 
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([])
     })
 
@@ -594,11 +596,11 @@ describe("duplex", function() {
       obj = {
         lastName: "Einstein"
       }
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
 
       obj.firstName = "Albert"
 
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "add",
@@ -607,7 +609,7 @@ describe("duplex", function() {
         }
       ])
 
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([])
     })
 
@@ -615,11 +617,11 @@ describe("duplex", function() {
       obj = {
         lastName: "Einstein"
       }
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
 
       delete obj.lastName
 
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "test",
@@ -632,7 +634,7 @@ describe("duplex", function() {
         }
       ])
 
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches).toReallyEqual([])
     })
 
@@ -642,14 +644,14 @@ describe("duplex", function() {
       }
 
       var patches
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
 
       obj.array.value = 1
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches.length).toReallyEqual(0)
 
       obj.array.value = 2
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches.length).toReallyEqual(0)
     })
 
@@ -666,9 +668,9 @@ describe("duplex", function() {
         }
       }
 
-      var observer = jsonpatch.observe(obj)
+      var observer = jsonpatch.observe(obj, {inversible: true})
       obj.b = 5
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches.length).toReallyEqual(2)
     })
 
@@ -689,7 +691,7 @@ describe("duplex", function() {
 
       var observer = jsonpatch.observe(outer)
       outer.obj.b = 5
-      patches = jsonpatch.generate(observer)
+      patches = jsonpatch.generate(observer, {inversible: true})
 
       expect(patches.length).toReallyEqual(2)
       expect(patches[1].op).toReallyEqual("replace")
@@ -699,17 +701,17 @@ describe("duplex", function() {
 
     /*it('should not generate the same patch twice (move)', function() { //"move" is not implemented yet in jsonpatch.generate
           obj = { lastName: {str: "Einstein"} };
-          var observer = jsonpatch.observe(obj);
+          var observer = jsonpatch.observe(obj, {inversible: true});
 
           obj.lastName2 = obj.lastName;
           delete obj.lastName;
 
-          patches = jsonpatch.generate(observer);
+          patches = jsonpatch.generate(observer), { inversible: true} ;
           expect(patches).toReallyEqual([
             { op: 'move', from: '/lastName', to: '/lastName2' }
           ]);
 
-          patches = jsonpatch.generate(observer);
+          patches = jsonpatch.generate(observer), { inversible: true} ;
           expect(patches).toReallyEqual([]);
         });*/
 
@@ -719,10 +721,10 @@ describe("duplex", function() {
           foo: "bar"
         }
 
-        var observer = jsonpatch.observe(obj)
+        var observer = jsonpatch.observe(obj, {inversible: true})
         obj.foo = undefined
 
-        var patches = jsonpatch.generate(observer)
+        var patches = jsonpatch.generate(observer, {inversible: true})
         expect(patches).toReallyEqual([
           {
             op: "test",
@@ -741,10 +743,10 @@ describe("duplex", function() {
           foo: "bar"
         }
 
-        var observer = jsonpatch.observe(obj)
+        var observer = jsonpatch.observe(obj, {inversible: true})
         obj.baz = undefined
 
-        var patches = jsonpatch.generate(observer)
+        var patches = jsonpatch.generate(observer, {inversible: true})
         expect(patches).toReallyEqual([])
       })
 
@@ -753,10 +755,10 @@ describe("duplex", function() {
           foo: [0, 1, 2]
         }
 
-        var observer = jsonpatch.observe(obj)
+        var observer = jsonpatch.observe(obj, {inversible: true})
         obj.foo[1] = undefined
 
-        var patches = jsonpatch.generate(observer)
+        var patches = jsonpatch.generate(observer, {inversible: true})
         expect(patches).toReallyEqual([
           {
             op: "test",
@@ -776,10 +778,10 @@ describe("duplex", function() {
           foo: undefined
         }
 
-        var observer = jsonpatch.observe(obj)
+        var observer = jsonpatch.observe(obj, {inversible: true})
         obj.foo = "something"
 
-        var patches = jsonpatch.generate(observer)
+        var patches = jsonpatch.generate(observer, {inversible: true})
         expect(patches).toReallyEqual([
           {
             op: "add",
@@ -793,10 +795,10 @@ describe("duplex", function() {
           foo: [0, undefined, 2]
         }
 
-        var observer = jsonpatch.observe(obj)
+        var observer = jsonpatch.observe(obj, {inversible: true})
         obj.foo[1] = 1
 
-        var patches = jsonpatch.generate(observer)
+        var patches = jsonpatch.generate(observer, {inversible: true})
         expect(patches).toReallyEqual([
           {
             op: "test",
@@ -1024,9 +1026,12 @@ describe("duplex", function() {
         ]
       }
 
-      jsonpatch.observe(obj, function(_patches) {
-        patches = _patches
-        patchesChanged()
+      jsonpatch.observe(obj, {
+        callback: function(_patches) {
+          patches = _patches
+          patchesChanged()
+        },
+        inversible: true
       })
       obj.firstName = "Joachim"
       obj.lastName = "Wester"
@@ -1072,10 +1077,13 @@ describe("duplex", function() {
         ]
       }
 
-      jsonpatch.observe(obj, function(patches) {
-        called++
-        lastPatches = patches
-        patchesChanged(called)
+      jsonpatch.observe(obj, {
+        callback: function(patches) {
+          called++
+          lastPatches = patches
+          patchesChanged(called)
+        },
+        inversible: true
       })
       obj.firstName = "Marcin"
 
@@ -1152,10 +1160,13 @@ describe("duplex", function() {
         ]
       }
 
-      jsonpatch.observe(obj, function(patches) {
-        called++
-        lastPatches = patches
-        patchesChanged(called)
+      jsonpatch.observe(obj, {
+        callback: function(patches) {
+          called++
+          lastPatches = patches
+          patchesChanged(called)
+        },
+        inversible: true
       })
       obj.phoneNumbers[0].number = "123"
 
@@ -1233,16 +1244,19 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, function(patches) {
-        called++
-        lastPatches = patches
+      var observer = jsonpatch.observe(obj, {
+        callback: function(patches) {
+          called++
+          lastPatches = patches
+        },
+        inversible: true
       })
       obj.phoneNumbers[0].number = "123"
 
       setTimeout(function() {
         expect(called).toReallyEqual(0)
 
-        res = jsonpatch.generate(observer)
+        res = jsonpatch.generate(observer, {inversible: true})
         expect(called).toReallyEqual(1)
         expect(lastPatches).toReallyEqual([
           {
@@ -1258,7 +1272,7 @@ describe("duplex", function() {
         ])
         expect(lastPatches).toReallyEqual(res)
 
-        res = jsonpatch.generate(observer)
+        res = jsonpatch.generate(observer, {inversible: true})
         expect(called).toReallyEqual(1)
         expect(lastPatches).toReallyEqual([
           {
@@ -1293,8 +1307,11 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, function(patches) {
-        called++
+      var observer = jsonpatch.observe(obj, {
+        callback: function(patches) {
+          called++
+        },
+        inversible: true
       })
 
       obj.firstName = "Malvin"
@@ -1314,8 +1331,11 @@ describe("duplex", function() {
         setTimeout(function() {
           expect(called).toReallyEqual(1)
 
-          observer = jsonpatch.observe(obj, function(patches) {
-            called++
+          observer = jsonpatch.observe(obj, {
+            callback: function(patches) {
+              called++
+            },
+            inversible: true
           })
 
           obj.firstName = "Megan"
@@ -1345,8 +1365,11 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, function(patches) {
-        called++
+      var observer = jsonpatch.observe(obj, {
+        callback: function(patches) {
+          called++
+        },
+        inversible: true
       })
 
       obj.phoneNumbers[1].number = "555"
@@ -1365,8 +1388,11 @@ describe("duplex", function() {
         setTimeout(function() {
           expect(called).toReallyEqual(1)
 
-          observer = jsonpatch.observe(obj, function(patches) {
-            called++
+          observer = jsonpatch.observe(obj, {
+            callback: function(patches) {
+              called++
+            },
+            inversible: true
           })
 
           obj.phoneNumbers[1].number = "557"
@@ -1397,8 +1423,11 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, function(patches) {
-        lastPatches = patches
+      var observer = jsonpatch.observe(obj, {
+        callback: function(patches) {
+          lastPatches = patches
+        },
+        inversible: true
       })
 
       obj.firstName = "Malvin"
@@ -1428,12 +1457,12 @@ describe("duplex", function() {
         .createSpy("callback", function() {
           jsonpatch.unobserve(obj, observer)
 
-          jsonpatch.observe(obj, callback)
+          jsonpatch.observe(obj, {callback})
           callbackCalled(++count)
         })
         .and.callThrough()
 
-      observer = jsonpatch.observe(obj, callback)
+      observer = jsonpatch.observe(obj, {callback})
 
       expect(callback.calls.count()).toReallyEqual(0)
 
@@ -1464,8 +1493,11 @@ describe("duplex", function() {
         lastName: "Einstein"
       }
       var lastPatches
-      var observer = jsonpatch.observe(obj, function(patches) {
-        lastPatches = patches
+      var observer = jsonpatch.observe(obj, {
+        callback: function(patches) {
+          lastPatches = patches
+        },
+        inversible: true
       })
 
       obj.lastName = "Hawking"
@@ -1494,8 +1526,11 @@ describe("duplex", function() {
         lastName: "Einstein"
       }
       var lastPatches
-      var observer = jsonpatch.observe(obj, function(patches) {
-        lastPatches = patches
+      var observer = jsonpatch.observe(obj, {
+        callback: function(patches) {
+          lastPatches = patches
+        },
+        inversible: true
       })
 
       obj.lastName = "Hawking"
@@ -1523,8 +1558,11 @@ describe("duplex", function() {
         lastName: "Einstein"
       }
       var lastPatches
-      var observer = jsonpatch.observe(obj, function(patches) {
-        lastPatches = patches
+      var observer = jsonpatch.observe(obj, {
+        callback: function(patches) {
+          lastPatches = patches
+        },
+        inversible: true
       })
 
       obj.lastName = "Hawking"
@@ -1552,8 +1590,11 @@ describe("duplex", function() {
         lastName: "Einstein"
       }
       var lastPatches
-      var observer = jsonpatch.observe(obj, function(patches) {
-        lastPatches = patches
+      var observer = jsonpatch.observe(obj, {
+        callback: function(patches) {
+          lastPatches = patches
+        },
+        inversible: true
       })
 
       obj.lastName = "Hawking"
@@ -1579,7 +1620,7 @@ describe("duplex", function() {
   describe("compare", function() {
     it("Replacing a root array with an object should be handled well", function() {
       const obj = {}
-      var patches = jsonpatch.compare(["jack"], obj)
+      var patches = jsonpatch.compare(["jack"], obj, {inversible: true})
       expect(patches).toEqual([
         {
           op: "test",
@@ -1595,7 +1636,11 @@ describe("duplex", function() {
     })
     it("Replacing an array with an object should be handled well", function() {
       const obj = {}
-      var patches = jsonpatch.compare({arr: ["jack"]}, {arr: obj})
+      var patches = jsonpatch.compare(
+        {arr: ["jack"]},
+        {arr: obj},
+        {inversible: true}
+      )
       expect(patches).toEqual([
         {
           op: "test",
@@ -1613,7 +1658,8 @@ describe("duplex", function() {
       const obj = {}
       var patches = jsonpatch.compare(
         {arr: {deeperArray: ["jack"]}},
-        {arr: {deeperArray: obj}}
+        {arr: {deeperArray: obj}},
+        {inversible: true}
       )
 
       expect(patches).toEqual([
@@ -1642,7 +1688,7 @@ describe("duplex", function() {
         }
       }
 
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
+      expect(jsonpatch.compare(objA, objB, {inversible: true})).toReallyEqual([
         {
           op: "add",
           path: "/user/lastName",
@@ -1664,7 +1710,7 @@ describe("duplex", function() {
         }
       }
 
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
+      expect(jsonpatch.compare(objA, objB, {inversible: true})).toReallyEqual([
         {
           op: "test",
           path: "/user/lastName",
@@ -1691,7 +1737,7 @@ describe("duplex", function() {
         }
       }
 
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
+      expect(jsonpatch.compare(objA, objB, {inversible: true})).toReallyEqual([
         {
           op: "test",
           path: "/user/lastName",
@@ -1713,7 +1759,7 @@ describe("duplex", function() {
         user: {}
       }
 
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
+      expect(jsonpatch.compare(objA, objB, {inversible: true})).toReallyEqual([
         {
           op: "test",
           path: "/user",
@@ -1735,7 +1781,7 @@ describe("duplex", function() {
         user: null
       }
 
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
+      expect(jsonpatch.compare(objA, objB, {inversible: true})).toReallyEqual([
         {
           op: "test",
           path: "/user",
@@ -1768,7 +1814,7 @@ describe("duplex", function() {
         user: ""
       }
 
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
+      expect(jsonpatch.compare(objA, objB, {inversible: true})).toReallyEqual([
         {
           op: "test",
           path: "/user",
@@ -1791,8 +1837,8 @@ describe("duplex", function() {
 
       var callback = jasmine.createSpy("callback")
 
-      jsonpatch.observe(obj, callback)
-      jsonpatch.observe(obj, callback)
+      jsonpatch.observe(obj, {callback})
+      jsonpatch.observe(obj, {callback})
 
       expect(callback.calls.count()).toReallyEqual(0)
 
@@ -1813,8 +1859,8 @@ describe("duplex", function() {
 
       var callback = jasmine.createSpy("callback")
 
-      var observer1 = jsonpatch.observe(obj, callback)
-      var observer2 = jsonpatch.observe(obj, callback)
+      var observer1 = jsonpatch.observe(obj, {callback})
+      var observer2 = jsonpatch.observe(obj, {callback})
 
       expect(observer1).toBe(observer2)
     })
@@ -1826,11 +1872,11 @@ describe("duplex", function() {
 
       var callback = jasmine.createSpy("callback")
 
-      var observer1 = jsonpatch.observe(obj, callback)
+      var observer1 = jsonpatch.observe(obj, {callback})
 
       jsonpatch.unobserve(obj, observer1)
 
-      var observer2 = jsonpatch.observe(obj, callback)
+      var observer2 = jsonpatch.observe(obj, {callback})
 
       expect(observer1).not.toBe(observer2)
     })
@@ -1851,8 +1897,11 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, function(patches) {
-        called++
+      var observer = jsonpatch.observe(obj, {
+        callback: function(patches) {
+          called++
+        },
+        inversible: true
       })
 
       obj.firstName = "Malvin"
@@ -1907,7 +1956,7 @@ describe("duplex", function() {
         ]
       }
 
-      var patches = jsonpatch.compare(obj, obj2)
+      var patches = jsonpatch.compare(obj, obj2, {inversible: true})
       expect(patches).toReallyEqual([
         {
           op: "test",
@@ -1964,7 +2013,7 @@ describe("duplex", function() {
       var obj = {
         foo: "bar"
       }
-      jsonpatch.compare(obj, {})
+      jsonpatch.compare(obj, {}, {inversible: true})
       expect(obj.foo).toReallyEqual("bar")
     })
   })
@@ -1978,6 +2027,6 @@ describe("duplex", function() {
     one.both = Object.create(null)
     two.both = Object.create(null)
     // This must not throw
-    jsonpatch.compare(one, two)
+    jsonpatch.compare(one, two, {inversible: true})
   })
 })
