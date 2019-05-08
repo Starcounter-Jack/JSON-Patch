@@ -694,11 +694,10 @@ exports.unobserve = unobserve;
 /**
  * Observes changes made to an object, which can then be retrieved using generate
  */
-function observe(obj, opts) {
-    if (opts === void 0) { opts = {}; }
+function observe(obj, callback, inversible) {
+    if (inversible === void 0) { inversible = false; }
     var patches = [];
     var observer;
-    var callback = opts.callback;
     var mirror = getMirror(obj);
     if (!mirror) {
         mirror = new Mirror(obj);
@@ -718,7 +717,7 @@ function observe(obj, opts) {
         observer.next = null;
         var dirtyCheck = function () {
             generate(observer, {
-                inversible: opts.inversible
+                inversible: inversible
             });
         };
         var fastCheck = function () {
@@ -750,7 +749,7 @@ function observe(obj, opts) {
     observer.object = obj;
     observer.unobserve = function () {
         generate(observer, {
-            inversible: opts.inversible
+            inversible: inversible
         });
         clearTimeout(observer.next);
         removeObserverFromMirror(mirror, observer);

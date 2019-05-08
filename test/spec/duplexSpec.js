@@ -20,7 +20,7 @@ function trigger(eventName, elem) {
 
 function getPatchesUsingGenerate(objFactory, objChanger) {
   var obj = objFactory()
-  var observer = jsonpatch.observe(obj, {inversible: true})
+  var observer = jsonpatch.observe(obj, undefined, true)
   objChanger(obj)
   return jsonpatch.generate(observer, {inversible: true})
 }
@@ -122,7 +122,7 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
       obj.firstName = "Joachim"
       obj.lastName = "Wester"
       obj.phoneNumbers[0].number = "123"
@@ -160,7 +160,7 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
       obj["/name/first"] = "Joachim"
       obj["/name/last"] = "Wester"
       obj["~phone~/numbers"][0].number = "123"
@@ -243,7 +243,7 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
       obj.firstName = "Marcin"
 
       var patches = jsonpatch.generate(observer, {inversible: true})
@@ -303,7 +303,7 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
       obj.phoneNumbers[0].number = "123"
 
       var patches = jsonpatch.generate(observer, {inversible: true})
@@ -352,7 +352,7 @@ describe("duplex", function() {
     it("should generate replace (changes in new array cell, primitive values)", function() {
       arr = [1]
 
-      var observer = jsonpatch.observe(arr, {inversible: true})
+      var observer = jsonpatch.observe(arr, undefined, true)
       arr.push(2)
 
       var patches = jsonpatch.generate(observer, {inversible: true})
@@ -405,7 +405,7 @@ describe("duplex", function() {
         }
       ]
 
-      var observer = jsonpatch.observe(arr, {inversible: true})
+      var observer = jsonpatch.observe(arr, undefined, true)
       arr.push({
         id: 2,
         name: "Jerry"
@@ -465,7 +465,7 @@ describe("duplex", function() {
           }
         ]
       }
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
 
       obj.firstName = "Joachim"
       obj.lastName = "Wester"
@@ -501,7 +501,7 @@ describe("duplex", function() {
           }
         ]
       }
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
 
       delete obj.firstName
       obj.lastName = "Wester"
@@ -530,7 +530,7 @@ describe("duplex", function() {
       obj = {
         items: ["a", "b", "c"]
       }
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
 
       obj.items.pop()
       obj.items.pop()
@@ -570,7 +570,7 @@ describe("duplex", function() {
       obj = {
         lastName: "Einstein"
       }
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
 
       obj.lastName = "Wester"
 
@@ -596,7 +596,7 @@ describe("duplex", function() {
       obj = {
         lastName: "Einstein"
       }
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
 
       obj.firstName = "Albert"
 
@@ -617,7 +617,7 @@ describe("duplex", function() {
       obj = {
         lastName: "Einstein"
       }
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
 
       delete obj.lastName
 
@@ -644,7 +644,7 @@ describe("duplex", function() {
       }
 
       var patches
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
 
       obj.array.value = 1
       patches = jsonpatch.generate(observer, {inversible: true})
@@ -668,7 +668,7 @@ describe("duplex", function() {
         }
       }
 
-      var observer = jsonpatch.observe(obj, {inversible: true})
+      var observer = jsonpatch.observe(obj, undefined, true)
       obj.b = 5
       patches = jsonpatch.generate(observer, {inversible: true})
       expect(patches.length).toReallyEqual(2)
@@ -701,7 +701,7 @@ describe("duplex", function() {
 
     /*it('should not generate the same patch twice (move)', function() { //"move" is not implemented yet in jsonpatch.generate
           obj = { lastName: {str: "Einstein"} };
-          var observer = jsonpatch.observe(obj, {inversible: true});
+          var observer = jsonpatch.observe(obj, undefined, true);
 
           obj.lastName2 = obj.lastName;
           delete obj.lastName;
@@ -721,7 +721,7 @@ describe("duplex", function() {
           foo: "bar"
         }
 
-        var observer = jsonpatch.observe(obj, {inversible: true})
+        var observer = jsonpatch.observe(obj, undefined, true)
         obj.foo = undefined
 
         var patches = jsonpatch.generate(observer, {inversible: true})
@@ -743,7 +743,7 @@ describe("duplex", function() {
           foo: "bar"
         }
 
-        var observer = jsonpatch.observe(obj, {inversible: true})
+        var observer = jsonpatch.observe(obj, undefined, true)
         obj.baz = undefined
 
         var patches = jsonpatch.generate(observer, {inversible: true})
@@ -755,7 +755,7 @@ describe("duplex", function() {
           foo: [0, 1, 2]
         }
 
-        var observer = jsonpatch.observe(obj, {inversible: true})
+        var observer = jsonpatch.observe(obj, undefined, true)
         obj.foo[1] = undefined
 
         var patches = jsonpatch.generate(observer, {inversible: true})
@@ -778,7 +778,7 @@ describe("duplex", function() {
           foo: undefined
         }
 
-        var observer = jsonpatch.observe(obj, {inversible: true})
+        var observer = jsonpatch.observe(obj, undefined, true)
         obj.foo = "something"
 
         var patches = jsonpatch.generate(observer, {inversible: true})
@@ -795,7 +795,7 @@ describe("duplex", function() {
           foo: [0, undefined, 2]
         }
 
-        var observer = jsonpatch.observe(obj, {inversible: true})
+        var observer = jsonpatch.observe(obj, undefined, true)
         obj.foo[1] = 1
 
         var patches = jsonpatch.generate(observer, {inversible: true})
@@ -1026,13 +1026,14 @@ describe("duplex", function() {
         ]
       }
 
-      jsonpatch.observe(obj, {
-        callback: function(_patches) {
+      jsonpatch.observe(
+        obj,
+        function(_patches) {
           patches = _patches
           patchesChanged()
         },
-        inversible: true
-      })
+        true
+      )
       obj.firstName = "Joachim"
       obj.lastName = "Wester"
       obj.phoneNumbers[0].number = "123"
@@ -1077,14 +1078,15 @@ describe("duplex", function() {
         ]
       }
 
-      jsonpatch.observe(obj, {
-        callback: function(patches) {
+      jsonpatch.observe(
+        obj,
+        function(patches) {
           called++
           lastPatches = patches
           patchesChanged(called)
         },
-        inversible: true
-      })
+        true
+      )
       obj.firstName = "Marcin"
 
       trigger("keyup")
@@ -1160,14 +1162,15 @@ describe("duplex", function() {
         ]
       }
 
-      jsonpatch.observe(obj, {
-        callback: function(patches) {
+      jsonpatch.observe(
+        obj,
+        function(patches) {
           called++
           lastPatches = patches
           patchesChanged(called)
         },
-        inversible: true
-      })
+        true
+      )
       obj.phoneNumbers[0].number = "123"
 
       trigger("keyup")
@@ -1244,13 +1247,14 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, {
-        callback: function(patches) {
+      var observer = jsonpatch.observe(
+        obj,
+        function(patches) {
           called++
           lastPatches = patches
         },
-        inversible: true
-      })
+        true
+      )
       obj.phoneNumbers[0].number = "123"
 
       setTimeout(function() {
@@ -1307,12 +1311,13 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, {
-        callback: function(patches) {
+      var observer = jsonpatch.observe(
+        obj,
+        function(patches) {
           called++
         },
-        inversible: true
-      })
+        true
+      )
 
       obj.firstName = "Malvin"
 
@@ -1331,12 +1336,13 @@ describe("duplex", function() {
         setTimeout(function() {
           expect(called).toReallyEqual(1)
 
-          observer = jsonpatch.observe(obj, {
-            callback: function(patches) {
+          observer = jsonpatch.observe(
+            obj,
+            function(patches) {
               called++
             },
-            inversible: true
-          })
+            true
+          )
 
           obj.firstName = "Megan"
           trigger("keyup")
@@ -1365,12 +1371,13 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, {
-        callback: function(patches) {
+      var observer = jsonpatch.observe(
+        obj,
+        function(patches) {
           called++
         },
-        inversible: true
-      })
+        true
+      )
 
       obj.phoneNumbers[1].number = "555"
 
@@ -1388,12 +1395,13 @@ describe("duplex", function() {
         setTimeout(function() {
           expect(called).toReallyEqual(1)
 
-          observer = jsonpatch.observe(obj, {
-            callback: function(patches) {
+          observer = jsonpatch.observe(
+            obj,
+            function(patches) {
               called++
             },
-            inversible: true
-          })
+            true
+          )
 
           obj.phoneNumbers[1].number = "557"
 
@@ -1423,12 +1431,13 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, {
-        callback: function(patches) {
+      var observer = jsonpatch.observe(
+        obj,
+        function(patches) {
           lastPatches = patches
         },
-        inversible: true
-      })
+        true
+      )
 
       obj.firstName = "Malvin"
 
@@ -1457,12 +1466,12 @@ describe("duplex", function() {
         .createSpy("callback", function() {
           jsonpatch.unobserve(obj, observer)
 
-          jsonpatch.observe(obj, {callback})
+          jsonpatch.observe(obj, callback)
           callbackCalled(++count)
         })
         .and.callThrough()
 
-      observer = jsonpatch.observe(obj, {callback})
+      observer = jsonpatch.observe(obj, callback)
 
       expect(callback.calls.count()).toReallyEqual(0)
 
@@ -1493,12 +1502,13 @@ describe("duplex", function() {
         lastName: "Einstein"
       }
       var lastPatches
-      var observer = jsonpatch.observe(obj, {
-        callback: function(patches) {
+      var observer = jsonpatch.observe(
+        obj,
+        function(patches) {
           lastPatches = patches
         },
-        inversible: true
-      })
+        true
+      )
 
       obj.lastName = "Hawking"
 
@@ -1526,12 +1536,13 @@ describe("duplex", function() {
         lastName: "Einstein"
       }
       var lastPatches
-      var observer = jsonpatch.observe(obj, {
-        callback: function(patches) {
+      var observer = jsonpatch.observe(
+        obj,
+        function(patches) {
           lastPatches = patches
         },
-        inversible: true
-      })
+        true
+      )
 
       obj.lastName = "Hawking"
       trigger("mousedown")
@@ -1558,12 +1569,13 @@ describe("duplex", function() {
         lastName: "Einstein"
       }
       var lastPatches
-      var observer = jsonpatch.observe(obj, {
-        callback: function(patches) {
+      var observer = jsonpatch.observe(
+        obj,
+        function(patches) {
           lastPatches = patches
         },
-        inversible: true
-      })
+        true
+      )
 
       obj.lastName = "Hawking"
       trigger("keydown")
@@ -1590,12 +1602,13 @@ describe("duplex", function() {
         lastName: "Einstein"
       }
       var lastPatches
-      var observer = jsonpatch.observe(obj, {
-        callback: function(patches) {
+      var observer = jsonpatch.observe(
+        obj,
+        function(patches) {
           lastPatches = patches
         },
-        inversible: true
-      })
+        true
+      )
 
       obj.lastName = "Hawking"
       trigger("change")
@@ -1837,8 +1850,8 @@ describe("duplex", function() {
 
       var callback = jasmine.createSpy("callback")
 
-      jsonpatch.observe(obj, {callback})
-      jsonpatch.observe(obj, {callback})
+      jsonpatch.observe(obj, callback)
+      jsonpatch.observe(obj, callback)
 
       expect(callback.calls.count()).toReallyEqual(0)
 
@@ -1859,8 +1872,8 @@ describe("duplex", function() {
 
       var callback = jasmine.createSpy("callback")
 
-      var observer1 = jsonpatch.observe(obj, {callback})
-      var observer2 = jsonpatch.observe(obj, {callback})
+      var observer1 = jsonpatch.observe(obj, callback)
+      var observer2 = jsonpatch.observe(obj, callback)
 
       expect(observer1).toBe(observer2)
     })
@@ -1872,11 +1885,11 @@ describe("duplex", function() {
 
       var callback = jasmine.createSpy("callback")
 
-      var observer1 = jsonpatch.observe(obj, {callback})
+      var observer1 = jsonpatch.observe(obj, callback)
 
       jsonpatch.unobserve(obj, observer1)
 
-      var observer2 = jsonpatch.observe(obj, {callback})
+      var observer2 = jsonpatch.observe(obj, callback)
 
       expect(observer1).not.toBe(observer2)
     })
@@ -1897,12 +1910,13 @@ describe("duplex", function() {
         ]
       }
 
-      var observer = jsonpatch.observe(obj, {
-        callback: function(patches) {
+      var observer = jsonpatch.observe(
+        obj,
+        function(patches) {
           called++
         },
-        inversible: true
-      })
+        true
+      )
 
       obj.firstName = "Malvin"
 

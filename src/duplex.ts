@@ -84,14 +84,11 @@ export function unobserve<T>(root: T, observer: Observer<T>) {
  */
 export function observe<T>(
   obj: Object | Array<T>,
-  opts: {
-    callback?: (patches: Operation[]) => void
-    inversible?: boolean
-  } = {}
+  callback?: (patches: Operation[]) => void,
+  inversible: boolean = false
 ): Observer<T> {
   var patches = []
   var observer
-  var callback = opts.callback
   var mirror = getMirror(obj)
 
   if (!mirror) {
@@ -116,7 +113,7 @@ export function observe<T>(
 
     var dirtyCheck = () => {
       generate(observer, {
-        inversible: opts.inversible
+        inversible: inversible
       })
     }
     var fastCheck = () => {
@@ -147,7 +144,7 @@ export function observe<T>(
 
   observer.unobserve = () => {
     generate(observer, {
-      inversible: opts.inversible
+      inversible: inversible
     })
     clearTimeout(observer.next)
     removeObserverFromMirror(mirror, observer)
