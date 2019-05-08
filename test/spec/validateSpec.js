@@ -1,77 +1,97 @@
-if(typeof jsonpatch == 'undefined') {
-  var jsonpatch = require('../../lib/duplex')
+if (typeof jsonpatch == "undefined") {
+  var jsonpatch = require("../../lib/duplex")
 }
-describe('validate', function() {
-  it('should return an empty array if the patch is valid', function() {
+describe("validate", function() {
+  it("should return an empty array if the patch is valid", function() {
     var patch = [
       {
-        op: 'test',
-        path: '/a/b/c',
-        value: 'foo'
+        op: "test",
+        path: "/a/b/c",
+        value: "foo"
       },
       {
-        op: 'remove',
-        path: '/a/b/c'
+        op: "remove",
+        path: "/a/b/c"
       },
       {
-        op: 'add',
-        path: '/a/b/c',
-        value: ['foo', 'bar']
+        op: "add",
+        path: "/a/b/c",
+        value: ["foo", "bar"]
       },
       {
-        op: 'replace',
-        path: '/a/b/c',
+        op: "replace",
+        path: "/a/b/c",
         value: 42
       },
       {
-        op: 'move',
-        from: '/a/b/c',
-        path: '/a/b/d'
+        op: "move",
+        from: "/a/b/c",
+        path: "/a/b/d"
       },
       {
-        op: 'copy',
-        from: '/a/b/d',
-        path: '/a/b/e'
+        op: "copy",
+        from: "/a/b/d",
+        path: "/a/b/e"
       }
-    ];
-    var error = jsonpatch.validate(patch);
-    expect(error).toBeUndefined();
-  });
+    ]
+    var error = jsonpatch.validate(patch)
+    expect(error).toBeUndefined()
+  })
 
-  it('applyPatch should throw an error if the patch is not an array and validate is `true`', function() {
-    expect(() => jsonpatch.applyPatch({}, {}, true)).toThrow(new jsonpatch.JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY'));
-  });
-  it('applyPatch should throw an error if the patch is not an array and validate is `true`', function() {
-    expect(() => jsonpatch.applyPatch({}, null, true)).toThrow(new jsonpatch.JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY'));
-  });
-  it('applyPatch should throw list the index and the object of the faulty operation in the patch', function() {
-      expect(() =>
-          jsonpatch.applyPatch(
-              {},
-              [
-                  { op: 'add', path: '/root', value: [] },
-                  { op: 'add', path: '/root/2', value: 2 } // out of bounds
-              ],
-              true
-          )
-      ).toThrow(
-          new jsonpatch.JsonPatchError(
-              'The specified index MUST NOT be greater than the number of elements in the array',
-              'OPERATION_VALUE_OUT_OF_BOUNDS',
-              1, // the index of the faulty operation
-              { op: 'add', path: '/root/2', value: 2 }, // the faulty operation
-              { root: [] } // the tree after the first operation
-          )
-      );
-  });
-  it('JsonPatchError should have a nice formatted message', function() {
-    const message = "Some error message";
-    const name = "SOME_ERROR_NAME";
-    const index = 1; // op index
-    const operation =  JSON.stringify({ op: "replace", path: '/root', value: {} }, null, 2);
-    const tree = JSON.stringify({ root: [] }, null, 2);
+  it("applyPatch should throw an error if the patch is not an array and validate is `true`", function() {
+    expect(() => jsonpatch.applyPatch({}, {}, true)).toThrow(
+      new jsonpatch.JsonPatchError(
+        "Patch sequence must be an array",
+        "SEQUENCE_NOT_AN_ARRAY"
+      )
+    )
+  })
+  it("applyPatch should throw an error if the patch is not an array and validate is `true`", function() {
+    expect(() => jsonpatch.applyPatch({}, null, true)).toThrow(
+      new jsonpatch.JsonPatchError(
+        "Patch sequence must be an array",
+        "SEQUENCE_NOT_AN_ARRAY"
+      )
+    )
+  })
+  it("applyPatch should throw list the index and the object of the faulty operation in the patch", function() {
+    expect(() =>
+      jsonpatch.applyPatch(
+        {},
+        [
+          {op: "add", path: "/root", value: []},
+          {op: "add", path: "/root/2", value: 2} // out of bounds
+        ],
+        true
+      )
+    ).toThrow(
+      new jsonpatch.JsonPatchError(
+        "The specified index MUST NOT be greater than the number of elements in the array",
+        "OPERATION_VALUE_OUT_OF_BOUNDS",
+        1, // the index of the faulty operation
+        {op: "add", path: "/root/2", value: 2}, // the faulty operation
+        {root: []} // the tree after the first operation
+      )
+    )
+  })
+  it("JsonPatchError should have a nice formatted message", function() {
+    const message = "Some error message"
+    const name = "SOME_ERROR_NAME"
+    const index = 1 // op index
+    const operation = JSON.stringify(
+      {op: "replace", path: "/root", value: {}},
+      null,
+      2
+    )
+    const tree = JSON.stringify({root: []}, null, 2)
 
-    const expectedError = new jsonpatch.JsonPatchError(message, name, index, operation, tree);
+    const expectedError = new jsonpatch.JsonPatchError(
+      message,
+      name,
+      index,
+      operation,
+      tree
+    )
 
     /*
     Some error message
@@ -91,543 +111,541 @@ describe('validate', function() {
       .concat(name, "\nindex: ")
       .concat(index, "\noperation: ")
       .concat(operation, "\ntree: ")
-      .concat(tree); // don't use `` to support the loveliest browser: IE
+      .concat(tree) // don't use `` to support the loveliest browser: IE
 
-    expect(expectedError.message).toEqual(expectedFormattedErrorMessage);
-  });
+    expect(expectedError.message).toEqual(expectedFormattedErrorMessage)
+  })
 
-
-  it('should return an empty array if the operation is a valid object', function() {
+  it("should return an empty array if the operation is a valid object", function() {
     var error = jsonpatch.validate([
       {
-        op: 'add',
-        value: 'foo',
-        path: '/bar'
+        op: "add",
+        value: "foo",
+        path: "/bar"
       }
-    ]);
-    expect(error).toBeUndefined();
-  });
+    ])
+    expect(error).toBeUndefined()
+  })
 
-  it('should return an error if the operation is null', function() {
-    var error = jsonpatch.validate([null]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_NOT_AN_OBJECT');
-  });
+  it("should return an error if the operation is null", function() {
+    var error = jsonpatch.validate([null])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_NOT_AN_OBJECT")
+  })
 
-  it('should return an error which is instance of Error and jsonpatch.JsonPatchError', function() {
-    var error = jsonpatch.validate({});
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error instanceof Error).toBe(true);
-    expect(error.name).toBe('SEQUENCE_NOT_AN_ARRAY');
-  });
+  it("should return an error which is instance of Error and jsonpatch.JsonPatchError", function() {
+    var error = jsonpatch.validate({})
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error instanceof Error).toBe(true)
+    expect(error.name).toBe("SEQUENCE_NOT_AN_ARRAY")
+  })
 
-  it('should return an error that contains the cloned patch and the patched object', function() {
+  it("should return an error that contains the cloned patch and the patched object", function() {
     var tree = {
-      name: 'Elvis',
+      name: "Elvis",
       cars: []
-    };
+    }
     var sequence = [
       {
-        op: 'remove',
-        path: '/name/first'
+        op: "remove",
+        path: "/name/first"
       }
-    ];
-    var error = jsonpatch.validate(sequence, tree);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(JSON.stringify(error.operation)).toBe(JSON.stringify(sequence[0]));
-    expect(JSON.stringify(error.tree)).toBe(JSON.stringify(tree));
-    expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
-  });
+    ]
+    var error = jsonpatch.validate(sequence, tree)
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(JSON.stringify(error.operation)).toBe(JSON.stringify(sequence[0]))
+    expect(JSON.stringify(error.tree)).toBe(JSON.stringify(tree))
+    expect(error.name).toBe("OPERATION_PATH_UNRESOLVABLE")
+  })
 
-  it('should return an error if the operation is undefined', function() {
-    var error = jsonpatch.validate([undefined]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_NOT_AN_OBJECT');
-  });
+  it("should return an error if the operation is undefined", function() {
+    var error = jsonpatch.validate([undefined])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_NOT_AN_OBJECT")
+  })
 
-  it('should return an error if the operation is an array', function() {
-    var error = jsonpatch.validate([[]]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_NOT_AN_OBJECT');
-  });
+  it("should return an error if the operation is an array", function() {
+    var error = jsonpatch.validate([[]])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_NOT_AN_OBJECT")
+  })
 
   it('should return an error if the operation "op" property is not a string', function() {
     var error = jsonpatch.validate([
       {
-        path: '/a/b/c'
+        path: "/a/b/c"
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_OP_INVALID');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_OP_INVALID")
+  })
 
   it('should return an error if the operation "path" property is not a string', function() {
     var error = jsonpatch.validate([
       {
-        op: 'remove',
-        value: 'foo'
+        op: "remove",
+        value: "foo"
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_PATH_INVALID');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_PATH_INVALID")
+  })
 
   it('should return an error if an "add" operation is missing "value" property', function() {
     var error = jsonpatch.validate([
       {
-        op: 'add',
-        path: '/a/b/c'
+        op: "add",
+        path: "/a/b/c"
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_VALUE_REQUIRED');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_VALUE_REQUIRED")
+  })
 
   it('should return an error if an "add" operation "value" property is "undefined"', function() {
     var error = jsonpatch.validate([
       {
-        op: 'add',
-        path: '/a/b/c',
+        op: "add",
+        path: "/a/b/c",
         value: undefined
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_VALUE_REQUIRED');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_VALUE_REQUIRED")
+  })
 
   it('should return an error if a "replace" operation is missing "value" property', function() {
     var error = jsonpatch.validate([
       {
-        op: 'replace',
-        path: '/a/b/c'
+        op: "replace",
+        path: "/a/b/c"
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_VALUE_REQUIRED');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_VALUE_REQUIRED")
+  })
 
   it('should return an error if a "replace" operation "value" property is "undefined"', function() {
     var error = jsonpatch.validate([
       {
-        op: 'replace',
-        path: '/a/b/c',
+        op: "replace",
+        path: "/a/b/c",
         value: undefined
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_VALUE_REQUIRED');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_VALUE_REQUIRED")
+  })
 
   it('should return an error if a "test" operation is missing "value" property', function() {
     var error = jsonpatch.validate([
       {
-        op: 'test',
-        path: '/a/b/c'
+        op: "test",
+        path: "/a/b/c"
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_VALUE_REQUIRED');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_VALUE_REQUIRED")
+  })
 
   it('should return an error if a "test" operation "value" property is "undefined"', function() {
     var error = jsonpatch.validate([
       {
-        op: 'test',
-        path: '/a/b/c',
+        op: "test",
+        path: "/a/b/c",
         value: undefined
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_VALUE_REQUIRED');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_VALUE_REQUIRED")
+  })
 
   it('should return an error if an "add" operation "value" contains "undefined"', function() {
     var error = jsonpatch.validate([
       {
-        op: 'add',
-        path: '/a/b/c',
+        op: "add",
+        path: "/a/b/c",
         value: {
           foo: undefined
         }
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED")
+  })
 
   it('should return an error if a "replace" operation "value" contains "undefined"', function() {
     var error = jsonpatch.validate([
       {
-        op: 'replace',
-        path: '/a/b/c',
+        op: "replace",
+        path: "/a/b/c",
         value: {
           foos: [undefined]
         }
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED")
+  })
 
   it('should return an error if a "test" operation "value" contains "undefined"', function() {
     var error = jsonpatch.validate([
       {
-        op: 'test',
-        path: '/a/b/c',
+        op: "test",
+        path: "/a/b/c",
         value: {
           foo: {
             bars: [undefined]
           }
         }
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED")
+  })
 
   it('should return an error if a "move" operation is missing "from" property', function() {
     var error = jsonpatch.validate([
       {
-        op: 'move',
-        path: '/a/b/c'
+        op: "move",
+        path: "/a/b/c"
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_FROM_REQUIRED');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_FROM_REQUIRED")
+  })
 
   it('should return an error if a "copy" operation is missing "from" property', function() {
     var error = jsonpatch.validate([
       {
-        op: 'copy',
-        path: '/a/b/c'
+        op: "copy",
+        path: "/a/b/c"
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_FROM_REQUIRED');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_FROM_REQUIRED")
+  })
 
   it('should return an error if the "op" property is invalid', function() {
     var error = jsonpatch.validate([
       {
-        op: 'foobar',
-        path: '/a/b/c'
+        op: "foobar",
+        path: "/a/b/c"
       }
-    ]);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_OP_INVALID');
-  });
+    ])
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_OP_INVALID")
+  })
 
-  it('should return error replacing an unexisting path', function() {
+  it("should return error replacing an unexisting path", function() {
     var sequence,
       error,
       tree = {
-        '': 'empty string is a valid key',
-        name: 'Elvis',
+        "": "empty string is a valid key",
+        name: "Elvis",
         cars: [
           {
-            brand: 'Jaguar'
+            brand: "Jaguar"
           }
         ],
         address: {}
-      };
+      }
 
     sequence = [
       {
-        op: 'replace',
-        path: '/name/first',
-        value: ''
+        op: "replace",
+        path: "/name/first",
+        value: ""
       }
-    ];
-    error = jsonpatch.validate(sequence, tree);
-    expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
+    ]
+    error = jsonpatch.validate(sequence, tree)
+    expect(error.name).toBe("OPERATION_PATH_UNRESOLVABLE")
 
     sequence = [
       {
-        op: 'replace',
-        path: '/firstName',
-        value: ''
+        op: "replace",
+        path: "/firstName",
+        value: ""
       }
-    ];
-    error = jsonpatch.validate(sequence, tree);
-    expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
+    ]
+    error = jsonpatch.validate(sequence, tree)
+    expect(error.name).toBe("OPERATION_PATH_UNRESOLVABLE")
 
     sequence = [
       {
-        op: 'replace',
-        path: '/cars/0/name',
-        value: ''
+        op: "replace",
+        path: "/cars/0/name",
+        value: ""
       }
-    ];
-    error = jsonpatch.validate(sequence, tree);
-    expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
-  });
+    ]
+    error = jsonpatch.validate(sequence, tree)
+    expect(error.name).toBe("OPERATION_PATH_UNRESOLVABLE")
+  })
 
-  it('should return error removing an unexisting path', function() {
+  it("should return error removing an unexisting path", function() {
     var tree = {
-      name: 'Elvis',
+      name: "Elvis",
       cars: []
-    };
+    }
     var sequence = [
       {
-        op: 'remove',
-        path: '/name/first'
+        op: "remove",
+        path: "/name/first"
       }
-    ];
-    var error = jsonpatch.validate(sequence, tree);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
-  });
+    ]
+    var error = jsonpatch.validate(sequence, tree)
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_PATH_UNRESOLVABLE")
+  })
 
   it('should allow adding property "b" in "a"', function() {
     var tree = {
       a: {
         foo: 1
       }
-    };
+    }
     var sequence = [
       {
-        op: 'add',
-        path: '/a/b',
-        value: 'sample'
+        op: "add",
+        path: "/a/b",
+        value: "sample"
       }
-    ];
+    ]
 
-    var error = jsonpatch.validate(sequence, tree);
-    expect(error).toBeUndefined();
-  });
+    var error = jsonpatch.validate(sequence, tree)
+    expect(error).toBeUndefined()
+  })
 
   it('should report error because "a" does not exist', function() {
     var tree = {
       q: {
         bar: 2
       }
-    };
+    }
     var sequence = [
       {
-        op: 'add',
-        path: '/a/b',
-        value: 'sample'
+        op: "add",
+        path: "/a/b",
+        value: "sample"
       }
-    ];
+    ]
 
-    var error = jsonpatch.validate(sequence, tree);
-    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
-    expect(error.name).toBe('OPERATION_PATH_CANNOT_ADD');
-  });
+    var error = jsonpatch.validate(sequence, tree)
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true)
+    expect(error.name).toBe("OPERATION_PATH_CANNOT_ADD")
+  })
 
-  it('should return error when replacing a removed path', function() {
+  it("should return error when replacing a removed path", function() {
     var tree = {
-      name: 'Elvis'
-    };
+      name: "Elvis"
+    }
     var sequence = [
       {
-        op: 'remove',
-        path: '/name'
+        op: "remove",
+        path: "/name"
       },
       {
-        op: 'replace',
-        path: '/name',
-        value: 'Freddie'
+        op: "replace",
+        path: "/name",
+        value: "Freddie"
       }
-    ];
-    var error = jsonpatch.validate(sequence, tree);
-    expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
-  });
+    ]
+    var error = jsonpatch.validate(sequence, tree)
+    expect(error.name).toBe("OPERATION_PATH_UNRESOLVABLE")
+  })
 
-  it('should allow to override validator to add custom validation', function() {
+  it("should allow to override validator to add custom validation", function() {
     var tree = {
-      password: 'Elvis'
-    };
+      password: "Elvis"
+    }
     var sequence = [
       {
-        op: 'replace',
-        path: '/password',
-        value: 'Elvis123'
+        op: "replace",
+        path: "/password",
+        value: "Elvis123"
       },
       {
-        op: 'replace',
-        path: '/password',
-        value: 'Presley123'
+        op: "replace",
+        path: "/password",
+        value: "Presley123"
       },
       {
-        op: 'replace',
-        path: '/password'
+        op: "replace",
+        path: "/password"
       }
-    ];
-
+    ]
 
     const validator = function(operation, index, tree, existingPath) {
       throw new jsonpatch.JsonPatchError(
-            'Operation `value` property must not contain the old value',
-            'OPERATION_VALUE_MUST_NOT_CONTAIN_OLD_VALUE',
-            index,
-            operation,
-            tree
-          );
-        }
-    var customError = jsonpatch.validate(sequence, tree, validator);
-    expect(customError.index).toBe(0);
-    expect(customError.name).toBe('OPERATION_VALUE_MUST_NOT_CONTAIN_OLD_VALUE');
-  });
+        "Operation `value` property must not contain the old value",
+        "OPERATION_VALUE_MUST_NOT_CONTAIN_OLD_VALUE",
+        index,
+        operation,
+        tree
+      )
+    }
+    var customError = jsonpatch.validate(sequence, tree, validator)
+    expect(customError.index).toBe(0)
+    expect(customError.name).toBe("OPERATION_VALUE_MUST_NOT_CONTAIN_OLD_VALUE")
+  })
 
-  it('should pass replacing the tree root', function() {
+  it("should pass replacing the tree root", function() {
     var tree = {
-      password: 'Elvis'
-    };
+      password: "Elvis"
+    }
     var sequence = [
       {
-        op: 'replace',
-        path: '',
+        op: "replace",
+        path: "",
         value: {}
       }
-    ];
+    ]
 
-    var error = jsonpatch.validate(sequence, tree);
-    expect(error).toBeUndefined();
-  });
+    var error = jsonpatch.validate(sequence, tree)
+    expect(error).toBeUndefined()
+  })
 
-  it('should return error moving from an unexisting path', function() {
+  it("should return error moving from an unexisting path", function() {
     var tree = {
-      name: 'Elvis'
-    };
+      name: "Elvis"
+    }
     var sequence = [
       {
-        op: 'move',
-        from: '/a/b/c',
-        path: '/name'
+        op: "move",
+        from: "/a/b/c",
+        path: "/name"
       }
-    ];
-    var error = jsonpatch.validate(sequence, tree);
-    expect(error.name).toBe('OPERATION_FROM_UNRESOLVABLE');
-  });
+    ]
+    var error = jsonpatch.validate(sequence, tree)
+    expect(error.name).toBe("OPERATION_FROM_UNRESOLVABLE")
+  })
 
-  it('should return error copying from an unexisting path', function() {
+  it("should return error copying from an unexisting path", function() {
     var tree = {
-      name: 'Elvis'
-    };
+      name: "Elvis"
+    }
     var sequence = [
       {
-        op: 'copy',
-        from: '/a/b/c',
-        path: '/name'
+        op: "copy",
+        from: "/a/b/c",
+        path: "/name"
       }
-    ];
-    var error = jsonpatch.validate(sequence, tree);
-    expect(error.name).toBe('OPERATION_FROM_UNRESOLVABLE');
-  });
+    ]
+    var error = jsonpatch.validate(sequence, tree)
+    expect(error.name).toBe("OPERATION_FROM_UNRESOLVABLE")
+  })
 
-  it('should throw OPERATION_PATH_INVALID when applying patch without path', function() {
-    var a = {};
-    var ex = null;
-
-    try {
-      jsonpatch.applyPatch(
-        a,
-        [
-          {
-            op: 'replace',
-            value: ''
-          }
-        ],
-        true
-      );
-    } catch (e) {
-      ex = e;
-    }
-
-    expect(ex.name).toBe('OPERATION_PATH_INVALID');
-  });
-
-  it('should throw OPERATION_PATH_INVALID when applying patch with an invalid path. Issue #77.', function() {
-    var a = {};
-    var ex = null;
+  it("should throw OPERATION_PATH_INVALID when applying patch without path", function() {
+    var a = {}
+    var ex = null
 
     try {
       jsonpatch.applyPatch(
         a,
         [
           {
-            op: 'replace',
-            value: '',
-            path: 'foo' // no preceding "/"
+            op: "replace",
+            value: ""
           }
         ],
         true
-      );
+      )
     } catch (e) {
-      ex = e;
+      ex = e
     }
-    expect(ex.name).toBe('OPERATION_PATH_INVALID');
-  });
 
-  it('should throw OPERATION_OP_INVALID when applying patch without operation', function() {
-    var a = {};
-    var ex = null;
+    expect(ex.name).toBe("OPERATION_PATH_INVALID")
+  })
+
+  it("should throw OPERATION_PATH_INVALID when applying patch with an invalid path. Issue #77.", function() {
+    var a = {}
+    var ex = null
 
     try {
       jsonpatch.applyPatch(
         a,
         [
           {
-            path: '/foo',
-            value: ''
+            op: "replace",
+            value: "",
+            path: "foo" // no preceding "/"
           }
         ],
         true
-      );
+      )
     } catch (e) {
-      ex = e;
+      ex = e
     }
+    expect(ex.name).toBe("OPERATION_PATH_INVALID")
+  })
 
-    expect(ex.name).toBe('OPERATION_OP_INVALID');
-  });
-
-  it('should throw OPERATION_VALUE_REQUIRED when applying patch without value', function() {
-    var a = {};
-    var ex = null;
+  it("should throw OPERATION_OP_INVALID when applying patch without operation", function() {
+    var a = {}
+    var ex = null
 
     try {
       jsonpatch.applyPatch(
         a,
         [
           {
-            path: '/foo',
-            op: 'add'
+            path: "/foo",
+            value: ""
           }
         ],
         true
-      );
+      )
     } catch (e) {
-      ex = e;
+      ex = e
     }
 
-    expect(ex.name).toBe('OPERATION_VALUE_REQUIRED');
-  });
+    expect(ex.name).toBe("OPERATION_OP_INVALID")
+  })
 
-  it('should not modify patch value of type array (issue #76)', function () {
+  it("should throw OPERATION_VALUE_REQUIRED when applying patch without value", function() {
+    var a = {}
+    var ex = null
+
+    try {
+      jsonpatch.applyPatch(
+        a,
+        [
+          {
+            path: "/foo",
+            op: "add"
+          }
+        ],
+        true
+      )
+    } catch (e) {
+      ex = e
+    }
+
+    expect(ex.name).toBe("OPERATION_VALUE_REQUIRED")
+  })
+
+  it("should not modify patch value of type array (issue #76)", function() {
     var patches = [
-      {op: 'add', path: '/foo', value: []},
-      {op: 'add', path: '/foo/-', value: 1}
-    ];
-    jsonpatch.validate(patches, {});
+      {op: "add", path: "/foo", value: []},
+      {op: "add", path: "/foo/-", value: 1}
+    ]
+    jsonpatch.validate(patches, {})
 
     expect(patches).toEqual([
-      {op: 'add', path: '/foo', value: []},
-      {op: 'add', path: '/foo/-', value: 1}
-    ]);
-  });
+      {op: "add", path: "/foo", value: []},
+      {op: "add", path: "/foo/-", value: 1}
+    ])
+  })
 
-  it('should not modify patch value of type object (issue #76)', function () {
+  it("should not modify patch value of type object (issue #76)", function() {
     var patches = [
-      {op: 'add', path: '/foo', value: {}},
-      {op: 'add', path: '/foo/bar', value: 1}
-    ];
-    jsonpatch.validate(patches, {});
+      {op: "add", path: "/foo", value: {}},
+      {op: "add", path: "/foo/bar", value: 1}
+    ]
+    jsonpatch.validate(patches, {})
 
     expect(patches).toEqual([
-      {op: 'add', path: '/foo', value: {}},
-      {op: 'add', path: '/foo/bar', value: 1}
-    ]);
-  });
-});
+      {op: "add", path: "/foo", value: {}},
+      {op: "add", path: "/foo/bar", value: 1}
+    ])
+  })
+})

@@ -710,15 +710,15 @@ function observe(obj, callback, inversible) {
     if (observer) {
         return observer;
     }
-    observer = {};
+    observer = {
+        inversible: inversible
+    };
     mirror.value = helpers_1._deepClone(obj);
     if (callback) {
         observer.callback = callback;
         observer.next = null;
         var dirtyCheck = function () {
-            generate(observer, {
-                inversible: inversible
-            });
+            generate(observer);
         };
         var fastCheck = function () {
             clearTimeout(observer.next);
@@ -748,9 +748,7 @@ function observe(obj, callback, inversible) {
     observer.patches = patches;
     observer.object = obj;
     observer.unobserve = function () {
-        generate(observer, {
-            inversible: inversible
-        });
+        generate(observer);
         clearTimeout(observer.next);
         removeObserverFromMirror(mirror, observer);
         if (typeof window !== "undefined") {
@@ -775,10 +773,15 @@ function observe(obj, callback, inversible) {
 exports.observe = observe;
 /**
  * Generate an array of patches from an observer
+ * If opts.inversible is defined, overwrite observer.inversible
  */
 function generate(observer, opts) {
+    if (opts === void 0) { opts = {}; }
     var mirror = beforeDict.get(observer.object);
-    _generate(mirror.value, observer.object, observer.patches, "", opts);
+    var inversible = typeof opts.inversible !== "undefined"
+        ? opts.inversible
+        : observer.inversible;
+    _generate(mirror.value, observer.object, observer.patches, "", { inversible: inversible });
     if (observer.patches.length) {
         core_1.applyPatch(mirror.value, observer.patches);
     }

@@ -36,6 +36,7 @@ export interface Observer<T> {
   patches: Operation[]
   unobserve: () => void
   callback: (patches: Operation[]) => void
+  inversible: boolean
 }
 
 var beforeDict = new WeakMap()
@@ -103,7 +104,9 @@ export function observe<T>(
     return observer
   }
 
-  observer = {}
+  observer = {
+    inversible
+  }
 
   mirror.value = _deepClone(obj)
 
@@ -112,9 +115,7 @@ export function observe<T>(
     observer.next = null
 
     var dirtyCheck = () => {
-      generate(observer, {
-        inversible: inversible
-      })
+      generate(observer)
     }
     var fastCheck = () => {
       clearTimeout(observer.next)
@@ -143,9 +144,7 @@ export function observe<T>(
   observer.object = obj
 
   observer.unobserve = () => {
-    generate(observer, {
-      inversible: inversible
-    })
+    generate(observer)
     clearTimeout(observer.next)
     removeObserverFromMirror(mirror, observer)
 
@@ -171,15 +170,22 @@ export function observe<T>(
 
 /**
  * Generate an array of patches from an observer
+ * If opts.inversible is defined, overwrite observer.inversible
  */
 export function generate<T>(
   observer: Observer<Object>,
-  opts?: {
-    inversible: boolean
-  }
+  opts: {
+    inversible?: boolean
+  } = {}
 ): Operation[] {
   var mirror = beforeDict.get(observer.object)
-  _generate(mirror.value, observer.object, observer.patches, "", opts)
+
+  var inversible =
+    typeof opts.inversible !== "undefined"
+      ? opts.inversible
+      : observer.inversible
+
+  _generate(mirror.value, observer.object, observer.patches, "", {inversible})
   if (observer.patches.length) {
     applyPatch(mirror.value, observer.patches)
   }

@@ -1,20 +1,18 @@
-JSON-Patch
-===============
+# JSON-Patch
 
 > A leaner and meaner implementation of JSON-Patch. Small footprint. High performance.
 
 [![Build Status](https://travis-ci.org/Starcounter-Jack/JSON-Patch.svg?branch=master)](https://travis-ci.org/Starcounter-Jack/JSON-Patch)
 
 With JSON-Patch, you can:
+
 - **applyPatch** to apply patches
 - **applyOperation** to apply single operations
 - **validate** a sequence of patches
 - **observe** for changes (and generate patches when a change is detected)
 - **compare** two objects (to obtain the difference).
 
-
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/json-patch.svg)](https://travis-ci.org/Starcounter-Jack/JSON-Patch)
-
 
 ## Why you should use JSON-Patch
 
@@ -22,9 +20,10 @@ JSON-Patch [(RFC6902)](http://tools.ietf.org/html/rfc6902) is a standard format 
 allows you to update a JSON document by sending the changes rather than the whole document.
 JSON Patch plays well with the HTTP PATCH verb (method) and REST style programming.
 
-Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) about it.
+Mark Nottingham has a [nice blog](http://www.mnot.net/blog/2012/09/05/patch) about it.
 
 ## Footprint
+
 4 KB minified and gzipped (12 KB minified)
 
 ## Performance
@@ -45,13 +44,13 @@ Tested on 29.08.2018. Compared libraries:
 - [jiff](https://www.npmjs.com/package/jiff) 0.7.3
 - [RFC6902](https://www.npmjs.com/package/rfc6902) 2.4.0
 
-We aim the tests to be fair. Our library puts performance as the #1 priority, while other libraries can have different priorities. If you'd like to update the benchmarks or add a library, please fork  the [perf.zone](https://perf.zone) benchmarks linked above and open an issue to include new results.
+We aim the tests to be fair. Our library puts performance as the #1 priority, while other libraries can have different priorities. If you'd like to update the benchmarks or add a library, please fork the [perf.zone](https://perf.zone) benchmarks linked above and open an issue to include new results.
 
 ## Features
-* Allows you to apply patches on object trees for incoming traffic.
-* Allows you to freely manipulate object trees and then generate patches for outgoing traffic.
-* Tested in IE11, Firefox, Chrome, Safari and Node.js
 
+- Allows you to apply patches on object trees for incoming traffic.
+- Allows you to freely manipulate object trees and then generate patches for outgoing traffic.
+- Tested in IE11, Firefox, Chrome, Safari and Node.js
 
 ## Install
 
@@ -62,6 +61,7 @@ Install the current version (and save it as a dependency):
 ```sh
 $ npm install fast-json-patch --save
 ```
+
 ### bower
 
 ```sh
@@ -69,7 +69,6 @@ $ bower install fast-json-patch --save
 ```
 
 ### [download as ZIP](https://github.com/Starcounter-Jack/JSON-Patch/archive/master.zip)
-
 
 ## Adding to your project
 
@@ -82,19 +81,19 @@ Include `dist/fast-json-patch.js`.
 Call require to get the instance:
 
 ```js
-var jsonpatch = require('fast-json-patch')
+var jsonpatch = require("fast-json-patch")
 ```
 
 Or use ES6 style:
 
 ```js
-import { applyOperation } from 'fast-json-patch'
+import {applyOperation} from "fast-json-patch"
 ```
 
 You can also require all API functions individually, all jsonpatch functions can be used as pure functions:
 
 ```js
-const { applyOperation } = require('fast-json-patch');
+const {applyOperation} = require("fast-json-patch")
 ```
 
 ## Usage
@@ -102,13 +101,17 @@ const { applyOperation } = require('fast-json-patch');
 #### Applying patches:
 
 ```js
-var document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
+var document = {firstName: "Albert", contactDetails: {phoneNumbers: []}}
 var patch = [
-  { op: "replace", path: "/firstName", value: "Joachim" },
-  { op: "add", path: "/lastName", value: "Wester" },
-  { op: "add", path: "/contactDetails/phoneNumbers/0", value: { number: "555-123" }  }
-];
-document = jsonpatch.applyPatch(document, patch).newDocument;
+  {op: "replace", path: "/firstName", value: "Joachim"},
+  {op: "add", path: "/lastName", value: "Wester"},
+  {
+    op: "add",
+    path: "/contactDetails/phoneNumbers/0",
+    value: {number: "555-123"}
+  }
+]
+document = jsonpatch.applyPatch(document, patch).newDocument
 // document == { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [{number:"555-123"}] } };
 ```
 
@@ -117,9 +120,9 @@ document = jsonpatch.applyPatch(document, patch).newDocument;
 `jsonpatch.applyOperation` accepts a single operation object instead of a sequence, and returns the object after applying the operation. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
 
 ```js
-var document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
-var operation = { op: "replace", path: "/firstName", value: "Joachim" };
-document = jsonpatch.applyOperation(document, operation).newDocument;
+var document = {firstName: "Albert", contactDetails: {phoneNumbers: []}}
+var operation = {op: "replace", path: "/firstName", value: "Joachim"}
+document = jsonpatch.applyOperation(document, operation).newDocument
 // document == { firstName: "Joachim", contactDetails: { phoneNumbers: [] }}
 ```
 
@@ -128,25 +131,33 @@ document = jsonpatch.applyOperation(document, operation).newDocument;
 If you have an array of operations, you can simple reduce them using `applyReducer` as your reducer:
 
 ```js
-var document = { firstName: "Albert", contactDetails: { phoneNumbers: [ ] } };
+var document = {firstName: "Albert", contactDetails: {phoneNumbers: []}}
 var patch = [
-  { op:"replace", path: "/firstName", value: "Joachim" },
-  { op:"add", path: "/lastName", value: "Wester" },
-  { op:"add", path: "/contactDetails/phoneNumbers/0", value: { number: "555-123" } }
-];
-var updatedDocument = patch.reduce(applyReducer, document);
+  {op: "replace", path: "/firstName", value: "Joachim"},
+  {op: "add", path: "/lastName", value: "Wester"},
+  {
+    op: "add",
+    path: "/contactDetails/phoneNumbers/0",
+    value: {number: "555-123"}
+  }
+]
+var updatedDocument = patch.reduce(applyReducer, document)
 // updatedDocument == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
 ```
 
-Generating patches:
+#### Generating patches
 
 ```js
-var document = { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
-var observer = jsonpatch.observe(document);
-document.firstName = "Albert";
-document.contactDetails.phoneNumbers[0].number = "123";
-document.contactDetails.phoneNumbers.push({ number:"456" });
-var patch = jsonpatch.generate(observer);
+var document = {
+  firstName: "Joachim",
+  lastName: "Wester",
+  contactDetails: {phoneNumbers: [{number: "555-123"}]}
+}
+var observer = jsonpatch.observe(document)
+document.firstName = "Albert"
+document.contactDetails.phoneNumbers[0].number = "123"
+document.contactDetails.phoneNumbers.push({number: "456"})
+var patch = jsonpatch.generate(observer)
 // patch  == [
 //   { op: "replace", path: "/firstName", value: "Albert"},
 //   { op: "replace", path: "/contactDetails/phoneNumbers/0/number", value: "123" },
@@ -154,31 +165,73 @@ var patch = jsonpatch.generate(observer);
 // ];
 ```
 
-Comparing two object trees:
+#### Generating patches with test operations
 
 ```js
-var documentA = {user: {firstName: "Albert", lastName: "Einstein"}};
-var documentB = {user: {firstName: "Albert", lastName: "Collins"}};
-var diff = jsonpatch.compare(documentA, documentB);
+var document = {
+  firstName: "Joachim",
+  lastName: "Wester",
+  contactDetails: {phoneNumbers: [{number: "555-123"}]}
+}
+var observer = jsonpatch.observe(document, undefined, true)
+// Or
+// var observer = jsonpatch.observe(document)
+// observer.inversible = true
+
+document.firstName = "Albert"
+document.contactDetails.phoneNumbers[0].number = "123"
+document.contactDetails.phoneNumbers.push({number: "456"})
+var patch = jsonpatch.generate(observer)
+// Or
+// var patch = jsonpatch.generate(observer, { inversible: true })
+
+// patch  == [
+//   { op: "test", path: "/firstName", value: "Joachim"},
+//   { op: "replace", path: "/firstName", value: "Albert"},
+//   { op: "test", path: "/contactDetails/phoneNumbers/0/number", value: "555-123" },
+//   { op: "replace", path: "/contactDetails/phoneNumbers/0/number", value: "123" },
+//   { op: "add", path: "/contactDetails/phoneNumbers/1", value: {number:"456"}}
+// ];
+```
+
+#### Comparing two object trees
+
+```js
+var documentA = {user: {firstName: "Albert", lastName: "Einstein"}}
+var documentB = {user: {firstName: "Albert", lastName: "Collins"}}
+var diff = jsonpatch.compare(documentA, documentB)
 //diff == [{op: "replace", path: "/user/lastName", value: "Collins"}]
 ```
 
-Validating a sequence of patches:
+#### Comparing two object trees with test operations
 
 ```js
-var obj = {user: {firstName: "Albert"}};
-var patches = [{op: "replace", path: "/user/firstName", value: "Albert"}, {op: "replace", path: "/user/lastName", value: "Einstein"}];
-var errors = jsonpatch.validate(patches, obj);
+var documentA = {user: {firstName: "Albert", lastName: "Einstein"}}
+var documentB = {user: {firstName: "Albert", lastName: "Collins"}}
+var diff = jsonpatch.compare(documentA, documentB, {inversible: true})
+//diff == [
+//   {op: "test", path: "/user/lastName", value: "Einstein"},
+//   {op: "replace", path: "/user/lastName", value: "Collins"}
+// ];
+```
+
+#### Validating a sequence of patches
+
+```js
+var obj = {user: {firstName: "Albert"}}
+var patches = [
+  {op: "replace", path: "/user/firstName", value: "Albert"},
+  {op: "replace", path: "/user/lastName", value: "Einstein"}
+]
+var errors = jsonpatch.validate(patches, obj)
 if (errors.length == 0) {
- //there are no errors!
-}
-else {
-  for (var i=0; i < errors.length; i++) {
+  //there are no errors!
+} else {
+  for (var i = 0; i < errors.length; i++) {
     if (!errors[i]) {
-      console.log("Valid patch at index", i, patches[i]);
-    }
-    else {
-      console.error("Invalid patch at index", i, errors[i], patches[i]);
+      console.log("Valid patch at index", i, patches[i])
+    } else {
+      console.error("Invalid patch at index", i, errors[i], patches[i])
     }
   }
 }
@@ -194,7 +247,7 @@ Applies `patch` array on `obj`.
 - `patch` a JSON-Patch array of operations to apply
 - `validateOperation` Boolean for whether to validate each operation with our default validator, or to pass a validator callback
 - `mutateDocument` Whether to mutate the original document or clone it before applying
-- `banPrototypeModifications`  Whether to ban modifications to `__proto__`, defaults to `true`.
+- `banPrototypeModifications` Whether to ban modifications to `__proto__`, defaults to `true`.
 
 An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
 
@@ -203,15 +256,15 @@ If you would like to avoid touching your `patch` array values, clone them: `json
 
 Returns an array of [`OperationResult`](#operationresult-type) objects - one item for each item in `patches`, each item is an object `{newDocument: any, test?: boolean, removed?: any}`.
 
-* `test` - boolean result of the test
-* `remove`, `replace` and `move` - original object that has been removed
-* `add` (only when adding to an array) - index at which item has been inserted (useful when using `-` alias)
+- `test` - boolean result of the test
+- `remove`, `replace` and `move` - original object that has been removed
+- `add` (only when adding to an array) - index at which item has been inserted (useful when using `-` alias)
 
-- ** Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails. **
-- ** Note II: the returned array has `newDocument` property that you can use as the final state of the patched document **.
-- ** Note III: By default, when `banPrototypeModifications` is `true`, this method throws a `TypeError` when you attempt to modify an object's prototype.
+* ** Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails. **
+* ** Note II: the returned array has `newDocument` property that you can use as the final state of the patched document **.
+* \*\* Note III: By default, when `banPrototypeModifications` is `true`, this method throws a `TypeError` when you attempt to modify an object's prototype.
 
-- See [Validation notes](#validation-notes).
+* See [Validation notes](#validation-notes).
 
 #### `function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, banPrototypeModifications: boolean = true, index: number = 0): OperationResult<T>`
 
@@ -230,7 +283,7 @@ If you would like to avoid touching your values, clone them: `jsonpatch.applyOpe
 Returns an [`OperationResult`](#operationresult-type) object `{newDocument: any, test?: boolean, removed?: any}`.
 
 - ** Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails. **
-- ** Note II: By default, when `banPrototypeModifications` is `true`, this method throws a `TypeError` when you attempt to modify an object's prototype.
+- \*\* Note II: By default, when `banPrototypeModifications` is `true`, this method throws a `TypeError` when you attempt to modify an object's prototype.
 
 - See [Validation notes](#validation-notes).
 
@@ -262,17 +315,16 @@ Retrieves a value from a JSON document by a JSON pointer.
 
 Returns the value.
 
-#### `jsonpatch.observe(document: any, callback?: Function): Observer`
+#### `jsonpatch.observe(document: any, callback?: Function, inversible: boolean = false): Observer`
 
-Sets up an deep observer on `document` that listens for changes in object tree. When changes are detected, the optional
-callback is called with the generated patches array as the parameter.
+Sets up an deep observer on `document` that listens for changes in object tree. When changes are detected, the optional callback is called with the generated patches array as the parameter. If inversible is true, then observer will generate test operations.
 
 Returns `observer`.
 
-#### `jsonpatch.generate(document: any, observer: Observer): Operation[]`
+#### `jsonpatch.generate(document: any, observer: Observer, opts?: { inversible: boolean }): Operation[]`
 
 If there are pending changes in `obj`, returns them synchronously. If a `callback` was defined in `observe`
-method, it will be triggered synchronously as well.
+method, it will be triggered synchronously as well. If opts.inversible is undefined then fallback to observer.inversible.
 
 If there are no pending changes in `obj`, returns an empty array (length 0).
 
@@ -282,9 +334,9 @@ Destroys the observer set up on `document`.
 
 Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). Note: this is different that ES6/7 `Object.unobserve`, which delivers remaining changes asynchronously.
 
-#### `jsonpatch.compare(document1: any, document2: any): Operation[]`
+#### `jsonpatch.compare(document1: any, document2: any, opts?: { inversible: boolean }): Operation[]`
 
-Compares object trees `document1` and `document2` and returns the difference relative to `document1` as a patches array.
+Compares object trees `document1` and `document2` and returns the difference relative to `document1` as a patches array. If opts.inversible is true, test operations will be generated.
 
 If there are no differences, returns an empty array (length 0).
 
@@ -304,21 +356,21 @@ If there are no errors, returns undefined. If there is an errors, returns a Json
 
 Possible errors:
 
-Error name                    | Error message
-------------------------------|------------
-SEQUENCE_NOT_AN_ARRAY         | Patch sequence must be an array
-OPERATION_NOT_AN_OBJECT       | Operation is not an object
-OPERATION_OP_INVALID          | Operation `op` property is not one of operations defined in RFC-6902
-OPERATION_PATH_INVALID        | Operation `path` property is not a valid string
-OPERATION_FROM_REQUIRED       | Operation `from` property is not present (applicable in `move` and `copy` operations)
-OPERATION_VALUE_REQUIRED      | Operation `value` property is not present, or `undefined` (applicable in `add`, `replace` and `test` operations)
-OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED  | Operation `value` property object has at least one `undefined` value (applicable in `add`, `replace` and `test` operations)
-OPERATION_PATH_CANNOT_ADD     | Cannot perform an `add` operation at the desired path
-OPERATION_PATH_UNRESOLVABLE   | Cannot perform the operation at a path that does not exist
-OPERATION_FROM_UNRESOLVABLE   | Cannot perform the operation from a path that does not exist
-OPERATION_PATH_ILLEGAL_ARRAY_INDEX | Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index
-OPERATION_VALUE_OUT_OF_BOUNDS | The specified index MUST NOT be greater than the number of elements in the array
-TEST_OPERATION_FAILED | When operation is `test` and the test fails, applies to `applyReducer`.
+| Error name                               | Error message                                                                                                               |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| SEQUENCE_NOT_AN_ARRAY                    | Patch sequence must be an array                                                                                             |
+| OPERATION_NOT_AN_OBJECT                  | Operation is not an object                                                                                                  |
+| OPERATION_OP_INVALID                     | Operation `op` property is not one of operations defined in RFC-6902                                                        |
+| OPERATION_PATH_INVALID                   | Operation `path` property is not a valid string                                                                             |
+| OPERATION_FROM_REQUIRED                  | Operation `from` property is not present (applicable in `move` and `copy` operations)                                       |
+| OPERATION_VALUE_REQUIRED                 | Operation `value` property is not present, or `undefined` (applicable in `add`, `replace` and `test` operations)            |
+| OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED | Operation `value` property object has at least one `undefined` value (applicable in `add`, `replace` and `test` operations) |
+| OPERATION_PATH_CANNOT_ADD                | Cannot perform an `add` operation at the desired path                                                                       |
+| OPERATION_PATH_UNRESOLVABLE              | Cannot perform the operation at a path that does not exist                                                                  |
+| OPERATION_FROM_UNRESOLVABLE              | Cannot perform the operation from a path that does not exist                                                                |
+| OPERATION_PATH_ILLEGAL_ARRAY_INDEX       | Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index     |
+| OPERATION_VALUE_OUT_OF_BOUNDS            | The specified index MUST NOT be greater than the number of elements in the array                                            |
+| TEST_OPERATION_FAILED                    | When operation is `test` and the test fails, applies to `applyReducer`.                                                     |
 
 ## `OperationResult` Type
 
@@ -334,7 +386,6 @@ Where:
 - `test`: if the operation was a `test` operation. This will be its result.
 - `removed`: contains the removed, moved, or replaced values from the document after a `remove`, `move` or `replace` operation.
 
-
 ## Validation Notes
 
 Functions `applyPatch`, `applyOperation`, and `validate` accept a `validate`/ `validator` parameter:
@@ -346,7 +397,7 @@ Functions `applyPatch`, `applyOperation`, and `validate` accept a `validate`/ `v
 If you pass a validator, it will be called with four parameters for each operation, `function(operation, index, tree, existingPath)` and it is expected to throw `JsonPatchError` when your conditions are not met.
 
 - `operation` The operation it self.
-- `index` `operation`'s index in the patch array (if application).  
+- `index` `operation`'s index in the patch array (if application).
 - `tree` The object that is supposed to be patched.
 - `existingPath` the path `operation` points to.
 
@@ -366,7 +417,7 @@ See the [ECMAScript spec](http://www.ecma-international.org/ecma-262/6.0/index.h
 
 ## Specs/tests
 
- - [Run in browser](http://starcounter-jack.github.io/JSON-Patch/test/)
+- [Run in browser](http://starcounter-jack.github.io/JSON-Patch/test/)
 
 ## [Contributing](CONTRIBUTING.md)
 
