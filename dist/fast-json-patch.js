@@ -710,9 +710,7 @@ function observe(obj, callback, inversible) {
     if (observer) {
         return observer;
     }
-    observer = {
-        inversible: inversible
-    };
+    observer = { inversible: inversible };
     mirror.value = helpers_1._deepClone(obj);
     if (callback) {
         observer.callback = callback;
@@ -724,24 +722,20 @@ function observe(obj, callback, inversible) {
             clearTimeout(observer.next);
             observer.next = setTimeout(dirtyCheck);
         };
-        if (typeof window !== "undefined") {
-            //not Node
+        if (typeof window !== 'undefined') {
             if (window.addEventListener) {
-                //standards
-                window.addEventListener("mouseup", fastCheck);
-                window.addEventListener("keyup", fastCheck);
-                window.addEventListener("mousedown", fastCheck);
-                window.addEventListener("keydown", fastCheck);
-                window.addEventListener("change", fastCheck);
+                window.addEventListener('mouseup', fastCheck);
+                window.addEventListener('keyup', fastCheck);
+                window.addEventListener('mousedown', fastCheck);
+                window.addEventListener('keydown', fastCheck);
+                window.addEventListener('change', fastCheck);
             }
             else {
-                //IE8
-                ;
-                document.documentElement.attachEvent("onmouseup", fastCheck);
-                document.documentElement.attachEvent("onkeyup", fastCheck);
-                document.documentElement.attachEvent("onmousedown", fastCheck);
-                document.documentElement.attachEvent("onkeydown", fastCheck);
-                document.documentElement.attachEvent("onchange", fastCheck);
+                document.documentElement.attachEvent('onmouseup', fastCheck);
+                document.documentElement.attachEvent('onkeyup', fastCheck);
+                document.documentElement.attachEvent('onmousedown', fastCheck);
+                document.documentElement.attachEvent('onkeydown', fastCheck);
+                document.documentElement.attachEvent('onchange', fastCheck);
             }
         }
     }
@@ -751,19 +745,18 @@ function observe(obj, callback, inversible) {
         generate(observer);
         clearTimeout(observer.next);
         removeObserverFromMirror(mirror, observer);
-        if (typeof window !== "undefined") {
+        if (typeof window !== 'undefined') {
             if (window.removeEventListener) {
-                window.removeEventListener("mouseup", fastCheck);
-                window.removeEventListener("keyup", fastCheck);
-                window.removeEventListener("mousedown", fastCheck);
-                window.removeEventListener("keydown", fastCheck);
+                window.removeEventListener('mouseup', fastCheck);
+                window.removeEventListener('keyup', fastCheck);
+                window.removeEventListener('mousedown', fastCheck);
+                window.removeEventListener('keydown', fastCheck);
             }
             else {
-                ;
-                document.documentElement.detachEvent("onmouseup", fastCheck);
-                document.documentElement.detachEvent("onkeyup", fastCheck);
-                document.documentElement.detachEvent("onmousedown", fastCheck);
-                document.documentElement.detachEvent("onkeydown", fastCheck);
+                document.documentElement.detachEvent('onmouseup', fastCheck);
+                document.documentElement.detachEvent('onkeyup', fastCheck);
+                document.documentElement.detachEvent('onmousedown', fastCheck);
+                document.documentElement.detachEvent('onkeydown', fastCheck);
             }
         }
     };
@@ -773,14 +766,11 @@ function observe(obj, callback, inversible) {
 exports.observe = observe;
 /**
  * Generate an array of patches from an observer
- * If opts.inversible is defined, overwrite observer.inversible
  */
 function generate(observer, opts) {
     if (opts === void 0) { opts = {}; }
     var mirror = beforeDict.get(observer.object);
-    var inversible = typeof opts.inversible !== "undefined"
-        ? opts.inversible
-        : observer.inversible;
+    var inversible = typeof opts.inversible !== "undefined" ? opts.inversible : observer.inversible;
     _generate(mirror.value, observer.object, observer.patches, "", { inversible: inversible });
     if (observer.patches.length) {
         core_1.applyPatch(mirror.value, observer.patches);
@@ -797,9 +787,7 @@ function generate(observer, opts) {
 exports.generate = generate;
 // Dirty check if obj is different from mirror, generate patches and update mirror
 function _generate(mirror, obj, patches, path, opts) {
-    if (opts === void 0) { opts = {
-        inversible: false
-    }; }
+    if (opts === void 0) { opts = { inversible: false }; }
     if (obj === mirror) {
         return;
     }
@@ -815,41 +803,23 @@ function _generate(mirror, obj, patches, path, opts) {
     for (var t = oldKeys.length - 1; t >= 0; t--) {
         var key = oldKeys[t];
         var oldVal = mirror[key];
-        if (helpers_1.hasOwnProperty(obj, key) &&
-            !(obj[key] === undefined &&
-                oldVal !== undefined &&
-                Array.isArray(obj) === false)) {
+        if (helpers_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
             var newVal = obj[key];
-            if (typeof oldVal == "object" &&
-                oldVal != null &&
-                typeof newVal == "object" &&
-                newVal != null) {
+            if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
                 _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key), opts);
             }
             else {
                 if (oldVal !== newVal) {
                     changed = true;
                     if (inversible)
-                        patches.push({
-                            op: "test",
-                            path: path + "/" + helpers_1.escapePathComponent(key),
-                            value: helpers_1._deepClone(oldVal)
-                        });
-                    patches.push({
-                        op: "replace",
-                        path: path + "/" + helpers_1.escapePathComponent(key),
-                        value: helpers_1._deepClone(newVal)
-                    });
+                        patches.push({ op: "test", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(oldVal) });
+                    patches.push({ op: "replace", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(newVal) });
                 }
             }
         }
         else if (Array.isArray(mirror) === Array.isArray(obj)) {
             if (inversible)
-                patches.push({
-                    op: "test",
-                    path: path + "/" + helpers_1.escapePathComponent(key),
-                    value: helpers_1._deepClone(oldVal)
-                });
+                patches.push({ op: "test", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(oldVal) });
             patches.push({ op: "remove", path: path + "/" + helpers_1.escapePathComponent(key) });
             deleted = true; // property has been deleted
         }
@@ -866,11 +836,7 @@ function _generate(mirror, obj, patches, path, opts) {
     for (var t = 0; t < newKeys.length; t++) {
         var key = newKeys[t];
         if (!helpers_1.hasOwnProperty(mirror, key) && obj[key] !== undefined) {
-            patches.push({
-                op: "add",
-                path: path + "/" + helpers_1.escapePathComponent(key),
-                value: helpers_1._deepClone(obj[key])
-            });
+            patches.push({ op: "add", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(obj[key]) });
         }
     }
 }
@@ -879,7 +845,7 @@ function _generate(mirror, obj, patches, path, opts) {
  */
 function compare(tree1, tree2, opts) {
     var patches = [];
-    _generate(tree1, tree2, patches, "", opts);
+    _generate(tree1, tree2, patches, '', opts);
     return patches;
 }
 exports.compare = compare;
