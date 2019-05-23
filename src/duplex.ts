@@ -6,8 +6,8 @@
 import { _deepClone, _objectKeys, escapePathComponent, hasOwnProperty } from './helpers';
 import { applyPatch, Operation } from './core';
 
-/* export all core functions */
-export { applyOperation, applyPatch, applyReducer, getValueByPointer, Operation, validate, validator, OperationResult } from './core';
+/* export all core functions and types */
+export { applyOperation, applyPatch, applyReducer, getValueByPointer, Operation, AddOperation, RemoveOperation, ReplaceOperation, MoveOperation, CopyOperation,  TestOperation, GetOperation, validate, validator, OperationResult } from './core';
 
 /* export some helpers */
 export { PatchError as JsonPatchError, _deepClone as deepClone, escapePathComponent, unescapePathComponent } from './helpers';

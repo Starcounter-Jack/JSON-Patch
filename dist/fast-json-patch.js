@@ -646,7 +646,7 @@ exports.validate = validate;
  */
 var helpers_1 = __webpack_require__(0);
 var core_1 = __webpack_require__(1);
-/* export all core functions */
+/* export all core functions and types */
 var core_2 = __webpack_require__(1);
 exports.applyOperation = core_2.applyOperation;
 exports.applyPatch = core_2.applyPatch;
