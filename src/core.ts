@@ -5,10 +5,9 @@
  */
 declare var require: any;
 
-const equalsOptions = { strict: true };
-const _equals = require('deep-equal');
+const _equals = require('fast-deep-equal');
 const areEquals = (a: any, b: any): boolean => {
-  return _equals(a, b, equalsOptions)
+  return _equals(a, b)
 }
 import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers';
 
