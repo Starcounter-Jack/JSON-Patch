@@ -3,7 +3,7 @@ if (typeof jsonpatch === 'undefined') {
 }
 if (typeof Benchmark === 'undefined') {
     var Benchmark = require('benchmark');
-    var benchmarkResultsToConsole = require('./../helpers/benchmarkReporter.js').benchmarkResultsToConsole;
+    var benchmarkResultsToConsole = require('./../lib/benchmark_console_reporter.js').benchmarkResultsToConsole;
 }
 
 

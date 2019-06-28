@@ -161,6 +161,7 @@ function patchErrorMessageFormatter(message: String, args: Object): string {
 export class PatchError extends Error {
     constructor(message: string, public name: JsonPatchErrorName, public index?: number, public operation?: any, public tree?: any) {
         super(patchErrorMessageFormatter(message, { name, index, operation, tree }));
+        Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain, see https://stackoverflow.com/a/48342359
         this.message = patchErrorMessageFormatter(message, { name, index, operation, tree });
     }
 }
