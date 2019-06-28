@@ -4,7 +4,7 @@ const sauceConnectLauncher = require('sauce-connect-launcher');
 const username = process.env.SAUCE_USERNAME; //JSON-Patch repo uses "json-patch" user which is a subaccount of the Starcounter SauceLabs account
 const accessKey = process.env.SAUCE_ACCESS_KEY;
 
-const tunnelIdentifier = "tunnel" + process.env.TRAVIS_JOB_NUMBER;
+const tunnelIdentifier = "tunnel" + (process.env.TRAVIS_JOB_NUMBER || "-local");
 
 if (!username) {
   console.error(
@@ -58,10 +58,10 @@ if (!username) {
 
           sauceConnectProcess.close(function () {
             console.log("Closed Sauce Connect process");
+            process.exit(0);
           })
 
           console.log('Done!');
-          process.exit(0);
         });
 
       } catch (error) {
