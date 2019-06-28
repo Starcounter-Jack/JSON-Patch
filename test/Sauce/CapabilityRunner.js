@@ -1,5 +1,5 @@
 /**
- * SauceLabs Jasmine CapabilityRunner 
+ * SauceLabs Jasmine CapabilityRunner
  * CapabilityRunner.js 0.0.0
  * (c) 2017 Omar Alshaker, Marcin Warpechowski
  * MIT license
@@ -13,7 +13,7 @@ const retryUntil = require("bluebird-retry");
 function CapabilityRunner(caps) {
   return new Promise(function(resolve, reject) {
     console.log("");
-    console.log(caps.name.green);
+    console.log(caps.name);
 
     const username = caps.username;
     const accessKey = caps.accessKey;
@@ -41,7 +41,7 @@ function CapabilityRunner(caps) {
     function checkIfDone() {
       return new Promise(function(resolve, reject) {
         driver
-          .executeScript("return window.jsApiReporter && window.jsApiReporter.finished && Object.values(window.jsApiReporter.suites());")
+          .executeScript("return window.jsApiReporter && window.jsApiReporter.finished && window.jsApiReporter.specs();")
           .then(function(results) {
             if (results) {
               resolve(results);
@@ -66,13 +66,11 @@ function CapabilityRunner(caps) {
 
     async function analyzeResults(results) {
       const resultsSummary = { passed: 0, pending: 0, failed: 0 };
-      const colorMap = { passed: "green", failed: "red", pending: "yellow" };
       var hadErrored = 0;
       results.forEach(spec => {
         resultsSummary[spec.status]++;
-        console.log("");
         console.log(
-          "   " + symbols[spec.status][colorMap[spec.status]] + " " + spec.fullName
+          "   " + symbols[spec.status] + " " + spec.fullName
         );
         if (spec.status === "failed") {
           hadErrored = 1;
@@ -81,7 +79,7 @@ function CapabilityRunner(caps) {
       });
       console.log("");
       console.log(
-        ("Summary for (" + caps.name + ")")[hadErrored ? "red" : "green"]
+        ("Summary for (" + caps.name + ")")
       );
       console.log(resultsSummary);
       console.log("");
