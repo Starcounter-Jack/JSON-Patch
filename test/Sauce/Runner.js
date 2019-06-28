@@ -1,8 +1,10 @@
 const CapabilityRunner = require("./CapabilityRunner");
 const sauceConnectLauncher = require('sauce-connect-launcher');
 
-const username = process.env.SAUCE_USERNAME;
+const username = process.env.SAUCE_USERNAME; //JSON-Patch repo uses "json-patch" user which is a subaccount of the Starcounter SauceLabs account
 const accessKey = process.env.SAUCE_ACCESS_KEY;
+
+const tunnelIdentifier = "tunnel" + process.env.TRAVIS_JOB_NUMBER;
 
 if (!username) {
   console.error(
@@ -18,7 +20,7 @@ if (!username) {
       username: username,
       accessKey: accessKey,
       name: "Chrome: Running tests",
-      "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
+      "tunnel-identifier": tunnelIdentifier
     },
     {
       browserName: "firefox",
@@ -26,7 +28,7 @@ if (!username) {
       username: username,
       accessKey: accessKey,
       name: "Firefox: Running tests",
-      "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
+      "tunnel-identifier": tunnelIdentifier
     },
     {
       browserName: "MicrosoftEdge",
@@ -34,7 +36,7 @@ if (!username) {
       username: username,
       accessKey: accessKey,
       name: "MicrosoftEdge: Running tests",
-      "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
+      "tunnel-identifier": tunnelIdentifier
     }
   ];
 
@@ -42,6 +44,7 @@ if (!username) {
       try {
         console.log("Preparing Sauce Connect");
         sauceConnectLauncher({
+            tunnelIdentifier
         }, async function (err, sauceConnectProcess) {
           if (err) {
             console.error(err.message);
