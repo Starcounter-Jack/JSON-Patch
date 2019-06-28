@@ -1,12 +1,8 @@
 language: node_js
 dist: trusty
-sauce_connect: true,
+node_js: lts/*
 before_script:
   - npm install
-  - npm install -g grunt
-node_js: 8
-before_script: 
-  - npm install
-  - npm run build 
+  - npm run serve &
 script:
-  - grunt && npm run bench
+  - npm run test-sauce

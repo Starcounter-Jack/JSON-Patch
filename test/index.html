@@ -1,31 +1,26 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta charset="utf-8">
-  <title>Jasmine Spec Runner v2.5.0</title>
+  <title>Jasmine Spec Runner</title>
 
-  <link rel="shortcut icon" type="image/png" href="lib/jasmine-2.5.0/jasmine_favicon.png">
-  <link rel="stylesheet" href="lib/jasmine-2.5.0/jasmine.css">
+  <link rel="shortcut icon" type="image/png" href="../node_modules/jasmine-core/images/jasmine_favicon.png">
+  <link rel="stylesheet" href="../node_modules/jasmine-core/lib/jasmine-core/jasmine.css">
 
-  <script src="lib/jasmine-2.5.0/jasmine.js"></script>
-  <script src="lib/jasmine-2.5.0/jasmine-html.js"></script>
-  <!-- <script src="lib/jasmine-2.5.0/boot.js"></script> -->
-  <script src="lib/jasmine-custom-boot.js"></script>
-
+  <script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+  <script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+  <script src="../node_modules/jasmine-core/lib/jasmine-core/boot.js"></script>
 
   <!-- include Benchmark.js -->
-  <script src="lib/benchmark.js/vendor/lodash/dist/lodash.compat.js"></script>
-  <script src="lib/benchmark.js/vendor/platform.js/platform.js"></script>
-  <script src="lib/benchmark.js/benchmark.js"></script>
+  <script src="../node_modules/lodash/lodash.min.js"></script>
+  <script src="../node_modules/platform/platform.js"></script>
+  <script src="../node_modules/benchmark/benchmark.js"></script>
   <script src="lib/benchmark_reporter.js"></script>
-  <script src="lib/jasmine-2.5.0/jasmine-jsreporter.js"></script>
   <link rel="stylesheet" type="text/css" href="lib/benchmark_reporter.css">
 
   <!-- include source files here... -->
-
-  <!-- include spec files here... -->
   <script src="../dist/fast-json-patch.js"></script>
+
   <!-- Dynamically load https://github.com/json-patch/json-patch-tests test suite -->
   <script src="spec/jsonPatchTestsSpec.js"></script>
   <script src="spec/coreSpec.js"></script>
@@ -33,12 +28,6 @@
   <script src="spec/duplexSpec.js"></script>
   <script src="spec/duplexBenchmark.js"></script>
   <script src="spec/coreBenchmark.js"></script>
-
-  <script>
-    var jasmineEnv = jasmine.getEnv();
-    jasmineEnv.addReporter(new jasmine.JSReporter2());
-  </script>
-
 </head>
 
 <body>

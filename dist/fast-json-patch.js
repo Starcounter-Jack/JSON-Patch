@@ -35,18 +35,35 @@ var jsonpatch =
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
 /******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
-/******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -64,6 +81,7 @@ var jsonpatch =
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
 /******/
+/******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
@@ -77,11 +95,20 @@ var jsonpatch =
  * (c) 2017 Joachim Wester
  * MIT license
  */
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);
@@ -228,15 +255,18 @@ function patchErrorMessageFormatter(message, args) {
     }
     return messageParts.join('\n');
 }
-var PatchError = (function (_super) {
+var PatchError = /** @class */ (function (_super) {
     __extends(PatchError, _super);
     function PatchError(message, name, index, operation, tree) {
-        _super.call(this, patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree }));
-        this.name = name;
-        this.index = index;
-        this.operation = operation;
-        this.tree = tree;
-        this.message = patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree });
+        var _newTarget = this.constructor;
+        var _this = _super.call(this, patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree })) || this;
+        _this.name = name;
+        _this.index = index;
+        _this.operation = operation;
+        _this.tree = tree;
+        Object.setPrototypeOf(_this, _newTarget.prototype); // restore prototype chain, see https://stackoverflow.com/a/48342359
+        _this.message = patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree });
+        return _this;
     }
     return PatchError;
 }(Error));
@@ -247,11 +277,8 @@ exports.PatchError = PatchError;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var equalsOptions = { strict: true };
-var _equals = __webpack_require__(3);
-var areEquals = function (a, b) {
-    return _equals(a, b, equalsOptions);
-};
+Object.defineProperty(exports, "__esModule", { value: true });
+var areEquals = __webpack_require__(3);
 var helpers_1 = __webpack_require__(0);
 exports.JsonPatchError = helpers_1.PatchError;
 exports.deepClone = helpers_1._deepClone;
@@ -309,7 +336,7 @@ var arrOps = {
         if (helpers_1.isInteger(i)) {
             arr.splice(i, 0, this.value);
         }
-        else {
+        else { // array props
             arr[i] = this.value;
         }
         // this may be needed when using '-' in an array
@@ -385,9 +412,9 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             returnValue.removed = document; //document we removed
             return returnValue;
         }
-        else if (operation.op === 'move' || operation.op === 'copy') {
+        else if (operation.op === 'move' || operation.op === 'copy') { // it's a move or copy to root
             returnValue.newDocument = getValueByPointer(document, operation.from); // get the value by json-pointer in `from` field
-            if (operation.op === 'move') {
+            if (operation.op === 'move') { // report removed item
                 returnValue.removed = document;
             }
             return returnValue;
@@ -400,7 +427,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             returnValue.newDocument = document;
             return returnValue;
         }
-        else if (operation.op === 'remove') {
+        else if (operation.op === 'remove') { // a remove on root
             returnValue.removed = document;
             returnValue.newDocument = null;
             return returnValue;
@@ -409,7 +436,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             operation.value = document;
             return returnValue;
         }
-        else {
+        else { /* bad operation */
             if (validateOperation) {
                 throw new exports.JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);
             }
@@ -541,7 +568,7 @@ exports.applyPatch = applyPatch;
  */
 function applyReducer(document, operation, index) {
     var operationResult = applyOperation(document, operation);
-    if (operationResult.test === false) {
+    if (operationResult.test === false) { // failed test
         throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
     }
     return operationResult.newDocument;
@@ -639,6 +666,7 @@ exports.validate = validate;
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
+Object.defineProperty(exports, "__esModule", { value: true });
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
  * (c) 2017 Joachim Wester
@@ -661,14 +689,14 @@ exports.deepClone = helpers_2._deepClone;
 exports.escapePathComponent = helpers_2.escapePathComponent;
 exports.unescapePathComponent = helpers_2.unescapePathComponent;
 var beforeDict = new WeakMap();
-var Mirror = (function () {
+var Mirror = /** @class */ (function () {
     function Mirror(obj) {
         this.observers = new Map();
         this.obj = obj;
     }
     return Mirror;
 }());
-var ObserverInfo = (function () {
+var ObserverInfo = /** @class */ (function () {
     function ObserverInfo(callback, observer) {
         this.callback = callback;
         this.observer = observer;
@@ -722,15 +750,15 @@ function observe(obj, callback, inversible) {
             clearTimeout(observer.next);
             observer.next = setTimeout(dirtyCheck);
         };
-        if (typeof window !== 'undefined') {
-            if (window.addEventListener) {
+        if (typeof window !== 'undefined') { //not Node
+            if (window.addEventListener) { //standards
                 window.addEventListener('mouseup', fastCheck);
                 window.addEventListener('keyup', fastCheck);
                 window.addEventListener('mousedown', fastCheck);
                 window.addEventListener('keydown', fastCheck);
                 window.addEventListener('change', fastCheck);
             }
-            else {
+            else { //IE8
                 document.documentElement.attachEvent('onmouseup', fastCheck);
                 document.documentElement.attachEvent('onkeyup', fastCheck);
                 document.documentElement.attachEvent('onmousedown', fastCheck);
@@ -855,141 +883,62 @@ exports.compare = compare;
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var pSlice = Array.prototype.slice;
-var objectKeys = __webpack_require__(5);
-var isArguments = __webpack_require__(4);
+"use strict";
 
-var deepEqual = module.exports = function (actual, expected, opts) {
-  if (!opts) opts = {};
-  // 7.1. All identical values are equivalent, as determined by ===.
-  if (actual === expected) {
-    return true;
 
-  } else if (actual instanceof Date && expected instanceof Date) {
-    return actual.getTime() === expected.getTime();
+var isArray = Array.isArray;
+var keyList = Object.keys;
+var hasProp = Object.prototype.hasOwnProperty;
 
-  // 7.3. Other pairs that do not both pass typeof value == 'object',
-  // equivalence is determined by ==.
-  } else if (!actual || !expected || typeof actual != 'object' && typeof expected != 'object') {
-    return opts.strict ? actual === expected : actual == expected;
+module.exports = function equal(a, b) {
+  if (a === b) return true;
 
-  // 7.4. For all other Object pairs, including Array objects, equivalence is
-  // determined by having the same number of owned properties (as verified
-  // with Object.prototype.hasOwnProperty.call), the same set of keys
-  // (although not necessarily the same order), equivalent values for every
-  // corresponding key, and an identical 'prototype' property. Note: this
-  // accounts for both named and indexed properties on Arrays.
-  } else {
-    return objEquiv(actual, expected, opts);
-  }
-}
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
+    var arrA = isArray(a)
+      , arrB = isArray(b)
+      , i
+      , length
+      , key;
 
-function isUndefinedOrNull(value) {
-  return value === null || value === undefined;
-}
+    if (arrA && arrB) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (!equal(a[i], b[i])) return false;
+      return true;
+    }
 
-function isBuffer (x) {
-  if (!x || typeof x !== 'object' || typeof x.length !== 'number') return false;
-  if (typeof x.copy !== 'function' || typeof x.slice !== 'function') {
-    return false;
-  }
-  if (x.length > 0 && typeof x[0] !== 'number') return false;
-  return true;
-}
+    if (arrA != arrB) return false;
 
-function objEquiv(a, b, opts) {
-  var i, key;
-  if (isUndefinedOrNull(a) || isUndefinedOrNull(b))
-    return false;
-  // an identical 'prototype' property.
-  if (a.prototype !== b.prototype) return false;
-  //~~~I've managed to break Object.keys through screwy arguments passing.
-  //   Converting to array solves the problem.
-  if (isArguments(a)) {
-    if (!isArguments(b)) {
+    var dateA = a instanceof Date
+      , dateB = b instanceof Date;
+    if (dateA != dateB) return false;
+    if (dateA && dateB) return a.getTime() == b.getTime();
+
+    var regexpA = a instanceof RegExp
+      , regexpB = b instanceof RegExp;
+    if (regexpA != regexpB) return false;
+    if (regexpA && regexpB) return a.toString() == b.toString();
+
+    var keys = keyList(a);
+    length = keys.length;
+
+    if (length !== keyList(b).length)
       return false;
+
+    for (i = length; i-- !== 0;)
+      if (!hasProp.call(b, keys[i])) return false;
+
+    for (i = length; i-- !== 0;) {
+      key = keys[i];
+      if (!equal(a[key], b[key])) return false;
     }
-    a = pSlice.call(a);
-    b = pSlice.call(b);
-    return deepEqual(a, b, opts);
-  }
-  if (isBuffer(a)) {
-    if (!isBuffer(b)) {
-      return false;
-    }
-    if (a.length !== b.length) return false;
-    for (i = 0; i < a.length; i++) {
-      if (a[i] !== b[i]) return false;
-    }
+
     return true;
   }
-  try {
-    var ka = objectKeys(a),
-        kb = objectKeys(b);
-  } catch (e) {//happens when one is a string literal and the other isn't
-    return false;
-  }
-  // having the same number of owned properties (keys incorporates
-  // hasOwnProperty)
-  if (ka.length != kb.length)
-    return false;
-  //the same set of keys (although not necessarily the same order),
-  ka.sort();
-  kb.sort();
-  //~~~cheap key test
-  for (i = ka.length - 1; i >= 0; i--) {
-    if (ka[i] != kb[i])
-      return false;
-  }
-  //equivalent values for every corresponding key, and
-  //~~~possibly expensive deep test
-  for (i = ka.length - 1; i >= 0; i--) {
-    key = ka[i];
-    if (!deepEqual(a[key], b[key], opts)) return false;
-  }
-  return typeof a === typeof b;
-}
 
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-var supportsArgumentsClass = (function(){
-  return Object.prototype.toString.call(arguments)
-})() == '[object Arguments]';
-
-exports = module.exports = supportsArgumentsClass ? supported : unsupported;
-
-exports.supported = supported;
-function supported(object) {
-  return Object.prototype.toString.call(object) == '[object Arguments]';
+  return a!==a && b!==b;
 };
-
-exports.unsupported = unsupported;
-function unsupported(object){
-  return object &&
-    typeof object == 'object' &&
-    typeof object.length == 'number' &&
-    Object.prototype.hasOwnProperty.call(object, 'callee') &&
-    !Object.prototype.propertyIsEnumerable.call(object, 'callee') ||
-    false;
-};
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-exports = module.exports = typeof Object.keys === 'function'
-  ? Object.keys : shim;
-
-exports.shim = shim;
-function shim (obj) {
-  var keys = [];
-  for (var key in obj) keys.push(key);
-  return keys;
-}
 
 
 /***/ })

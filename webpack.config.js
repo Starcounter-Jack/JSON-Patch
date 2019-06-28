@@ -1,12 +1,15 @@
 var webpack = require('webpack');
-const BabiliPlugin = require('babili-webpack-plugin');
 const package = require('./package.json');
 
 module.exports = [
   {
     entry: './lib/duplex.js',
+    mode: 'production',
+    optimization: {
+      minimize: false
+    },
     output: {
-      filename: './dist/fast-json-patch.js',
+      filename: 'fast-json-patch.js',
       library: 'jsonpatch',
       libraryTarget: 'var'
     },
@@ -19,16 +22,17 @@ module.exports = [
   },
   {
     entry: './lib/duplex.js',
+    mode: 'production',
     output: {
-      filename: './dist/fast-json-patch.min.js',
+      filename: 'fast-json-patch.min.js',
       library: 'jsonpatch',
       libraryTarget: 'var'
     },
     resolve: {
       extensions: ['.js']
     },
-    plugins: [new BabiliPlugin(),
-    new webpack.BannerPlugin('fast-json-patch, version: ' + package['version'])
+    plugins: [
+      new webpack.BannerPlugin('fast-json-patch, version: ' + package['version'])
     ]
   }
 ];

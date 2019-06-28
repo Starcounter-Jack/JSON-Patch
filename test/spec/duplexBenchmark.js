@@ -1,8 +1,9 @@
 if (typeof window === 'undefined') {
-  var jsdom = require('jsdom').jsdom;
-  var doc = jsdom(undefined, undefined);
-  GLOBAL.window = doc.defaultView;
-  GLOBAL.document = doc.defaultView.document;
+  const jsdom = require("jsdom");
+  const { JSDOM } = jsdom;
+  const dom = new JSDOM();
+  global.window = dom.window;
+  global.document = dom.window.document;
 }
 
 if (typeof jsonpatch === 'undefined') {
@@ -11,8 +12,7 @@ if (typeof jsonpatch === 'undefined') {
 
 if (typeof Benchmark === 'undefined') {
   var Benchmark = require('benchmark');
-  var benchmarkResultsToConsole = require('./../helpers/benchmarkReporter.js')
-    .benchmarkResultsToConsole;
+  var benchmarkResultsToConsole = require('./../lib/benchmark_console_reporter.js').benchmarkResultsToConsole;
 }
 
 var suite = new Benchmark.Suite();

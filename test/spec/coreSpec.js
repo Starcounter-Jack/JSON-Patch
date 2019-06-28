@@ -3,7 +3,7 @@ if (typeof jsonpatch === 'undefined') {
   jsonpatch = require('./../../lib/duplex');
 }
 if (typeof _ === 'undefined') {
-  _ = require('./../lib/underscore.min.js');
+  _ = require('underscore');
 }
 
 describe('jsonpatch.getValueByPointer', function() {
