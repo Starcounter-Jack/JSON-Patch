@@ -5,11 +5,7 @@
  */
 declare var require: any;
 
-const equalsOptions = { strict: true };
-const _equals = require('deep-equal');
-const areEquals = (a: any, b: any): boolean => {
-  return _equals(a, b, equalsOptions)
-}
+const areEquals = require('fast-deep-equal');
 import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers';
 
 export const JsonPatchError = PatchError;
