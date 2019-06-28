@@ -50,7 +50,7 @@
     "tsc": "tsc",
     "version": "tsc && webpack && git add -A",
     "build": "tsc && webpack",
-    "serve": "http-server -p 5000",
+    "serve": "http-server -p 5000 --silent",
     "tsc-watch": "tsc -w",
     "test": "npm run tsc && npm run test-core && npm run test-duplex",
     "test-sauce": "npm run build && node test/Sauce/Runner.js",
