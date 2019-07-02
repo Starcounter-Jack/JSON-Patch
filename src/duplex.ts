@@ -96,20 +96,11 @@ export function observe<T>(obj: Object|Array<T>, callback?: (patches: Operation[
       observer.next = setTimeout(dirtyCheck);
     };
     if (typeof window !== 'undefined') { //not Node
-      if (window.addEventListener) { //standards
-        window.addEventListener('mouseup', fastCheck);
-        window.addEventListener('keyup', fastCheck);
-        window.addEventListener('mousedown', fastCheck);
-        window.addEventListener('keydown', fastCheck);
-        window.addEventListener('change', fastCheck);
-      }
-      else { //IE8
-        (<any>document.documentElement).attachEvent('onmouseup', fastCheck);
-        (<any>document.documentElement).attachEvent('onkeyup', fastCheck);
-        (<any>document.documentElement).attachEvent('onmousedown', fastCheck);
-        (<any>document.documentElement).attachEvent('onkeydown', fastCheck);
-        (<any>document.documentElement).attachEvent('onchange', fastCheck);
-      }
+      window.addEventListener('mouseup', fastCheck);
+      window.addEventListener('keyup', fastCheck);
+      window.addEventListener('mousedown', fastCheck);
+      window.addEventListener('keydown', fastCheck);
+      window.addEventListener('change', fastCheck);
     }
   }
   observer.patches = patches;
@@ -121,18 +112,10 @@ export function observe<T>(obj: Object|Array<T>, callback?: (patches: Operation[
     removeObserverFromMirror(mirror, observer);
 
     if (typeof window !== 'undefined') {
-      if (window.removeEventListener) {
-        window.removeEventListener('mouseup', fastCheck);
-        window.removeEventListener('keyup', fastCheck);
-        window.removeEventListener('mousedown', fastCheck);
-        window.removeEventListener('keydown', fastCheck);
-      }
-      else {
-        (<any>document.documentElement).detachEvent('onmouseup', fastCheck);
-        (<any>document.documentElement).detachEvent('onkeyup', fastCheck);
-        (<any>document.documentElement).detachEvent('onmousedown', fastCheck);
-        (<any>document.documentElement).detachEvent('onkeydown', fastCheck);
-      }
+      window.removeEventListener('mouseup', fastCheck);
+      window.removeEventListener('keyup', fastCheck);
+      window.removeEventListener('mousedown', fastCheck);
+      window.removeEventListener('keydown', fastCheck);
     }
   };
 
