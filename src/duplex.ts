@@ -116,6 +116,7 @@ export function observe<T>(obj: Object|Array<T>, callback?: (patches: Operation[
       window.removeEventListener('keyup', fastCheck);
       window.removeEventListener('mousedown', fastCheck);
       window.removeEventListener('keydown', fastCheck);
+      window.removeEventListener('change', fastCheck);
     }
   };
 
