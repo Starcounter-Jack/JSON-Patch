@@ -17,7 +17,6 @@ export interface Observer<T> {
   patches: Operation[];
   unobserve: () => void;
   callback: (patches: Operation[]) => void;
-  inversible: boolean;
 }
 
 var beforeDict = new WeakMap();
@@ -64,7 +63,7 @@ export function unobserve<T>(root: T, observer: Observer<T>) {
 /**
  * Observes changes made to an object, which can then be retrieved using generate
  */
-export function observe<T>(obj: Object|Array<T>, callback?: (patches: Operation[]) => void, inversible: boolean = false): Observer<T> {
+export function observe<T>(obj: Object|Array<T>, callback?: (patches: Operation[]) => void): Observer<T> {
   var patches = [];
   var observer;
   var mirror = getMirror(obj);
@@ -81,7 +80,7 @@ export function observe<T>(obj: Object|Array<T>, callback?: (patches: Operation[
     return observer;
   }
 
-  observer = { inversible };
+  observer = {};
 
   mirror.value = _deepClone(obj);
 
@@ -145,11 +144,10 @@ export function observe<T>(obj: Object|Array<T>, callback?: (patches: Operation[
 /**
  * Generate an array of patches from an observer
  */
-export function generate<T>(observer: Observer<Object>, opts: { inversible?: boolean } = {}): Operation[] {
+export function generate<T>(observer: Observer<Object>, invertible = false): Operation[] {
   var mirror = beforeDict.get(observer.object);
-  var inversible = typeof opts.inversible !== "undefined" ? opts.inversible : observer.inversible;
 
-  _generate(mirror.value, observer.object, observer.patches, "", { inversible });
+  _generate(mirror.value, observer.object, observer.patches, "", invertible);
   if (observer.patches.length) {
     applyPatch(mirror.value, observer.patches);
   }
@@ -164,7 +162,7 @@ export function generate<T>(observer: Observer<Object>, opts: { inversible?: boo
 }
 
 // Dirty check if obj is different from mirror, generate patches and update mirror
-function _generate(mirror, obj, patches, path, opts = { inversible: false }) {
+function _generate(mirror, obj, patches, path, invertible) {
   if (obj === mirror) {
     return;
   }
@@ -177,7 +175,6 @@ function _generate(mirror, obj, patches, path, opts = { inversible: false }) {
   var oldKeys = _objectKeys(mirror);
   var changed = false;
   var deleted = false;
-  var { inversible } = opts;
 
   //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
 
@@ -189,22 +186,22 @@ function _generate(mirror, obj, patches, path, opts = { inversible: false }) {
       var newVal = obj[key];
 
       if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
-        _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key), opts);
+        _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key), invertible);
       }
       else {
         if (oldVal !== newVal) {
           changed = true;
-          if (inversible) patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) });
+          if (invertible) patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) });
           patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: _deepClone(newVal) });
         }
       }
     }
     else if(Array.isArray(mirror) === Array.isArray(obj)) {
-      if (inversible) patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) })
+      if (invertible) patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) })
       patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
       deleted = true; // property has been deleted
     } else {
-      if (inversible) patches.push({ op: "test", path, value: mirror });
+      if (invertible) patches.push({ op: "test", path, value: mirror });
       patches.push({ op: "replace", path, value: obj });
       changed = true;
     }
@@ -224,8 +221,8 @@ function _generate(mirror, obj, patches, path, opts = { inversible: false }) {
 /**
  * Create an array of patches from the differences in two objects
  */
-export function compare(tree1: Object | Array<any>, tree2: Object | Array<any>, opts?: { inversible: boolean }): Operation[] {
+export function compare(tree1: Object | Array<any>, tree2: Object | Array<any>, invertible = false): Operation[] {
   var patches = [];
-  _generate(tree1, tree2, patches, '', opts);
+  _generate(tree1, tree2, patches, '', invertible);
   return patches;
 }

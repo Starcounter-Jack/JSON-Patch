@@ -146,7 +146,7 @@ suite.add('compare operation same but deep objects', {
 });
 
 // Benchmark generating test operations
-suite.add('generate operation, with inversible set to true', {
+suite.add('generate operation, invertible = true', {
   setup: function() {
     var obj = {
       firstName: 'Albert',
@@ -160,7 +160,7 @@ suite.add('generate operation, with inversible set to true', {
         }
       ]
     };
-    var observer = jsonpatch.observe(obj, undefined, true);
+    var observer = jsonpatch.observe(obj);
   },
   fn: function() {
     obj.firstName = 'Joachim';
@@ -168,10 +168,10 @@ suite.add('generate operation, with inversible set to true', {
     obj.phoneNumbers[0].number = '123';
     obj.phoneNumbers[1].number = '456';
 
-    var patches = jsonpatch.generate(observer);
+    var patches = jsonpatch.generate(observer, true);
   }
 });
-suite.add('generate operation and re-apply, with inversible set to true', {
+suite.add('generate operation and re-apply, invertible = true', {
   setup: function() {
     var obj = {
       firstName: 'Albert',
@@ -185,7 +185,7 @@ suite.add('generate operation and re-apply, with inversible set to true', {
         }
       ]
     };
-    var observer = jsonpatch.observe(obj, undefined, true);
+    var observer = jsonpatch.observe(obj);
   },
   fn: function() {
     obj.firstName = 'Joachim';
@@ -193,7 +193,7 @@ suite.add('generate operation and re-apply, with inversible set to true', {
     obj.phoneNumbers[0].number = '123';
     obj.phoneNumbers[1].number = '456';
 
-    var patches = jsonpatch.generate(observer);
+    var patches = jsonpatch.generate(observer, true);
     obj2 = {
       firstName: 'Albert',
       lastName: 'Einstein',
@@ -210,7 +210,7 @@ suite.add('generate operation and re-apply, with inversible set to true', {
     jsonpatch.applyPatch(obj2, patches);
   }
 });
-suite.add('compare operation, with inversible set to true', {
+suite.add('compare operation, invertible = true', {
   setup: function() {
     var obj = {
       firstName: 'Albert',
@@ -238,11 +238,11 @@ suite.add('compare operation, with inversible set to true', {
     };
   },
   fn: function() {
-    var patches = jsonpatch.compare(obj, obj2, { inversible: true });
+    var patches = jsonpatch.compare(obj, obj2, true);
   }
 });
 
-suite.add('compare operation same but deep objects, with inversible set to true', {
+suite.add('compare operation same but deep objects, invertible = true', {
   setup: function() {
     var depth = 10;
 
@@ -271,7 +271,7 @@ suite.add('compare operation same but deep objects, with inversible set to true'
     var obj2 = obj;
   },
   fn: function() {
-    var patches = jsonpatch.compare(obj, obj2, { inversible: true });
+    var patches = jsonpatch.compare(obj, obj2, true);
   }
 });
 
