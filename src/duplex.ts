@@ -191,17 +191,23 @@ function _generate(mirror, obj, patches, path, invertible) {
       else {
         if (oldVal !== newVal) {
           changed = true;
-          if (invertible) patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) });
+          if (invertible) { 
+            patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) }); 
+      	  }
           patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: _deepClone(newVal) });
         }
       }
     }
     else if(Array.isArray(mirror) === Array.isArray(obj)) {
-      if (invertible) patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) })
+      if (invertible) {
+        patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) });
+      }
       patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
       deleted = true; // property has been deleted
     } else {
-      if (invertible) patches.push({ op: "test", path, value: mirror });
+      if (invertible) {
+        patches.push({ op: "test", path, value: mirror });
+      }
       patches.push({ op: "replace", path, value: obj });
       changed = true;
     }
