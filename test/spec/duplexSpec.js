@@ -1330,12 +1330,14 @@ describe('duplex', function() {
       }
     });
 
-    it('should generate patch after `mouseup` event', function(done) {
+    it('should generate patch after `mouseup` event while observing', function(done) {
       obj = {
         lastName: 'Einstein'
       };
       var lastPatches;
+      var callCount = 0;
       var observer = jsonpatch.observe(obj, function(patches) {
+        callCount++;
         lastPatches = patches;
       });
 
@@ -1351,16 +1353,26 @@ describe('duplex', function() {
             value: 'Hawking'
           }
         ]);
-        done();
-      });
+
+        observer.unobserve();
+        obj.lastName = 'Musk';
+        trigger('mouseup');
+
+        setTimeout(function() {
+          expect(callCount).toEqual(1);
+          done();
+        }, 20);
+      }, 20);
     });
 
-    it('should generate patch after `mousedown` event', function(done) {
+    it('should generate patch after `mousedown` event while observing', function(done) {
       obj = {
         lastName: 'Einstein'
       };
       var lastPatches;
+      var callCount = 0;
       var observer = jsonpatch.observe(obj, function(patches) {
+        callCount++;
         lastPatches = patches;
       });
 
@@ -1375,16 +1387,60 @@ describe('duplex', function() {
             value: 'Hawking'
           }
         ]);
-        done();
+
+        observer.unobserve();
+        obj.lastName = 'Musk';
+        trigger('mousedown');
+
+        setTimeout(function() {
+          expect(callCount).toEqual(1);
+          done();
+        }, 20);
       }, 20);
     });
 
-    it('should generate patch after `keydown` event', function(done) {
+    it('should generate patch after `keyup` event while observing', function(done) {
       obj = {
         lastName: 'Einstein'
       };
       var lastPatches;
+      var callCount = 0;
       var observer = jsonpatch.observe(obj, function(patches) {
+        callCount++;
+        lastPatches = patches;
+      });
+
+      obj.lastName = 'Hawking';
+      trigger('keyup');
+
+      setTimeout(function() {
+        expect(lastPatches).toEqual([
+          {
+            op: 'replace',
+            path: '/lastName',
+            value: 'Hawking'
+          }
+        ]);
+
+        observer.unobserve();
+        obj.lastName = 'Musk';
+        trigger('keyup');
+
+        setTimeout(function() {
+          expect(callCount).toEqual(1);
+          done();
+        }, 20);
+      }, 20);
+    });
+
+    it('should generate patch after `keydown` event while observing', function(done) {
+      obj = {
+        lastName: 'Einstein'
+      };
+      var lastPatches;
+      var callCount = 0;
+      var observer = jsonpatch.observe(obj, function(patches) {
+        callCount++;
         lastPatches = patches;
       });
 
@@ -1399,16 +1455,26 @@ describe('duplex', function() {
             value: 'Hawking'
           }
         ]);
-        done();
+
+        observer.unobserve();
+        obj.lastName = 'Musk';
+        trigger('keydown');
+
+        setTimeout(function() {
+          expect(callCount).toEqual(1);
+          done();
+        }, 20);
       }, 20);
     });
 
-    it('should generate patch after `change` event', function(done) {
+    it('should generate patch after `change` event while observing', function(done) {
       obj = {
         lastName: 'Einstein'
       };
       var lastPatches;
+      var callCount = 0;
       var observer = jsonpatch.observe(obj, function(patches) {
+        callCount++;
         lastPatches = patches;
       });
 
@@ -1423,7 +1489,15 @@ describe('duplex', function() {
             value: 'Hawking'
           }
         ]);
-        done();
+
+        observer.unobserve();
+        obj.lastName = 'Musk';
+        trigger('change');
+
+        setTimeout(function() {
+          expect(callCount).toEqual(1);
+          done();
+        }, 20);
       }, 20);
     });
   });
