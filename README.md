@@ -154,6 +154,24 @@ var patch = jsonpatch.generate(observer);
 // ];
 ```
 
+Generating patches with test operations for values in the first object:
+
+```js
+var document = { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
+var observer = jsonpatch.observe(document);
+document.firstName = "Albert";
+document.contactDetails.phoneNumbers[0].number = "123";
+document.contactDetails.phoneNumbers.push({ number:"456" });
+var patch = jsonpatch.generate(observer, true);
+// patch  == [
+//   { op: "test", path: "/firstName", value: "Joachim"},
+//   { op: "replace", path: "/firstName", value: "Albert"},
+//   { op: "test", path: "/contactDetails/phoneNumbers/0/number", value: "555-123" },
+//   { op: "replace", path: "/contactDetails/phoneNumbers/0/number", value: "123" },
+//   { op: "add", path: "/contactDetails/phoneNumbers/1", value: {number:"456"}}
+// ];
+```
+
 Comparing two object trees:
 
 ```js
@@ -161,6 +179,18 @@ var documentA = {user: {firstName: "Albert", lastName: "Einstein"}};
 var documentB = {user: {firstName: "Albert", lastName: "Collins"}};
 var diff = jsonpatch.compare(documentA, documentB);
 //diff == [{op: "replace", path: "/user/lastName", value: "Collins"}]
+```
+
+Comparing two object trees with test operations for values in the first object:
+
+```js
+var documentA = {user: {firstName: "Albert", lastName: "Einstein"}};
+var documentB = {user: {firstName: "Albert", lastName: "Collins"}};
+var diff = jsonpatch.compare(documentA, documentB, true);
+//diff == [
+//   {op: "test", path: "/user/lastName", value: "Einstein"},
+//   {op: "replace", path: "/user/lastName", value: "Collins"}
+// ];
 ```
 
 Validating a sequence of patches:
@@ -269,10 +299,10 @@ callback is called with the generated patches array as the parameter.
 
 Returns `observer`.
 
-#### `jsonpatch.generate(document: any, observer: Observer): Operation[]`
+#### `jsonpatch.generate(document: any, observer: Observer, invertible = false): Operation[]`
 
 If there are pending changes in `obj`, returns them synchronously. If a `callback` was defined in `observe`
-method, it will be triggered synchronously as well.
+method, it will be triggered synchronously as well. If `invertible` is true, then each change will be preceded by a test operation of the value before the change.
 
 If there are no pending changes in `obj`, returns an empty array (length 0).
 
@@ -282,9 +312,9 @@ Destroys the observer set up on `document`.
 
 Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). Note: this is different that ES6/7 `Object.unobserve`, which delivers remaining changes asynchronously.
 
-#### `jsonpatch.compare(document1: any, document2: any): Operation[]`
+#### `jsonpatch.compare(document1: any, document2: any, invertible = false): Operation[]`
 
-Compares object trees `document1` and `document2` and returns the difference relative to `document1` as a patches array.
+Compares object trees `document1` and `document2` and returns the difference relative to `document1` as a patches array.  If `invertible` is true, then each change will be preceded by a test operation of the value in `document1`.
 
 If there are no differences, returns an empty array (length 0).
 
@@ -346,7 +376,7 @@ Functions `applyPatch`, `applyOperation`, and `validate` accept a `validate`/ `v
 If you pass a validator, it will be called with four parameters for each operation, `function(operation, index, tree, existingPath)` and it is expected to throw `JsonPatchError` when your conditions are not met.
 
 - `operation` The operation it self.
-- `index` `operation`'s index in the patch array (if application).  
+- `index` `operation`'s index in the patch array (if application).
 - `tree` The object that is supposed to be patched.
 - `existingPath` the path `operation` points to.
 

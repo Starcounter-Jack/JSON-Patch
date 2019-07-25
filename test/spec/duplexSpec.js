@@ -74,6 +74,16 @@ var customMatchers = {
   }
 };
 
+function variantIt(name, variants, fn) {
+  variants.forEach(variant => {
+    it(`${name} | variant: ${variant[0]}`, fn(...variant.slice(1)));
+  });
+}
+
+function insertIf(condition, ...elements) {
+  return condition ? elements : [];
+}
+
 describe('duplex', function() {
   beforeEach(function() {
     jasmine.addMatchers(customMatchers);
@@ -183,139 +193,184 @@ describe('duplex', function() {
       expect(obj2).toReallyEqual(obj);
     });
 
-    it('should generate replace (2 observers)', function() {
-      var person1 = {
-        firstName: 'Alexandra',
-        lastName: 'Galbreath'
-      };
-      var person2 = {
-        firstName: 'Lisa',
-        lastName: 'Mendoza'
-      };
+    variantIt('should generate replace (2 observers)', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        var person1 = {
+          firstName: 'Alexandra',
+          lastName: 'Galbreath'
+        };
+        var person2 = {
+          firstName: 'Lisa',
+          lastName: 'Mendoza'
+        };
 
-      var observer1 = jsonpatch.observe(person1);
-      var observer2 = jsonpatch.observe(person2);
+        var observer1 = jsonpatch.observe(person1);
+        var observer2 = jsonpatch.observe(person2);
 
-      person1.firstName = 'Alexander';
-      person2.firstName = 'Lucas';
+        person1.firstName = 'Alexander';
+        person2.firstName = 'Lucas';
 
-      var patch1 = jsonpatch.generate(observer1);
-      var patch2 = jsonpatch.generate(observer2);
+        var patch1 = jsonpatch.generate(observer1, testInvertible);
+        var patch2 = jsonpatch.generate(observer2, testInvertible);
 
-      expect(patch1).toReallyEqual([
-        {
-          op: 'replace',
-          path: '/firstName',
-          value: 'Alexander'
-        }
-      ]);
-      expect(patch2).toReallyEqual([
-        {
-          op: 'replace',
-          path: '/firstName',
-          value: 'Lucas'
-        }
-      ]);
+        expect(patch1).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: "test",
+            path: "/firstName",
+            value: "Alexandra"
+          }),
+          {
+            op: 'replace',
+            path: '/firstName',
+            value: 'Alexander'
+          }
+        ]);
+        expect(patch2).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: "test",
+            path: "/firstName",
+            value: "Lisa"
+          }),
+          {
+            op: 'replace',
+            path: '/firstName',
+            value: 'Lucas'
+          }
+        ]);
+      }
     });
 
-    it('should generate replace (double change, shallow object)', function() {
-      obj = {
-        firstName: 'Albert',
-        lastName: 'Einstein',
-        phoneNumbers: [
+    variantIt('should generate test and replace (double change, shallow object)', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        obj = {
+          firstName: 'Albert',
+          lastName: 'Einstein',
+          phoneNumbers: [
+            {
+              number: '12345'
+            },
+            {
+              number: '45353'
+            }
+          ]
+        };
+
+        var observer = jsonpatch.observe(obj);
+        obj.firstName = 'Marcin';
+
+        var patches = jsonpatch.generate(observer, testInvertible);
+        expect(patches).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: "test",
+            path: "/firstName",
+            value: "Albert"
+          }),
           {
-            number: '12345'
-          },
-          {
-            number: '45353'
+            op: 'replace',
+            path: '/firstName',
+            value: 'Marcin'
           }
-        ]
-      };
+        ]);
 
-      var observer = jsonpatch.observe(obj);
-      obj.firstName = 'Marcin';
-
-      var patches = jsonpatch.generate(observer);
-      expect(patches).toReallyEqual([
-        {
-          op: 'replace',
-          path: '/firstName',
-          value: 'Marcin'
-        }
-      ]);
-
-      obj.lastName = 'Warp';
-      patches = jsonpatch.generate(observer); //first patch should NOT be reported again here
-      expect(patches).toReallyEqual([
-        {
-          op: 'replace',
-          path: '/lastName',
-          value: 'Warp'
-        }
-      ]);
-
-      expect(obj).toReallyEqual({
-        firstName: 'Marcin',
-        lastName: 'Warp',
-        phoneNumbers: [
+        obj.lastName = 'Warp';
+        patches = jsonpatch.generate(observer, testInvertible); //first patch should NOT be reported again here
+        expect(patches).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: "test",
+            path: "/lastName",
+            value: "Einstein"
+          }),
           {
-            number: '12345'
-          },
-          {
-            number: '45353'
+            op: 'replace',
+            path: '/lastName',
+            value: 'Warp'
           }
-        ]
-      }); //objects should be still the same
-    });
+        ]);
 
-    it('should generate replace (double change, deep object)', function() {
-      obj = {
-        firstName: 'Albert',
-        lastName: 'Einstein',
-        phoneNumbers: [
+        expect(obj).toReallyEqual({
+          firstName: 'Marcin',
+          lastName: 'Warp',
+          phoneNumbers: [
+            {
+              number: '12345'
+            },
+            {
+              number: '45353'
+            }
+          ]
+        }); //objects should be still the same
+      }
+      });
+
+    variantIt('should generate test and replace (double change, shallow object)', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        obj = {
+          firstName: 'Albert',
+          lastName: 'Einstein',
+          phoneNumbers: [
+            {
+              number: '12345'
+            },
+            {
+              number: '45353'
+            }
+          ]
+        };
+
+        var observer = jsonpatch.observe(obj);
+        obj.phoneNumbers[0].number = '123';
+
+        var patches = jsonpatch.generate(observer, testInvertible);
+        expect(patches).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: "test",
+            path: "/phoneNumbers/0/number",
+            value: "12345"
+          }),
           {
-            number: '12345'
-          },
-          {
-            number: '45353'
+            op: 'replace',
+            path: '/phoneNumbers/0/number',
+            value: '123'
           }
-        ]
-      };
+        ]);
 
-      var observer = jsonpatch.observe(obj);
-      obj.phoneNumbers[0].number = '123';
-
-      var patches = jsonpatch.generate(observer);
-      expect(patches).toReallyEqual([
-        {
-          op: 'replace',
-          path: '/phoneNumbers/0/number',
-          value: '123'
-        }
-      ]);
-
-      obj.phoneNumbers[1].number = '456';
-      patches = jsonpatch.generate(observer); //first patch should NOT be reported again here
-      expect(patches).toReallyEqual([
-        {
-          op: 'replace',
-          path: '/phoneNumbers/1/number',
-          value: '456'
-        }
-      ]);
-
-      expect(obj).toReallyEqual({
-        firstName: 'Albert',
-        lastName: 'Einstein',
-        phoneNumbers: [
+        obj.phoneNumbers[1].number = '456';
+        patches = jsonpatch.generate(observer, testInvertible); //first patch should NOT be reported again here
+        expect(patches).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: "test",
+            path: "/phoneNumbers/1/number",
+            value: "45353"
+          }),
           {
-            number: '123'
-          },
-          {
-            number: '456'
+            op: 'replace',
+            path: '/phoneNumbers/1/number',
+            value: '456'
           }
-        ]
-      }); //objects should be still the same
+        ]);
+
+        expect(obj).toReallyEqual({
+          firstName: 'Albert',
+          lastName: 'Einstein',
+          phoneNumbers: [
+            {
+              number: '123'
+            },
+            {
+              number: '456'
+            }
+          ]
+        }); //objects should be still the same
+      }
     });
 
     it('should generate replace (changes in new array cell, primitive values)', function() {
@@ -475,34 +530,49 @@ describe('duplex', function() {
       expect(obj2).toEqualInJson(obj);
     });
 
-    it('should generate remove (array indexes should be sorted descending)', function() {
-      obj = {
-        items: ['a', 'b', 'c']
-      };
-      var observer = jsonpatch.observe(obj);
+    variantIt('should generate test and replace (double change, shallow object)', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        obj = {
+          items: ['a', 'b', 'c']
+        };
+        var observer = jsonpatch.observe(obj);
 
-      obj.items.pop();
-      obj.items.pop();
+        obj.items.pop();
+        obj.items.pop();
 
-      patches = jsonpatch.generate(observer);
+        patches = jsonpatch.generate(observer, testInvertible);
 
-      //array indexes must be sorted descending, otherwise there is an index collision in apply
-      expect(patches).toReallyEqual([
-        {
-          op: 'remove',
-          path: '/items/2'
-        },
-        {
-          op: 'remove',
-          path: '/items/1'
-        }
-      ]);
+        //array indexes must be sorted descending, otherwise there is an index collision in apply
+        expect(patches).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '/items/2',
+            value: 'c'
+          }),
+          {
+            op: 'remove',
+            path: '/items/2'
+          },
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '/items/1',
+            value: 'b'
+          }),
+          {
+            op: 'remove',
+            path: '/items/1'
+          },
+        ]);
 
-      obj2 = {
-        items: ['a', 'b', 'c']
-      };
-      jsonpatch.applyPatch(obj2, patches);
-      expect(obj).toEqualInJson(obj2);
+        obj2 = {
+          items: ['a', 'b', 'c']
+        };
+        jsonpatch.applyPatch(obj2, patches);
+        expect(obj).toEqualInJson(obj2);
+      }
     });
 
     it('should not generate the same patch twice (replace)', function() {
@@ -1502,172 +1572,262 @@ describe('duplex', function() {
     });
   });
   describe('compare', function() {
-    it('Replacing a root array with an object should be handled well', function() {
+    variantIt('Replacing a root array with an object should be handled well', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
 
-      const obj = {};
-      var patches = jsonpatch.compare(['jack'], obj);
-      expect(patches).toEqual([
-        {
-          op: 'replace',
-          path: '',
-          value: obj
-        }
-      ]);
-
+        const objA = ['jack'];
+        const objB = {};
+        var patches = jsonpatch.compare(objA, objB, testInvertible);
+        expect(patches).toEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '',
+            value: objA
+          }),
+          {
+            op: 'replace',
+            path: '',
+            value: objB
+          }
+        ]);
+      }
     });
-    it('Replacing an array with an object should be handled well', function() {
-
-      const obj = {};
-      var patches = jsonpatch.compare({arr: ['jack']}, {arr: obj});
-      expect(patches).toEqual([
-        {
-          op: 'replace',
-          path: '/arr',
-          value: obj
-        }
-      ]);
-            
+    variantIt('Replacing an array with an object should be handled well', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        const arr = ['jack'];
+        const obj = {};
+        var patches = jsonpatch.compare({ arr: arr }, { arr: obj }, testInvertible);
+        expect(patches).toEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '/arr',
+            value: arr
+          }),
+          {
+            op: 'replace',
+            path: '/arr',
+            value: obj
+          }
+        ]);
+      }
     });
-    it('Replacing an array that nested in an object with an object nested in an an object should be handled well', function() {
+    variantIt('Replacing an array that nested in an object with an object nested in an an object should be handled well', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
 
-      const obj = {};
-      var patches = jsonpatch.compare({arr: {deeperArray: ['jack']}}, {arr: {deeperArray: obj}});
+        const arr = ['jack'];
+        const obj = {};
+        var patches = jsonpatch.compare({ arr: { deeperArray: arr } }, { arr: { deeperArray: obj } }, testInvertible);
 
-      expect(patches).toEqual([
-        {
-          op: 'replace',
-          path: '/arr/deeperArray',
-          value: obj
-        }
-      ]);
-            
+        expect(patches).toEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '/arr/deeperArray',
+            value: arr
+          }),
+          {
+            op: 'replace',
+            path: '/arr/deeperArray',
+            value: obj
+          }
+        ]);
+      }
     });
-    it('should return an add for a property that does not exist in the first obj', function() {
-      var objA = {
-        user: {
-          firstName: 'Albert'
-        }
-      };
-      var objB = {
-        user: {
-          firstName: 'Albert',
-          lastName: 'Einstein'
-        }
-      };
+    variantIt('should return an add for a property that does not exist in the first obj, without a test operation', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        var objA = {
+          user: {
+            firstName: 'Albert'
+          }
+        };
+        var objB = {
+          user: {
+            firstName: 'Albert',
+            lastName: 'Einstein'
+          }
+        };
 
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
-        {
-          op: 'add',
-          path: '/user/lastName',
-          value: 'Einstein'
-        }
-      ]);
-    });
-
-    it('should return a remove for a property that does not exist in the second obj', function() {
-      var objA = {
-        user: {
-          firstName: 'Albert',
-          lastName: 'Einstein'
-        }
-      };
-      var objB = {
-        user: {
-          firstName: 'Albert'
-        }
-      };
-
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
-        {
-          op: 'remove',
-          path: '/user/lastName'
-        }
-      ]);
-    });
-
-    it('should return a replace for a property that exists in both', function() {
-      var objA = {
-        user: {
-          firstName: 'Albert',
-          lastName: 'Einstein'
-        }
-      };
-      var objB = {
-        user: {
-          firstName: 'Albert',
-          lastName: 'Collins'
-        }
-      };
-
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
-        {
-          op: 'replace',
-          path: '/user/lastName',
-          value: 'Collins'
-        }
-      ]);
+        expect(jsonpatch.compare(objA, objB, testInvertible)).toReallyEqual([
+          // no test operation, because undefined values are not serialized to JSON
+          {
+            op: 'add',
+            path: '/user/lastName',
+            value: 'Einstein'
+          }
+        ]);
+      }
     });
 
-    it('should replace null with object', function() {
-      var objA = {
-        user: null
-      };
-      var objB = {
-        user: {}
-      };
+    variantIt('should return test and remove for a property that does not exist in the second obj', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        var objA = {
+          user: {
+            firstName: 'Albert',
+            lastName: 'Einstein'
+          }
+        };
+        var objB = {
+          user: {
+            firstName: 'Albert'
+          }
+        };
 
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
-        {
-          op: 'replace',
-          path: '/user',
-          value: {}
-        }
-      ]);
+        expect(jsonpatch.compare(objA, objB, testInvertible)).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '/user/lastName',
+            value: 'Einstein'
+          }),
+          {
+            op: 'remove',
+            path: '/user/lastName'
+          }
+        ]);
+      }
     });
 
-    it('should replace object with null', function() {
-      var objA = {
-        user: {}
-      };
-      var objB = {
-        user: null
-      };
+    variantIt('should return test and replace for a property that exists in both', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        var objA = {
+          user: {
+            firstName: 'Albert',
+            lastName: 'Einstein'
+          }
+        };
+        var objB = {
+          user: {
+            firstName: 'Albert',
+            lastName: 'Collins'
+          }
+        };
 
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
-        {
-          op: 'replace',
-          path: '/user',
-          value: null
-        }
-      ]);
+        expect(jsonpatch.compare(objA, objB, testInvertible)).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '/user/lastName',
+            value: 'Einstein'
+          }),
+          {
+            op: 'replace',
+            path: '/user/lastName',
+            value: 'Collins'
+          }
+        ]);
+      }
     });
 
-    it('should not remove undefined', function() {
-      var objA = {
-        user: undefined
-      };
-      var objB = {
-        user: undefined
-      };
+    variantIt('should replace null with object', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        var objA = {
+          user: null
+        };
+        var objB = {
+          user: {}
+        };
 
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([]);
+        expect(jsonpatch.compare(objA, objB, testInvertible)).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '/user',
+            value: null
+          }),
+          {
+            op: 'replace',
+            path: '/user',
+            value: {}
+          }
+        ]);
+      }
+      });
+
+    variantIt('should replace object with null', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        var objA = {
+          user: {}
+        };
+        var objB = {
+          user: null
+        };
+
+        expect(jsonpatch.compare(objA, objB, testInvertible)).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '/user',
+            value: {}
+          }),
+          {
+            op: 'replace',
+            path: '/user',
+            value: null
+          }
+        ]);
+      }
     });
 
-    it('should replace 0 with empty string', function() {
-      var objA = {
-        user: 0
-      };
-      var objB = {
-        user: ''
-      };
+    variantIt('should not remove undefined', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        var objA = {
+          user: undefined
+        };
+        var objB = {
+          user: undefined
+        };
 
-      expect(jsonpatch.compare(objA, objB)).toReallyEqual([
-        {
-          op: 'replace',
-          path: '/user',
-          value: ''
-        }
-      ]);
+        expect(jsonpatch.compare(objA, objB, testInvertible)).toReallyEqual([]);
+      }
+    });
+
+    variantIt('should replace 0 with empty string', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        var objA = {
+          user: 0
+        };
+        var objB = {
+          user: ''
+        };
+
+        expect(jsonpatch.compare(objA, objB, testInvertible)).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '/user',
+            value: 0
+          }),
+          {
+            op: 'replace',
+            path: '/user',
+            value: ''
+          }
+        ]);
+      };
     });
   });
 

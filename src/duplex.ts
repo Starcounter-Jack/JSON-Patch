@@ -6,8 +6,8 @@
 import { _deepClone, _objectKeys, escapePathComponent, hasOwnProperty } from './helpers';
 import { applyPatch, Operation } from './core';
 
-/* export all core functions */
-export { applyOperation, applyPatch, applyReducer, getValueByPointer, Operation, validate, validator, OperationResult } from './core';
+/* export all core functions and types */
+export { applyOperation, applyPatch, applyReducer, getValueByPointer, Operation, AddOperation, RemoveOperation, ReplaceOperation, MoveOperation, CopyOperation,  TestOperation, GetOperation, validate, validator, OperationResult } from './core';
 
 /* export some helpers */
 export { PatchError as JsonPatchError, _deepClone as deepClone, escapePathComponent, unescapePathComponent } from './helpers';
@@ -128,9 +128,10 @@ export function observe<T>(obj: Object|Array<T>, callback?: (patches: Operation[
 /**
  * Generate an array of patches from an observer
  */
-export function generate<T>(observer: Observer<Object>): Operation[] {
+export function generate<T>(observer: Observer<Object>, invertible = false): Operation[] {
   var mirror = beforeDict.get(observer.object);
-  _generate(mirror.value, observer.object, observer.patches, "");
+
+  _generate(mirror.value, observer.object, observer.patches, "", invertible);
   if (observer.patches.length) {
     applyPatch(mirror.value, observer.patches);
   }
@@ -145,7 +146,7 @@ export function generate<T>(observer: Observer<Object>): Operation[] {
 }
 
 // Dirty check if obj is different from mirror, generate patches and update mirror
-function _generate(mirror, obj, patches, path) {
+function _generate(mirror, obj, patches, path, invertible) {
   if (obj === mirror) {
     return;
   }
@@ -169,19 +170,28 @@ function _generate(mirror, obj, patches, path) {
       var newVal = obj[key];
 
       if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
-        _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
+        _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key), invertible);
       }
       else {
         if (oldVal !== newVal) {
           changed = true;
+          if (invertible) { 
+            patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) }); 
+      	  }
           patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: _deepClone(newVal) });
         }
       }
     }
     else if(Array.isArray(mirror) === Array.isArray(obj)) {
+      if (invertible) {
+        patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) });
+      }
       patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
       deleted = true; // property has been deleted
     } else {
+      if (invertible) {
+        patches.push({ op: "test", path, value: mirror });
+      }
       patches.push({ op: "replace", path, value: obj });
       changed = true;
     }
@@ -201,8 +211,8 @@ function _generate(mirror, obj, patches, path) {
 /**
  * Create an array of patches from the differences in two objects
  */
-export function compare(tree1: Object | Array<any>, tree2: Object | Array<any>): Operation[] {
+export function compare(tree1: Object | Array<any>, tree2: Object | Array<any>, invertible = false): Operation[] {
   var patches = [];
-  _generate(tree1, tree2, patches, '');
+  _generate(tree1, tree2, patches, '', invertible);
   return patches;
 }

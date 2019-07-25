@@ -5,4 +5,4 @@ before_script:
   - npm install
   - npm run serve &
 script:
-  - npm run test-sauce
+  - npm run test
