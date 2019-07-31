@@ -23,6 +23,7 @@
   },
   "license": "MIT",
   "main": "lib/duplex.js",
+  "module": "module/duplex.js",
   "typings": "lib/duplex.d.ts",
   "engines": {
     "node": ">= 0.4.0"
@@ -47,7 +48,9 @@
     "webpack-cli": "^3.3.5"
   },
   "scripts": {
-    "tsc": "tsc",
+    "tsc": "npm run tsc-common && npm run tsc-module",
+    "tsc-common": "tsc",
+    "tsc-module": "tsc --module ES6 --moduleResolution node --outDir \"module/\"",
     "version": "tsc && webpack && git add -A",
     "build": "tsc && webpack",
     "serve": "http-server -p 5000 --silent",
