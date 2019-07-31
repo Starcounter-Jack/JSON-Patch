@@ -4,8 +4,6 @@
  * MIT license
  */
 
-import { Operation } from "./core";
-
 const _hasOwnProperty = Object.prototype.hasOwnProperty;
 export function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);

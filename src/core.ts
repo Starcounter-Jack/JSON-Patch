@@ -6,7 +6,7 @@
 declare var require: any;
 
 import * as areEquals from 'fast-deep-equal';
-import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers';
+import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers.js';
 
 export const JsonPatchError = PatchError;
 export const deepClone = _deepClone;

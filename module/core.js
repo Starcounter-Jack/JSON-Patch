@@ -1,5 +1,5 @@
 import * as areEquals from 'fast-deep-equal';
-import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers';
+import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers.js';
 export var JsonPatchError = PatchError;
 export var deepClone = _deepClone;
 /* We use a Javascript hash to store each
