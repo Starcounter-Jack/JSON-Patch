@@ -11,9 +11,5 @@ npm-debug.log
 # Typescript
 *.d.ts
 
-# compiled files
-src/*.js
-lib/*
-
 # SauceLabs logs
 *.log
