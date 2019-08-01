@@ -1,10 +1,4 @@
-var obj;
-if (typeof jsonpatch === 'undefined') {
-  jsonpatch = require('./../../lib/duplex');
-}
-if (typeof _ === 'undefined') {
-  _ = require('underscore');
-}
+import * as jsonpatch from '../../module/duplex.js';
 
 describe('jsonpatch.getValueByPointer', function() {
   it('should retrieve values by JSON pointer from tree - deep object', function() {
@@ -493,7 +487,7 @@ describe('root replacement with applyOperation', function() {
 /* this is just a copy-paste of original specs, but with using applyOperation, to test for non-root patches */
 describe('core - using applyOperation', function() {
   it("shouldn't touch original tree", function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -522,7 +516,7 @@ describe('core - using applyOperation', function() {
     });
   });
   it('should apply add', function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -647,7 +641,7 @@ describe('core - using applyOperation', function() {
   });
 
   it('should apply remove', function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -679,7 +673,7 @@ describe('core - using applyOperation', function() {
     });
   });
   it('should apply replace', function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -731,7 +725,7 @@ describe('core - using applyOperation', function() {
     });
   });
   it('should apply test', function() {
-    obj = {
+    var obj = {
       foo: {
         bar: [1, 2, 5, 4]
       },
@@ -852,7 +846,7 @@ describe('core - using applyOperation', function() {
   });
 
   it('should apply move', function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -907,7 +901,7 @@ describe('core - using applyOperation', function() {
   });
 
   it('should apply copy', function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -970,7 +964,7 @@ describe('core - using applyOperation', function() {
 
 describe('core', function() {
   it("shouldn't touch original tree", function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -1001,7 +995,7 @@ describe('core', function() {
     });
   });
   it('should apply add', function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -1123,7 +1117,7 @@ describe('core', function() {
     var obj = {
       hello: 'world'
     };
-    newObj = jsonpatch.applyPatch(obj, [
+    var newObj = jsonpatch.applyPatch(obj, [
       {
         op: 'add',
         path: '',
@@ -1139,7 +1133,7 @@ describe('core', function() {
   });
 
   it('should apply remove', function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -1178,7 +1172,7 @@ describe('core', function() {
   });
 
   it('should apply replace', function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -1240,7 +1234,7 @@ describe('core', function() {
   });
 
   it('should apply test', function() {
-    obj = {
+    var obj = {
       foo: {
         bar: [1, 2, 5, 4]
       },
@@ -1388,7 +1382,7 @@ describe('core', function() {
   });
 
   it('should apply move', function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -1434,7 +1428,7 @@ describe('core', function() {
         city: 'Vancouver'
       }
     };
-    newObj = jsonpatch.applyPatch(obj, [
+    var newObj = jsonpatch.applyPatch(obj, [
       {
         op: 'move',
         from: '/location',
@@ -1448,7 +1442,7 @@ describe('core', function() {
   });
 
   it('should apply copy', function() {
-    obj = {
+    var obj = {
       foo: 1,
       baz: [
         {
@@ -1500,7 +1494,7 @@ describe('core', function() {
         city: 'Vancouver'
       }
     };
-    newObj = jsonpatch.applyPatch(obj, [
+    var newObj = jsonpatch.applyPatch(obj, [
       {
         op: 'copy',
         from: '/location',
@@ -1694,7 +1688,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
     });
 
     it('remove on element already set to `undefined`, and remove it completely', function() {
-      obj = {
+      var obj = {
         foo: 1,
         not: undefined
       };
@@ -1710,7 +1704,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
     it('remove on array element set to `undefined`', function() {
-      obj = {
+      var obj = {
         foo: 1,
         bar: [0, 1, undefined, 3]
       };
@@ -1728,7 +1722,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
     });
 
     it('replace on element set to `undefined`', function() {
-      obj = {
+      var obj = {
         foo: 1,
         not: undefined
       };
@@ -1746,7 +1740,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
     it('replace on array element set to `undefined`', function() {
-      obj = {
+      var obj = {
         foo: 1,
         bar: [0, 1, undefined, 3]
       };
@@ -1764,7 +1758,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
     it('replace element with `undefined` (extension)', function() {
-      obj = {
+      var obj = {
         foo: 1
       };
 
@@ -1780,7 +1774,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
     it('replace array element with `undefined` (extension)', function() {
-      obj = {
+      var obj = {
         foo: 1,
         bar: [0, 1, 2, 3]
       };
@@ -1798,7 +1792,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
     it('test on element set to `undefined`', function() {
-      obj = {
+      var obj = {
         foo: 1,
         not: undefined
       };
@@ -1822,7 +1816,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       ).toBe(true);
     });
     it('test on array element set to `undefined`', function() {
-      obj = {
+      var obj = {
         foo: 1,
         bar: [0, 1, undefined, 3]
       };
@@ -1856,7 +1850,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
     });
 
     it('move of `undefined`', function() {
-      obj = {
+      var obj = {
         foo: undefined,
         baz: 'defined'
       };
@@ -1886,7 +1880,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
     });
 
     it('copy of `undefined` as `null` (like `JSON.stringify` does)', function() {
-      obj = {
+      var obj = {
         foo: undefined,
         baz: 'defined'
       };

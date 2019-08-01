@@ -122,7 +122,7 @@ const objOps = {
     return { newDocument: document }
   },
   test: function (obj, key, document) {
-    return { newDocument: document, test: areEquals(obj[key], this.value) }
+    return { newDocument: document, test: _areEquals(obj[key], this.value) }
   },
   _get: function (obj, key, document) {
     this.value = obj[key];
@@ -213,7 +213,7 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
       }
       return returnValue;
     } else if (operation.op === 'test') {
-      returnValue.test = areEquals(document, operation.value);
+      returnValue.test = _areEquals(document, operation.value);
       if (returnValue.test === false) {
         throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
       }
@@ -479,7 +479,7 @@ export function validate<T>(sequence: Operation[], document?: T, externalValidat
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-function areEquals(a: any, b: any): boolean {
+export function _areEquals(a: any, b: any): boolean {
   if (a === b) return true;
 
   if (a && b && typeof a == 'object' && typeof b == 'object') {
@@ -493,7 +493,7 @@ function areEquals(a: any, b: any): boolean {
       length = a.length;
       if (length != b.length) return false;
       for (i = length; i-- !== 0;)
-        if (!areEquals(a[i], b[i])) return false;
+        if (!_areEquals(a[i], b[i])) return false;
       return true;
     }
 
@@ -510,7 +510,7 @@ function areEquals(a: any, b: any): boolean {
 
     for (i = length; i-- !== 0;) {
       key = keys[i];
-      if (!areEquals(a[key], b[key])) return false;
+      if (!_areEquals(a[key], b[key])) return false;
     }
 
     return true;

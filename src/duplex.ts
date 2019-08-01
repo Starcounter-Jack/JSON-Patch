@@ -7,7 +7,7 @@ import { _deepClone, _objectKeys, escapePathComponent, hasOwnProperty } from './
 import { applyPatch, Operation } from './core.js';
 
 /* export all core functions and types */
-export { applyOperation, applyPatch, applyReducer, getValueByPointer, Operation, AddOperation, RemoveOperation, ReplaceOperation, MoveOperation, CopyOperation,  TestOperation, GetOperation, validate, validator, OperationResult } from './core.js';
+export { applyOperation, applyPatch, applyReducer, getValueByPointer, Operation, AddOperation, RemoveOperation, ReplaceOperation, MoveOperation, CopyOperation,  TestOperation, GetOperation, validate, validator, OperationResult, _areEquals } from './core.js';
 
 /* export some helpers */
 export { PatchError as JsonPatchError, _deepClone as deepClone, escapePathComponent, unescapePathComponent } from './helpers.js';
@@ -175,8 +175,8 @@ function _generate(mirror, obj, patches, path, invertible) {
       else {
         if (oldVal !== newVal) {
           changed = true;
-          if (invertible) { 
-            patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) }); 
+          if (invertible) {
+            patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) });
       	  }
           patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: _deepClone(newVal) });
         }

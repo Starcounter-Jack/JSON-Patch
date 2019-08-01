@@ -1,22 +1,23 @@
 var obj, obj2, patches;
+
+import * as jsonpatch from '../../module/duplex.js';
+import {EventTarget, defineEventAttribute} from "../../node_modules/event-target-shim/dist/event-target-shim.mjs";
+
 if (typeof window === 'undefined') {
-  const jsdom = require("jsdom");
-  const { JSDOM } = jsdom;
-  const dom = new JSDOM();
-  global.window = dom.window;
-  global.document = dom.window.document;
-}
-if (typeof jsonpatch === 'undefined') {
-  jsonpatch = require('./../../lib/duplex');
-}
-if (typeof _ === 'undefined') {
-  _ = require('underscore');
+  global.window = new EventTarget();
 }
 
-function trigger(eventName, elem) {
-  if (typeof document !== 'undefined') {
-    fireEvent(elem || document.documentElement, eventName);
+function trigger(eventName) {
+  let event;
+  if (typeof CustomEvent !== 'undefined') {
+    //browser with real EventTarget
+    event = new CustomEvent(eventName);
   }
+  else {
+    //browser with real EventTarget
+    event = { type: eventName };
+  }
+  window.dispatchEvent(event)
 }
 
 function getPatchesUsingGenerate(objFactory, objChanger) {
@@ -31,21 +32,6 @@ function getPatchesUsingCompare(objFactory, objChanger) {
   var mirror = JSON.parse(JSON.stringify(obj));
   objChanger(obj);
   return jsonpatch.compare(mirror, JSON.parse(JSON.stringify(obj)));
-}
-
-//http://stackoverflow.com/questions/827716/emulate-clicking-a-link-with-javascript-that-works-with-ie
-function fireEvent(obj, evt) {
-  var fireOnThis = obj;
-  if (document.createEvent) {
-    var evObj = document.createEvent(
-      evt.indexOf('mouse') > -1 ? 'MouseEvents' : 'KeyboardEvent'
-    );
-    evObj.initEvent(evt, true, false);
-    fireOnThis.dispatchEvent(evObj);
-  } else if (document.createEventObject) {
-    var evObj = document.createEventObject();
-    fireOnThis.fireEvent('on' + evt, evObj);
-  }
 }
 
 var customMatchers = {
@@ -67,7 +53,7 @@ var customMatchers = {
     return {
       compare: function(actual, expected) {
         return {
-          pass: _.isEqual(actual, expected)
+          pass: jsonpatch._areEquals(actual, expected)
         };
       }
     };
@@ -374,7 +360,7 @@ describe('duplex', function() {
     });
 
     it('should generate replace (changes in new array cell, primitive values)', function() {
-      arr = [1];
+      const arr = [1];
 
       var observer = jsonpatch.observe(arr);
       arr.push(2);
@@ -412,7 +398,7 @@ describe('duplex', function() {
     });
 
     it('should generate replace (changes in new array cell, complex values)', function() {
-      arr = [
+      const arr = [
         {
           id: 1,
           name: 'Ted'

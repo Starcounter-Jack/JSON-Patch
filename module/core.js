@@ -42,7 +42,7 @@ var objOps = {
         return { newDocument: document };
     },
     test: function (obj, key, document) {
-        return { newDocument: document, test: areEquals(obj[key], this.value) };
+        return { newDocument: document, test: _areEquals(obj[key], this.value) };
     },
     _get: function (obj, key, document) {
         this.value = obj[key];
@@ -138,7 +138,7 @@ export function applyOperation(document, operation, validateOperation, mutateDoc
             return returnValue;
         }
         else if (operation.op === 'test') {
-            returnValue.test = areEquals(document, operation.value);
+            returnValue.test = _areEquals(document, operation.value);
             if (returnValue.test === false) {
                 throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
             }
@@ -391,7 +391,7 @@ export function validate(sequence, document, externalValidator) {
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-function areEquals(a, b) {
+export function _areEquals(a, b) {
     if (a === b)
         return true;
     if (a && b && typeof a == 'object' && typeof b == 'object') {
@@ -401,7 +401,7 @@ function areEquals(a, b) {
             if (length != b.length)
                 return false;
             for (i = length; i-- !== 0;)
-                if (!areEquals(a[i], b[i]))
+                if (!_areEquals(a[i], b[i]))
                     return false;
             return true;
         }
@@ -416,7 +416,7 @@ function areEquals(a, b) {
                 return false;
         for (i = length; i-- !== 0;) {
             key = keys[i];
-            if (!areEquals(a[key], b[key]))
+            if (!_areEquals(a[key], b[key]))
                 return false;
         }
         return true;

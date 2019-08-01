@@ -1,32 +1,18 @@
-if(typeof jsonpatch == 'undefined') {
-  var jsonpatch = require('../../lib/duplex')
-}
+import * as jsonpatch from '../../module/duplex.js';
+
+import tests_json from './json-patch-tests/tests.json.js';
+import spec_tests_json from './json-patch-tests/spec_tests.json.js';
 
 var JSONtests = [
   {
     name: 'tests.json',
-    path: 'spec/json-patch-tests/tests.json'
+    tests: tests_json
   },
   {
     name: 'spec_tests.json',
-    path: 'spec/json-patch-tests/spec_tests.json'
+    tests: spec_tests_json
   }
 ];
-
-var loadJsonTestSuite;
-if (typeof XMLHttpRequest === 'undefined') {
-  var jsonfile = require('jsonfile');
-  loadJsonTestSuite = function(url, callback) {
-    return jsonfile.readFileSync('test/' + url);
-  };
-} else {
-  loadJsonTestSuite = function(url, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, false);
-    xhr.send();
-    return JSON.parse(xhr.responseText);
-  };
-}
 
 if (typeof Array.prototype.forEach != 'function') {
   Array.prototype.forEach = function(callback) {
@@ -39,7 +25,7 @@ if (typeof Array.prototype.forEach != 'function') {
 describe('json-patch-tests', function() {
   JSONtests.forEach(function(jsonTest) {
     describe(jsonTest.name, function() {
-      loadJsonTestSuite(jsonTest.path).forEach(function(test) {
+      jsonTest.tests.forEach(function(test) {
         if (test.disabled) {
           return;
         }
@@ -47,7 +33,7 @@ describe('json-patch-tests', function() {
         if (test.expected) {
           it('should succeed: ' + testName, function() {
             const results = jsonpatch.applyPatch(test.doc, test.patch, true);
-            test.doc = results.newDocument;            
+            test.doc = results.newDocument;
             expect(test.doc).toEqual(test.expected);
           });
         } else if (test.error || test.patch[0].op === 'test') {

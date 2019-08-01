@@ -15,21 +15,20 @@
   <script src="../node_modules/lodash/lodash.min.js"></script>
   <script src="../node_modules/platform/platform.js"></script>
   <script src="../node_modules/benchmark/benchmark.js"></script>
-  <script src="lib/benchmark_reporter.js"></script>
+  <script src="lib/benchmark_reporter.js"></script> -->
   <link rel="stylesheet" type="text/css" href="lib/benchmark_reporter.css">
 
   <!-- include source files here... -->
   <script src="../dist/fast-json-patch.js"></script>
 
   <!-- Dynamically load https://github.com/json-patch/json-patch-tests test suite -->
-  <script src="spec/jsonPatchTestsSpec.js"></script>
-  <script src="spec/coreSpec.js"></script>
-  <script src="spec/validateSpec.js"></script>
-  <script src="spec/duplexSpec.js"></script>
+  <script type="module" src="spec/jsonPatchTestsSpec.js"></script>
+  <script type="module" src="spec/coreSpec.js"></script>
+  <script type="module" src="spec/validateSpec.js"></script>
+  <script type="module" src="spec/duplexSpec.js"></script>
   <script src="spec/duplexBenchmark.js"></script>
   <script src="spec/coreBenchmark.js"></script>
 
-  <script type="module" src="spec/moduleSpec.js"></script>
 </head>
 
 <body>

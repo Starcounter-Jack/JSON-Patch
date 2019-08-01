@@ -6,7 +6,7 @@
 import { _deepClone, _objectKeys, escapePathComponent, hasOwnProperty } from './helpers.js';
 import { applyPatch } from './core.js';
 /* export all core functions and types */
-export { applyOperation, applyPatch, applyReducer, getValueByPointer, validate, validator } from './core.js';
+export { applyOperation, applyPatch, applyReducer, getValueByPointer, validate, validator, _areEquals } from './core.js';
 /* export some helpers */
 export { PatchError as JsonPatchError, _deepClone as deepClone, escapePathComponent, unescapePathComponent } from './helpers.js';
 var beforeDict = new WeakMap();

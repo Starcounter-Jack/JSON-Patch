@@ -322,7 +322,7 @@ var objOps = {
         return { newDocument: document };
     },
     test: function (obj, key, document) {
-        return { newDocument: document, test: areEquals(obj[key], this.value) };
+        return { newDocument: document, test: _areEquals(obj[key], this.value) };
     },
     _get: function (obj, key, document) {
         this.value = obj[key];
@@ -419,7 +419,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             return returnValue;
         }
         else if (operation.op === 'test') {
-            returnValue.test = areEquals(document, operation.value);
+            returnValue.test = _areEquals(document, operation.value);
             if (returnValue.test === false) {
                 throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
             }
@@ -677,7 +677,7 @@ exports.validate = validate;
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-function areEquals(a, b) {
+function _areEquals(a, b) {
     if (a === b)
         return true;
     if (a && b && typeof a == 'object' && typeof b == 'object') {
@@ -687,7 +687,7 @@ function areEquals(a, b) {
             if (length != b.length)
                 return false;
             for (i = length; i-- !== 0;)
-                if (!areEquals(a[i], b[i]))
+                if (!_areEquals(a[i], b[i]))
                     return false;
             return true;
         }
@@ -702,13 +702,14 @@ function areEquals(a, b) {
                 return false;
         for (i = length; i-- !== 0;) {
             key = keys[i];
-            if (!areEquals(a[key], b[key]))
+            if (!_areEquals(a[key], b[key]))
                 return false;
         }
         return true;
     }
     return a !== a && b !== b;
 }
+exports._areEquals = _areEquals;
 ;
 
 
@@ -732,6 +733,7 @@ exports.applyReducer = core_js_2.applyReducer;
 exports.getValueByPointer = core_js_2.getValueByPointer;
 exports.validate = core_js_2.validate;
 exports.validator = core_js_2.validator;
+exports._areEquals = core_js_2._areEquals;
 /* export some helpers */
 var helpers_js_2 = __webpack_require__(0);
 exports.JsonPatchError = helpers_js_2.PatchError;

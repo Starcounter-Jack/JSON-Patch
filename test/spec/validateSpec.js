@@ -1,6 +1,5 @@
-if(typeof jsonpatch == 'undefined') {
-  var jsonpatch = require('../../lib/duplex')
-}
+import * as jsonpatch from '../../module/duplex.js';
+
 describe('validate', function() {
   it('should return an empty array if the patch is valid', function() {
     var patch = [
