@@ -22,12 +22,9 @@
     "url": "http://www.starcounter.com/"
   },
   "license": "MIT",
-  "main": "lib/duplex.js",
-  "module": "module/duplex.js",
-  "typings": "lib/duplex.d.ts",
-  "engines": {
-    "node": ">= 0.4.0"
-  },
+  "main": "module/duplex.js",
+  "typings": "module/duplex.d.ts",
+  "type": "module",
   "devDependencies": {
     "benchmark": "^2.1.4",
     "bluebird": "^3.5.5",
