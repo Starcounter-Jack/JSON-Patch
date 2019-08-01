@@ -62,8 +62,5 @@
     "bench": "npm run bench-core && npm run bench-duplex",
     "bench-core": "node test/spec/coreBenchmark.js",
     "bench-duplex": "node test/spec/coreBenchmark.js DUPLEX=yes && node test/spec/duplexBenchmark.js"
-  },
-  "dependencies": {
-    "fast-deep-equal": "^2.0.1"
   }
 }

@@ -278,10 +278,9 @@ exports.PatchError = PatchError;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var areEquals = __webpack_require__(3);
-var helpers_1 = __webpack_require__(0);
-exports.JsonPatchError = helpers_1.PatchError;
-exports.deepClone = helpers_1._deepClone;
+var helpers_js_1 = __webpack_require__(0);
+exports.JsonPatchError = helpers_js_1.PatchError;
+exports.deepClone = helpers_js_1._deepClone;
 /* We use a Javascript hash to store each
  function. Each hash entry (property) uses
  the operation identifiers specified in rfc6902.
@@ -310,7 +309,7 @@ var objOps = {
         and is potentially unneeded */
         var removed = getValueByPointer(document, this.path);
         if (removed) {
-            removed = helpers_1._deepClone(removed);
+            removed = helpers_js_1._deepClone(removed);
         }
         var originalValue = applyOperation(document, { op: "remove", path: this.from }).removed;
         applyOperation(document, { op: "add", path: this.path, value: originalValue });
@@ -319,7 +318,7 @@ var objOps = {
     copy: function (obj, key, document) {
         var valueToCopy = getValueByPointer(document, this.from);
         // enforce copy by value so further operations don't affect source (see issue #177)
-        applyOperation(document, { op: "add", path: this.path, value: helpers_1._deepClone(valueToCopy) });
+        applyOperation(document, { op: "add", path: this.path, value: helpers_js_1._deepClone(valueToCopy) });
         return { newDocument: document };
     },
     test: function (obj, key, document) {
@@ -333,7 +332,7 @@ var objOps = {
 /* The operations applicable to an array. Many are the same as for the object */
 var arrOps = {
     add: function (arr, i, document) {
-        if (helpers_1.isInteger(i)) {
+        if (helpers_js_1.isInteger(i)) {
             arr.splice(i, 0, this.value);
         }
         else { // array props
@@ -447,7 +446,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
     } /* END ROOT OPERATIONS */
     else {
         if (!mutateDocument) {
-            document = helpers_1._deepClone(document);
+            document = helpers_js_1._deepClone(document);
         }
         var path = operation.path || "";
         var keys = path.split('/');
@@ -487,10 +486,10 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
                     key = obj.length;
                 }
                 else {
-                    if (validateOperation && !helpers_1.isInteger(key)) {
+                    if (validateOperation && !helpers_js_1.isInteger(key)) {
                         throw new exports.JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", index, operation, document);
                     } // only parse key when it's an integer for `arr.prop` to work
-                    else if (helpers_1.isInteger(key)) {
+                    else if (helpers_js_1.isInteger(key)) {
                         key = ~~key;
                     }
                 }
@@ -507,7 +506,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             }
             else {
                 if (key && key.indexOf('~') != -1) {
-                    key = helpers_1.unescapePathComponent(key);
+                    key = helpers_js_1.unescapePathComponent(key);
                 }
                 if (t >= len) {
                     var returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
@@ -545,7 +544,7 @@ function applyPatch(document, patch, validateOperation, mutateDocument, banProto
         }
     }
     if (!mutateDocument) {
-        document = helpers_1._deepClone(document);
+        document = helpers_js_1._deepClone(document);
     }
     var results = new Array(patch.length);
     for (var i = 0, length_1 = patch.length; i < length_1; i++) {
@@ -601,7 +600,7 @@ function validator(operation, index, document, existingPathFragment) {
     else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && operation.value === undefined) {
         throw new exports.JsonPatchError('Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)', 'OPERATION_VALUE_REQUIRED', index, operation, document);
     }
-    else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && helpers_1.hasUndefined(operation.value)) {
+    else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && helpers_js_1.hasUndefined(operation.value)) {
         throw new exports.JsonPatchError('Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)', 'OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED', index, operation, document);
     }
     else if (document) {
@@ -641,7 +640,7 @@ function validate(sequence, document, externalValidator) {
         }
         if (document) {
             //clone document and sequence so that we can safely try applying operations
-            applyPatch(helpers_1._deepClone(document), helpers_1._deepClone(sequence), externalValidator || true);
+            applyPatch(helpers_js_1._deepClone(document), helpers_js_1._deepClone(sequence), externalValidator || true);
         }
         else {
             externalValidator = externalValidator || validator;
@@ -660,6 +659,57 @@ function validate(sequence, document, externalValidator) {
     }
 }
 exports.validate = validate;
+// based on https://github.com/epoberezkin/fast-deep-equal
+// MIT License
+// Copyright (c) 2017 Evgeny Poberezkin
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+function areEquals(a, b) {
+    if (a === b)
+        return true;
+    if (a && b && typeof a == 'object' && typeof b == 'object') {
+        var arrA = Array.isArray(a), arrB = Array.isArray(b), i, length, key;
+        if (arrA && arrB) {
+            length = a.length;
+            if (length != b.length)
+                return false;
+            for (i = length; i-- !== 0;)
+                if (!areEquals(a[i], b[i]))
+                    return false;
+            return true;
+        }
+        if (arrA != arrB)
+            return false;
+        var keys = Object.keys(a);
+        length = keys.length;
+        if (length !== Object.keys(b).length)
+            return false;
+        for (i = length; i-- !== 0;)
+            if (!b.hasOwnProperty(keys[i]))
+                return false;
+        for (i = length; i-- !== 0;) {
+            key = keys[i];
+            if (!areEquals(a[key], b[key]))
+                return false;
+        }
+        return true;
+    }
+    return a !== a && b !== b;
+}
+;
 
 
 /***/ }),
@@ -672,22 +722,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * (c) 2017 Joachim Wester
  * MIT license
  */
-var helpers_1 = __webpack_require__(0);
-var core_1 = __webpack_require__(1);
+var helpers_js_1 = __webpack_require__(0);
+var core_js_1 = __webpack_require__(1);
 /* export all core functions and types */
-var core_2 = __webpack_require__(1);
-exports.applyOperation = core_2.applyOperation;
-exports.applyPatch = core_2.applyPatch;
-exports.applyReducer = core_2.applyReducer;
-exports.getValueByPointer = core_2.getValueByPointer;
-exports.validate = core_2.validate;
-exports.validator = core_2.validator;
+var core_js_2 = __webpack_require__(1);
+exports.applyOperation = core_js_2.applyOperation;
+exports.applyPatch = core_js_2.applyPatch;
+exports.applyReducer = core_js_2.applyReducer;
+exports.getValueByPointer = core_js_2.getValueByPointer;
+exports.validate = core_js_2.validate;
+exports.validator = core_js_2.validator;
 /* export some helpers */
-var helpers_2 = __webpack_require__(0);
-exports.JsonPatchError = helpers_2.PatchError;
-exports.deepClone = helpers_2._deepClone;
-exports.escapePathComponent = helpers_2.escapePathComponent;
-exports.unescapePathComponent = helpers_2.unescapePathComponent;
+var helpers_js_2 = __webpack_require__(0);
+exports.JsonPatchError = helpers_js_2.PatchError;
+exports.deepClone = helpers_js_2._deepClone;
+exports.escapePathComponent = helpers_js_2.escapePathComponent;
+exports.unescapePathComponent = helpers_js_2.unescapePathComponent;
 var beforeDict = new WeakMap();
 var Mirror = /** @class */ (function () {
     function Mirror(obj) {
@@ -738,7 +788,7 @@ function observe(obj, callback) {
         return observer;
     }
     observer = {};
-    mirror.value = helpers_1._deepClone(obj);
+    mirror.value = helpers_js_1._deepClone(obj);
     if (callback) {
         observer.callback = callback;
         observer.next = null;
@@ -783,7 +833,7 @@ function generate(observer, invertible) {
     var mirror = beforeDict.get(observer.object);
     _generate(mirror.value, observer.object, observer.patches, "", invertible);
     if (observer.patches.length) {
-        core_1.applyPatch(mirror.value, observer.patches);
+        core_js_1.applyPatch(mirror.value, observer.patches);
     }
     var temp = observer.patches;
     if (temp.length > 0) {
@@ -803,34 +853,34 @@ function _generate(mirror, obj, patches, path, invertible) {
     if (typeof obj.toJSON === "function") {
         obj = obj.toJSON();
     }
-    var newKeys = helpers_1._objectKeys(obj);
-    var oldKeys = helpers_1._objectKeys(mirror);
+    var newKeys = helpers_js_1._objectKeys(obj);
+    var oldKeys = helpers_js_1._objectKeys(mirror);
     var changed = false;
     var deleted = false;
     //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
     for (var t = oldKeys.length - 1; t >= 0; t--) {
         var key = oldKeys[t];
         var oldVal = mirror[key];
-        if (helpers_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
+        if (helpers_js_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
             var newVal = obj[key];
             if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
-                _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key), invertible);
+                _generate(oldVal, newVal, patches, path + "/" + helpers_js_1.escapePathComponent(key), invertible);
             }
             else {
                 if (oldVal !== newVal) {
                     changed = true;
                     if (invertible) {
-                        patches.push({ op: "test", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(oldVal) });
+                        patches.push({ op: "test", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(oldVal) });
                     }
-                    patches.push({ op: "replace", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(newVal) });
+                    patches.push({ op: "replace", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(newVal) });
                 }
             }
         }
         else if (Array.isArray(mirror) === Array.isArray(obj)) {
             if (invertible) {
-                patches.push({ op: "test", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(oldVal) });
+                patches.push({ op: "test", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(oldVal) });
             }
-            patches.push({ op: "remove", path: path + "/" + helpers_1.escapePathComponent(key) });
+            patches.push({ op: "remove", path: path + "/" + helpers_js_1.escapePathComponent(key) });
             deleted = true; // property has been deleted
         }
         else {
@@ -846,8 +896,8 @@ function _generate(mirror, obj, patches, path, invertible) {
     }
     for (var t = 0; t < newKeys.length; t++) {
         var key = newKeys[t];
-        if (!helpers_1.hasOwnProperty(mirror, key) && obj[key] !== undefined) {
-            patches.push({ op: "add", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(obj[key]) });
+        if (!helpers_js_1.hasOwnProperty(mirror, key) && obj[key] !== undefined) {
+            patches.push({ op: "add", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(obj[key]) });
         }
     }
 }
@@ -861,68 +911,6 @@ function compare(tree1, tree2, invertible) {
     return patches;
 }
 exports.compare = compare;
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var isArray = Array.isArray;
-var keyList = Object.keys;
-var hasProp = Object.prototype.hasOwnProperty;
-
-module.exports = function equal(a, b) {
-  if (a === b) return true;
-
-  if (a && b && typeof a == 'object' && typeof b == 'object') {
-    var arrA = isArray(a)
-      , arrB = isArray(b)
-      , i
-      , length
-      , key;
-
-    if (arrA && arrB) {
-      length = a.length;
-      if (length != b.length) return false;
-      for (i = length; i-- !== 0;)
-        if (!equal(a[i], b[i])) return false;
-      return true;
-    }
-
-    if (arrA != arrB) return false;
-
-    var dateA = a instanceof Date
-      , dateB = b instanceof Date;
-    if (dateA != dateB) return false;
-    if (dateA && dateB) return a.getTime() == b.getTime();
-
-    var regexpA = a instanceof RegExp
-      , regexpB = b instanceof RegExp;
-    if (regexpA != regexpB) return false;
-    if (regexpA && regexpB) return a.toString() == b.toString();
-
-    var keys = keyList(a);
-    length = keys.length;
-
-    if (length !== keyList(b).length)
-      return false;
-
-    for (i = length; i-- !== 0;)
-      if (!hasProp.call(b, keys[i])) return false;
-
-    for (i = length; i-- !== 0;) {
-      key = keys[i];
-      if (!equal(a[key], b[key])) return false;
-    }
-
-    return true;
-  }
-
-  return a!==a && b!==b;
-};
 
 
 /***/ })
