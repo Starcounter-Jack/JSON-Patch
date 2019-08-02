@@ -3,7 +3,7 @@ import * as jsonpatch from '../../module/duplex.js';
 import tests_json from './json-patch-tests/tests.json.js';
 import spec_tests_json from './json-patch-tests/spec_tests.json.js';
 
-var JSONtests = [
+const JSONtests = [
   {
     name: 'tests.json',
     tests: tests_json
@@ -16,7 +16,7 @@ var JSONtests = [
 
 if (typeof Array.prototype.forEach != 'function') {
   Array.prototype.forEach = function(callback) {
-    for (var i = 0; i < this.length; i++) {
+    for (const i = 0; i < this.length; i++) {
       callback.apply(this, [this[i], i, this]);
     }
   };
@@ -29,7 +29,7 @@ describe('json-patch-tests', function() {
         if (test.disabled) {
           return;
         }
-        var testName = test.comment || test.error || JSON.stringify(test.patch);
+        const testName = test.comment || test.error || JSON.stringify(test.patch);
         if (test.expected) {
           it('should succeed: ' + testName, function() {
             const results = jsonpatch.applyPatch(test.doc, test.patch, true);
@@ -38,9 +38,9 @@ describe('json-patch-tests', function() {
           });
         } else if (test.error || test.patch[0].op === 'test') {
           it('should throw an error: ' + testName, function() {
-            var errors = 0;
+            let errors = 0;
             try {
-              var res = jsonpatch.applyPatch(test.doc, test.patch, true);
+              const res = jsonpatch.applyPatch(test.doc, test.patch, true);
               if (res.test === false) {
                 throw new Error('Test failed');
               }

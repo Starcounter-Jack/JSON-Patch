@@ -2,16 +2,16 @@ if (typeof jsonpatch === 'undefined') {
    jsonpatch = require('./../../lib/duplex');
 }
 if (typeof Benchmark === 'undefined') {
-    var Benchmark = require('benchmark');
-    var benchmarkResultsToConsole = require('./../lib/benchmark_console_reporter.js').benchmarkResultsToConsole;
+    global.Benchmark = require('benchmark');
+    global.benchmarkResultsToConsole = require('./../lib/benchmark_console_reporter.js').benchmarkResultsToConsole;
 }
 
 
 
-var suite = new Benchmark.Suite;
-suite.add('add operation', {
+const coreSuite = new Benchmark.Suite;
+coreSuite.add('add operation', {
     setup: function(){
-        var obj = {
+        const obj = {
             foo: 1,
             baz: [{
                 qux: 'hello'
@@ -26,9 +26,9 @@ suite.add('add operation', {
         }]);
     }
 });
-suite.add('remove operation', {
+coreSuite.add('remove operation', {
     setup: function(){
-        var obj = {
+        const obj = {
             foo: 1,
             baz: [{
                 qux: 'hello'
@@ -43,9 +43,9 @@ suite.add('remove operation', {
         }]);
     }
 });
-suite.add('replace operation', {
+coreSuite.add('replace operation', {
     setup: function(){
-        var obj = {
+        const obj = {
             foo: 1,
             baz: [{
                 qux: 'hello'
@@ -60,9 +60,9 @@ suite.add('replace operation', {
         }]);
     }
 });
-suite.add('move operation', {
+coreSuite.add('move operation', {
     setup: function(){
-        var obj = {
+        const obj = {
             foo: 1,
             baz: [{
                 qux: 'hello'
@@ -78,9 +78,9 @@ suite.add('move operation', {
         }]);
     }
 });
-suite.add('copy operation', {
+coreSuite.add('copy operation', {
     setup: function(){
-        var obj = {
+        const obj = {
             foo: 1,
             baz: [{
                 qux: 'hello'
@@ -96,9 +96,9 @@ suite.add('copy operation', {
         }]);
     }
 });
-suite.add('test operation', {
+coreSuite.add('test operation', {
     setup: function(){
-        var obj = {
+        const obj = {
             foo: 1,
             baz: [{
                 qux: 'hello'
@@ -118,10 +118,10 @@ suite.add('test operation', {
 
 // if we are in the browser with benchmark < 2.1.2
 if(typeof benchmarkReporter !== 'undefined'){
-    benchmarkReporter(suite);
+    benchmarkReporter(coreSuite);
 } else {
-    suite.on('complete', function () {
-        benchmarkResultsToConsole(suite);
+    coreSuite.on('complete', function () {
+        benchmarkResultsToConsole(coreSuite);
     });
-    suite.run();
+    coreSuite.run();
 }

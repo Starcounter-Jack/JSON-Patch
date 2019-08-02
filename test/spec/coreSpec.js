@@ -2,26 +2,26 @@ import * as jsonpatch from '../../module/duplex.js';
 
 describe('jsonpatch.getValueByPointer', function() {
   it('should retrieve values by JSON pointer from tree - deep object', function() {
-    var obj = {
+    const obj = {
       person: { name: 'Marilyn' }
     };
-    var name = jsonpatch.getValueByPointer(obj, '/person/name');
+    const name = jsonpatch.getValueByPointer(obj, '/person/name');
     expect(name).toEqual('Marilyn');
   });
 
   it('should retrieve values by JSON pointer from tree - deep array', function() {
-    var obj = {
+    const obj = {
       people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
     };
-    var name = jsonpatch.getValueByPointer(obj, '/people/1/name');
+    const name = jsonpatch.getValueByPointer(obj, '/people/1/name');
     expect(name).toEqual('Monroe');
   });
 
   it('should retrieve values by JSON pointer from tree - root object', function() {
-    var obj = {
+    const obj = {
       people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
     };
-    var retrievedObject = jsonpatch.getValueByPointer(obj, '');
+    const retrievedObject = jsonpatch.getValueByPointer(obj, '');
 
     expect(retrievedObject).toEqual({
       people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
@@ -29,12 +29,12 @@ describe('jsonpatch.getValueByPointer', function() {
   });
 
   it('should retrieve values by JSON pointer from tree - root array', function() {
-    var obj = [
+    const obj = [
       {
         people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
       }
     ];
-    var retrievedObject = jsonpatch.getValueByPointer(obj, '');
+    const retrievedObject = jsonpatch.getValueByPointer(obj, '');
 
     expect(retrievedObject).toEqual([
       {
@@ -45,15 +45,15 @@ describe('jsonpatch.getValueByPointer', function() {
 });
 describe('jsonpatch.applyReducer - using with Array#reduce', function() {
   it('should work with Array.reduce on array of patches', function() {
-    var obj = {
+    const obj = {
       hello: 'world'
     };
-    var patch = [
+    const patch = [
       { op: 'replace', path: '/hello', value: 1 },
       { op: 'add', path: '/bye', value: { testing: 'isGood' } }
     ];
-    obj = patch.reduce(jsonpatch.applyReducer, obj);
-    expect(obj).toEqual({
+    const obj2 = patch.reduce(jsonpatch.applyReducer, obj);
+    expect(obj2).toEqual({
       hello: 1,
       bye: { testing: 'isGood' }
     });
@@ -62,13 +62,13 @@ describe('jsonpatch.applyReducer - using with Array#reduce', function() {
 describe('root replacement with applyOperation', function() {
   describe('_get operation', function() {
     it('should get root value', function() {
-      var obj = [
+      const obj = [
         {
           people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
         }
       ];
 
-      var patch = { op: '_get', path: '' };
+      const patch = { op: '_get', path: '' };
 
       jsonpatch.applyOperation(obj, patch);
 
@@ -79,11 +79,11 @@ describe('root replacement with applyOperation', function() {
       ]);
     });
     it('should get deep value', function() {
-      var obj = {
+      const obj = {
         people: [{ name: 'Marilyn' }, { name: 'Monroe' }]
       };
 
-      var patch = { op: '_get', path: '/people/1/name' };
+      const patch = { op: '_get', path: '/people/1/name' };
 
       jsonpatch.applyOperation(obj, patch);
 
@@ -92,10 +92,10 @@ describe('root replacement with applyOperation', function() {
   });
   describe('add operation', function() {
     it('should `add` an object (on a json document of type object)) - in place', function() {
-      var obj = {
+      const obj = {
         hello: 'world'
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'add',
         path: '',
         value: {
@@ -108,10 +108,10 @@ describe('root replacement with applyOperation', function() {
       });
     });
     it('should `add` an object (on a json document of type object) - and return', function() {
-      var obj = {
+      const obj = {
         hello: 'world'
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'add',
         path: '',
         value: {
@@ -123,12 +123,12 @@ describe('root replacement with applyOperation', function() {
       });
     });
     it('should `add` an object (on a json document of type array) - and return', function() {
-      var obj = [
+      const obj = [
         {
           hello: 'world'
         }
       ];
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'add',
         path: '',
         value: {
@@ -140,12 +140,12 @@ describe('root replacement with applyOperation', function() {
       });
     });
     it('should `add` an array (on a json document of type array) - in place', function() {
-      var obj = [
+      const obj = [
         {
           hello: 'world'
         }
       ];
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'add',
         path: '',
         value: [
@@ -161,12 +161,12 @@ describe('root replacement with applyOperation', function() {
       ]);
     });
     it('should `add` an array (on a json document of type array) - and return', function() {
-      var obj = [
+      const obj = [
         {
           hello: 'world'
         }
       ];
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'add',
         path: '',
         value: [
@@ -182,9 +182,9 @@ describe('root replacement with applyOperation', function() {
       ]);
     });
     it('should `add` an array prop', function() {
-      var obj = [];
+      const obj = [];
 
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'add',
         path: '/prop',
         value: 'arrayProp'
@@ -193,10 +193,10 @@ describe('root replacement with applyOperation', function() {
       expect(newObj.prop).toEqual('arrayProp');
     });
     it('should `replace` an array prop', function() {
-      var obj = [];
+      const obj = [];
       obj.prop = 'oldArrayProp';
 
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'replace',
         path: '/prop',
         value: 'arrayProp'
@@ -205,10 +205,10 @@ describe('root replacement with applyOperation', function() {
       expect(newObj.prop).toEqual('arrayProp');
     });
     it('should `add` an array (on a json document of type object) - and return', function() {
-      var obj = {
+      const obj = {
         hello: 'world'
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'add',
         path: '',
         value: [
@@ -224,10 +224,10 @@ describe('root replacement with applyOperation', function() {
       ]);
     });
     it('should `add` a primitive (on a json document of type object) - and return', function() {
-      var obj = {
+      const obj = {
         hello: 'world'
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'add',
         path: '',
         value: 1
@@ -235,12 +235,12 @@ describe('root replacement with applyOperation', function() {
       expect(newObj).toEqual(1);
     });
     it('should `add` with a primitive (on a json document of type array) - and return', function() {
-      var obj = [
+      const obj = [
         {
           hello: 'world'
         }
       ];
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'add',
         path: '',
         value: 1
@@ -250,10 +250,10 @@ describe('root replacement with applyOperation', function() {
   });
   describe('replace operation', function() {
     it('should `replace` with an object (on a json document of type object)', function() {
-      var obj = {
+      const obj = {
         hello: 'world'
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'replace',
         path: '',
         value: {
@@ -265,12 +265,12 @@ describe('root replacement with applyOperation', function() {
       });
     });
     it('should `replace` with an object (on a json document of type array)', function() {
-      var obj = [
+      const obj = [
         {
           hello: 'world'
         }
       ];
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'replace',
         path: '',
         value: {
@@ -282,12 +282,12 @@ describe('root replacement with applyOperation', function() {
       });
     });
     it('should `replace` with an array (on a json document of type array)', function() {
-      var obj = [
+      const obj = [
         {
           hello: 'world'
         }
       ];
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'replace',
         path: '',
         value: [
@@ -303,10 +303,10 @@ describe('root replacement with applyOperation', function() {
       ]);
     });
     it('should `replace` with an array (on a json document of type object)', function() {
-      var obj = {
+      const obj = {
         hello: 'world'
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'replace',
         path: '',
         value: [
@@ -322,10 +322,10 @@ describe('root replacement with applyOperation', function() {
       ]);
     });
     it('should `replace` with a primitive (on a json document of type object)', function() {
-      var obj = {
+      const obj = {
         hello: 'world'
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'add',
         path: '',
         value: 1
@@ -333,12 +333,12 @@ describe('root replacement with applyOperation', function() {
       expect(newObj).toEqual(1);
     });
     it('should `replace` with a primitive (on a json document of type array)', function() {
-      var obj = [
+      const obj = [
         {
           hello: 'world'
         }
       ];
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'replace',
         path: '',
         value: 1
@@ -348,22 +348,22 @@ describe('root replacement with applyOperation', function() {
   });
   describe('remove operation', function() {
     it('should `remove` root (on a json document of type array)', function() {
-      var obj = [
+      const obj = [
         {
           hello: 'world'
         }
       ];
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'remove',
         path: ''
       }).newDocument;
       expect(newObj).toEqual(null);
     });
     it('should `remove` root (on a json document of type object)', function() {
-      var obj = {
+      const obj = {
         hello: 'world'
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'remove',
         path: ''
       }).newDocument;
@@ -373,10 +373,10 @@ describe('root replacement with applyOperation', function() {
 
   describe('move operation', function() {
     it('should `move` a child of type object to root (on a json document of type object)', function() {
-      var obj = {
+      const obj = {
         child: { name: 'Charles' }
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'move',
         from: '/child',
         path: ''
@@ -384,10 +384,10 @@ describe('root replacement with applyOperation', function() {
       expect(newObj).toEqual({ name: 'Charles' });
     });
     it('should `move` a child of type object to root (on a json document of type array)', function() {
-      var obj = {
+      const obj = {
         child: [{ name: 'Charles' }]
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'move',
         from: '/child/0',
         path: ''
@@ -395,10 +395,10 @@ describe('root replacement with applyOperation', function() {
       expect(newObj).toEqual({ name: 'Charles' });
     });
     it('should `move` a child of type array to root (on a json document of type object)', function() {
-      var obj = {
+      const obj = {
         child: [{ name: 'Charles' }]
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'move',
         from: '/child',
         path: ''
@@ -408,10 +408,10 @@ describe('root replacement with applyOperation', function() {
   });
   describe('copy operation', function() {
     it('should `copy` a child of type object to root (on a json document of type object) - and return', function() {
-      var obj = {
+      const obj = {
         child: { name: 'Charles' }
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'copy',
         from: '/child',
         path: ''
@@ -419,10 +419,10 @@ describe('root replacement with applyOperation', function() {
       expect(newObj).toEqual({ name: 'Charles' });
     });
     it('should `copy` a child of type object to root (on a json document of type array) - and return', function() {
-      var obj = {
+      const obj = {
         child: [{ name: 'Charles' }]
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'copy',
         from: '/child/0',
         path: ''
@@ -430,10 +430,10 @@ describe('root replacement with applyOperation', function() {
       expect(newObj).toEqual({ name: 'Charles' });
     });
     it('should `copy` a child of type array to root (on a json document of type object) - and return', function() {
-      var obj = {
+      const obj = {
         child: [{ name: 'Charles' }]
       };
-      var newObj = jsonpatch.applyOperation(obj, {
+      const newObj = jsonpatch.applyOperation(obj, {
         op: 'copy',
         from: '/child',
         path: ''
@@ -443,10 +443,10 @@ describe('root replacement with applyOperation', function() {
   });
   describe('test operation', function() {
     it('should `test` against root (on a json document of type object) - and return true', function() {
-      var obj = {
+      const obj = {
         hello: 'world'
       };
-      var result = jsonpatch.applyOperation(obj, {
+      const result = jsonpatch.applyOperation(obj, {
         op: 'test',
         path: '',
         value: {
@@ -456,7 +456,7 @@ describe('root replacement with applyOperation', function() {
       expect(result).toEqual(obj);
     });
     it('should `test` against root (on a json document of type object) - and return false', function() {
-      var obj = {
+      const obj = {
         hello: 'world'
       };
       expect(() =>
@@ -468,7 +468,7 @@ describe('root replacement with applyOperation', function() {
       ).toThrow();
     });
     it('should `test` against root (on a json document of type array) - and return false', function() {
-      var obj = [
+      const obj = [
         {
           hello: 'world'
         }
@@ -487,7 +487,7 @@ describe('root replacement with applyOperation', function() {
 /* this is just a copy-paste of original specs, but with using applyOperation, to test for non-root patches */
 describe('core - using applyOperation', function() {
   it("shouldn't touch original tree", function() {
-    var obj = {
+    const obj = {
       foo: 1,
       baz: [
         {
@@ -495,7 +495,7 @@ describe('core - using applyOperation', function() {
         }
       ]
     };
-    var newObj = jsonpatch.applyOperation(
+    const newObj = jsonpatch.applyOperation(
       obj,
       {
         op: 'add',
@@ -516,7 +516,7 @@ describe('core - using applyOperation', function() {
     });
   });
   it('should apply add', function() {
-    var obj = {
+    let obj = {
       foo: 1,
       baz: [
         {
@@ -524,7 +524,7 @@ describe('core - using applyOperation', function() {
         }
       ]
     };
-    var newObj = jsonpatch.applyOperation(obj, {
+    let newObj = jsonpatch.applyOperation(obj, {
       op: 'add',
       path: '/bar',
       value: [1, 2, 3, 4]
@@ -538,7 +538,7 @@ describe('core - using applyOperation', function() {
       ],
       bar: [1, 2, 3, 4]
     });
-    var newObj = jsonpatch.applyOperation(newObj, {
+    newObj = jsonpatch.applyOperation(newObj, {
       op: 'add',
       path: '/baz/0/foo',
       value: 'world'
@@ -562,7 +562,7 @@ describe('core - using applyOperation', function() {
         }
       ]
     };
-    var newObj = jsonpatch.applyOperation(obj, {
+    newObj = jsonpatch.applyOperation(obj, {
       op: 'add',
       path: '/bar',
       value: true
@@ -585,7 +585,7 @@ describe('core - using applyOperation', function() {
         }
       ]
     };
-    var newObj = jsonpatch.applyOperation(obj, {
+    newObj = jsonpatch.applyOperation(obj, {
       op: 'add',
       path: '/bar',
       value: false
@@ -608,7 +608,7 @@ describe('core - using applyOperation', function() {
         }
       ]
     };
-    var newObj = jsonpatch.applyOperation(obj, {
+    newObj = jsonpatch.applyOperation(obj, {
       op: 'add',
       path: '/bar',
       value: null
@@ -625,10 +625,10 @@ describe('core - using applyOperation', function() {
   });
 
   it('should apply add on root', function() {
-    var obj = {
+    const obj = {
       hello: 'world'
     };
-    var newObj = jsonpatch.applyOperation(obj, {
+    const newObj = jsonpatch.applyOperation(obj, {
       op: 'add',
       path: '',
       value: {
@@ -641,7 +641,7 @@ describe('core - using applyOperation', function() {
   });
 
   it('should apply remove', function() {
-    var obj = {
+    const obj = {
       foo: 1,
       baz: [
         {
@@ -651,7 +651,7 @@ describe('core - using applyOperation', function() {
       bar: [1, 2, 3, 4]
     };
 
-    var newObj = jsonpatch.applyOperation(obj, {
+    let newObj = jsonpatch.applyOperation(obj, {
       op: 'remove',
       path: '/bar'
     }).newDocument;
@@ -663,7 +663,7 @@ describe('core - using applyOperation', function() {
         }
       ]
     });
-    var newObj = jsonpatch.applyOperation(newObj, {
+    newObj = jsonpatch.applyOperation(newObj, {
       op: 'remove',
       path: '/baz/0/qux'
     }).newDocument;
@@ -673,7 +673,7 @@ describe('core - using applyOperation', function() {
     });
   });
   it('should apply replace', function() {
-    var obj = {
+    const obj = {
       foo: 1,
       baz: [
         {
@@ -681,7 +681,7 @@ describe('core - using applyOperation', function() {
         }
       ]
     };
-    var newObj = jsonpatch.applyOperation(obj, {
+    let newObj = jsonpatch.applyOperation(obj, {
       op: 'replace',
       path: '/foo',
       value: [1, 2, 3, 4]
@@ -694,7 +694,7 @@ describe('core - using applyOperation', function() {
         }
       ]
     });
-    var newObj = jsonpatch.applyOperation(newObj, {
+    newObj = jsonpatch.applyOperation(newObj, {
       op: 'replace',
       path: '/baz/0/qux',
       value: 'world'
@@ -709,10 +709,10 @@ describe('core - using applyOperation', function() {
     });
   });
   it('should apply replace on root', function() {
-    var obj = {
+    const obj = {
       hello: 'world'
     };
-    var newObj = jsonpatch.applyOperation(obj, {
+    const newObj = jsonpatch.applyOperation(obj, {
       op: 'replace',
       path: '',
       value: {
@@ -725,7 +725,7 @@ describe('core - using applyOperation', function() {
     });
   });
   it('should apply test', function() {
-    var obj = {
+    const obj = {
       foo: {
         bar: [1, 2, 5, 4]
       },
@@ -824,7 +824,7 @@ describe('core - using applyOperation', function() {
   });
 
   it('should apply test on root', function() {
-    var obj = {
+    const obj = {
       hello: 'world'
     };
     expect(
@@ -846,7 +846,7 @@ describe('core - using applyOperation', function() {
   });
 
   it('should apply move', function() {
-    var obj = {
+    const obj = {
       foo: 1,
       baz: [
         {
@@ -855,7 +855,7 @@ describe('core - using applyOperation', function() {
       ]
     };
 
-    var newObj = jsonpatch.applyOperation(obj, {
+    let newObj = jsonpatch.applyOperation(obj, {
       op: 'move',
       from: '/foo',
       path: '/bar'
@@ -869,7 +869,7 @@ describe('core - using applyOperation', function() {
       bar: 1
     });
 
-    var newObj = jsonpatch.applyOperation(newObj, {
+    newObj = jsonpatch.applyOperation(newObj, {
       op: 'move',
       from: '/baz/0/qux',
       path: '/baz/1'
@@ -883,13 +883,13 @@ describe('core - using applyOperation', function() {
 
   it('should apply move on root', function() {
     //investigate if this test is right (https://github.com/Starcounter-Jack/JSON-Patch/issues/40)
-    var obj = {
+    const obj = {
       hello: 'world',
       location: {
         city: 'Vancouver'
       }
     };
-    var newObj = jsonpatch.applyOperation(obj, {
+    const newObj = jsonpatch.applyOperation(obj, {
       op: 'move',
       from: '/location',
       path: ''
@@ -901,7 +901,7 @@ describe('core - using applyOperation', function() {
   });
 
   it('should apply copy', function() {
-    var obj = {
+    const obj = {
       foo: 1,
       baz: [
         {
@@ -910,7 +910,7 @@ describe('core - using applyOperation', function() {
       ]
     };
 
-    var newObj = jsonpatch.applyOperation(obj, {
+    let newObj = jsonpatch.applyOperation(obj, {
       op: 'copy',
       from: '/foo',
       path: '/bar'
@@ -926,7 +926,7 @@ describe('core - using applyOperation', function() {
       bar: 1
     });
 
-    var newObj = jsonpatch.applyOperation(newObj, {
+    newObj = jsonpatch.applyOperation(newObj, {
       op: 'copy',
       from: '/baz/0/qux',
       path: '/baz/1'
@@ -945,13 +945,13 @@ describe('core - using applyOperation', function() {
   });
 
   it('should apply copy on root', function() {
-    var obj = {
+    const obj = {
       hello: 'world',
       location: {
         city: 'Vancouver'
       }
     };
-    var newObj = jsonpatch.applyOperation(obj, {
+    const newObj = jsonpatch.applyOperation(obj, {
       op: 'copy',
       from: '/location',
       path: ''
@@ -964,7 +964,7 @@ describe('core - using applyOperation', function() {
 
 describe('core', function() {
   it("shouldn't touch original tree", function() {
-    var obj = {
+    const obj = {
       foo: 1,
       baz: [
         {
@@ -972,7 +972,7 @@ describe('core', function() {
         }
       ]
     };
-    var newObj = jsonpatch.applyPatch(
+    const newObj = jsonpatch.applyPatch(
       obj,
       [
         {
@@ -995,7 +995,7 @@ describe('core', function() {
     });
   });
   it('should apply add', function() {
-    var obj = {
+    let obj = {
       foo: 1,
       baz: [
         {
@@ -1114,10 +1114,10 @@ describe('core', function() {
   });
 
   it('should apply add on root', function() {
-    var obj = {
+    const obj = {
       hello: 'world'
     };
-    var newObj = jsonpatch.applyPatch(obj, [
+    const newObj = jsonpatch.applyPatch(obj, [
       {
         op: 'add',
         path: '',
@@ -1133,7 +1133,7 @@ describe('core', function() {
   });
 
   it('should apply remove', function() {
-    var obj = {
+    const obj = {
       foo: 1,
       baz: [
         {
@@ -1172,7 +1172,7 @@ describe('core', function() {
   });
 
   it('should apply replace', function() {
-    var obj = {
+    const obj = {
       foo: 1,
       baz: [
         {
@@ -1215,10 +1215,10 @@ describe('core', function() {
   });
 
   it('should apply replace on root', function() {
-    var obj = {
+    const obj = {
       hello: 'world'
     };
-    var newObject = jsonpatch.applyPatch(obj, [
+    const newObject = jsonpatch.applyPatch(obj, [
       {
         op: 'replace',
         path: '',
@@ -1234,7 +1234,7 @@ describe('core', function() {
   });
 
   it('should apply test', function() {
-    var obj = {
+    const obj = {
       foo: {
         bar: [1, 2, 5, 4]
       },
@@ -1354,7 +1354,7 @@ describe('core', function() {
   });
 
   it('should apply test on root', function() {
-    var obj = {
+    const obj = {
       hello: 'world'
     };
     expect(
@@ -1382,7 +1382,7 @@ describe('core', function() {
   });
 
   it('should apply move', function() {
-    var obj = {
+    const obj = {
       foo: 1,
       baz: [
         {
@@ -1422,13 +1422,13 @@ describe('core', function() {
 
   it('should apply move on root', function() {
     //investigate if this test is right (https://github.com/Starcounter-Jack/JSON-Patch/issues/40)
-    var obj = {
+    const obj = {
       hello: 'world',
       location: {
         city: 'Vancouver'
       }
     };
-    var newObj = jsonpatch.applyPatch(obj, [
+    const newObj = jsonpatch.applyPatch(obj, [
       {
         op: 'move',
         from: '/location',
@@ -1442,7 +1442,7 @@ describe('core', function() {
   });
 
   it('should apply copy', function() {
-    var obj = {
+    const obj = {
       foo: 1,
       baz: [
         {
@@ -1488,13 +1488,13 @@ describe('core', function() {
   });
 
   it('should apply copy on root', function() {
-    var obj = {
+    const obj = {
       hello: 'world',
       location: {
         city: 'Vancouver'
       }
     };
-    var newObj = jsonpatch.applyPatch(obj, [
+    const newObj = jsonpatch.applyPatch(obj, [
       {
         op: 'copy',
         from: '/location',
@@ -1508,8 +1508,8 @@ describe('core', function() {
   });
 
   it('should apply copy, without leaving cross-reference between nodes', function() {
-    var obj = {};
-    var patchset = [
+    const obj = {};
+    const patchset = [
       { op: 'add', path: '/foo', value: [] },
       { op: 'add', path: '/foo/-', value: 1 },
       { op: 'copy', from: '/foo', path: '/bar' },
@@ -1525,8 +1525,8 @@ describe('core', function() {
   });
 
   it('should use value object as a reference', function() {
-    var obj1 = {};
-    var patch = [{ op: 'add', path: '/foo', value: [] }];
+    const obj1 = {};
+    const patch = [{ op: 'add', path: '/foo', value: [] }];
 
     jsonpatch.applyPatch(obj1, patch, false);
 
@@ -1534,7 +1534,7 @@ describe('core', function() {
   });
 
   describe('returning removed elements >', function() {
-    var obj;
+    let obj;
     beforeEach(function() {
       obj = {
         name: 'jack',
@@ -1544,7 +1544,7 @@ describe('core', function() {
     });
 
     it('return removed element when removing from object', function() {
-      var result = jsonpatch.applyPatch(obj, [
+      const result = jsonpatch.applyPatch(obj, [
         {
           op: 'remove',
           path: '/name'
@@ -1553,7 +1553,7 @@ describe('core', function() {
       expect(result[0].removed).toEqual('jack');
     });
     it('return removed element when replacing in object', function() {
-      var result = jsonpatch.applyPatch(obj, [
+      const result = jsonpatch.applyPatch(obj, [
         {
           op: 'replace',
           path: '/name',
@@ -1563,7 +1563,7 @@ describe('core', function() {
       expect(result[0].removed).toEqual('jack');
     });
     it('return removed element when moving in object', function() {
-      var result = jsonpatch.applyPatch(obj, [
+      const result = jsonpatch.applyPatch(obj, [
         {
           op: 'move',
           from: '/name',
@@ -1574,7 +1574,7 @@ describe('core', function() {
     });
 
     it('return removed element when removing from array', function() {
-      var result = jsonpatch.applyPatch(obj, [
+      const result = jsonpatch.applyPatch(obj, [
         {
           op: 'remove',
           path: '/languages/1'
@@ -1583,7 +1583,7 @@ describe('core', function() {
       expect(result[0].removed).toEqual('haskell');
     });
     it('return removed element when replacing in array', function() {
-      var result = jsonpatch.applyPatch(obj, [
+      const result = jsonpatch.applyPatch(obj, [
         {
           op: 'replace',
           path: '/languages/1',
@@ -1593,7 +1593,7 @@ describe('core', function() {
       expect(result[0].removed).toEqual('haskell');
     });
     it('return removed element when moving in array', function() {
-      var result = jsonpatch.applyPatch(obj, [
+      const result = jsonpatch.applyPatch(obj, [
         {
           op: 'move',
           from: '/hobby',
@@ -1603,7 +1603,7 @@ describe('core', function() {
       expect(result[0].removed).toEqual('haskell');
     });
     it('return root when removing root', function() {
-      var result = jsonpatch.applyPatch(obj, [
+      const result = jsonpatch.applyPatch(obj, [
         {
           op: 'remove',
           path: ''
@@ -1616,7 +1616,7 @@ describe('core', function() {
       });
     });
     it('return root when replacing root', function() {
-      var result = jsonpatch.applyPatch(obj, [
+      const result = jsonpatch.applyPatch(obj, [
         {
           op: 'replace',
           path: '',
@@ -1632,7 +1632,7 @@ describe('core', function() {
       });
     });
     it('return root when moving to root', function() {
-      var result = jsonpatch.applyPatch(obj, [
+      const result = jsonpatch.applyPatch(obj, [
         {
           op: 'move',
           from: '/languages',
@@ -1651,7 +1651,7 @@ describe('core', function() {
 describe('undefined - JS to JSON projection / JSON to JS extension', function() {
   describe('jsonpatch should apply', function() {
     it('add for properties already set to `undefined` in target JS document', function() {
-      var obj = {
+      const obj = {
         hello: 'world',
         nothing: undefined
       };
@@ -1670,7 +1670,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
     });
 
     it('add for properties with value set to `undefined` (extension)', function() {
-      var obj = {
+      const obj = {
         hello: 'world'
       };
       jsonpatch.applyPatch(obj, [
@@ -1688,7 +1688,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
     });
 
     it('remove on element already set to `undefined`, and remove it completely', function() {
-      var obj = {
+      const obj = {
         foo: 1,
         not: undefined
       };
@@ -1704,7 +1704,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
     it('remove on array element set to `undefined`', function() {
-      var obj = {
+      const obj = {
         foo: 1,
         bar: [0, 1, undefined, 3]
       };
@@ -1722,7 +1722,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
     });
 
     it('replace on element set to `undefined`', function() {
-      var obj = {
+      const obj = {
         foo: 1,
         not: undefined
       };
@@ -1740,7 +1740,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
     it('replace on array element set to `undefined`', function() {
-      var obj = {
+      const obj = {
         foo: 1,
         bar: [0, 1, undefined, 3]
       };
@@ -1758,7 +1758,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
     it('replace element with `undefined` (extension)', function() {
-      var obj = {
+      const obj = {
         foo: 1
       };
 
@@ -1774,7 +1774,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
     it('replace array element with `undefined` (extension)', function() {
-      var obj = {
+      const obj = {
         foo: 1,
         bar: [0, 1, 2, 3]
       };
@@ -1792,7 +1792,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       });
     });
     it('test on element set to `undefined`', function() {
-      var obj = {
+      const obj = {
         foo: 1,
         not: undefined
       };
@@ -1816,7 +1816,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
       ).toBe(true);
     });
     it('test on array element set to `undefined`', function() {
-      var obj = {
+      const obj = {
         foo: 1,
         bar: [0, 1, undefined, 3]
       };
@@ -1850,7 +1850,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
     });
 
     it('move of `undefined`', function() {
-      var obj = {
+      const obj = {
         foo: undefined,
         baz: 'defined'
       };
@@ -1880,7 +1880,7 @@ describe('undefined - JS to JSON projection / JSON to JS extension', function() 
     });
 
     it('copy of `undefined` as `null` (like `JSON.stringify` does)', function() {
-      var obj = {
+      const obj = {
         foo: undefined,
         baz: 'defined'
       };

@@ -11,14 +11,14 @@ if (typeof jsonpatch === 'undefined') {
 }
 
 if (typeof Benchmark === 'undefined') {
-  var Benchmark = require('benchmark');
-  var benchmarkResultsToConsole = require('./../lib/benchmark_console_reporter.js').benchmarkResultsToConsole;
+  global.Benchmark = require('benchmark');
+  global.benchmarkResultsToConsole = require('./../lib/benchmark_console_reporter.js').benchmarkResultsToConsole;
 }
 
-var suite = new Benchmark.Suite();
-suite.add('generate operation', {
+const duplexSuite = new Benchmark.Suite();
+duplexSuite.add('generate operation', {
   setup: function() {
-    var obj = {
+    const obj = {
       firstName: 'Albert',
       lastName: 'Einstein',
       phoneNumbers: [
@@ -30,7 +30,7 @@ suite.add('generate operation', {
         }
       ]
     };
-    var observer = jsonpatch.observe(obj);
+    const observer = jsonpatch.observe(obj);
   },
   fn: function() {
     obj.firstName = 'Joachim';
@@ -38,12 +38,12 @@ suite.add('generate operation', {
     obj.phoneNumbers[0].number = '123';
     obj.phoneNumbers[1].number = '456';
 
-    var patches = jsonpatch.generate(observer);
+    const patches = jsonpatch.generate(observer);
   }
 });
-suite.add('generate operation and re-apply', {
+duplexSuite.add('generate operation and re-apply', {
   setup: function() {
-    var obj = {
+    const obj = {
       firstName: 'Albert',
       lastName: 'Einstein',
       phoneNumbers: [
@@ -55,7 +55,7 @@ suite.add('generate operation and re-apply', {
         }
       ]
     };
-    var observer = jsonpatch.observe(obj);
+    const observer = jsonpatch.observe(obj);
   },
   fn: function() {
     obj.firstName = 'Joachim';
@@ -63,7 +63,7 @@ suite.add('generate operation and re-apply', {
     obj.phoneNumbers[0].number = '123';
     obj.phoneNumbers[1].number = '456';
 
-    var patches = jsonpatch.generate(observer);
+    const patches = jsonpatch.generate(observer);
     obj2 = {
       firstName: 'Albert',
       lastName: 'Einstein',
@@ -80,9 +80,9 @@ suite.add('generate operation and re-apply', {
     jsonpatch.applyPatch(obj2, patches);
   }
 });
-suite.add('compare operation', {
+duplexSuite.add('compare operation', {
   setup: function() {
-    var obj = {
+    const obj = {
       firstName: 'Albert',
       lastName: 'Einstein',
       phoneNumbers: [
@@ -94,7 +94,7 @@ suite.add('compare operation', {
         }
       ]
     };
-    var obj2 = {
+    const obj2 = {
       firstName: 'Joachim',
       lastName: 'Wester',
       mobileNumbers: [
@@ -108,13 +108,13 @@ suite.add('compare operation', {
     };
   },
   fn: function() {
-    var patches = jsonpatch.compare(obj, obj2);
+    const patches = jsonpatch.compare(obj, obj2);
   }
 });
 
-suite.add('compare operation same but deep objects', {
+duplexSuite.add('compare operation same but deep objects', {
   setup: function() {
-    var depth = 10;
+    const depth = 10;
 
     function shallowObj() {
       return {
@@ -132,23 +132,23 @@ suite.add('compare operation same but deep objects', {
         }
       };
     }
-    var obj = shallowObj();
-    var node = obj;
+    const obj = shallowObj();
+    const node = obj;
     while (depth-- > 0) {
       node.nested = shallowObj();
       node = node.nested;
     }
-    var obj2 = obj;
+    const obj2 = obj;
   },
   fn: function() {
-    var patches = jsonpatch.compare(obj, obj2);
+    const patches = jsonpatch.compare(obj, obj2);
   }
 });
 
 // Benchmark generating test operations
-suite.add('generate operation, invertible = true', {
+duplexSuite.add('generate operation, invertible = true', {
   setup: function() {
-    var obj = {
+    const obj = {
       firstName: 'Albert',
       lastName: 'Einstein',
       phoneNumbers: [
@@ -160,7 +160,7 @@ suite.add('generate operation, invertible = true', {
         }
       ]
     };
-    var observer = jsonpatch.observe(obj);
+    const observer = jsonpatch.observe(obj);
   },
   fn: function() {
     obj.firstName = 'Joachim';
@@ -168,12 +168,12 @@ suite.add('generate operation, invertible = true', {
     obj.phoneNumbers[0].number = '123';
     obj.phoneNumbers[1].number = '456';
 
-    var patches = jsonpatch.generate(observer, true);
+    const patches = jsonpatch.generate(observer, true);
   }
 });
-suite.add('generate operation and re-apply, invertible = true', {
+duplexSuite.add('generate operation and re-apply, invertible = true', {
   setup: function() {
-    var obj = {
+    const obj = {
       firstName: 'Albert',
       lastName: 'Einstein',
       phoneNumbers: [
@@ -185,7 +185,7 @@ suite.add('generate operation and re-apply, invertible = true', {
         }
       ]
     };
-    var observer = jsonpatch.observe(obj);
+    const observer = jsonpatch.observe(obj);
   },
   fn: function() {
     obj.firstName = 'Joachim';
@@ -193,7 +193,7 @@ suite.add('generate operation and re-apply, invertible = true', {
     obj.phoneNumbers[0].number = '123';
     obj.phoneNumbers[1].number = '456';
 
-    var patches = jsonpatch.generate(observer, true);
+    const patches = jsonpatch.generate(observer, true);
     obj2 = {
       firstName: 'Albert',
       lastName: 'Einstein',
@@ -210,9 +210,9 @@ suite.add('generate operation and re-apply, invertible = true', {
     jsonpatch.applyPatch(obj2, patches);
   }
 });
-suite.add('compare operation, invertible = true', {
+duplexSuite.add('compare operation, invertible = true', {
   setup: function() {
-    var obj = {
+    const obj = {
       firstName: 'Albert',
       lastName: 'Einstein',
       phoneNumbers: [
@@ -224,7 +224,7 @@ suite.add('compare operation, invertible = true', {
         }
       ]
     };
-    var obj2 = {
+    const obj2 = {
       firstName: 'Joachim',
       lastName: 'Wester',
       mobileNumbers: [
@@ -238,13 +238,13 @@ suite.add('compare operation, invertible = true', {
     };
   },
   fn: function() {
-    var patches = jsonpatch.compare(obj, obj2, true);
+    const patches = jsonpatch.compare(obj, obj2, true);
   }
 });
 
-suite.add('compare operation same but deep objects, invertible = true', {
+duplexSuite.add('compare operation same but deep objects, invertible = true', {
   setup: function() {
-    var depth = 10;
+    const depth = 10;
 
     function shallowObj() {
       return {
@@ -262,25 +262,25 @@ suite.add('compare operation same but deep objects, invertible = true', {
         }
       };
     }
-    var obj = shallowObj();
-    var node = obj;
+    const obj = shallowObj();
+    const node = obj;
     while (depth-- > 0) {
       node.nested = shallowObj();
       node = node.nested;
     }
-    var obj2 = obj;
+    const obj2 = obj;
   },
   fn: function() {
-    var patches = jsonpatch.compare(obj, obj2, true);
+    const patches = jsonpatch.compare(obj, obj2, true);
   }
 });
 
 // if we are in the browser with benchmark < 2.1.2
 if (typeof benchmarkReporter !== 'undefined') {
-  benchmarkReporter(suite);
+  benchmarkReporter(duplexSuite);
 } else {
-  suite.on('complete', function() {
-    benchmarkResultsToConsole(suite);
+  duplexSuite.on('complete', function() {
+    benchmarkResultsToConsole(duplexSuite);
   });
-  suite.run();
+  duplexSuite.run();
 }
