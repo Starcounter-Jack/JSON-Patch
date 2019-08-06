@@ -1,4 +1,4 @@
-import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers.js';
+import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers.mjs';
 export var JsonPatchError = PatchError;
 export var deepClone = _deepClone;
 /* We use a Javascript hash to store each
