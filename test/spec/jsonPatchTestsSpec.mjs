@@ -1,7 +1,7 @@
-import * as jsonpatch from '../../module/duplex.js';
+import * as jsonpatch from '../../module/duplex.mjs';
 
-import tests_json from './json-patch-tests/tests.json.js';
-import spec_tests_json from './json-patch-tests/spec_tests.json.js';
+import tests_json from './json-patch-tests/tests.json.mjs';
+import spec_tests_json from './json-patch-tests/spec_tests.json.mjs';
 
 const JSONtests = [
   {

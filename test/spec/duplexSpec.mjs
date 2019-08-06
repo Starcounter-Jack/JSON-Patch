@@ -1,4 +1,4 @@
-import * as jsonpatch from '../../module/duplex.js';
+import * as jsonpatch from '../../module/duplex.mjs';
 import {EventTarget, defineEventAttribute} from "../../node_modules/event-target-shim/dist/event-target-shim.mjs";
 
 if (typeof window === 'undefined') {

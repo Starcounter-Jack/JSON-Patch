@@ -1,4 +1,4 @@
-import * as jsonpatch from '../../module/duplex.js';
+import * as jsonpatch from '../../module/duplex.mjs';
 
 describe('jsonpatch.getValueByPointer', function() {
   it('should retrieve values by JSON pointer from tree - deep object', function() {

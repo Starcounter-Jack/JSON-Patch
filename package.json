@@ -53,8 +53,8 @@
     "tsc-watch": "tsc -w",
     "test": "npm run tsc && npm run test-core && npm run test-duplex",
     "test-sauce": "npm run build && node test/Sauce/Runner.js",
-    "test-duplex": "node --experimental-modules jasmine-run.js test/**/*[sS]pec.js",
-    "test-core": "node --experimental-modules jasmine-run.js test/spec/jsonPatchTestsSpec.js test/spec/coreSpec.js test/spec/validateSpec.js",
+    "test-duplex": "node --experimental-modules jasmine-run.mjs test/**/*[sS]pec.mjs",
+    "test-core": "node --experimental-modules jasmine-run.mjs test/spec/jsonPatchTestsSpec.mjs test/spec/coreSpec.mjs test/spec/validateSpec.mjs",
     "bench": "npm run bench-core && npm run bench-duplex",
     "bench-core": "node test/spec/coreBenchmark.js",
     "bench-duplex": "node test/spec/coreBenchmark.js && node test/spec/duplexBenchmark.js"

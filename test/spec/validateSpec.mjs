@@ -1,4 +1,4 @@
-import * as jsonpatch from '../../module/duplex.js';
+import * as jsonpatch from '../../module/duplex.mjs';
 
 describe('validate', function() {
   it('should return an empty array if the patch is valid', function() {
