@@ -10,20 +10,18 @@ export { applyOperation, applyPatch, applyReducer, getValueByPointer, validate, 
 /* export some helpers */
 export { PatchError as JsonPatchError, _deepClone as deepClone, escapePathComponent, unescapePathComponent } from './helpers.mjs';
 var beforeDict = new WeakMap();
-var Mirror = /** @class */ (function () {
-    function Mirror(obj) {
+class Mirror {
+    constructor(obj) {
         this.observers = new Map();
         this.obj = obj;
     }
-    return Mirror;
-}());
-var ObserverInfo = /** @class */ (function () {
-    function ObserverInfo(callback, observer) {
+}
+class ObserverInfo {
+    constructor(callback, observer) {
         this.callback = callback;
         this.observer = observer;
     }
-    return ObserverInfo;
-}());
+}
 function getMirror(obj) {
     return beforeDict.get(obj);
 }
@@ -51,7 +49,7 @@ export function observe(obj, callback) {
         beforeDict.set(obj, mirror);
     }
     else {
-        var observerInfo = getObserverFromMirror(mirror, callback);
+        const observerInfo = getObserverFromMirror(mirror, callback);
         observer = observerInfo && observerInfo.observer;
     }
     if (observer) {
@@ -62,10 +60,10 @@ export function observe(obj, callback) {
     if (callback) {
         observer.callback = callback;
         observer.next = null;
-        var dirtyCheck = function () {
+        var dirtyCheck = () => {
             generate(observer);
         };
-        var fastCheck = function () {
+        var fastCheck = () => {
             clearTimeout(observer.next);
             observer.next = setTimeout(dirtyCheck);
         };
@@ -79,7 +77,7 @@ export function observe(obj, callback) {
     }
     observer.patches = patches;
     observer.object = obj;
-    observer.unobserve = function () {
+    observer.unobserve = () => {
         generate(observer);
         clearTimeout(observer.next);
         removeObserverFromMirror(mirror, observer);
@@ -97,8 +95,7 @@ export function observe(obj, callback) {
 /**
  * Generate an array of patches from an observer
  */
-export function generate(observer, invertible) {
-    if (invertible === void 0) { invertible = false; }
+export function generate(observer, invertible = false) {
     var mirror = beforeDict.get(observer.object);
     _generate(mirror.value, observer.object, observer.patches, "", invertible);
     if (observer.patches.length) {
@@ -153,9 +150,9 @@ function _generate(mirror, obj, patches, path, invertible) {
         }
         else {
             if (invertible) {
-                patches.push({ op: "test", path: path, value: mirror });
+                patches.push({ op: "test", path, value: mirror });
             }
-            patches.push({ op: "replace", path: path, value: obj });
+            patches.push({ op: "replace", path, value: obj });
             changed = true;
         }
     }
@@ -172,8 +169,7 @@ function _generate(mirror, obj, patches, path, invertible) {
 /**
  * Create an array of patches from the differences in two objects
  */
-export function compare(tree1, tree2, invertible) {
-    if (invertible === void 0) { invertible = false; }
+export function compare(tree1, tree2, invertible = false) {
     var patches = [];
     _generate(tree1, tree2, patches, '', invertible);
     return patches;

@@ -108,7 +108,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
+ 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);
@@ -277,7 +277,7 @@ exports.PatchError = PatchError;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-Object.defineProperty(exports, "__esModule", { value: true });
+ 
 var helpers_js_1 = __webpack_require__(0);
 exports.JsonPatchError = helpers_js_1.PatchError;
 exports.deepClone = helpers_js_1._deepClone;
@@ -717,7 +717,7 @@ exports._areEquals = _areEquals;
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-Object.defineProperty(exports, "__esModule", { value: true });
+ 
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
  * (c) 2017 Joachim Wester

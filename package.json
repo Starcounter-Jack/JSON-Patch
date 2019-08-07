@@ -44,9 +44,10 @@
   },
   "scripts": {
     "tsc": "npm run tsc-common && npm run tsc-module",
-    "tsc-common": "tsc",
-    "tsc-module": "tsc --module esnext --moduleResolution node --outDir \"module/\" && npm run tsc-to-mjs",
+    "tsc-common": "tsc && npm run tsc-to-cjs",
+    "tsc-module": "tsc --target es6 --module es6 --moduleResolution node --outDir \"module/\" && npm run tsc-to-mjs",
     "tsc-to-mjs": "bash tsc-to-mjs.sh",
+    "tsc-to-cjs": "bash tsc-to-cjs.sh",
     "version": "npm run tsc && webpack && git add -A",
     "build": "npm run tsc && webpack",
     "serve": "http-server -p 5000 --silent",
