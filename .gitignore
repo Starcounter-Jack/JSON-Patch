@@ -9,7 +9,7 @@ npm-debug.log
 .idea
 
 # Typescript
-*.d.ts
+lib/*.d.ts
 
 # SauceLabs logs
 *.log

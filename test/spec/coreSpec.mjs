@@ -1,4 +1,4 @@
-import * as jsonpatch from '../../module/index.mjs';
+import * as jsonpatch from '../../index.mjs';
 
 describe('jsonpatch.getValueByPointer', function() {
   it('should retrieve values by JSON pointer from tree - deep object', function() {

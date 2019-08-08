@@ -50,8 +50,8 @@ In [browsers that support ECMAScript modules](https://caniuse.com/#feat=es6-modu
 
 ```html
 <script type="module">
-  import { * as jsonpatch } from 'fast-json-patch/module/index.mjs';
-  import { applyOperation } from 'fast-json-patch/module/index.mjs';
+  import { * as jsonpatch } from 'fast-json-patch/index.mjs';
+  import { applyOperation } from 'fast-json-patch/index.mjs';
 </script>
 ```
 
@@ -60,8 +60,8 @@ In [browsers that support ECMAScript modules](https://caniuse.com/#feat=es6-modu
 In Node 12+ with `--experimental-modules` flag, the below code uses this library as an ECMAScript module:
 
 ```js
-import { * as jsonpatch } from 'fast-json-patch/module/index.mjs';
-import { applyOperation } from 'fast-json-patch/module/index.mjs';
+import { * as jsonpatch } from 'fast-json-patch/index.mjs';
+import { applyOperation } from 'fast-json-patch/index.mjs';
 ```
 
 In Webpack (and most surely other bundlers based on Babel), the below code uses this library as an ECMAScript module:

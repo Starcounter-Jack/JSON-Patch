@@ -717,28 +717,17 @@ exports._areEquals = _areEquals;
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-Object.defineProperty(exports, "__esModule", { value: true });
-/* export all core functions and types */
-var core_js_1 = __webpack_require__(1);
-exports.applyOperation = core_js_1.applyOperation;
-exports.applyPatch = core_js_1.applyPatch;
-exports.applyReducer = core_js_1.applyReducer;
-exports.getValueByPointer = core_js_1.getValueByPointer;
-exports.validate = core_js_1.validate;
-exports.validator = core_js_1.validator;
-exports._areEquals = core_js_1._areEquals;
-/* export all duplex functions */
-var duplex_js_1 = __webpack_require__(3);
-exports.unobserve = duplex_js_1.unobserve;
-exports.observe = duplex_js_1.observe;
-exports.generate = duplex_js_1.generate;
-exports.compare = duplex_js_1.compare;
-/* export some helpers */
-var helpers_js_1 = __webpack_require__(0);
-exports.JsonPatchError = helpers_js_1.PatchError;
-exports.deepClone = helpers_js_1._deepClone;
-exports.escapePathComponent = helpers_js_1.escapePathComponent;
-exports.unescapePathComponent = helpers_js_1.unescapePathComponent;
+var core = __webpack_require__(1);
+Object.assign(exports, core);
+
+var duplex = __webpack_require__(3);
+Object.assign(exports, duplex);
+
+var helpers = __webpack_require__(0);
+exports.JsonPatchError = helpers.PatchError;
+exports.deepClone = helpers._deepClone;
+exports.escapePathComponent = helpers.escapePathComponent;
+exports.unescapePathComponent = helpers.unescapePathComponent;
 
 
 /***/ }),

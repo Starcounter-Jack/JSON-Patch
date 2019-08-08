@@ -1,4 +1,4 @@
-import * as jsonpatch from '../../module/index.mjs';
+import * as jsonpatch from '../../index.mjs';
 import {EventTarget, defineEventAttribute} from "../../node_modules/event-target-shim/dist/event-target-shim.mjs";
 
 if (typeof window === 'undefined') {
