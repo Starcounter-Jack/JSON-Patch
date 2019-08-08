@@ -63,13 +63,6 @@ export interface PatchResult<T> extends Array<OperationResult<T>> {
   newDocument: T;
 }
 
-export interface Observer<T> {
-  object: T;
-  patches: Operation[];
-  unobserve: () => void;
-  callback: (patches: Operation[]) => void;
-}
-
 /* We use a Javascript hash to store each
  function. Each hash entry (property) uses
  the operation identifiers specified in rfc6902.
