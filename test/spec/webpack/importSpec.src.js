@@ -2,7 +2,7 @@ import jsonpatch from '../../..'; //as used in https://github.com/swagger-api/sw
 import * as jsonpatchStar from '../../..';
 import { applyOperation } from '../../..';
 
-describe('CommonJS processed by Webpack', function () {
+describe('This package imported by Webpack', function () {
     describe('import default', function () {
         it('should have the expected structure', function () {
             verifyObjectStructure(jsonpatch);
