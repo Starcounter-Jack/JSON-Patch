@@ -1,6 +1,6 @@
 import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers.mjs';
-export const JsonPatchError = PatchError;
-export const deepClone = _deepClone;
+export var JsonPatchError = PatchError;
+export var deepClone = _deepClone;
 /* We use a Javascript hash to store each
  function. Each hash entry (property) uses
  the operation identifiers specified in rfc6902.
@@ -8,7 +8,7 @@ export const deepClone = _deepClone;
  to its dedicated function in efficient way.
  */
 /* The operations applicable to an object */
-const objOps = {
+var objOps = {
     add: function (obj, key, document) {
         obj[key] = this.value;
         return { newDocument: document };
@@ -16,27 +16,27 @@ const objOps = {
     remove: function (obj, key, document) {
         var removed = obj[key];
         delete obj[key];
-        return { newDocument: document, removed };
+        return { newDocument: document, removed: removed };
     },
     replace: function (obj, key, document) {
         var removed = obj[key];
         obj[key] = this.value;
-        return { newDocument: document, removed };
+        return { newDocument: document, removed: removed };
     },
     move: function (obj, key, document) {
         /* in case move target overwrites an existing value,
         return the removed value, this can be taxing performance-wise,
         and is potentially unneeded */
-        let removed = getValueByPointer(document, this.path);
+        var removed = getValueByPointer(document, this.path);
         if (removed) {
             removed = _deepClone(removed);
         }
-        const originalValue = applyOperation(document, { op: "remove", path: this.from }).removed;
+        var originalValue = applyOperation(document, { op: "remove", path: this.from }).removed;
         applyOperation(document, { op: "add", path: this.path, value: originalValue });
-        return { newDocument: document, removed };
+        return { newDocument: document, removed: removed };
     },
     copy: function (obj, key, document) {
-        const valueToCopy = getValueByPointer(document, this.from);
+        var valueToCopy = getValueByPointer(document, this.from);
         // enforce copy by value so further operations don't affect source (see issue #177)
         applyOperation(document, { op: "add", path: this.path, value: _deepClone(valueToCopy) });
         return { newDocument: document };
@@ -68,7 +68,7 @@ var arrOps = {
     replace: function (arr, i, document) {
         var removed = arr[i];
         arr[i] = this.value;
-        return { newDocument: document, removed };
+        return { newDocument: document, removed: removed };
     },
     move: objOps.move,
     copy: objOps.copy,
@@ -105,7 +105,11 @@ export function getValueByPointer(document, pointer) {
  * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return `{newDocument, result}` after the operation
  */
-export function applyOperation(document, operation, validateOperation = false, mutateDocument = true, banPrototypeModifications = true, index = 0) {
+export function applyOperation(document, operation, validateOperation, mutateDocument, banPrototypeModifications, index) {
+    if (validateOperation === void 0) { validateOperation = false; }
+    if (mutateDocument === void 0) { mutateDocument = true; }
+    if (banPrototypeModifications === void 0) { banPrototypeModifications = true; }
+    if (index === void 0) { index = 0; }
     if (validateOperation) {
         if (typeof validateOperation == 'function') {
             validateOperation(operation, 0, document, operation.path);
@@ -116,7 +120,7 @@ export function applyOperation(document, operation, validateOperation = false, m
     }
     /* ROOT OPERATIONS */
     if (operation.path === "") {
-        let returnValue = { newDocument: document };
+        var returnValue = { newDocument: document };
         if (operation.op === 'add') {
             returnValue.newDocument = operation.value;
             return returnValue;
@@ -163,14 +167,14 @@ export function applyOperation(document, operation, validateOperation = false, m
         if (!mutateDocument) {
             document = _deepClone(document);
         }
-        const path = operation.path || "";
-        const keys = path.split('/');
-        let obj = document;
-        let t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
-        let len = keys.length;
-        let existingPathFragment = undefined;
-        let key;
-        let validateFunction;
+        var path = operation.path || "";
+        var keys = path.split('/');
+        var obj = document;
+        var t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
+        var len = keys.length;
+        var existingPathFragment = undefined;
+        var key = void 0;
+        var validateFunction = void 0;
         if (typeof validateOperation == 'function') {
             validateFunction = validateOperation;
         }
@@ -212,7 +216,7 @@ export function applyOperation(document, operation, validateOperation = false, m
                     if (validateOperation && operation.op === "add" && key > obj.length) {
                         throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
                     }
-                    const returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
+                    var returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
                     if (returnValue.test === false) {
                         throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
                     }
@@ -224,7 +228,7 @@ export function applyOperation(document, operation, validateOperation = false, m
                     key = unescapePathComponent(key);
                 }
                 if (t >= len) {
-                    const returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
+                    var returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
                     if (returnValue.test === false) {
                         throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
                     }
@@ -249,7 +253,9 @@ export function applyOperation(document, operation, validateOperation = false, m
  * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return An array of `{newDocument, result}` after the patch
  */
-export function applyPatch(document, patch, validateOperation, mutateDocument = true, banPrototypeModifications = true) {
+export function applyPatch(document, patch, validateOperation, mutateDocument, banPrototypeModifications) {
+    if (mutateDocument === void 0) { mutateDocument = true; }
+    if (banPrototypeModifications === void 0) { banPrototypeModifications = true; }
     if (validateOperation) {
         if (!Array.isArray(patch)) {
             throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
@@ -258,8 +264,8 @@ export function applyPatch(document, patch, validateOperation, mutateDocument = 
     if (!mutateDocument) {
         document = _deepClone(document);
     }
-    const results = new Array(patch.length);
-    for (let i = 0, length = patch.length; i < length; i++) {
+    var results = new Array(patch.length);
+    for (var i = 0, length_1 = patch.length; i < length_1; i++) {
         // we don't need to pass mutateDocument argument because if it was true, we already deep cloned the object, we'll just pass `true`
         results[i] = applyOperation(document, patch[i], validateOperation, true, banPrototypeModifications, i);
         document = results[i].newDocument; // in case root was replaced
@@ -277,7 +283,7 @@ export function applyPatch(document, patch, validateOperation, mutateDocument = 
  * @return The updated document
  */
 export function applyReducer(document, operation, index) {
-    const operationResult = applyOperation(document, operation);
+    var operationResult = applyOperation(document, operation);
     if (operationResult.test === false) { // failed test
         throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
     }

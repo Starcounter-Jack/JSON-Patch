@@ -3,7 +3,20 @@
  * (c) 2017 Joachim Wester
  * MIT license
  */
-const _hasOwnProperty = Object.prototype.hasOwnProperty;
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var _hasOwnProperty = Object.prototype.hasOwnProperty;
 export function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);
 }
@@ -131,23 +144,28 @@ export function hasUndefined(obj) {
     return false;
 }
 function patchErrorMessageFormatter(message, args) {
-    const messageParts = [message];
-    for (const key in args) {
-        const value = typeof args[key] === 'object' ? JSON.stringify(args[key], null, 2) : args[key]; // pretty print
+    var messageParts = [message];
+    for (var key in args) {
+        var value = typeof args[key] === 'object' ? JSON.stringify(args[key], null, 2) : args[key]; // pretty print
         if (typeof value !== 'undefined') {
-            messageParts.push(`${key}: ${value}`);
+            messageParts.push(key + ": " + value);
         }
     }
     return messageParts.join('\n');
 }
-export class PatchError extends Error {
-    constructor(message, name, index, operation, tree) {
-        super(patchErrorMessageFormatter(message, { name, index, operation, tree }));
-        this.name = name;
-        this.index = index;
-        this.operation = operation;
-        this.tree = tree;
-        Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain, see https://stackoverflow.com/a/48342359
-        this.message = patchErrorMessageFormatter(message, { name, index, operation, tree });
+var PatchError = /** @class */ (function (_super) {
+    __extends(PatchError, _super);
+    function PatchError(message, name, index, operation, tree) {
+        var _newTarget = this.constructor;
+        var _this = _super.call(this, patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree })) || this;
+        _this.name = name;
+        _this.index = index;
+        _this.operation = operation;
+        _this.tree = tree;
+        Object.setPrototypeOf(_this, _newTarget.prototype); // restore prototype chain, see https://stackoverflow.com/a/48342359
+        _this.message = patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree });
+        return _this;
     }
-}
+    return PatchError;
+}(Error));
+export { PatchError };
