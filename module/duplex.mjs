@@ -5,10 +5,6 @@
  */
 import { _deepClone, _objectKeys, escapePathComponent, hasOwnProperty } from './helpers.mjs';
 import { applyPatch } from './core.mjs';
-/* export all core functions and types */
-export { applyOperation, applyPatch, applyReducer, getValueByPointer, validate, validator, _areEquals } from './core.mjs';
-/* export some helpers */
-export { PatchError as JsonPatchError, _deepClone as deepClone, escapePathComponent, unescapePathComponent } from './helpers.mjs';
 var beforeDict = new WeakMap();
 var Mirror = /** @class */ (function () {
     function Mirror(obj) {

@@ -1,4 +1,4 @@
-import * as jsonpatch from '../../module/duplex.mjs';
+import * as jsonpatch from '../../module/index.mjs';
 
 import tests_json from './json-patch-tests/tests.json.mjs';
 import spec_tests_json from './json-patch-tests/spec_tests.json.mjs';

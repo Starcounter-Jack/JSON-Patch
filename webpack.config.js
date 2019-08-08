@@ -22,7 +22,7 @@ module.exports = env => {
   else {
     return [
       {
-        entry: './lib/duplex.js',
+        entry: './lib/index.js',
         mode: 'production',
         optimization: {
           minimize: false
@@ -40,7 +40,7 @@ module.exports = env => {
         ]
       },
       {
-        entry: './lib/duplex.js',
+        entry: './lib/index.js',
         mode: 'production',
         output: {
           filename: 'fast-json-patch.min.js',

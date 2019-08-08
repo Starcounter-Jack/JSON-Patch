@@ -718,6 +718,34 @@ exports._areEquals = _areEquals;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+/* export all core functions and types */
+var core_js_1 = __webpack_require__(1);
+exports.applyOperation = core_js_1.applyOperation;
+exports.applyPatch = core_js_1.applyPatch;
+exports.applyReducer = core_js_1.applyReducer;
+exports.getValueByPointer = core_js_1.getValueByPointer;
+exports.validate = core_js_1.validate;
+exports.validator = core_js_1.validator;
+exports._areEquals = core_js_1._areEquals;
+/* export all duplex functions */
+var duplex_js_1 = __webpack_require__(3);
+exports.unobserve = duplex_js_1.unobserve;
+exports.observe = duplex_js_1.observe;
+exports.generate = duplex_js_1.generate;
+exports.compare = duplex_js_1.compare;
+/* export some helpers */
+var helpers_js_1 = __webpack_require__(0);
+exports.JsonPatchError = helpers_js_1.PatchError;
+exports.deepClone = helpers_js_1._deepClone;
+exports.escapePathComponent = helpers_js_1.escapePathComponent;
+exports.unescapePathComponent = helpers_js_1.unescapePathComponent;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
  * (c) 2017 Joachim Wester
@@ -725,21 +753,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var helpers_js_1 = __webpack_require__(0);
 var core_js_1 = __webpack_require__(1);
-/* export all core functions and types */
-var core_js_2 = __webpack_require__(1);
-exports.applyOperation = core_js_2.applyOperation;
-exports.applyPatch = core_js_2.applyPatch;
-exports.applyReducer = core_js_2.applyReducer;
-exports.getValueByPointer = core_js_2.getValueByPointer;
-exports.validate = core_js_2.validate;
-exports.validator = core_js_2.validator;
-exports._areEquals = core_js_2._areEquals;
-/* export some helpers */
-var helpers_js_2 = __webpack_require__(0);
-exports.JsonPatchError = helpers_js_2.PatchError;
-exports.deepClone = helpers_js_2._deepClone;
-exports.escapePathComponent = helpers_js_2.escapePathComponent;
-exports.unescapePathComponent = helpers_js_2.unescapePathComponent;
 var beforeDict = new WeakMap();
 var Mirror = /** @class */ (function () {
     function Mirror(obj) {
