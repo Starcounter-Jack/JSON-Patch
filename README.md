@@ -46,32 +46,36 @@ Load the bundled distribution script:
 <script src="dist/fast-json-patch.min.js"></script>
 ```
 
+In [browsers that support ECMAScript modules](https://caniuse.com/#feat=es6-module), the below code uses this library as a module:
+
+```html
+<script type="module">
+  import { * as jsonpatch } from 'fast-json-patch/module/duplex.mjs';
+  import { applyOperation } from 'fast-json-patch/module/duplex.mjs';
+</script>
+```
+
 ### In Node.js
 
-Call require to get the instance:
-
-```js
-var jsonpatch = require('fast-json-patch');
-// or, get just a single function:
-const { applyOperation } = require('fast-json-patch');
-const applyOperation = require('fast-json-patch').applyOperation;
-```
-
-Or use the CommonJS export in ES6 style (Works with Webpack, Babel):
-
-```js
-// default import does not work:
-//   import jsonpatch from 'fast-json-patch';
-// use named imports instead:
-import { * as jsonpatch } from 'fast-json-patch';
-import { applyOperation } from 'fast-json-patch';
-```
-
-Or use the ECMAScript module (Works with Webpack, Babel, and in Node 12+ with `--experimental-modules` flag):
+In Node 12+ with `--experimental-modules` flag, the below code uses this library as an ECMAScript module:
 
 ```js
 import { * as jsonpatch } from 'fast-json-patch/module/duplex.mjs';
 import { applyOperation } from 'fast-json-patch/module/duplex.mjs';
+```
+
+In Webpack (and most surely other transpilers based on Babel), the below code uses this library as an ECMAScript module:
+
+```js
+import { * as jsonpatch } from 'fast-json-patch';
+import { applyOperation } from 'fast-json-patch';
+```
+
+In standard Node, the below code uses this library as a CommonJS module:
+
+```js
+const { applyOperation } = require('fast-json-patch');
+const applyOperation = require('fast-json-patch').applyOperation;
 ```
 
 ## Directories
