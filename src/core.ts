@@ -457,3 +457,18 @@ export function validate<T>(sequence: Operation[], document?: T, externalValidat
     }
   }
 }
+
+/**
+ * Default export for backwards compat
+ */
+
+export default {
+  JsonPatchError,
+  deepClone,
+  getValueByPointer,
+  applyOperation,
+  applyPatch,
+  applyReducer,
+  validator,
+  validate   
+}
