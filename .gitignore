@@ -10,6 +10,7 @@ npm-debug.log
 
 # Typescript
 lib/*.d.ts
+test/spec/typings/typingsSpec.js
 
 # SauceLabs logs
 *.log
