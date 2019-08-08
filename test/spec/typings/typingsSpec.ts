@@ -5,7 +5,7 @@
  * @see https://stackoverflow.com/questions/49296151/how-to-write-tests-for-typescript-typing-definition
  */
 
-// import jsonpatch from '../../..';
+import jsonpatch from '../../..';
 import * as jsonpatchStar from '../../..';
 import { applyPatch, Operation } from '../../..';
 
@@ -14,7 +14,7 @@ const document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
 const typedPatch = new Array<Operation>({ op: "replace", path: "/firstName", value: "Joachim" });
 const untypedPatch = [{ op: "replace", path: "/firstName", value: "Joachim" }];
 
-// const test_jsonpatch = jsonpatch.applyPatch(document, typedPatch).newDocument;
+const test_jsonpatch = jsonpatch.applyPatch(document, typedPatch).newDocument;
 const test_jsonpatchStar = jsonpatchStar.applyPatch(document, typedPatch).newDocument;
 const test_applyPatch = applyPatch(document, typedPatch).newDocument;
 
