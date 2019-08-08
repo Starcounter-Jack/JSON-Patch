@@ -83,7 +83,7 @@ const applyOperation = require('fast-json-patch').applyOperation;
 Directories used in this package:
 
 - `dist/` - contains ES5 files for a Web browser
-- `lib/` - contains CommonJS module and typings
+- `commonjs/` - contains CommonJS module and typings
 - `module/` - contains ECMAScript module and typings
 - `src/` - contains TypeScript source files
 

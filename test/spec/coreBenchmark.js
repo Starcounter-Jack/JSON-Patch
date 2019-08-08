@@ -1,5 +1,5 @@
 if (typeof jsonpatch === 'undefined') {
-   jsonpatch = require('./../../lib/duplex');
+   jsonpatch = require('./../..');
 }
 if (typeof Benchmark === 'undefined') {
     global.Benchmark = require('benchmark');
