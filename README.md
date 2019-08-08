@@ -64,7 +64,7 @@ import { * as jsonpatch } from 'fast-json-patch/module/duplex.mjs';
 import { applyOperation } from 'fast-json-patch/module/duplex.mjs';
 ```
 
-In Webpack (and most surely other transpilers based on Babel), the below code uses this library as an ECMAScript module:
+In Webpack (and most surely other bundlers based on Babel), the below code uses this library as an ECMAScript module:
 
 ```js
 import { * as jsonpatch } from 'fast-json-patch';
