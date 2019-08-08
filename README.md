@@ -51,22 +51,27 @@ Load the bundled distribution script:
 Call require to get the instance:
 
 ```js
-var jsonpatch = require('fast-json-patch/lib');
+var jsonpatch = require('fast-json-patch');
 // or, get just a single function:
-const { applyOperation } = require('fast-json-patch/lib');
-const applyOperation = require('fast-json-patch/lib').applyOperation;
+const { applyOperation } = require('fast-json-patch');
+const applyOperation = require('fast-json-patch').applyOperation;
 ```
 
 Or use the CommonJS export in ES6 style (Works with Webpack, Babel):
 
 ```js
-import { applyOperation } from 'fast-json-patch/lib'
+// default import does not work:
+//   import jsonpatch from 'fast-json-patch';
+// use named imports instead:
+import { * as jsonpatch } from 'fast-json-patch';
+import { applyOperation } from 'fast-json-patch';
 ```
 
 Or use the ECMAScript module (Works with Webpack, Babel, and in Node 12+ with `--experimental-modules` flag):
 
 ```js
-import { applyOperation } from 'fast-json-patch'
+import { * as jsonpatch } from 'fast-json-patch/module/duplex.mjs';
+import { applyOperation } from 'fast-json-patch/module/duplex.mjs';
 ```
 
 ## Directories
