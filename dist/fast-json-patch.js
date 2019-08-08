@@ -96,19 +96,15 @@ var jsonpatch =
  * MIT license
  */
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);
@@ -255,7 +251,7 @@ function patchErrorMessageFormatter(message, args) {
     }
     return messageParts.join('\n');
 }
-var PatchError = /** @class */ (function (_super) {
+var PatchError = (function (_super) {
     __extends(PatchError, _super);
     function PatchError(message, name, index, operation, tree) {
         var _newTarget = this.constructor;
@@ -277,7 +273,6 @@ exports.PatchError = PatchError;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-Object.defineProperty(exports, "__esModule", { value: true });
 var areEquals = __webpack_require__(3);
 var helpers_1 = __webpack_require__(0);
 exports.JsonPatchError = helpers_1.PatchError;
@@ -336,7 +331,7 @@ var arrOps = {
         if (helpers_1.isInteger(i)) {
             arr.splice(i, 0, this.value);
         }
-        else { // array props
+        else {
             arr[i] = this.value;
         }
         // this may be needed when using '-' in an array
@@ -412,9 +407,9 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             returnValue.removed = document; //document we removed
             return returnValue;
         }
-        else if (operation.op === 'move' || operation.op === 'copy') { // it's a move or copy to root
+        else if (operation.op === 'move' || operation.op === 'copy') {
             returnValue.newDocument = getValueByPointer(document, operation.from); // get the value by json-pointer in `from` field
-            if (operation.op === 'move') { // report removed item
+            if (operation.op === 'move') {
                 returnValue.removed = document;
             }
             return returnValue;
@@ -427,7 +422,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             returnValue.newDocument = document;
             return returnValue;
         }
-        else if (operation.op === 'remove') { // a remove on root
+        else if (operation.op === 'remove') {
             returnValue.removed = document;
             returnValue.newDocument = null;
             return returnValue;
@@ -436,7 +431,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             operation.value = document;
             return returnValue;
         }
-        else { /* bad operation */
+        else {
             if (validateOperation) {
                 throw new exports.JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);
             }
@@ -568,7 +563,7 @@ exports.applyPatch = applyPatch;
  */
 function applyReducer(document, operation, index) {
     var operationResult = applyOperation(document, operation);
-    if (operationResult.test === false) { // failed test
+    if (operationResult.test === false) {
         throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
     }
     return operationResult.newDocument;
@@ -666,7 +661,6 @@ exports.validate = validate;
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-Object.defineProperty(exports, "__esModule", { value: true });
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
  * (c) 2017 Joachim Wester
@@ -689,14 +683,14 @@ exports.deepClone = helpers_2._deepClone;
 exports.escapePathComponent = helpers_2.escapePathComponent;
 exports.unescapePathComponent = helpers_2.unescapePathComponent;
 var beforeDict = new WeakMap();
-var Mirror = /** @class */ (function () {
+var Mirror = (function () {
     function Mirror(obj) {
         this.observers = new Map();
         this.obj = obj;
     }
     return Mirror;
 }());
-var ObserverInfo = /** @class */ (function () {
+var ObserverInfo = (function () {
     function ObserverInfo(callback, observer) {
         this.callback = callback;
         this.observer = observer;
@@ -749,7 +743,7 @@ function observe(obj, callback) {
             clearTimeout(observer.next);
             observer.next = setTimeout(dirtyCheck);
         };
-        if (typeof window !== 'undefined') { //not Node
+        if (typeof window !== 'undefined') {
             window.addEventListener('mouseup', fastCheck);
             window.addEventListener('keyup', fastCheck);
             window.addEventListener('mousedown', fastCheck);
