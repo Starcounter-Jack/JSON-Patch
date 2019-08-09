@@ -10,6 +10,7 @@ npm-debug.log
 
 # Typescript
 *.d.ts
+test/spec/typings/typingsSpec.js
 
 # compiled files
 src/*.js
