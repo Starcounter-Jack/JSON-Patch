@@ -30,5 +30,15 @@ module.exports = [
     plugins: [new BabiliPlugin(),
     new webpack.BannerPlugin('fast-json-patch, version: ' + package['version'])
     ]
+  },
+  {
+    entry: './test/spec/webpack/importSpec.src.js',
+    output: {
+      filename: './test/spec/webpack/importSpec.build.js',
+    },
+    target: 'node',
+    resolve: {
+      extensions: ['.js']
+    }
   }
 ];
