@@ -432,3 +432,17 @@ function _areEquals(a, b) {
 }
 exports._areEquals = _areEquals;
 ;
+/**
+ * Default export for backwards compat
+ */
+exports.default = {
+    JsonPatchError: exports.JsonPatchError,
+    deepClone: exports.deepClone,
+    getValueByPointer: getValueByPointer,
+    applyOperation: applyOperation,
+    applyPatch: applyPatch,
+    applyReducer: applyReducer,
+    validator: validator,
+    validate: validate,
+    _areEquals: _areEquals
+};
