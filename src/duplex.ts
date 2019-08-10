@@ -210,24 +210,3 @@ export function compare(tree1: Object | Array<any>, tree2: Object | Array<any>, 
   _generate(tree1, tree2, patches, '', invertible);
   return patches;
 }
-
-/**
- * Default export for backwards compat
- */
-// import just to re-export as default
-import * as core from './core.js';
-import { PatchError as JsonPatchError, unescapePathComponent } from './helpers.js';
-
-export default {
-    ...core,
-    // duplex
-    unobserve,
-    observe,
-    generate,
-    compare,
-    // helpers
-    JsonPatchError,
-    deepClone:_deepClone,
-    escapePathComponent,
-    unescapePathComponent
-}

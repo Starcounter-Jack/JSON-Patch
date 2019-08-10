@@ -511,18 +511,3 @@ export function _areEquals(a: any, b: any): boolean {
 
   return a!==a && b!==b;
 };
-/**
- * Default export for backwards compat
- */
-
-export default {
-  JsonPatchError,
-  deepClone,
-  getValueByPointer,
-  applyOperation,
-  applyPatch,
-  applyReducer,
-  validator,
-  validate,
-  _areEquals
-}
