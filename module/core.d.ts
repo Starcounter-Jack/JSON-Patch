@@ -109,18 +109,3 @@ export declare function validator(operation: Operation, index: number, document?
  */
 export declare function validate<T>(sequence: Operation[], document?: T, externalValidator?: Validator<T>): PatchError;
 export declare function _areEquals(a: any, b: any): boolean;
-declare const _default: {
-    JsonPatchError: typeof PatchError;
-    deepClone: typeof _deepClone;
-    getValueByPointer: typeof getValueByPointer;
-    applyOperation: typeof applyOperation;
-    applyPatch: typeof applyPatch;
-    applyReducer: typeof applyReducer;
-    validator: typeof validator;
-    validate: typeof validate;
-    _areEquals: typeof _areEquals;
-};
-/**
- * Default export for backwards compat
- */
-export default _default;

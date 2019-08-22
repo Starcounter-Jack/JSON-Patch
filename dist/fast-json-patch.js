@@ -711,20 +711,6 @@ function _areEquals(a, b) {
 }
 exports._areEquals = _areEquals;
 ;
-/**
- * Default export for backwards compat
- */
-exports.default = {
-    JsonPatchError: exports.JsonPatchError,
-    deepClone: exports.deepClone,
-    getValueByPointer: getValueByPointer,
-    applyOperation: applyOperation,
-    applyPatch: applyPatch,
-    applyReducer: applyReducer,
-    validator: validator,
-    validate: validate,
-    _areEquals: _areEquals
-};
 
 
 /***/ }),
@@ -748,17 +734,6 @@ exports.unescapePathComponent = helpers.unescapePathComponent;
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
@@ -940,21 +915,6 @@ function compare(tree1, tree2, invertible) {
     return patches;
 }
 exports.compare = compare;
-/**
- * Default export for backwards compat
- */
-// import just to re-export as default
-var core = __webpack_require__(1);
-var helpers_js_2 = __webpack_require__(0);
-exports.default = __assign({}, core, { 
-    // duplex
-    unobserve: unobserve,
-    observe: observe,
-    generate: generate,
-    compare: compare,
-    // helpers
-    JsonPatchError: helpers_js_2.PatchError, deepClone: helpers_js_1._deepClone, escapePathComponent: helpers_js_1.escapePathComponent,
-    unescapePathComponent: helpers_js_2.unescapePathComponent });
 
 
 /***/ })
