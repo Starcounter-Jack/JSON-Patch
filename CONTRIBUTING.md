@@ -40,11 +40,10 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 1. Don't break too much. See [how many projects depend on this](https://www.npmjs.com/browse/depended/fast-json-patch).
 2. Make sure that the browser tests pass in Chrome, Firefox, Edge and IE
 3. Make sure that the NodeJS tests pass `npm install && npm run test`
-4. Transpile by executing `npm run tsc`.
-5. Execute `webpack` to bundle and minify.
-6. Execute `npm version`like (`npm version [ major | minor | patch | premajor | preminor | prepatch | prerelease]`)
-7. Call `git push` to push the changes to `origin master`
-8. Call `git push --tags` to push the tag to `origin master`
-9. Call `npm publish` to push the new version to NPM. [Read more](https://docs.npmjs.com/getting-started/publishing-npm-packages)
-10. Call `npm view fast-json-patch dist-tags` to verify that the new version was published in NPM.
-11. Explain the changes (at least a summary of the commit log) in [GitHub Releases](https://github.com/Starcounter-Jack/JSON-Patch/releases).
+4. Execute `npm run build` to transpile, bundle and minify.
+5. Execute `npm version` like (`npm version [ major | minor | patch | premajor | preminor | prepatch | prerelease]`)
+6. Call `git push` to push the changes to `origin master`
+7. Call `git push --tags` to push the tag to `origin master`
+8. Call `npm publish` to push the new version to NPM. [Read more](https://docs.npmjs.com/getting-started/publishing-npm-packages)
+9. Call `npm view fast-json-patch dist-tags` to verify that the new version was published in NPM.
+10. Explain the changes (at least a summary of the commit log) in [GitHub Releases](https://github.com/Starcounter-Jack/JSON-Patch/releases).
