@@ -3,14 +3,8 @@
  * (c) 2017 Joachim Wester
  * MIT license
  */
-import { _deepClone, _objectKeys, escapePathComponent, hasOwnProperty } from './helpers';
-import { applyPatch, Operation } from './core';
-
-/* export all core functions and types */
-export { applyOperation, applyPatch, applyReducer, getValueByPointer, Operation, AddOperation, RemoveOperation, ReplaceOperation, MoveOperation, CopyOperation,  TestOperation, GetOperation, validate, validator, OperationResult } from './core';
-
-/* export some helpers */
-export { PatchError as JsonPatchError, _deepClone as deepClone, escapePathComponent, unescapePathComponent } from './helpers';
+import { _deepClone, _objectKeys, escapePathComponent, hasOwnProperty } from './helpers.js';
+import { applyPatch, Operation } from './core.js';
 
 export interface Observer<T> {
   object: T;
@@ -175,8 +169,8 @@ function _generate(mirror, obj, patches, path, invertible) {
       else {
         if (oldVal !== newVal) {
           changed = true;
-          if (invertible) { 
-            patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) }); 
+          if (invertible) {
+            patches.push({ op: "test", path: path + "/" + escapePathComponent(key), value: _deepClone(oldVal) });
       	  }
           patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: _deepClone(newVal) });
         }
@@ -215,25 +209,4 @@ export function compare(tree1: Object | Array<any>, tree2: Object | Array<any>, 
   var patches = [];
   _generate(tree1, tree2, patches, '', invertible);
   return patches;
-}
-
-/**
- * Default export for backwards compat
- */
-// import just to re-export as default
-import * as core from './core';
-import { PatchError as JsonPatchError, unescapePathComponent } from './helpers';
-
-export default {
-    ...core,
-    // duplex
-    unobserve,
-    observe,
-    generate,
-    compare,
-    // helpers
-    JsonPatchError,
-    deepClone:_deepClone,
-    escapePathComponent,
-    unescapePathComponent
 }

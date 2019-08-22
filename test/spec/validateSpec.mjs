@@ -1,9 +1,8 @@
-if(typeof jsonpatch == 'undefined') {
-  var jsonpatch = require('../../lib/duplex')
-}
+import * as jsonpatch from '../../index.mjs';
+
 describe('validate', function() {
   it('should return an empty array if the patch is valid', function() {
-    var patch = [
+    const patch = [
       {
         op: 'test',
         path: '/a/b/c',
@@ -34,7 +33,7 @@ describe('validate', function() {
         path: '/a/b/e'
       }
     ];
-    var error = jsonpatch.validate(patch);
+    const error = jsonpatch.validate(patch);
     expect(error).toBeUndefined();
   });
 
@@ -98,7 +97,7 @@ describe('validate', function() {
 
 
   it('should return an empty array if the operation is a valid object', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'add',
         value: 'foo',
@@ -109,30 +108,30 @@ describe('validate', function() {
   });
 
   it('should return an error if the operation is null', function() {
-    var error = jsonpatch.validate([null]);
+    const error = jsonpatch.validate([null]);
     expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
     expect(error.name).toBe('OPERATION_NOT_AN_OBJECT');
   });
 
   it('should return an error which is instance of Error and jsonpatch.JsonPatchError', function() {
-    var error = jsonpatch.validate({});
+    const error = jsonpatch.validate({});
     expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
     expect(error instanceof Error).toBe(true);
     expect(error.name).toBe('SEQUENCE_NOT_AN_ARRAY');
   });
 
   it('should return an error that contains the cloned patch and the patched object', function() {
-    var tree = {
+    const tree = {
       name: 'Elvis',
       cars: []
     };
-    var sequence = [
+    const sequence = [
       {
         op: 'remove',
         path: '/name/first'
       }
     ];
-    var error = jsonpatch.validate(sequence, tree);
+    const error = jsonpatch.validate(sequence, tree);
     expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
     expect(JSON.stringify(error.operation)).toBe(JSON.stringify(sequence[0]));
     expect(JSON.stringify(error.tree)).toBe(JSON.stringify(tree));
@@ -140,19 +139,19 @@ describe('validate', function() {
   });
 
   it('should return an error if the operation is undefined', function() {
-    var error = jsonpatch.validate([undefined]);
+    const error = jsonpatch.validate([undefined]);
     expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
     expect(error.name).toBe('OPERATION_NOT_AN_OBJECT');
   });
 
   it('should return an error if the operation is an array', function() {
-    var error = jsonpatch.validate([[]]);
+    const error = jsonpatch.validate([[]]);
     expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
     expect(error.name).toBe('OPERATION_NOT_AN_OBJECT');
   });
 
   it('should return an error if the operation "op" property is not a string', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         path: '/a/b/c'
       }
@@ -162,7 +161,7 @@ describe('validate', function() {
   });
 
   it('should return an error if the operation "path" property is not a string', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'remove',
         value: 'foo'
@@ -173,7 +172,7 @@ describe('validate', function() {
   });
 
   it('should return an error if an "add" operation is missing "value" property', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'add',
         path: '/a/b/c'
@@ -184,7 +183,7 @@ describe('validate', function() {
   });
 
   it('should return an error if an "add" operation "value" property is "undefined"', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'add',
         path: '/a/b/c',
@@ -196,7 +195,7 @@ describe('validate', function() {
   });
 
   it('should return an error if a "replace" operation is missing "value" property', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'replace',
         path: '/a/b/c'
@@ -207,7 +206,7 @@ describe('validate', function() {
   });
 
   it('should return an error if a "replace" operation "value" property is "undefined"', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'replace',
         path: '/a/b/c',
@@ -219,7 +218,7 @@ describe('validate', function() {
   });
 
   it('should return an error if a "test" operation is missing "value" property', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'test',
         path: '/a/b/c'
@@ -230,7 +229,7 @@ describe('validate', function() {
   });
 
   it('should return an error if a "test" operation "value" property is "undefined"', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'test',
         path: '/a/b/c',
@@ -242,7 +241,7 @@ describe('validate', function() {
   });
 
   it('should return an error if an "add" operation "value" contains "undefined"', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'add',
         path: '/a/b/c',
@@ -256,7 +255,7 @@ describe('validate', function() {
   });
 
   it('should return an error if a "replace" operation "value" contains "undefined"', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'replace',
         path: '/a/b/c',
@@ -270,7 +269,7 @@ describe('validate', function() {
   });
 
   it('should return an error if a "test" operation "value" contains "undefined"', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'test',
         path: '/a/b/c',
@@ -286,7 +285,7 @@ describe('validate', function() {
   });
 
   it('should return an error if a "move" operation is missing "from" property', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'move',
         path: '/a/b/c'
@@ -297,7 +296,7 @@ describe('validate', function() {
   });
 
   it('should return an error if a "copy" operation is missing "from" property', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'copy',
         path: '/a/b/c'
@@ -308,7 +307,7 @@ describe('validate', function() {
   });
 
   it('should return an error if the "op" property is invalid', function() {
-    var error = jsonpatch.validate([
+    const error = jsonpatch.validate([
       {
         op: 'foobar',
         path: '/a/b/c'
@@ -319,9 +318,9 @@ describe('validate', function() {
   });
 
   it('should return error replacing an unexisting path', function() {
-    var sequence,
-      error,
-      tree = {
+    let sequence;
+    let error;
+    const tree = {
         '': 'empty string is a valid key',
         name: 'Elvis',
         cars: [
@@ -364,28 +363,28 @@ describe('validate', function() {
   });
 
   it('should return error removing an unexisting path', function() {
-    var tree = {
+    const tree = {
       name: 'Elvis',
       cars: []
     };
-    var sequence = [
+    const sequence = [
       {
         op: 'remove',
         path: '/name/first'
       }
     ];
-    var error = jsonpatch.validate(sequence, tree);
+    const error = jsonpatch.validate(sequence, tree);
     expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
     expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
   });
 
   it('should allow adding property "b" in "a"', function() {
-    var tree = {
+    const tree = {
       a: {
         foo: 1
       }
     };
-    var sequence = [
+    const sequence = [
       {
         op: 'add',
         path: '/a/b',
@@ -393,17 +392,17 @@ describe('validate', function() {
       }
     ];
 
-    var error = jsonpatch.validate(sequence, tree);
+    const error = jsonpatch.validate(sequence, tree);
     expect(error).toBeUndefined();
   });
 
   it('should report error because "a" does not exist', function() {
-    var tree = {
+    const tree = {
       q: {
         bar: 2
       }
     };
-    var sequence = [
+    const sequence = [
       {
         op: 'add',
         path: '/a/b',
@@ -411,16 +410,16 @@ describe('validate', function() {
       }
     ];
 
-    var error = jsonpatch.validate(sequence, tree);
+    const error = jsonpatch.validate(sequence, tree);
     expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
     expect(error.name).toBe('OPERATION_PATH_CANNOT_ADD');
   });
 
   it('should return error when replacing a removed path', function() {
-    var tree = {
+    const tree = {
       name: 'Elvis'
     };
-    var sequence = [
+    const sequence = [
       {
         op: 'remove',
         path: '/name'
@@ -431,15 +430,15 @@ describe('validate', function() {
         value: 'Freddie'
       }
     ];
-    var error = jsonpatch.validate(sequence, tree);
+    const error = jsonpatch.validate(sequence, tree);
     expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
   });
 
   it('should allow to override validator to add custom validation', function() {
-    var tree = {
+    const tree = {
       password: 'Elvis'
     };
-    var sequence = [
+    const sequence = [
       {
         op: 'replace',
         path: '/password',
@@ -466,16 +465,16 @@ describe('validate', function() {
             tree
           );
         }
-    var customError = jsonpatch.validate(sequence, tree, validator);
+    const customError = jsonpatch.validate(sequence, tree, validator);
     expect(customError.index).toBe(0);
     expect(customError.name).toBe('OPERATION_VALUE_MUST_NOT_CONTAIN_OLD_VALUE');
   });
 
   it('should pass replacing the tree root', function() {
-    var tree = {
+    const tree = {
       password: 'Elvis'
     };
-    var sequence = [
+    const sequence = [
       {
         op: 'replace',
         path: '',
@@ -483,43 +482,43 @@ describe('validate', function() {
       }
     ];
 
-    var error = jsonpatch.validate(sequence, tree);
+    const error = jsonpatch.validate(sequence, tree);
     expect(error).toBeUndefined();
   });
 
   it('should return error moving from an unexisting path', function() {
-    var tree = {
+    const tree = {
       name: 'Elvis'
     };
-    var sequence = [
+    const sequence = [
       {
         op: 'move',
         from: '/a/b/c',
         path: '/name'
       }
     ];
-    var error = jsonpatch.validate(sequence, tree);
+    const error = jsonpatch.validate(sequence, tree);
     expect(error.name).toBe('OPERATION_FROM_UNRESOLVABLE');
   });
 
   it('should return error copying from an unexisting path', function() {
-    var tree = {
+    const tree = {
       name: 'Elvis'
     };
-    var sequence = [
+    const sequence = [
       {
         op: 'copy',
         from: '/a/b/c',
         path: '/name'
       }
     ];
-    var error = jsonpatch.validate(sequence, tree);
+    const error = jsonpatch.validate(sequence, tree);
     expect(error.name).toBe('OPERATION_FROM_UNRESOLVABLE');
   });
 
   it('should throw OPERATION_PATH_INVALID when applying patch without path', function() {
-    var a = {};
-    var ex = null;
+    const a = {};
+    let ex = null;
 
     try {
       jsonpatch.applyPatch(
@@ -540,8 +539,8 @@ describe('validate', function() {
   });
 
   it('should throw OPERATION_PATH_INVALID when applying patch with an invalid path. Issue #77.', function() {
-    var a = {};
-    var ex = null;
+    const a = {};
+    let ex = null;
 
     try {
       jsonpatch.applyPatch(
@@ -562,8 +561,8 @@ describe('validate', function() {
   });
 
   it('should throw OPERATION_OP_INVALID when applying patch without operation', function() {
-    var a = {};
-    var ex = null;
+    const a = {};
+    let ex = null;
 
     try {
       jsonpatch.applyPatch(
@@ -584,8 +583,8 @@ describe('validate', function() {
   });
 
   it('should throw OPERATION_VALUE_REQUIRED when applying patch without value', function() {
-    var a = {};
-    var ex = null;
+    const a = {};
+    let ex = null;
 
     try {
       jsonpatch.applyPatch(
@@ -606,7 +605,7 @@ describe('validate', function() {
   });
 
   it('should not modify patch value of type array (issue #76)', function () {
-    var patches = [
+    const patches = [
       {op: 'add', path: '/foo', value: []},
       {op: 'add', path: '/foo/-', value: 1}
     ];
@@ -619,7 +618,7 @@ describe('validate', function() {
   });
 
   it('should not modify patch value of type object (issue #76)', function () {
-    var patches = [
+    const patches = [
       {op: 'add', path: '/foo', value: {}},
       {op: 'add', path: '/foo/bar', value: 1}
     ];

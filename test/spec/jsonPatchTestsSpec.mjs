@@ -1,36 +1,22 @@
-if(typeof jsonpatch == 'undefined') {
-  var jsonpatch = require('../../lib/duplex')
-}
+import * as jsonpatch from '../../index.mjs';
 
-var JSONtests = [
+import tests_json from './json-patch-tests/tests.json.mjs';
+import spec_tests_json from './json-patch-tests/spec_tests.json.mjs';
+
+const JSONtests = [
   {
     name: 'tests.json',
-    path: 'spec/json-patch-tests/tests.json'
+    tests: tests_json
   },
   {
     name: 'spec_tests.json',
-    path: 'spec/json-patch-tests/spec_tests.json'
+    tests: spec_tests_json
   }
 ];
 
-var loadJsonTestSuite;
-if (typeof XMLHttpRequest === 'undefined') {
-  var jsonfile = require('jsonfile');
-  loadJsonTestSuite = function(url, callback) {
-    return jsonfile.readFileSync('test/' + url);
-  };
-} else {
-  loadJsonTestSuite = function(url, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, false);
-    xhr.send();
-    return JSON.parse(xhr.responseText);
-  };
-}
-
 if (typeof Array.prototype.forEach != 'function') {
   Array.prototype.forEach = function(callback) {
-    for (var i = 0; i < this.length; i++) {
+    for (const i = 0; i < this.length; i++) {
       callback.apply(this, [this[i], i, this]);
     }
   };
@@ -39,22 +25,22 @@ if (typeof Array.prototype.forEach != 'function') {
 describe('json-patch-tests', function() {
   JSONtests.forEach(function(jsonTest) {
     describe(jsonTest.name, function() {
-      loadJsonTestSuite(jsonTest.path).forEach(function(test) {
+      jsonTest.tests.forEach(function(test) {
         if (test.disabled) {
           return;
         }
-        var testName = test.comment || test.error || JSON.stringify(test.patch);
+        const testName = test.comment || test.error || JSON.stringify(test.patch);
         if (test.expected) {
           it('should succeed: ' + testName, function() {
             const results = jsonpatch.applyPatch(test.doc, test.patch, true);
-            test.doc = results.newDocument;            
+            test.doc = results.newDocument;
             expect(test.doc).toEqual(test.expected);
           });
         } else if (test.error || test.patch[0].op === 'test') {
           it('should throw an error: ' + testName, function() {
-            var errors = 0;
+            let errors = 0;
             try {
-              var res = jsonpatch.applyPatch(test.doc, test.patch, true);
+              const res = jsonpatch.applyPatch(test.doc, test.patch, true);
               if (res.test === false) {
                 throw new Error('Test failed');
               }

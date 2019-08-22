@@ -5,8 +5,7 @@
  */
 declare var require: any;
 
-const areEquals = require('fast-deep-equal');
-import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers';
+import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers.js';
 
 export const JsonPatchError = PatchError;
 export const deepClone = _deepClone;
@@ -64,13 +63,6 @@ export interface PatchResult<T> extends Array<OperationResult<T>> {
   newDocument: T;
 }
 
-export interface Observer<T> {
-  object: T;
-  patches: Operation[];
-  unobserve: () => void;
-  callback: (patches: Operation[]) => void;
-}
-
 /* We use a Javascript hash to store each
  function. Each hash entry (property) uses
  the operation identifiers specified in rfc6902.
@@ -123,7 +115,7 @@ const objOps = {
     return { newDocument: document }
   },
   test: function (obj, key, document) {
-    return { newDocument: document, test: areEquals(obj[key], this.value) }
+    return { newDocument: document, test: _areEquals(obj[key], this.value) }
   },
   _get: function (obj, key, document) {
     this.value = obj[key];
@@ -214,7 +206,7 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
       }
       return returnValue;
     } else if (operation.op === 'test') {
-      returnValue.test = areEquals(document, operation.value);
+      returnValue.test = _areEquals(document, operation.value);
       if (returnValue.test === false) {
         throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
       }
@@ -458,17 +450,64 @@ export function validate<T>(sequence: Operation[], document?: T, externalValidat
   }
 }
 
-/**
- * Default export for backwards compat
- */
+// based on https://github.com/epoberezkin/fast-deep-equal
+// MIT License
 
-export default {
-  JsonPatchError,
-  deepClone,
-  getValueByPointer,
-  applyOperation,
-  applyPatch,
-  applyReducer,
-  validator,
-  validate   
-}
+// Copyright (c) 2017 Evgeny Poberezkin
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+export function _areEquals(a: any, b: any): boolean {
+  if (a === b) return true;
+
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
+    var arrA = Array.isArray(a)
+      , arrB = Array.isArray(b)
+      , i
+      , length
+      , key;
+
+    if (arrA && arrB) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (!_areEquals(a[i], b[i])) return false;
+      return true;
+    }
+
+    if (arrA != arrB) return false;
+
+    var keys = Object.keys(a);
+    length = keys.length;
+
+    if (length !== Object.keys(b).length)
+      return false;
+
+    for (i = length; i-- !== 0;)
+      if (!b.hasOwnProperty(keys[i])) return false;
+
+    for (i = length; i-- !== 0;) {
+      key = keys[i];
+      if (!_areEquals(a[key], b[key])) return false;
+    }
+
+    return true;
+  }
+
+  return a!==a && b!==b;
+};

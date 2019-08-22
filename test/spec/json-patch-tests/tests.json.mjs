@@ -1,4 +1,4 @@
-[
+export default [
     { "comment": "empty list, empty docs",
       "doc": {},
       "patch": [],
@@ -189,17 +189,17 @@
       "patch": [{"op": "replace", "path": "/foo", "value": "truthy"}],
       "expected": {"foo": "truthy"},
       "comment": "null value should be valid obj property to be replaced with something truthy" },
-      
+
     { "doc": {"foo": null},
       "patch": [{"op": "move", "from": "/foo", "path": "/bar"}],
       "expected": {"bar": null},
       "comment": "null value should be valid obj property to be moved" },
-      
+
     { "doc": {"foo": null},
       "patch": [{"op": "copy", "from": "/foo", "path": "/bar"}],
       "expected": {"foo": null, "bar": null},
       "comment": "null value should be valid obj property to be copied" },
-      
+
     { "doc": {"foo": null},
       "patch": [{"op": "remove", "path": "/foo"}],
       "expected": {},

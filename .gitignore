@@ -9,12 +9,8 @@ npm-debug.log
 .idea
 
 # Typescript
-*.d.ts
+commonjs/*.d.ts
 test/spec/typings/typingsSpec.js
-
-# compiled files
-src/*.js
-lib/*
 
 # SauceLabs logs
 *.log

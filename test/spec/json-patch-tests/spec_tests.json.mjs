@@ -1,4 +1,4 @@
-[
+export default [
   {
     "comment": "4.1. add with missing object",
     "doc": { "q": { "bar": 2 } },

@@ -31,6 +31,7 @@ function verifyObjectStructure(obj) {
     expect(obj.getValueByPointer).withContext("getValueByPointer should be a method within the object").toBeDefined();
     expect(obj.validate).withContext("validate should be a method within the object").toBeDefined();
     expect(obj.validator).withContext("validator should be a method within the object").toBeDefined();
+    expect(obj._areEquals).withContext("_areEquals should be a method within the object").toBeDefined();
     expect(obj.JsonPatchError).withContext("JsonPatchError should be a method within the object").toBeDefined();
     expect(obj.deepClone).withContext("deepClone should be a method within the object").toBeDefined();
     expect(obj.escapePathComponent).withContext("escapePathComponent should be a method within the object").toBeDefined();

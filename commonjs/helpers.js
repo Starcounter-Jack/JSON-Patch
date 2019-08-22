@@ -3,12 +3,26 @@
  * (c) 2017 Joachim Wester
  * MIT license
  */
-
-const _hasOwnProperty = Object.prototype.hasOwnProperty;
-export function hasOwnProperty(obj, key) {
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var _hasOwnProperty = Object.prototype.hasOwnProperty;
+function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);
 }
-export function _objectKeys(obj) {
+exports.hasOwnProperty = hasOwnProperty;
+function _objectKeys(obj) {
     if (Array.isArray(obj)) {
         var keys = new Array(obj.length);
         for (var k = 0; k < keys.length; k++) {
@@ -26,14 +40,16 @@ export function _objectKeys(obj) {
         }
     }
     return keys;
-};
+}
+exports._objectKeys = _objectKeys;
+;
 /**
 * Deeply clone the object.
 * https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
 * @param  {any} obj value to clone
 * @return {any} cloned obj
 */
-export function _deepClone(obj) {
+function _deepClone(obj) {
     switch (typeof obj) {
         case "object":
             return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
@@ -43,8 +59,9 @@ export function _deepClone(obj) {
             return obj; //no need to clone primitives
     }
 }
+exports._deepClone = _deepClone;
 //3x faster than cached /^\d+$/.test(str)
-export function isInteger(str: string): boolean {
+function isInteger(str) {
     var i = 0;
     var len = str.length;
     var charCode;
@@ -58,25 +75,28 @@ export function isInteger(str: string): boolean {
     }
     return true;
 }
+exports.isInteger = isInteger;
 /**
 * Escapes a json pointer path
 * @param path The raw pointer
 * @return the Escaped path
 */
-export function escapePathComponent(path: string): string {
-    if (path.indexOf('/') === -1 && path.indexOf('~') === -1) return path;
+function escapePathComponent(path) {
+    if (path.indexOf('/') === -1 && path.indexOf('~') === -1)
+        return path;
     return path.replace(/~/g, '~0').replace(/\//g, '~1');
 }
+exports.escapePathComponent = escapePathComponent;
 /**
  * Unescapes a json pointer path
  * @param path The escaped pointer
  * @return The unescaped path
  */
-export function unescapePathComponent(path: string): string {
+function unescapePathComponent(path) {
     return path.replace(/~1/g, '/').replace(/~0/g, '~');
 }
-
-export function _getPathRecursive(root: Object, obj: Object): string {
+exports.unescapePathComponent = unescapePathComponent;
+function _getPathRecursive(root, obj) {
     var found;
     for (var key in root) {
         if (hasOwnProperty(root, key)) {
@@ -93,8 +113,8 @@ export function _getPathRecursive(root: Object, obj: Object): string {
     }
     return '';
 }
-
-export function getPath(root: Object, obj: Object): string {
+exports._getPathRecursive = _getPathRecursive;
+function getPath(root, obj) {
     if (root === obj) {
         return '/';
     }
@@ -104,10 +124,11 @@ export function getPath(root: Object, obj: Object): string {
     }
     return '/' + path;
 }
+exports.getPath = getPath;
 /**
 * Recursively checks whether an object has any undefined values inside.
 */
-export function hasUndefined(obj: any): boolean {
+function hasUndefined(obj) {
     if (obj === undefined) {
         return true;
     }
@@ -131,35 +152,30 @@ export function hasUndefined(obj: any): boolean {
     }
     return false;
 }
-
-export type JsonPatchErrorName = 'SEQUENCE_NOT_AN_ARRAY' |
-    'OPERATION_NOT_AN_OBJECT' |
-    'OPERATION_OP_INVALID' |
-    'OPERATION_PATH_INVALID' |
-    'OPERATION_FROM_REQUIRED' |
-    'OPERATION_VALUE_REQUIRED' |
-    'OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED' |
-    'OPERATION_PATH_CANNOT_ADD' |
-    'OPERATION_PATH_UNRESOLVABLE' |
-    'OPERATION_FROM_UNRESOLVABLE' |
-    'OPERATION_PATH_ILLEGAL_ARRAY_INDEX' |
-    'OPERATION_VALUE_OUT_OF_BOUNDS' |
-    'TEST_OPERATION_FAILED';
-
-function patchErrorMessageFormatter(message: String, args: Object): string {
-    const messageParts = [message];
-    for(const key in args) {
-        const value = typeof args[key] === 'object' ? JSON.stringify(args[key], null, 2) : args[key]; // pretty print
-        if(typeof value !== 'undefined') {
-            messageParts.push(`${key}: ${value}`);
+exports.hasUndefined = hasUndefined;
+function patchErrorMessageFormatter(message, args) {
+    var messageParts = [message];
+    for (var key in args) {
+        var value = typeof args[key] === 'object' ? JSON.stringify(args[key], null, 2) : args[key]; // pretty print
+        if (typeof value !== 'undefined') {
+            messageParts.push(key + ": " + value);
         }
     }
     return messageParts.join('\n');
 }
-export class PatchError extends Error {
-    constructor(message: string, public name: JsonPatchErrorName, public index?: number, public operation?: any, public tree?: any) {
-        super(patchErrorMessageFormatter(message, { name, index, operation, tree }));
-        Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain, see https://stackoverflow.com/a/48342359
-        this.message = patchErrorMessageFormatter(message, { name, index, operation, tree });
+var PatchError = /** @class */ (function (_super) {
+    __extends(PatchError, _super);
+    function PatchError(message, name, index, operation, tree) {
+        var _newTarget = this.constructor;
+        var _this = _super.call(this, patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree })) || this;
+        _this.name = name;
+        _this.index = index;
+        _this.operation = operation;
+        _this.tree = tree;
+        Object.setPrototypeOf(_this, _newTarget.prototype); // restore prototype chain, see https://stackoverflow.com/a/48342359
+        _this.message = patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree });
+        return _this;
     }
-}
+    return PatchError;
+}(Error));
+exports.PatchError = PatchError;

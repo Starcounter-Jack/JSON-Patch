@@ -11,6 +11,7 @@ describe('CommonJS', function () {
             expect(jsonpatch.getValueByPointer).withContext("getValueByPointer should be a method within the object").toBeDefined();
             expect(jsonpatch.validate).withContext("validate should be a method within the object").toBeDefined();
             expect(jsonpatch.validator).withContext("validator should be a method within the object").toBeDefined();
+            expect(jsonpatch._areEquals).withContext("_areEquals should be a method within the object").toBeDefined();
             expect(jsonpatch.JsonPatchError).withContext("JsonPatchError should be a method within the object").toBeDefined();
             expect(jsonpatch.deepClone).withContext("deepClone should be a method within the object").toBeDefined();
             expect(jsonpatch.escapePathComponent).withContext("escapePathComponent should be a method within the object").toBeDefined();

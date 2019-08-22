@@ -6,14 +6,12 @@ JSON-Patch
 [![Build Status](https://travis-ci.org/Starcounter-Jack/JSON-Patch.svg?branch=master)](https://travis-ci.org/Starcounter-Jack/JSON-Patch)
 
 With JSON-Patch, you can:
-- **applyPatch** to apply patches
-- **applyOperation** to apply single operations
+- **apply** patches (arrays) and single operations on JS object
 - **validate** a sequence of patches
-- **observe** for changes (and generate patches when a change is detected)
-- **compare** two objects (to obtain the difference).
+- **observe** for changes and **generate** patches when a change is detected
+- **compare** two objects to obtain the difference
 
-
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/json-patch.svg)](https://travis-ci.org/Starcounter-Jack/JSON-Patch)
+Tested in IE11, Firefox, Chrome, Safari and Node.js
 
 
 ## Why you should use JSON-Patch
@@ -24,195 +22,70 @@ JSON Patch plays well with the HTTP PATCH verb (method) and REST style programmi
 
 Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) about it.
 
-## Footprint
-4 KB minified and gzipped (12 KB minified)
-
-## Performance
-
-##### [`add` benchmark](https://run.perf.zone/view/JSON-Patch-Add-Operation-1535541298893)
-
-![image](https://user-images.githubusercontent.com/17054134/44784357-aa422480-ab8d-11e8-8a7e-037e692dd842.png)
-
-##### [`replace` benchmark](https://run.perf.zone/view/JSON-Patch-Replace-Operation-1535540952263)
-
-![image](https://user-images.githubusercontent.com/17054134/44784275-5fc0a800-ab8d-11e8-8a90-e87b8d5409d0.png)
-
-Tested on 29.08.2018. Compared libraries:
-
-- [Starcounter-Jack/JSON-Patch](https://www.npmjs.com/package/fast-json-patch) 2.0.6
-- [bruth/jsonpatch-js](https://www.npmjs.com/package/json-patch) 0.7.0
-- [dharmafly/jsonpatch.js](https://www.npmjs.com/package/jsonpatch) 3.0.1
-- [jiff](https://www.npmjs.com/package/jiff) 0.7.3
-- [RFC6902](https://www.npmjs.com/package/rfc6902) 2.4.0
-
-We aim the tests to be fair. Our library puts performance as the #1 priority, while other libraries can have different priorities. If you'd like to update the benchmarks or add a library, please fork  the [perf.zone](https://perf.zone) benchmarks linked above and open an issue to include new results.
-
-## Features
-* Allows you to apply patches on object trees for incoming traffic.
-* Allows you to freely manipulate object trees and then generate patches for outgoing traffic.
-* Tested in IE11, Firefox, Chrome, Safari and Node.js
-
 
 ## Install
 
-Install the current version (and save it as a dependency):
-
-### npm
+[Download as ZIP](https://github.com/Starcounter-Jack/JSON-Patch/archive/master.zip) or install the current version using a package manager (and save it as a dependency):
 
 ```sh
-$ npm install fast-json-patch --save
-```
-### bower
+# NPM
+npm install fast-json-patch --save
 
-```sh
-$ bower install fast-json-patch --save
+# or Bower
+bower install fast-json-patch --save
 ```
-
-### [download as ZIP](https://github.com/Starcounter-Jack/JSON-Patch/archive/master.zip)
 
 
 ## Adding to your project
 
 ### In a web browser
 
-Include `dist/fast-json-patch.js`.
+Load the bundled distribution script:
+
+```html
+<script src="dist/fast-json-patch.min.js"></script>
+```
+
+In [browsers that support ECMAScript modules](https://caniuse.com/#feat=es6-module), the below code uses this library as a module:
+
+```html
+<script type="module">
+  import * as jsonpatch from 'fast-json-patch/index.mjs';
+  import { applyOperation } from 'fast-json-patch/index.mjs';
+</script>
+```
 
 ### In Node.js
 
-Call require to get the instance:
+In Node 12+ with `--experimental-modules` flag, the below code uses this library as an ECMAScript module:
 
 ```js
-var jsonpatch = require('fast-json-patch')
+import * as jsonpatch from 'fast-json-patch/index.mjs';
+import { applyOperation } from 'fast-json-patch/index.mjs';
 ```
 
-Or use ES6 style:
+In Webpack (and most surely other bundlers based on Babel), the below code uses this library as an ECMAScript module:
 
 ```js
-import { applyOperation } from 'fast-json-patch'
+import * as jsonpatch from 'fast-json-patch';
+import { applyOperation } from 'fast-json-patch';
 ```
 
-You can also require all API functions individually, all jsonpatch functions can be used as pure functions:
+In standard Node, the below code uses this library as a CommonJS module:
 
 ```js
 const { applyOperation } = require('fast-json-patch');
+const applyOperation = require('fast-json-patch').applyOperation;
 ```
 
-## Usage
+## Directories
 
-#### Applying patches:
+Directories used in this package:
 
-```js
-var document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
-var patch = [
-  { op: "replace", path: "/firstName", value: "Joachim" },
-  { op: "add", path: "/lastName", value: "Wester" },
-  { op: "add", path: "/contactDetails/phoneNumbers/0", value: { number: "555-123" }  }
-];
-document = jsonpatch.applyPatch(document, patch).newDocument;
-// document == { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [{number:"555-123"}] } };
-```
-
-##### For apply individual operations you can use `applyOperation`
-
-`jsonpatch.applyOperation` accepts a single operation object instead of a sequence, and returns the object after applying the operation. It works with all the standard JSON patch operations (`add, replace, move, test, remove and copy`).
-
-```js
-var document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
-var operation = { op: "replace", path: "/firstName", value: "Joachim" };
-document = jsonpatch.applyOperation(document, operation).newDocument;
-// document == { firstName: "Joachim", contactDetails: { phoneNumbers: [] }}
-```
-
-#### Using `applyReducer` with `reduce`
-
-If you have an array of operations, you can simple reduce them using `applyReducer` as your reducer:
-
-```js
-var document = { firstName: "Albert", contactDetails: { phoneNumbers: [ ] } };
-var patch = [
-  { op:"replace", path: "/firstName", value: "Joachim" },
-  { op:"add", path: "/lastName", value: "Wester" },
-  { op:"add", path: "/contactDetails/phoneNumbers/0", value: { number: "555-123" } }
-];
-var updatedDocument = patch.reduce(applyReducer, document);
-// updatedDocument == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
-```
-
-Generating patches:
-
-```js
-var document = { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
-var observer = jsonpatch.observe(document);
-document.firstName = "Albert";
-document.contactDetails.phoneNumbers[0].number = "123";
-document.contactDetails.phoneNumbers.push({ number:"456" });
-var patch = jsonpatch.generate(observer);
-// patch  == [
-//   { op: "replace", path: "/firstName", value: "Albert"},
-//   { op: "replace", path: "/contactDetails/phoneNumbers/0/number", value: "123" },
-//   { op: "add", path: "/contactDetails/phoneNumbers/1", value: {number:"456"}}
-// ];
-```
-
-Generating patches with test operations for values in the first object:
-
-```js
-var document = { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
-var observer = jsonpatch.observe(document);
-document.firstName = "Albert";
-document.contactDetails.phoneNumbers[0].number = "123";
-document.contactDetails.phoneNumbers.push({ number:"456" });
-var patch = jsonpatch.generate(observer, true);
-// patch  == [
-//   { op: "test", path: "/firstName", value: "Joachim"},
-//   { op: "replace", path: "/firstName", value: "Albert"},
-//   { op: "test", path: "/contactDetails/phoneNumbers/0/number", value: "555-123" },
-//   { op: "replace", path: "/contactDetails/phoneNumbers/0/number", value: "123" },
-//   { op: "add", path: "/contactDetails/phoneNumbers/1", value: {number:"456"}}
-// ];
-```
-
-Comparing two object trees:
-
-```js
-var documentA = {user: {firstName: "Albert", lastName: "Einstein"}};
-var documentB = {user: {firstName: "Albert", lastName: "Collins"}};
-var diff = jsonpatch.compare(documentA, documentB);
-//diff == [{op: "replace", path: "/user/lastName", value: "Collins"}]
-```
-
-Comparing two object trees with test operations for values in the first object:
-
-```js
-var documentA = {user: {firstName: "Albert", lastName: "Einstein"}};
-var documentB = {user: {firstName: "Albert", lastName: "Collins"}};
-var diff = jsonpatch.compare(documentA, documentB, true);
-//diff == [
-//   {op: "test", path: "/user/lastName", value: "Einstein"},
-//   {op: "replace", path: "/user/lastName", value: "Collins"}
-// ];
-```
-
-Validating a sequence of patches:
-
-```js
-var obj = {user: {firstName: "Albert"}};
-var patches = [{op: "replace", path: "/user/firstName", value: "Albert"}, {op: "replace", path: "/user/lastName", value: "Einstein"}];
-var errors = jsonpatch.validate(patches, obj);
-if (errors.length == 0) {
- //there are no errors!
-}
-else {
-  for (var i=0; i < errors.length; i++) {
-    if (!errors[i]) {
-      console.log("Valid patch at index", i, patches[i]);
-    }
-    else {
-      console.error("Invalid patch at index", i, errors[i], patches[i]);
-    }
-  }
-}
-```
+- `dist/` - contains ES5 files for a Web browser
+- `commonjs/` - contains CommonJS module and typings
+- `module/` - contains ECMAScript module and typings
+- `src/` - contains TypeScript source files
 
 ## API
 
@@ -243,6 +116,19 @@ Returns an array of [`OperationResult`](#operationresult-type) objects - one ite
 
 - See [Validation notes](#validation-notes).
 
+Example:
+
+```js
+var document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
+var patch = [
+  { op: "replace", path: "/firstName", value: "Joachim" },
+  { op: "add", path: "/lastName", value: "Wester" },
+  { op: "add", path: "/contactDetails/phoneNumbers/0", value: { number: "555-123" }  }
+];
+document = jsonpatch.applyPatch(document, patch).newDocument;
+// document == { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [{number:"555-123"}] } };
+```
+
 #### `function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, banPrototypeModifications: boolean = true, index: number = 0): OperationResult<T>`
 
 Applies single operation object `operation` on `document`.
@@ -264,6 +150,15 @@ Returns an [`OperationResult`](#operationresult-type) object `{newDocument: any,
 
 - See [Validation notes](#validation-notes).
 
+Example:
+
+```js
+var document = { firstName: "Albert", contactDetails: { phoneNumbers: [] } };
+var operation = { op: "replace", path: "/firstName", value: "Joachim" };
+document = jsonpatch.applyOperation(document, operation).newDocument;
+// document == { firstName: "Joachim", contactDetails: { phoneNumbers: [] }}
+```
+
 #### `jsonpatch.applyReducer<T>(document: T, operation: Operation, index: number): T`
 
 **Ideal for `patch.reduce(jsonpatch.applyReducer, document)`**.
@@ -273,6 +168,19 @@ Applies single operation object `operation` on `document`.
 Returns the a modified document.
 
 Note: It throws `TEST_OPERATION_FAILED` error if `test` operation fails.
+
+Example:
+
+```js
+var document = { firstName: "Albert", contactDetails: { phoneNumbers: [ ] } };
+var patch = [
+  { op:"replace", path: "/firstName", value: "Joachim" },
+  { op:"add", path: "/lastName", value: "Wester" },
+  { op:"add", path: "/contactDetails/phoneNumbers/0", value: { number: "555-123" } }
+];
+var updatedDocument = patch.reduce(applyReducer, document);
+// updatedDocument == { firstName:"Joachim", lastName:"Wester", contactDetails:{ phoneNumbers[ {number:"555-123"} ] } };
+```
 
 #### `jsonpatch.deepClone(value: any): any`
 
@@ -306,6 +214,40 @@ method, it will be triggered synchronously as well. If `invertible` is true, the
 
 If there are no pending changes in `obj`, returns an empty array (length 0).
 
+Example:
+
+```js
+var document = { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
+var observer = jsonpatch.observe(document);
+document.firstName = "Albert";
+document.contactDetails.phoneNumbers[0].number = "123";
+document.contactDetails.phoneNumbers.push({ number:"456" });
+var patch = jsonpatch.generate(observer);
+// patch  == [
+//   { op: "replace", path: "/firstName", value: "Albert"},
+//   { op: "replace", path: "/contactDetails/phoneNumbers/0/number", value: "123" },
+//   { op: "add", path: "/contactDetails/phoneNumbers/1", value: {number:"456"}}
+// ];
+```
+
+Example of generating patches with test operations for values in the first object:
+
+```js
+var document = { firstName: "Joachim", lastName: "Wester", contactDetails: { phoneNumbers: [ { number:"555-123" }] } };
+var observer = jsonpatch.observe(document);
+document.firstName = "Albert";
+document.contactDetails.phoneNumbers[0].number = "123";
+document.contactDetails.phoneNumbers.push({ number:"456" });
+var patch = jsonpatch.generate(observer, true);
+// patch  == [
+//   { op: "test", path: "/firstName", value: "Joachim"},
+//   { op: "replace", path: "/firstName", value: "Albert"},
+//   { op: "test", path: "/contactDetails/phoneNumbers/0/number", value: "555-123" },
+//   { op: "replace", path: "/contactDetails/phoneNumbers/0/number", value: "123" },
+//   { op: "add", path: "/contactDetails/phoneNumbers/1", value: {number:"456"}}
+// ];
+```
+
 #### `jsonpatch.unobserve(document: any, observer: Observer): void`
 
 Destroys the observer set up on `document`.
@@ -317,6 +259,27 @@ Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). 
 Compares object trees `document1` and `document2` and returns the difference relative to `document1` as a patches array.  If `invertible` is true, then each change will be preceded by a test operation of the value in `document1`.
 
 If there are no differences, returns an empty array (length 0).
+
+Example:
+
+```js
+var documentA = {user: {firstName: "Albert", lastName: "Einstein"}};
+var documentB = {user: {firstName: "Albert", lastName: "Collins"}};
+var diff = jsonpatch.compare(documentA, documentB);
+//diff == [{op: "replace", path: "/user/lastName", value: "Collins"}]
+```
+
+Example of comparing two object trees with test operations for values in the first object:
+
+```js
+var documentA = {user: {firstName: "Albert", lastName: "Einstein"}};
+var documentB = {user: {firstName: "Albert", lastName: "Collins"}};
+var diff = jsonpatch.compare(documentA, documentB, true);
+//diff == [
+//   {op: "test", path: "/user/lastName", value: "Einstein"},
+//   {op: "replace", path: "/user/lastName", value: "Collins"}
+// ];
+```
 
 #### `jsonpatch.validate(patch: Operation[], document?: any, validator?: Function): JsonPatchError`
 
@@ -349,6 +312,27 @@ OPERATION_FROM_UNRESOLVABLE   | Cannot perform the operation from a path that do
 OPERATION_PATH_ILLEGAL_ARRAY_INDEX | Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index
 OPERATION_VALUE_OUT_OF_BOUNDS | The specified index MUST NOT be greater than the number of elements in the array
 TEST_OPERATION_FAILED | When operation is `test` and the test fails, applies to `applyReducer`.
+
+Example:
+
+```js
+var obj = {user: {firstName: "Albert"}};
+var patches = [{op: "replace", path: "/user/firstName", value: "Albert"}, {op: "replace", path: "/user/lastName", value: "Einstein"}];
+var errors = jsonpatch.validate(patches, obj);
+if (errors.length == 0) {
+ //there are no errors!
+}
+else {
+  for (var i=0; i < errors.length; i++) {
+    if (!errors[i]) {
+      console.log("Valid patch at index", i, patches[i]);
+    }
+    else {
+      console.error("Invalid patch at index", i, errors[i], patches[i]);
+    }
+  }
+}
+```
 
 ## `OperationResult` Type
 
@@ -403,6 +387,29 @@ See the [ECMAScript spec](http://www.ecma-international.org/ecma-262/6.0/index.h
 ## Changelog
 
 To see the list of recent changes, see [Releases](https://github.com/Starcounter-Jack/JSON-Patch/releases).
+
+## Footprint
+4 KB minified and gzipped (12 KB minified)
+
+## Performance
+
+##### [`add` benchmark](https://run.perf.zone/view/JSON-Patch-Add-Operation-1535541298893)
+
+![image](https://user-images.githubusercontent.com/17054134/44784357-aa422480-ab8d-11e8-8a7e-037e692dd842.png)
+
+##### [`replace` benchmark](https://run.perf.zone/view/JSON-Patch-Replace-Operation-1535540952263)
+
+![image](https://user-images.githubusercontent.com/17054134/44784275-5fc0a800-ab8d-11e8-8a90-e87b8d5409d0.png)
+
+Tested on 29.08.2018. Compared libraries:
+
+- [Starcounter-Jack/JSON-Patch](https://www.npmjs.com/package/fast-json-patch) 2.0.6
+- [bruth/jsonpatch-js](https://www.npmjs.com/package/json-patch) 0.7.0
+- [dharmafly/jsonpatch.js](https://www.npmjs.com/package/jsonpatch) 3.0.1
+- [jiff](https://www.npmjs.com/package/jiff) 0.7.3
+- [RFC6902](https://www.npmjs.com/package/rfc6902) 2.4.0
+
+We aim the tests to be fair. Our library puts performance as the #1 priority, while other libraries can have different priorities. If you'd like to update the benchmarks or add a library, please fork  the [perf.zone](https://perf.zone) benchmarks linked above and open an issue to include new results.
 
 ## License
 
