@@ -21,11 +21,9 @@ import {
     unescapePathComponent
 } from './module/helpers.mjs';
 
-export default {
-    ...core,
-    ...duplex,
+export default Object.assign({}, core, duplex, {
     JsonPatchError,
     deepClone,
     escapePathComponent,
     unescapePathComponent
-}
+});
