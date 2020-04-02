@@ -57,7 +57,7 @@
     "test-webpack-import": "webpack --env.NODE_ENV=test && jasmine test/spec/webpack/importSpec.build.js",
     "test-typings": "tsc test/spec/typings/typingsSpec.ts",
     "test-duplex": "node --experimental-modules jasmine-run.mjs test/**/*[sS]pec.mjs",
-    "test-core": "node --experimental-modules jasmine-run.mjs test/spec/jsonPatchTestsSpec.mjs test/spec/coreSpec.mjs test/spec/validateSpec.mjs",
+    "test-core": "node --experimental-modules jasmine-run.mjs 'test/spec/{jsonPatchTestsSpec,coreSpec,validateSpec}.mjs'",
     "bench": "npm run bench-core && npm run bench-duplex",
     "bench-core": "node test/spec/coreBenchmark.js",
     "bench-duplex": "node test/spec/coreBenchmark.js && node test/spec/duplexBenchmark.js"
