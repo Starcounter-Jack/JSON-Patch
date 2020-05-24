@@ -415,6 +415,46 @@ describe('validate', function() {
     expect(error.name).toBe('OPERATION_PATH_CANNOT_ADD');
   });
 
+  it('should report error because "a" is null', function() {
+    const tree = {
+      q: {
+        bar: 2
+      },
+      a: null
+    };
+    const sequence = [
+      {
+        op: 'add',
+        path: '/a/b',
+        value: 'sample'
+      }
+    ];
+
+    const error = jsonpatch.validate(sequence, tree);
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
+    expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
+  });
+
+  it('should report error because "a" is not an object', function() {
+    const tree = {
+      q: {
+        bar: 2
+      },
+      a: 42
+    };
+    const sequence = [
+      {
+        op: 'add',
+        path: '/a/b',
+        value: 'sample'
+      }
+    ];
+
+    const error = jsonpatch.validate(sequence, tree);
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
+    expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
+  });
+
   it('should return error when replacing a removed path', function() {
     const tree = {
       name: 'Elvis'

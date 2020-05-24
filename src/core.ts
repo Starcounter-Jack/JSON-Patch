@@ -302,6 +302,11 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
         }
       }
       obj = obj[key];
+      // If we have more keys in the path, but the next value isn't a non-null object,
+      // throw an OPERATION_PATH_UNRESOLVABLE error instead of iterating again.
+      if (validateOperation && t < len && (!obj || typeof obj !== "object")){
+        throw new JsonPatchError('Cannot perform operation at the desired path', 'OPERATION_PATH_UNRESOLVABLE', index, operation, document);
+      }
     }
   }
 }
