@@ -987,6 +987,32 @@ describe('duplex', function() {
         });
       });
     });
+
+    // https://github.com/Starcounter-Jack/JSON-Patch/issues/209
+    it('should generate only one replace', function() {
+      var obj1 = {
+        test: [
+          { k: "xx" },
+          { k: "yy" }
+        ]
+      };
+
+      var obj2 = {
+        test: {
+          "xx": { k: "xx" },
+          "yy": { k: "yy" }
+        }
+      };
+
+      let patch = jsonpatch.compare(obj1, obj2);
+
+      expect(patch.length).toEqual(1);
+      expect(patch[0]).toEqual({
+        op: 'replace',
+        path: '/test',
+        value: obj2.test,
+      });
+    });
   });
 
   describe('apply', function() {
