@@ -444,6 +444,56 @@ describe('duplex', function() {
       ]);
     });
 
+    it('should not mutate the document (object to array substitution)', function() {
+      const obj = {
+        data: {foo: 'bar'}
+      };
+
+      const observer = jsonpatch.observe(obj);
+      obj.data = [1, 2];
+
+      const obj2 = jsonpatch.deepClone(obj);
+
+      jsonpatch.generate(observer);
+      expect(obj2).toReallyEqual(obj);
+    });
+
+    it('should generate replace (object to array substitution)', function() {
+      const obj = {
+        data: {foo: 'bar'}
+      };
+
+      const observer = jsonpatch.observe(obj);
+      obj.data = [1, 2]
+
+      const patches = jsonpatch.generate(observer);
+
+      const obj2 = {
+        data: {foo: 'bar'}
+      };
+
+      jsonpatch.applyPatch(obj2, patches);
+      expect(obj2).toReallyEqual(obj);
+    });
+
+    it('should generate replace (empty object to empty array substitution)', function() {
+      const obj = {
+        data: {}
+      };
+
+      const observer = jsonpatch.observe(obj);
+      obj.data = []
+
+      const patches = jsonpatch.generate(observer);
+
+      const obj2 = {
+        data: {}
+      };
+
+      jsonpatch.applyPatch(obj2, patches);
+      expect(obj2).toReallyEqual(obj);
+    });
+
     it('should generate add', function() {
       const obj = {
         lastName: 'Einstein',
