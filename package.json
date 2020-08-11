@@ -32,7 +32,7 @@
     "chalk": "^2.4.2",
     "event-target-shim": "^5.0.1",
     "fast-deep-equal": "^2.0.1",
-    "http-server": "^0.11.1",
+    "http-server": "^0.12.3",
     "jasmine": "^3.4.0",
     "request": "^2.88.0",
     "sauce-connect-launcher": "^1.2.7",
