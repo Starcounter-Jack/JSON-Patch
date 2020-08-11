@@ -11,7 +11,7 @@ With JSON-Patch, you can:
 - **observe** for changes and **generate** patches when a change is detected
 - **compare** two objects to obtain the difference
 
-Tested in IE11, Firefox, Chrome, Safari and Node.js
+Tested in Firefox, Chrome, Edge, Safari, IE11, Deno and Node.js
 
 
 ## Why you should use JSON-Patch
