@@ -325,7 +325,7 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
  * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return An array of `{newDocument, result}` after the patch
  */
-export function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>, mutateDocument: boolean = true, banPrototypeModifications: boolean = true): PatchResult<T> {
+export function applyPatch<T>(document: T, patch: ReadonlyArray<Operation>, validateOperation?: boolean | Validator<T>, mutateDocument: boolean = true, banPrototypeModifications: boolean = true): PatchResult<T> {
   if(validateOperation) {
     if(!Array.isArray(patch)) {
       throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
@@ -429,7 +429,7 @@ export function validator(operation: Operation, index: number, document?: any, e
  * @param document
  * @returns {JsonPatchError|undefined}
  */
-export function validate<T>(sequence: Operation[], document?: T, externalValidator?: Validator<T>): PatchError {
+export function validate<T>(sequence: ReadonlyArray<Operation>, document?: T, externalValidator?: Validator<T>): PatchError {
   try {
     if (!Array.isArray(sequence)) {
       throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
