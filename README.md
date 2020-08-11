@@ -30,9 +30,6 @@ Mark Nottingham has a [nice blog]( http://www.mnot.net/blog/2012/09/05/patch) ab
 ```sh
 # NPM
 npm install fast-json-patch --save
-
-# or Bower
-bower install fast-json-patch --save
 ```
 
 
