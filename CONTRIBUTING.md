@@ -38,7 +38,7 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 **The release is done from `master` branch.**
 
 1. Don't break too much. See [how many projects depend on this](https://www.npmjs.com/browse/depended/fast-json-patch).
-2. Make sure that the browser tests pass in Chrome, Firefox, Edge and IE
+2. Make sure that the browser tests pass in Chrome, Firefox, Safari, Edge and IE11
 3. Make sure that the NodeJS tests pass `npm install && npm run test`
 4. Execute `npm run build` to transpile, bundle and minify.
 5. Execute `npm version` like (`npm version [ major | minor | patch | premajor | preminor | prepatch | prerelease]`)
