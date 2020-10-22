@@ -248,7 +248,9 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
     while (true) {
       key = keys[t];
 
-      if(banPrototypeModifications && key == '__proto__') {
+      if(banPrototypeModifications && 
+          (key == '__proto__' || key == 'constructor' || key == 'prototype')
+        ) {
         throw new TypeError('JSON-Patch: modifying `__proto__` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
       }
 
