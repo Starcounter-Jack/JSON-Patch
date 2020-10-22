@@ -247,11 +247,11 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
     }
     while (true) {
       key = keys[t];
-
       if(banPrototypeModifications && 
-          (key == '__proto__' || key == 'constructor' || key == 'prototype')
+          (key == '__proto__' || 
+          (key == 'prototype' && t>0 && keys[t-1] == 'constructor'))
         ) {
-        throw new TypeError('JSON-Patch: modifying `__proto__` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
+        throw new TypeError('JSON-Patch: modifying `__proto__` or `constructor/prototype` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
       }
 
       if (validateOperation) {
