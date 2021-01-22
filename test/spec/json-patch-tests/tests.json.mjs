@@ -268,6 +268,11 @@ export default [
       "patch": [{"op": "move", "from": "/foo", "path": "/bar"}],
       "expected": {"baz": [{"qux": "hello"}], "bar": 1} },
 
+    { "comment": "Move handles escaped paths",
+      "doc": {"foo/": {"bar/": 1, "baz": 1}},
+      "patch": [{"op": "move", "from": "/foo~1/bar~1", "path": "/bar"}],
+      "expected": {"bar": 1, "foo/": {"baz": 1}} },
+
     { "doc": {"baz": [{"qux": "hello"}], "bar": 1},
       "patch": [{"op": "move", "from": "/baz/0/qux", "path": "/baz/1"}],
       "expected": {"baz": [{}, "hello"], "bar": 1} },
