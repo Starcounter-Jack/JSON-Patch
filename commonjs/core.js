@@ -185,6 +185,9 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
         }
         while (true) {
             key = keys[t];
+            if (key && key.indexOf('~') != -1) {
+                key = helpers_js_1.unescapePathComponent(key);
+            }
             if (banPrototypeModifications && key == '__proto__') {
                 throw new TypeError('JSON-Patch: modifying `__proto__` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
             }
@@ -226,9 +229,6 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
                 }
             }
             else {
-                if (key && key.indexOf('~') != -1) {
-                    key = helpers_js_1.unescapePathComponent(key);
-                }
                 if (t >= len) {
                     var returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
                     if (returnValue.test === false) {

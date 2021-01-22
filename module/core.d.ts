@@ -81,7 +81,7 @@ export declare function applyOperation<T>(document: T, operation: Operation, val
  * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return An array of `{newDocument, result}` after the patch
  */
-export declare function applyPatch<T>(document: T, patch: Operation[], validateOperation?: boolean | Validator<T>, mutateDocument?: boolean, banPrototypeModifications?: boolean): PatchResult<T>;
+export declare function applyPatch<T>(document: T, patch: ReadonlyArray<Operation>, validateOperation?: boolean | Validator<T>, mutateDocument?: boolean, banPrototypeModifications?: boolean): PatchResult<T>;
 /**
  * Apply a single JSON Patch Operation on a JSON document.
  * Returns the updated document.
@@ -107,5 +107,5 @@ export declare function validator(operation: Operation, index: number, document?
  * @param document
  * @returns {JsonPatchError|undefined}
  */
-export declare function validate<T>(sequence: Operation[], document?: T, externalValidator?: Validator<T>): PatchError;
+export declare function validate<T>(sequence: ReadonlyArray<Operation>, document?: T, externalValidator?: Validator<T>): PatchError;
 export declare function _areEquals(a: any, b: any): boolean;
