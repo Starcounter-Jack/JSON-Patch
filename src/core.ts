@@ -1,6 +1,6 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * (c) 2013-2020 Joachim Wester
+ * (c) 2013-2021 Joachim Wester
  * MIT license
  */
 declare var require: any;
