@@ -247,6 +247,9 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
     }
     while (true) {
       key = keys[t];
+      if (key && key.indexOf('~') != -1) {
+        key = unescapePathComponent(key);
+      }
 
       if(banPrototypeModifications && key == '__proto__') {
         throw new TypeError('JSON-Patch: modifying `__proto__` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
@@ -290,9 +293,6 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
         }
       }
       else {
-        if (key && key.indexOf('~') != -1) {
-          key = unescapePathComponent(key);
-        }
         if (t >= len) {
           const returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
           if (returnValue.test === false) {
