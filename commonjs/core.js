@@ -185,6 +185,9 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
         }
         while (true) {
             key = keys[t];
+            if (key && key.indexOf('~') != -1) {
+                key = helpers_js_1.unescapePathComponent(key);
+            }
             if (banPrototypeModifications &&
                 (key == '__proto__' ||
                     (key == 'prototype' && t > 0 && keys[t - 1] == 'constructor'))) {
@@ -228,9 +231,6 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
                 }
             }
             else {
-                if (key && key.indexOf('~') != -1) {
-                    key = helpers_js_1.unescapePathComponent(key);
-                }
                 if (t >= len) {
                     var returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
                     if (returnValue.test === false) {

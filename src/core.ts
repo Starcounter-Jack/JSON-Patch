@@ -1,6 +1,6 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * (c) 2013-2020 Joachim Wester
+ * (c) 2013-2021 Joachim Wester
  * MIT license
  */
 declare var require: any;
@@ -247,6 +247,10 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
     }
     while (true) {
       key = keys[t];
+      if (key && key.indexOf('~') != -1) {
+        key = unescapePathComponent(key);
+      }
+
       if(banPrototypeModifications && 
           (key == '__proto__' || 
           (key == 'prototype' && t>0 && keys[t-1] == 'constructor'))
@@ -292,9 +296,6 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
         }
       }
       else {
-        if (key && key.indexOf('~') != -1) {
-          key = unescapePathComponent(key);
-        }
         if (t >= len) {
           const returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
           if (returnValue.test === false) {
