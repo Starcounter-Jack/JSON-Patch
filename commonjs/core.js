@@ -188,8 +188,10 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             if (key && key.indexOf('~') != -1) {
                 key = helpers_js_1.unescapePathComponent(key);
             }
-            if (banPrototypeModifications && key == '__proto__') {
-                throw new TypeError('JSON-Patch: modifying `__proto__` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
+            if (banPrototypeModifications &&
+                (key == '__proto__' ||
+                    (key == 'prototype' && t > 0 && keys[t - 1] == 'constructor'))) {
+                throw new TypeError('JSON-Patch: modifying `__proto__` or `constructor/prototype` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
             }
             if (validateOperation) {
                 if (existingPathFragment === undefined) {
