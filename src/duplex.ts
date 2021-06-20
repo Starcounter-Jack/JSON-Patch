@@ -150,7 +150,7 @@ export function generate<T>(observer: Observer<Object>, invertible = false): Ope
 function testOrder(arr1, arr2, patches) {
   // we dont want to mess up with arr1
   // the patches are just remove / add so need to clone deep
-  let clonedArr1 = arr1.map(e => e);
+  let clonedArr1 = Array.from(arr1);
   
   applyPatch(clonedArr1, patches);
   if (clonedArr1.length !== arr2.length) {
@@ -175,6 +175,9 @@ function testOrder(arr1, arr2, patches) {
  */
 
 function compareArrays(arr1, arr2, path, invertible) {
+  if (arr1.length === arr2.length) {
+    return [];
+  }
   let diff = lodashDifference(arr1, arr2);
   if (diff.length === arr1.length) {
     // this means that the the arrays are completly different 
