@@ -4,6 +4,7 @@
  * MIT license
  */
 import { _deepClone, _objectKeys, escapePathComponent, hasOwnProperty } from './helpers.js';
+import lodashDifference from './lodash-difference.js'
 import { applyPatch, Operation } from './core.js';
 
 export interface Observer<T> {
@@ -139,6 +140,81 @@ export function generate<T>(observer: Observer<Object>, invertible = false): Ope
   return temp;
 }
 
+/*
+ * 'compareArrays' doesnt do a good job with ordering, 
+ * if bad ordering was detected, or bad job, return false, and revert
+ * to old code. its most likely that there isnt much added value anyway
+ *
+ */
+
+function testOrder(arr1, arr2, patches) {
+  // we dont want to mess up with arr1
+  // the patches are just remove / add so need to clone deep
+  let clonedArr1 = arr1.map(e => e);
+  
+  applyPatch(clonedArr1, patches);
+  if (clonedArr1.length !== arr2.length) {
+    return false;
+  }
+  for (let index = 0; index < arr2.length; index++) {
+    if (clonedArr1[index] !== arr2[index]) {
+      return false;
+    }
+  }
+  return true;
+
+}
+
+/*
+ * return array efficient array patches when possible.
+ * in frequenct cases of arrays additions or removals, where an element was removed, or added.
+ * and thats the only difference between the arrays, and all other elements are the exact same (===)
+ * then the code bellow can do a great job and having a very small number of patches.
+ * in some cases it will revert back to the old behaviour.
+ *
+ */
+
+function compareArrays(arr1, arr2, path, invertible) {
+  let diff = lodashDifference(arr1, arr2);
+  if (diff.length === arr1.length) {
+    // this means that the the arrays are completly different 
+    // and there is no added value in this function - revert to old behaviour
+    return [];
+  }
+  let removePatches = [];
+  diff.forEach(value => {
+    const index = arr1.indexOf(value);
+
+    const op =  'remove';
+    removePatches.push({
+      op,
+      path: "/" + index
+    })
+    if (invertible) {
+      removePatches.push({
+        op: 'test',
+        path:  "/" + index,
+        value
+      });
+    }
+  });
+  diff = lodashDifference(arr2, arr1);
+  const addPatches = diff.map(value => {
+    const index = arr2.indexOf(value);
+    const op = 'add';
+    return {
+      op,
+      value,
+      path:  "/" + index
+    }
+  });
+  const finalPatches = removePatches.reverse().concat(addPatches);
+  if (testOrder(arr1, arr2, finalPatches)) {
+    return finalPatches.map(p => ({ ...p, path: path + p.path }));
+  }
+  return []
+}
+
 // Dirty check if obj is different from mirror, generate patches and update mirror
 function _generate(mirror, obj, patches, path, invertible) {
   if (obj === mirror) {
@@ -153,6 +229,13 @@ function _generate(mirror, obj, patches, path, invertible) {
   var oldKeys = _objectKeys(mirror);
   var changed = false;
   var deleted = false;
+
+  if(Array.isArray(mirror) && Array.isArray(obj)) {
+    const newPatches =  compareArrays(mirror, obj, path, invertible)
+    if (newPatches.length) {
+      return newPatches.forEach(p => patches.push(p));
+    }
+   }
 
   //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
 
