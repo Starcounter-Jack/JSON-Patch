@@ -64,6 +64,36 @@ function variantIt(name, variants, fn) {
   });
 }
 
+
+function randomArray(maxSize, maxValue) {
+  const size = Math.round(Math.random() * maxSize) 
+  const arr = [];
+  for (let i = 0; i < size; i++) {
+    arr.push(Math.round(Math.random() * maxValue))
+  }
+  return arr;
+}
+
+function createTest(counter) {
+  // create a random arrays with random sizes and max value.
+  const arr1 = randomArray(20, 20);
+  const arr2 = randomArray(20, 20);
+  const testName = JSON.stringify(arr1) + " VS " + JSON.stringify(arr2);
+  it(counter + ". " + testName, () => {
+    const arr3 = JSON.parse(JSON.stringify(arr1));
+    const patches = jsonpatch.compare(arr1, arr2);
+    jsonpatch.applyPatch(arr1, patches);
+    expect(arr2).toReallyEqual(arr1);
+  })
+}
+
+function nIt(n) {
+  for (let i = 1; i <= n; i++) {
+    createTest(i);
+  }
+
+}
+
 function insertIf(condition, ...elements) {
   return condition ? elements : [];
 }
@@ -1658,6 +1688,24 @@ describe('duplex', function() {
         ]);
       }
     });
+
+
+    it('Diff array should remove not replace', function () {
+      const obj1 = { id: 1 };
+      const obj2 = { id: 2 };
+      const obj3 = { id: 3 };
+      const objA = {
+        arr: [obj1, obj2, obj3]
+      };
+      const objB = { arr: objA.arr.filter(o => o.id !== 1) }
+      const patches = jsonpatch.compare(objA, objB);
+      expect(patches).toEqual([
+        {
+          op: "remove", path: '/arr/0'
+        }
+      ])
+    })
+
     variantIt('Replacing an array with an object should be handled well', [
       ['invertible = FALSE', false],
       ['invertible = TRUE', true]
@@ -1991,6 +2039,18 @@ describe('duplex', function() {
         }, 20);
       }, 20);
     });
+  });
+
+  describe('random', function() {
+    it('found a', () => {
+      const arr1 = [ 2, 10, 14, 2, 13];
+      const arr2 = [ 8, 2, 19];
+      const arr3 = JSON.parse(JSON.stringify(arr1));
+      const patches = jsonpatch.compare(arr1, arr2);
+      jsonpatch.applyPatch(arr1, patches);
+      expect(arr2).toReallyEqual(arr1);
+    });
+    nIt(1000);
   });
 
   describe('compare', function() {

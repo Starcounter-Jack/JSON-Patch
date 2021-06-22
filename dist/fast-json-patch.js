@@ -1,4 +1,4 @@
-/*! fast-json-patch, version: 3.0.0-1 */
+/*! fast-json-patch, version: 3.0.2 */
 var jsonpatch =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -464,6 +464,9 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
         }
         while (true) {
             key = keys[t];
+            if (key && key.indexOf('~') != -1) {
+                key = helpers_js_1.unescapePathComponent(key);
+            }
             if (banPrototypeModifications && key == '__proto__') {
                 throw new TypeError('JSON-Patch: modifying `__proto__` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
             }
@@ -505,9 +508,6 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
                 }
             }
             else {
-                if (key && key.indexOf('~') != -1) {
-                    key = helpers_js_1.unescapePathComponent(key);
-                }
                 if (t >= len) {
                     var returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
                     if (returnValue.test === false) {
@@ -519,7 +519,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             obj = obj[key];
             // If we have more keys in the path, but the next value isn't a non-null object,
             // throw an OPERATION_PATH_UNRESOLVABLE error instead of iterating again.
-            if (t < len && (!obj || typeof obj !== "object")) {
+            if (validateOperation && t < len && (!obj || typeof obj !== "object")) {
                 throw new exports.JsonPatchError('Cannot perform operation at the desired path', 'OPERATION_PATH_UNRESOLVABLE', index, operation, document);
             }
         }
@@ -739,6 +739,17 @@ exports.unescapePathComponent = helpers.unescapePathComponent;
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
@@ -746,6 +757,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * MIT license
  */
 var helpers_js_1 = __webpack_require__(0);
+var lodash_difference_js_1 = __webpack_require__(4);
 var core_js_1 = __webpack_require__(1);
 var beforeDict = new WeakMap();
 var Mirror = /** @class */ (function () {
@@ -854,6 +866,77 @@ function generate(observer, invertible) {
     return temp;
 }
 exports.generate = generate;
+/*
+ * 'compareArrays' doesnt do a good job with ordering,
+ * if bad ordering was detected, or bad job, return false, and revert
+ * to old code. its most likely that there isnt much added value anyway
+ *
+ */
+function testOrder(arr1, arr2, patches) {
+    // we dont want to mess up with arr1
+    // the patches are just remove / add so need to clone deep
+    var clonedArr1 = Array.from(arr1);
+    core_js_1.applyPatch(clonedArr1, patches);
+    if (clonedArr1.length !== arr2.length) {
+        return false;
+    }
+    for (var index = 0; index < arr2.length; index++) {
+        if (clonedArr1[index] !== arr2[index]) {
+            return false;
+        }
+    }
+    return true;
+}
+/*
+ * return array efficient array patches when possible.
+ * in frequenct cases of arrays additions or removals, where an element was removed, or added.
+ * and thats the only difference between the arrays, and all other elements are the exact same (===)
+ * then the code bellow can do a great job and having a very small number of patches.
+ * in some cases it will revert back to the old behaviour.
+ *
+ */
+function compareArrays(arr1, arr2, path, invertible) {
+    if (arr1.length === arr2.length) {
+        return [];
+    }
+    var diff = lodash_difference_js_1.default(arr1, arr2);
+    if (diff.length === arr1.length) {
+        // this means that the the arrays are completly different 
+        // and there is no added value in this function - revert to old behaviour
+        return [];
+    }
+    var removePatches = [];
+    diff.forEach(function (value) {
+        var index = arr1.indexOf(value);
+        var op = 'remove';
+        removePatches.push({
+            op: op,
+            path: "/" + index
+        });
+        if (invertible) {
+            removePatches.push({
+                op: 'test',
+                path: "/" + index,
+                value: value
+            });
+        }
+    });
+    diff = lodash_difference_js_1.default(arr2, arr1);
+    var addPatches = diff.map(function (value) {
+        var index = arr2.indexOf(value);
+        var op = 'add';
+        return {
+            op: op,
+            value: value,
+            path: "/" + index
+        };
+    });
+    var finalPatches = removePatches.reverse().concat(addPatches);
+    if (testOrder(arr1, arr2, finalPatches)) {
+        return finalPatches.map(function (p) { return (__assign({}, p, { path: path + p.path })); });
+    }
+    return [];
+}
 // Dirty check if obj is different from mirror, generate patches and update mirror
 function _generate(mirror, obj, patches, path, invertible) {
     if (obj === mirror) {
@@ -866,13 +949,19 @@ function _generate(mirror, obj, patches, path, invertible) {
     var oldKeys = helpers_js_1._objectKeys(mirror);
     var changed = false;
     var deleted = false;
+    if (Array.isArray(mirror) && Array.isArray(obj)) {
+        var newPatches = compareArrays(mirror, obj, path, invertible);
+        if (newPatches.length) {
+            return newPatches.forEach(function (p) { return patches.push(p); });
+        }
+    }
     //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
     for (var t = oldKeys.length - 1; t >= 0; t--) {
         var key = oldKeys[t];
         var oldVal = mirror[key];
         if (helpers_js_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
             var newVal = obj[key];
-            if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
+            if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null && Array.isArray(oldVal) === Array.isArray(newVal)) {
                 _generate(oldVal, newVal, patches, path + "/" + helpers_js_1.escapePathComponent(key), invertible);
             }
             else {
@@ -920,6 +1009,73 @@ function compare(tree1, tree2, invertible) {
     return patches;
 }
 exports.compare = compare;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function baseIsNaN(value) {
+    return value !== value;
+}
+function strictIndexOf(array, value, fromIndex) {
+    var index = fromIndex - 1;
+    var length = array.length;
+    while (++index < length) {
+        if (array[index] === value) {
+            return index;
+        }
+    }
+    return -1;
+}
+function baseFindIndex(array, predicate, fromIndex, fromRight) {
+    var length = array.length;
+    var index = fromIndex + (fromRight ? 1 : -1);
+    while ((fromRight ? index-- : ++index < length)) {
+        if (predicate(array[index], index, array)) {
+            return index;
+        }
+    }
+    return -1;
+}
+function baseIndexOf(array, value, fromIndex) {
+    return value === value
+        ? strictIndexOf(array, value, fromIndex)
+        : baseFindIndex(array, baseIsNaN, fromIndex, false);
+}
+function arrayIncludes(array, value) {
+    var length = array == null ? 0 : array.length;
+    return !!length && baseIndexOf(array, value, 0) > -1;
+}
+function lodashDifference(array, values) {
+    var includes = arrayIncludes;
+    var isCommon = true;
+    var result = [];
+    var valuesLength = values.length;
+    if (!array.length) {
+        return result;
+    }
+    outer: for (var _i = 0, array_1 = array; _i < array_1.length; _i++) {
+        var value = array_1[_i];
+        var computed = value;
+        value = (value !== 0) ? value : 0;
+        if (isCommon && computed === computed) {
+            var valuesIndex = valuesLength;
+            while (valuesIndex--) {
+                if (values[valuesIndex] === computed) {
+                    continue outer;
+                }
+            }
+            result.push(value);
+        }
+        else if (!includes(values, computed)) {
+            result.push(value);
+        }
+    }
+    return result;
+}
+exports.default = lodashDifference;
 
 
 /***/ })
