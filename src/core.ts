@@ -481,6 +481,39 @@ export function validator(operation: Operation, index: number, document?: any, e
     throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);
   }
 
+  // check for extended ops
+  if (operation.op === 'x') {
+    // default validations
+    if (!isValidExtendedOpId(operation.xid)) {
+      throw new JsonPatchError('Operation `xid` property is not present or invalid string', 'OPERATION_X_ID_INVALID', index, operation, document);
+    }
+
+    const xConfig = xOpRegistry.get(operation.xid);
+    if (!xConfig) {
+      throw new JsonPatchError('Extended operation `xid` property is not a registered extended operation', 'OPERATION_X_OP_INVALID', index, operation, document);
+    }
+
+    if (typeof operation.path !== 'string') {
+      throw new JsonPatchError('Operation `path` property is not a string', 'OPERATION_PATH_INVALID', index, operation, document);
+    }
+
+    if (operation.path.indexOf('/') !== 0 && operation.path.length > 0) {
+      // paths that aren't empty string should start with "/"
+      throw new JsonPatchError('Operation `path` property must start with "/"', 'OPERATION_PATH_INVALID', index, operation, document);
+    }
+
+    if (operation.path === '/') {
+      throw new JsonPatchError('Operation `path` slash-only is ambiguous', 'OPERATION_PATH_UNRESOLVABLE', index, operation, document);
+    }
+
+    if (operation.args !== undefined && !Array.isArray(operation.args)) {
+      throw new JsonPatchError('Operation `args` property is not an array', 'OPERATION_X_ARGS_NOT_ARRAY', index, operation, document);
+    }
+
+    // we made it this far, now run the operation's configured validator
+    xConfig.validator.call(operation, operation, index, document, existingPathFragment);
+  }
+
   else if (!objOps[operation.op]) {
     throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);
   }
