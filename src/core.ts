@@ -366,6 +366,20 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
     let len = keys.length;
     let existingPathFragment = undefined;
     let key: string | number;
+
+    let xConfig;
+    let workingDocument = document;
+    let graftPath = undefined;
+    if (operation.op === 'x') {
+      xConfig = xOpRegistry.get(operation.xid);
+      if (!xConfig) {
+        throw new JsonPatchError('Extended operation `xid` property is not a registered extended operation', 'OPERATION_X_OP_INVALID', index, operation, document);
+      }
+      // make another clone to allow configured operator to 'abort' or 'no op'
+      // by returning a strict undefined
+      workingDocument = obj = _deepClone(obj);
+    }
+
     let validateFunction;
     if (typeof validateOperation == 'function') {
       validateFunction = validateOperation;
@@ -401,8 +415,33 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
       }
       t++;
       if (Array.isArray(obj)) {
+        // don't coerce an empty key string into an integer (below w/~~)
+        // if not in resolve mode (extended ops only)
+        if (operation.op === 'x' && operation.resolve !== true && key === '') {
+          throw new JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", index, operation, document);
+        }
+
         if (key === '-') {
           key = obj.length;
+          // make some adjustments for grafting with extended ops
+          if (operation.op === 'x') {
+            // update global keys array as well
+            keys[t - 1] = key.toString(10);
+            // set this point as the graft path
+            if (graftPath === undefined) {
+              graftPath = keys.slice(0, t).join('/');
+            }
+          }
+        }
+        // extended operations can use a special 'end element' sentinel in array paths
+        else if (operation.op === 'x' && key === '--') {
+          key = obj.length - 1;
+          // update global keys array as well
+          keys[t - 1] = key.toString(10);
+          // set this point as the graft path
+          if (graftPath === undefined) {
+            graftPath = keys.slice(0, t).join('/');
+          }
         }
         else {
           if (validateOperation && !isInteger(key)) {
@@ -410,9 +449,52 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
           } // only parse key when it's an integer for `arr.prop` to work
           else if(isInteger(key)) {
             key = ~~key;
+            // don't allow arbitrary idx creation if not in resolve mode (extended ops only)
+            if (operation.op === 'x' && operation.resolve !== true && key >= obj.length) {
+              throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
+            }
           }
         }
         if (t >= len) {
+          if (operation.op === 'x' && xConfig) {
+            // maintain parity with empty root behavior above
+            if (typeof key === 'string' && key.length === 0 && !operation.resolve) {
+              return { newDocument: operation.value };
+            }
+            // Apply extended array patch
+            const result = xConfig.arr.call(operation, obj, key, workingDocument);
+            if (result === undefined) {
+              return { newDocument: document };
+            }
+            // check for ambiguous results
+            if (result.removed !== undefined && operation.resolve === true) {
+              // can't use resolve with a removal; ambiguous removal path
+              throw new JsonPatchError('Extended operation should not remove items while resolving undefined paths', 'OPERATION_X_AMBIGUOUS_REMOVAL', index, operation, document);
+            }
+
+            if (mutateDocument) {
+              // default graft path
+              let pc: PathComponents = {
+                modType: 'graft',
+                comps: graftPath === undefined ? keys.slice(1, t) : graftPath.split('/').slice(1),
+              };
+              // figure out graft or prune
+              if (result.removed !== undefined) {
+                // it's a prune
+                pc = {
+                  modType: 'prune',
+                  // use entire path up to, and including, key
+                  comps: keys.slice(1, t),
+                };
+              }
+              // modifies document in-place
+              _graftTree(result.newDocument, document, pc);
+              // make sure to return original document reference
+              return { newDocument: document };
+            }
+            return result;
+          }
+
           if (validateOperation && operation.op === "add" && key > obj.length) {
             throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
           }
@@ -425,6 +507,40 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
       }
       else {
         if (t >= len) {
+          if (operation.op === 'x' && xConfig) {
+            // maintain parity with empty root behavior above
+            if (key.length === 0 && !operation.resolve) {
+              return { newDocument: operation.value };
+            }
+            // Apply extended obj patch
+            const result = xConfig.obj.call(operation, obj, key, workingDocument);
+            if (result === undefined) {
+              return { newDocument: document };
+            }
+
+            if (mutateDocument) {
+              // default graft path
+              let pc: PathComponents = {
+                modType: 'graft',
+                comps: graftPath === undefined ? keys.slice(1, t) : graftPath.split('/').slice(1),
+              };
+              // figure out graft or prune
+              if (result.removed !== undefined) {
+                // it's a prune
+                pc = {
+                  modType: 'prune',
+                  // use entire path up to, and including, key
+                  comps: keys.slice(1, t),
+                };
+              }
+              // modifies document in-place
+              _graftTree(result.newDocument, document, pc);
+              // make sure to return original document reference
+              return { newDocument: document };
+            }
+            return result;
+          }
+
           const returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
           if (returnValue.test === false) {
             throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
@@ -432,6 +548,28 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
           return returnValue;
         }
       }
+
+      // extended operation forced path resolution
+      if (operation.op === 'x' && xConfig && obj[key] === undefined) {
+
+        // get first path where something isn't defined
+        if (graftPath === undefined) {
+          graftPath = keys.slice(0, t).join('/');
+        }
+
+        if (operation.resolve === true) {
+          // add resolvable nodes
+          // check next key to determine object creation strategy
+          if (Array.isArray(document) && isInteger(String(keys[t]))) { // goofy cast
+            // if original document is an array, numeric path elements
+            // should add new arrays with minimum capacity
+            obj[key] = new Array(~~keys[t] + 1);
+          } else {
+            obj[key] = {};
+          }
+        }
+      }
+
       obj = obj[key];
       // If we have more keys in the path, but the next value isn't a non-null object,
       // throw an OPERATION_PATH_UNRESOLVABLE error instead of iterating again.
