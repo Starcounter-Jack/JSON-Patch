@@ -163,3 +163,6 @@ export class PatchError extends Error {
         this.message = patchErrorMessageFormatter(message, { name, index, operation, tree });
     }
 }
+
+// exported for use in jasmine test
+export const PROTO_ERROR_MSG = 'JSON-Patch: modifying `__proto__` or `constructor/prototype` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README';

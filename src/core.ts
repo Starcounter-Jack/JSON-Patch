@@ -5,7 +5,7 @@
  */
 declare var require: any;
 
-import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers.js';
+import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined, PROTO_ERROR_MSG } from './helpers.js';
 
 export const JsonPatchError = PatchError;
 export const deepClone = _deepClone;
@@ -255,7 +255,7 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
           (key == '__proto__' || 
           (key == 'prototype' && t>0 && keys[t-1] == 'constructor'))
         ) {
-        throw new TypeError('JSON-Patch: modifying `__proto__` or `constructor/prototype` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
+        throw new TypeError(PROTO_ERROR_MSG);
       }
 
       if (validateOperation) {
