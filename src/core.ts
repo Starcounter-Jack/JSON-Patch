@@ -10,16 +10,24 @@ import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined,
 export const JsonPatchError = PatchError;
 export const deepClone = _deepClone;
 
-export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any>;
+export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any> | ExtendedMutationOperation<any>;
 
 export interface Validator<T> {
   (operation: Operation, index: number, document: T, existingPathFragment: string): void;
 }
 
 export interface OperationResult<T> {
-  removed?: any,
-  test?: boolean,
+  removed?: any;
+  test?: boolean;
   newDocument: T;
+}
+
+export interface ArrayOperator<T, R> {
+  (arr: Array<T>, i: string, document: T): R;
+}
+
+export interface ObjectOperator<T, R> {
+  (obj: T, key: string, document: T): R;
 }
 
 export interface BaseOperation {
@@ -59,6 +67,32 @@ export interface GetOperation<T> extends BaseOperation {
   op: '_get';
   value: T;
 }
+
+/* Extended (non-RFC 6902) operation to perform an arbitrary
+ mutation/modification between existing value at 'path' and supplied 'value'
+ placing result in output document.
+
+ Property 'xid' is the string name (in registry) of the extended operation
+ a.k.a. "the extended operation to be performed"
+ (analogous to 'op' in the RFC operation interfaces)
+
+ Property 'args' is an optional array of additional arguments to be supplied to
+ the specified 'xid' extended operator
+
+ Property 'resolve' is optional [default false] and will cause an unresolvable
+ path to be forced to exist in document to be patched: arrays will be padded
+ with undefined elements, empty objects will be created at each currently
+ undefined path component IFF current resolution is strictly equal to undefined
+
+ */
+ export interface ExtendedMutationOperation<T> extends BaseOperation {
+  op: 'x';
+  args?: Array<any>;
+  resolve?: boolean;
+  xid: string,
+  value: T;
+}
+
 export interface PatchResult<T> extends Array<OperationResult<T>> {
   newDocument: T;
 }
@@ -71,7 +105,7 @@ export interface PatchResult<T> extends Array<OperationResult<T>> {
  */
 
 /* The operations applicable to an object */
-const objOps = {
+const objOps: { readonly [index: string]: ObjectOperator<any, OperationResult<any>> } = {
   add: function (obj, key, document) {
     obj[key] = this.value;
     return { newDocument: document };
@@ -124,10 +158,10 @@ const objOps = {
 };
 
 /* The operations applicable to an array. Many are the same as for the object */
-var arrOps = {
+var arrOps: { readonly [index: string]: ArrayOperator<any, OperationResult<any>> } = {
   add: function (arr, i, document) {
-    if(isInteger(i)) {
-      arr.splice(i, 0, this.value);
+    if (isInteger(i)) {
+      arr.splice(~~i, 0, this.value);
     } else { // array props
       arr[i] = this.value;
     }
@@ -135,7 +169,7 @@ var arrOps = {
     return { newDocument: document, index: i }
   },
   remove: function (arr, i, document) {
-    var removedList = arr.splice(i, 1);
+    var removedList = arr.splice(~~i, 1);
     return { newDocument: document, removed: removedList[0] };
   },
   replace: function (arr, i, document) {
