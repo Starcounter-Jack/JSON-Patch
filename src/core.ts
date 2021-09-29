@@ -5,7 +5,7 @@
  */
 declare var require: any;
 
-import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined, PROTO_ERROR_MSG } from './helpers.js';
+import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined, PROTO_ERROR_MSG, isValidExtendedOpId } from './helpers.js';
 
 export const JsonPatchError = PatchError;
 export const deepClone = _deepClone;
@@ -93,9 +93,26 @@ export interface GetOperation<T> extends BaseOperation {
   value: T;
 }
 
+/*
+ A configuration object for extended mutation operations that includes
+ exactly 3 functions:
+
+ 'arr' - the operation implementation for an array element in document
+ 'obj' - the operation implementation for an object in document
+ 'validator' - the validation function for this operation; should throw error if not valid
+ */
+ export interface ExtendedMutationOperationConfig<T> {
+  readonly arr: ArrayOperator<T, OperationResult<T> | undefined>;
+  readonly obj: ObjectOperator<T, OperationResult<T> | undefined>;
+  readonly validator: Validator<T>;
+};
+
 export interface PatchResult<T> extends Array<OperationResult<T>> {
   newDocument: T;
 }
+
+/* Registry of Extended operations */
+const xOpRegistry = new Map<string, ExtendedMutationOperationConfig<any>>();
 
 /* We use a Javascript hash to store each
  function. Each hash entry (property) uses
@@ -182,6 +199,59 @@ var arrOps: { readonly [index: string]: ArrayOperator<any, OperationResult<any>>
   test: objOps.test,
   _get: objOps._get
 };
+
+/**
+ * Registers an extended (non-RFC 6902) operation for processing.
+ * Will overwrite configs that already exist for given xid string
+ *
+ * @param xid The operation id (must follow the convention /^x-[a-z]+$/
+ *  to avoid visual confusion with the RFC's ops)
+ * @param config the operation configuration object containing
+ *  the array, and object operators (functions), and a validator function for
+ *  the extended operation
+ */
+ export function useExtendedOperation<T>(xid: string, config: ExtendedMutationOperationConfig<T>): void {
+  if (!isValidExtendedOpId(xid)) {
+    throw new JsonPatchError('Extended operation `xid` has malformed id (MUST begin with `x-`)', 'OPERATION_X_OP_INVALID', undefined, xid);
+  }
+  // basic checks for all props
+  if (typeof config.arr !== 'function') {
+    throw new JsonPatchError('Extended operation config has invalid `arr` function', 'OPERATION_X_CONFIG_INVALID', undefined, xid);
+  }
+
+  if (typeof config.obj !== 'function') {
+    throw new JsonPatchError('Extended operation config has invalid `obj` function', 'OPERATION_X_CONFIG_INVALID', undefined, xid);
+  }
+
+  if (typeof config.validator !== 'function') {
+    throw new JsonPatchError('Extended operation config has invalid `validator` function', 'OPERATION_X_CONFIG_INVALID', undefined, xid);
+  }
+
+  // register config as immutable obj
+  xOpRegistry.set(xid, Object.freeze(config));
+}
+
+/**
+ * Performs check for a registered extended (non-RFC 6902) operation.
+ *
+ * @param xop the qualified ("x-<foo>") extended operation name
+ * @return boolean true if xop is registered as an extended operation
+ */
+export function hasExtendedOperation(xop: string): boolean {
+  if (!isValidExtendedOpId(xop)) {
+    throw new JsonPatchError('Extended operation `xop` has malformed id (MUST begin with `x-`)', 'OPERATION_X_OP_INVALID', undefined, xop);
+  }
+  return xOpRegistry.has(xop);
+}
+
+/**
+ * Removes all previously registered extended operation configurations.
+ * (primarily used during unit testing)
+ */
+export function unregisterAllExtendedOperations(): void {
+  xOpRegistry.clear();
+}
+
 
 /**
  * Retrieves a value from a JSON document by a JSON pointer.
