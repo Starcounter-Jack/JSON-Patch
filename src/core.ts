@@ -5,7 +5,7 @@
  */
 declare var require: any;
 
-import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined, PROTO_ERROR_MSG, isValidExtendedOpId } from './helpers.js';
+import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined, PROTO_ERROR_MSG, isValidExtendedOpId, _graftTree, PathComponents } from './helpers.js';
 
 export const JsonPatchError = PatchError;
 export const deepClone = _deepClone;
@@ -323,6 +323,30 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
     } else if (operation.op === '_get') {
       operation.value = document;
       return returnValue;
+    } else if (operation.op === 'x') {
+      // get extended config
+      const xConfig = xOpRegistry.get(operation.xid);
+      if (!xConfig) {
+        throw new JsonPatchError('Extended operation `xid` property is not a registered extended operation', 'OPERATION_X_OP_INVALID', index, operation, document);
+      }
+      // at empty (root) path default to obj operator
+      let workingDocument = document;
+      let obj = document;
+      if (!mutateDocument) {
+        obj = workingDocument = _deepClone(document);
+      }
+      let result = { newDocument: operation.value };
+      // if resolve is true, allow extended operator to run against supplied
+      // document object/clone
+      if (operation.resolve === true) {
+        result = xConfig.obj.call(operation, obj, '', workingDocument);
+        // in resolve mode, allow operator result of undefined to revert back to
+        // original document
+        if (result === undefined) {
+          return { newDocument: document };
+        }
+      }
+      return result;
     } else { /* bad operation */
       if (validateOperation) {
         throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);
