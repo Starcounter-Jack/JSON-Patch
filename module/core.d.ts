@@ -1,7 +1,7 @@
 import { PatchError, _deepClone } from './helpers.js';
 export declare const JsonPatchError: typeof PatchError;
 export declare const deepClone: typeof _deepClone;
-export declare type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any>;
+export declare type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any> | ExtendedMutationOperation;
 export interface Validator<T> {
     (operation: Operation, index: number, document: T, existingPathFragment: string): void;
 }
@@ -9,6 +9,12 @@ export interface OperationResult<T> {
     removed?: any;
     test?: boolean;
     newDocument: T;
+}
+export interface ArrayOperator<T, R> {
+    (arr: Array<T>, i: number | string, document: T): R;
+}
+export interface ObjectOperator<T, R> {
+    (obj: T, key: string, document: T): R;
 }
 export interface BaseOperation {
     path: string;
@@ -40,9 +46,44 @@ export interface GetOperation<T> extends BaseOperation {
     op: '_get';
     value: T;
 }
+export interface ExtendedMutationOperation extends BaseOperation {
+    op: 'x';
+    args?: Array<any>;
+    resolve?: boolean;
+    xid: string;
+    value?: any;
+}
+export interface ExtendedMutationOperationConfig<T> {
+    readonly arr: ArrayOperator<T, OperationResult<T> | undefined>;
+    readonly obj: ObjectOperator<T, OperationResult<T> | undefined>;
+    readonly validator: Validator<T>;
+}
 export interface PatchResult<T> extends Array<OperationResult<T>> {
     newDocument: T;
 }
+/**
+ * Registers an extended (non-RFC 6902) operation for processing.
+ * Will overwrite configs that already exist for given xid string
+ *
+ * @param xid The operation id (must follow the convention /^x-[a-z]+$/
+ *  to avoid visual confusion with the RFC's ops)
+ * @param config the operation configuration object containing
+ *  the array, and object operators (functions), and a validator function for
+ *  the extended operation
+ */
+export declare function useExtendedOperation<T>(xid: string, config: ExtendedMutationOperationConfig<T>): void;
+/**
+ * Performs check for a registered extended (non-RFC 6902) operation.
+ *
+ * @param xid the qualified ("x-<foo>") extended operation name
+ * @return boolean true if xop is registered as an extended operation
+ */
+export declare function hasExtendedOperation(xid: string): boolean;
+/**
+ * Removes all previously registered extended operation configurations.
+ * (primarily used during unit testing)
+ */
+export declare function unregisterAllExtendedOperations(): void;
 /**
  * Retrieves a value from a JSON document by a JSON pointer.
  * Returns the value.

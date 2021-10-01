@@ -1,6 +1,6 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * (c) 2017 Joachim Wester
+ * (c) 2017-2021 Joachim Wester
  * MIT license
  */
 import { _deepClone, _objectKeys, escapePathComponent, hasOwnProperty } from './helpers.mjs';
