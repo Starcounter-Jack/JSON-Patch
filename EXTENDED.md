@@ -750,11 +750,11 @@ jsonpatch.useExtendedOperation("x-sum2", xcfg2);
 ```
 
 ```js
----EXPECTED BEHAVIOR---
+/* ---EXPECTED BEHAVIOR--- */
 
-EXAMPLE #1
-
-// Given a source document of {}
+/* EXAMPLE #1
+Given a source document of */
+{}
 
 // And a patch consisting of several operations
 [
@@ -775,7 +775,7 @@ EXAMPLE #1
   },
 };
 
-EXAMPLE #2
+/* EXAMPLE #2 */
 
 // The same results could be achieved by "force resolving" the path '/a/b' instead of first creating it with an RFC 'add' operation:
 [

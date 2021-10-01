@@ -405,6 +405,8 @@ To see the list of recent changes, see [Releases](https://github.com/Starcounter
 
 4 KB minified and gzipped (12 KB minified)
 
+(v4.x+) 5 KB minified and gzipped (17 KB minified)
+
 ## Performance
 
 ##### [`add` benchmark](https://run.perf.zone/view/JSON-Patch-Add-Operation-1535541298893)
