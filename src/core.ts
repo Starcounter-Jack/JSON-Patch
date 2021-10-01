@@ -10,7 +10,7 @@ import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined,
 export const JsonPatchError = PatchError;
 export const deepClone = _deepClone;
 
-export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any> | ExtendedMutationOperation<any>;
+export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any> | ExtendedMutationOperation;
 
 export interface Validator<T> {
   (operation: Operation, index: number, document: T, existingPathFragment: string): void;
@@ -23,7 +23,7 @@ export interface OperationResult<T> {
 }
 
 export interface ArrayOperator<T, R> {
-  (arr: Array<T>, i: string, document: T): R;
+  (arr: Array<T>, i: number | string, document: T): R;
 }
 
 export interface ObjectOperator<T, R> {
@@ -85,12 +85,12 @@ export interface GetOperation<T> extends BaseOperation {
  undefined path component IFF current resolution is strictly equal to undefined
 
  */
- export interface ExtendedMutationOperation<T> extends BaseOperation {
+ export interface ExtendedMutationOperation extends BaseOperation {
   op: 'x';
   args?: Array<any>;
   resolve?: boolean;
   xid: string,
-  value: T;
+  value?: any;
 }
 
 /*
@@ -177,7 +177,7 @@ const objOps: { readonly [index: string]: ObjectOperator<any, OperationResult<an
 /* The operations applicable to an array. Many are the same as for the object */
 var arrOps: { readonly [index: string]: ArrayOperator<any, OperationResult<any>> } = {
   add: function (arr, i, document) {
-    if (isInteger(i)) {
+    if (isInteger(String(i))) {
       arr.splice(~~i, 0, this.value);
     } else { // array props
       arr[i] = this.value;
@@ -212,7 +212,7 @@ var arrOps: { readonly [index: string]: ArrayOperator<any, OperationResult<any>>
  */
  export function useExtendedOperation<T>(xid: string, config: ExtendedMutationOperationConfig<T>): void {
   if (!isValidExtendedOpId(xid)) {
-    throw new JsonPatchError('Extended operation `xid` has malformed id (MUST begin with `x-`)', 'OPERATION_X_OP_INVALID', undefined, xid);
+    throw new JsonPatchError('Extended operation `xid` has malformed id (MUST begin with `x-`)', 'OPERATION_X_ID_INVALID', undefined, xid);
   }
   // basic checks for all props
   if (typeof config.arr !== 'function') {
@@ -234,14 +234,14 @@ var arrOps: { readonly [index: string]: ArrayOperator<any, OperationResult<any>>
 /**
  * Performs check for a registered extended (non-RFC 6902) operation.
  *
- * @param xop the qualified ("x-<foo>") extended operation name
+ * @param xid the qualified ("x-<foo>") extended operation name
  * @return boolean true if xop is registered as an extended operation
  */
-export function hasExtendedOperation(xop: string): boolean {
-  if (!isValidExtendedOpId(xop)) {
-    throw new JsonPatchError('Extended operation `xop` has malformed id (MUST begin with `x-`)', 'OPERATION_X_OP_INVALID', undefined, xop);
+export function hasExtendedOperation(xid: string): boolean {
+  if (!isValidExtendedOpId(xid)) {
+    throw new JsonPatchError('Extended operation `xid` has malformed id (MUST begin with `x-`)', 'OPERATION_X_ID_INVALID', undefined, xid);
   }
-  return xOpRegistry.has(xop);
+  return xOpRegistry.has(xid);
 }
 
 /**

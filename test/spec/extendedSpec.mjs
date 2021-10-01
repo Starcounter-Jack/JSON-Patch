@@ -35,7 +35,7 @@ describe("jsonpatch.useExtendedOperation", function () {
       unwrapPatchError(() => {
         jsonpatch.useExtendedOperation("", {});
       })
-    ).toThrowError(Error, "OPERATION_X_OP_INVALID");
+    ).toThrowError(Error, "OPERATION_X_ID_INVALID");
   });
 
   it("should reject improperly formatted extended operation name", function () {
@@ -43,7 +43,7 @@ describe("jsonpatch.useExtendedOperation", function () {
       unwrapPatchError(() => {
         jsonpatch.useExtendedOperation("add", {});
       })
-    ).toThrowError(Error, "OPERATION_X_OP_INVALID");
+    ).toThrowError(Error, "OPERATION_X_ID_INVALID");
   });
 
   it("should reject when missing `arr` function", function () {
