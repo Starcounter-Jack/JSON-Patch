@@ -5,21 +5,29 @@
  */
 declare var require: any;
 
-import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined } from './helpers.js';
+import { PatchError, _deepClone, isInteger, unescapePathComponent, hasUndefined, PROTO_ERROR_MSG, isValidExtendedOpId, _graftTree, PathComponents } from './helpers.js';
 
 export const JsonPatchError = PatchError;
 export const deepClone = _deepClone;
 
-export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any>;
+export type Operation = AddOperation<any> | RemoveOperation | ReplaceOperation<any> | MoveOperation | CopyOperation | TestOperation<any> | GetOperation<any> | ExtendedMutationOperation;
 
 export interface Validator<T> {
   (operation: Operation, index: number, document: T, existingPathFragment: string): void;
 }
 
 export interface OperationResult<T> {
-  removed?: any,
-  test?: boolean,
+  removed?: any;
+  test?: boolean;
   newDocument: T;
+}
+
+export interface ArrayOperator<T, R> {
+  (arr: Array<T>, i: number | string, document: T): R;
+}
+
+export interface ObjectOperator<T, R> {
+  (obj: T, key: string, document: T): R;
 }
 
 export interface BaseOperation {
@@ -59,9 +67,52 @@ export interface GetOperation<T> extends BaseOperation {
   op: '_get';
   value: T;
 }
+
+/* Extended (non-RFC 6902) operation to perform an arbitrary
+ mutation/modification between existing value at 'path' and supplied 'value'
+ placing result in output document.
+
+ Property 'xid' is the string name (in registry) of the extended operation
+ a.k.a. "the extended operation to be performed"
+ (analogous to 'op' in the RFC operation interfaces)
+
+ Property 'args' is an optional array of additional arguments to be supplied to
+ the specified 'xid' extended operator
+
+ Property 'resolve' is optional [default false] and will cause an unresolvable
+ path to be forced to exist in document to be patched: arrays will be padded
+ with undefined elements, empty objects will be created at each currently
+ undefined path component IFF current resolution is strictly equal to undefined
+
+ */
+ export interface ExtendedMutationOperation extends BaseOperation {
+  op: 'x';
+  args?: Array<any>;
+  resolve?: boolean;
+  xid: string,
+  value?: any;
+}
+
+/*
+ A configuration object for extended mutation operations that includes
+ exactly 3 functions:
+
+ 'arr' - the operation implementation for an array element in document
+ 'obj' - the operation implementation for an object in document
+ 'validator' - the validation function for this operation; should throw error if not valid
+ */
+ export interface ExtendedMutationOperationConfig<T> {
+  readonly arr: ArrayOperator<T, OperationResult<T> | undefined>;
+  readonly obj: ObjectOperator<T, OperationResult<T> | undefined>;
+  readonly validator: Validator<T>;
+};
+
 export interface PatchResult<T> extends Array<OperationResult<T>> {
   newDocument: T;
 }
+
+/* Registry of Extended operations */
+const xOpRegistry = new Map<string, ExtendedMutationOperationConfig<any>>();
 
 /* We use a Javascript hash to store each
  function. Each hash entry (property) uses
@@ -71,7 +122,7 @@ export interface PatchResult<T> extends Array<OperationResult<T>> {
  */
 
 /* The operations applicable to an object */
-const objOps = {
+const objOps: { readonly [index: string]: ObjectOperator<any, OperationResult<any>> } = {
   add: function (obj, key, document) {
     obj[key] = this.value;
     return { newDocument: document };
@@ -124,10 +175,10 @@ const objOps = {
 };
 
 /* The operations applicable to an array. Many are the same as for the object */
-var arrOps = {
+var arrOps: { readonly [index: string]: ArrayOperator<any, OperationResult<any>> } = {
   add: function (arr, i, document) {
-    if(isInteger(i)) {
-      arr.splice(i, 0, this.value);
+    if (isInteger(String(i))) {
+      arr.splice(~~i, 0, this.value);
     } else { // array props
       arr[i] = this.value;
     }
@@ -135,7 +186,7 @@ var arrOps = {
     return { newDocument: document, index: i }
   },
   remove: function (arr, i, document) {
-    var removedList = arr.splice(i, 1);
+    var removedList = arr.splice(~~i, 1);
     return { newDocument: document, removed: removedList[0] };
   },
   replace: function (arr, i, document) {
@@ -148,6 +199,59 @@ var arrOps = {
   test: objOps.test,
   _get: objOps._get
 };
+
+/**
+ * Registers an extended (non-RFC 6902) operation for processing.
+ * Will overwrite configs that already exist for given xid string
+ *
+ * @param xid The operation id (must follow the convention /^x-[a-z]+$/
+ *  to avoid visual confusion with the RFC's ops)
+ * @param config the operation configuration object containing
+ *  the array, and object operators (functions), and a validator function for
+ *  the extended operation
+ */
+ export function useExtendedOperation<T>(xid: string, config: ExtendedMutationOperationConfig<T>): void {
+  if (!isValidExtendedOpId(xid)) {
+    throw new JsonPatchError('Extended operation `xid` has malformed id (MUST begin with `x-`)', 'OPERATION_X_ID_INVALID', undefined, xid);
+  }
+  // basic checks for all props
+  if (typeof config.arr !== 'function') {
+    throw new JsonPatchError('Extended operation config has invalid `arr` function', 'OPERATION_X_CONFIG_INVALID', undefined, xid);
+  }
+
+  if (typeof config.obj !== 'function') {
+    throw new JsonPatchError('Extended operation config has invalid `obj` function', 'OPERATION_X_CONFIG_INVALID', undefined, xid);
+  }
+
+  if (typeof config.validator !== 'function') {
+    throw new JsonPatchError('Extended operation config has invalid `validator` function', 'OPERATION_X_CONFIG_INVALID', undefined, xid);
+  }
+
+  // register config as immutable obj
+  xOpRegistry.set(xid, Object.freeze(config));
+}
+
+/**
+ * Performs check for a registered extended (non-RFC 6902) operation.
+ *
+ * @param xid the qualified ("x-<foo>") extended operation name
+ * @return boolean true if xop is registered as an extended operation
+ */
+export function hasExtendedOperation(xid: string): boolean {
+  if (!isValidExtendedOpId(xid)) {
+    throw new JsonPatchError('Extended operation `xid` has malformed id (MUST begin with `x-`)', 'OPERATION_X_ID_INVALID', undefined, xid);
+  }
+  return xOpRegistry.has(xid);
+}
+
+/**
+ * Removes all previously registered extended operation configurations.
+ * (primarily used during unit testing)
+ */
+export function unregisterAllExtendedOperations(): void {
+  xOpRegistry.clear();
+}
+
 
 /**
  * Retrieves a value from a JSON document by a JSON pointer.
@@ -219,6 +323,30 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
     } else if (operation.op === '_get') {
       operation.value = document;
       return returnValue;
+    } else if (operation.op === 'x') {
+      // get extended config
+      const xConfig = xOpRegistry.get(operation.xid);
+      if (!xConfig) {
+        throw new JsonPatchError('Extended operation `xid` property is not a registered extended operation', 'OPERATION_X_OP_INVALID', index, operation, document);
+      }
+      // at empty (root) path default to obj operator
+      let workingDocument = document;
+      let obj = document;
+      if (!mutateDocument) {
+        obj = workingDocument = _deepClone(document);
+      }
+      let result = { newDocument: operation.value };
+      // if resolve is true, allow extended operator to run against supplied
+      // document object/clone
+      if (operation.resolve === true) {
+        result = xConfig.obj.call(operation, obj, '', workingDocument);
+        // in resolve mode, allow operator result of undefined to revert back to
+        // original document
+        if (result === undefined) {
+          return { newDocument: document };
+        }
+      }
+      return result;
     } else { /* bad operation */
       if (validateOperation) {
         throw new JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);
@@ -238,6 +366,20 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
     let len = keys.length;
     let existingPathFragment = undefined;
     let key: string | number;
+
+    let xConfig;
+    let workingDocument = document;
+    let graftPath = undefined;
+    if (operation.op === 'x') {
+      xConfig = xOpRegistry.get(operation.xid);
+      if (!xConfig) {
+        throw new JsonPatchError('Extended operation `xid` property is not a registered extended operation', 'OPERATION_X_OP_INVALID', index, operation, document);
+      }
+      // make another clone to allow configured operator to 'abort' or 'no op'
+      // by returning a strict undefined
+      workingDocument = obj = _deepClone(obj);
+    }
+
     let validateFunction;
     if (typeof validateOperation == 'function') {
       validateFunction = validateOperation;
@@ -255,7 +397,7 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
           (key == '__proto__' || 
           (key == 'prototype' && t>0 && keys[t-1] == 'constructor'))
         ) {
-        throw new TypeError('JSON-Patch: modifying `__proto__` or `constructor/prototype` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
+        throw new TypeError(PROTO_ERROR_MSG);
       }
 
       if (validateOperation) {
@@ -273,8 +415,33 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
       }
       t++;
       if (Array.isArray(obj)) {
+        // don't coerce an empty key string into an integer (below w/~~)
+        // if not in resolve mode (extended ops only)
+        if (operation.op === 'x' && operation.resolve !== true && key === '') {
+          throw new JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", index, operation, document);
+        }
+
         if (key === '-') {
           key = obj.length;
+          // make some adjustments for grafting with extended ops
+          if (operation.op === 'x') {
+            // update global keys array as well
+            keys[t - 1] = key.toString(10);
+            // set this point as the graft path
+            if (graftPath === undefined) {
+              graftPath = keys.slice(0, t).join('/');
+            }
+          }
+        }
+        // extended operations can use a special 'end element' sentinel in array paths
+        else if (operation.op === 'x' && key === '--') {
+          key = obj.length - 1;
+          // update global keys array as well
+          keys[t - 1] = key.toString(10);
+          // set this point as the graft path
+          if (graftPath === undefined) {
+            graftPath = keys.slice(0, t).join('/');
+          }
         }
         else {
           if (validateOperation && !isInteger(key)) {
@@ -282,9 +449,52 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
           } // only parse key when it's an integer for `arr.prop` to work
           else if(isInteger(key)) {
             key = ~~key;
+            // don't allow arbitrary idx creation if not in resolve mode (extended ops only)
+            if (operation.op === 'x' && operation.resolve !== true && key >= obj.length) {
+              throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
+            }
           }
         }
         if (t >= len) {
+          if (operation.op === 'x' && xConfig) {
+            // maintain parity with empty root behavior above
+            if (typeof key === 'string' && key.length === 0 && !operation.resolve) {
+              return { newDocument: operation.value };
+            }
+            // Apply extended array patch
+            const result = xConfig.arr.call(operation, obj, key, workingDocument);
+            if (result === undefined) {
+              return { newDocument: document };
+            }
+            // check for ambiguous results
+            if (result.removed !== undefined && operation.resolve === true) {
+              // can't use resolve with a removal; ambiguous removal path
+              throw new JsonPatchError('Extended operation should not remove items while resolving undefined paths', 'OPERATION_X_AMBIGUOUS_REMOVAL', index, operation, document);
+            }
+
+            if (mutateDocument) {
+              // default graft path
+              let pc: PathComponents = {
+                modType: 'graft',
+                comps: graftPath === undefined ? keys.slice(1, t) : graftPath.split('/').slice(1),
+              };
+              // figure out graft or prune
+              if (result.removed !== undefined) {
+                // it's a prune
+                pc = {
+                  modType: 'prune',
+                  // use entire path up to, and including, key
+                  comps: keys.slice(1, t),
+                };
+              }
+              // modifies document in-place
+              _graftTree(result.newDocument, document, pc);
+              // make sure to return original document reference
+              return { newDocument: document };
+            }
+            return result;
+          }
+
           if (validateOperation && operation.op === "add" && key > obj.length) {
             throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
           }
@@ -297,6 +507,40 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
       }
       else {
         if (t >= len) {
+          if (operation.op === 'x' && xConfig) {
+            // maintain parity with empty root behavior above
+            if (key.length === 0 && !operation.resolve) {
+              return { newDocument: operation.value };
+            }
+            // Apply extended obj patch
+            const result = xConfig.obj.call(operation, obj, key, workingDocument);
+            if (result === undefined) {
+              return { newDocument: document };
+            }
+
+            if (mutateDocument) {
+              // default graft path
+              let pc: PathComponents = {
+                modType: 'graft',
+                comps: graftPath === undefined ? keys.slice(1, t) : graftPath.split('/').slice(1),
+              };
+              // figure out graft or prune
+              if (result.removed !== undefined) {
+                // it's a prune
+                pc = {
+                  modType: 'prune',
+                  // use entire path up to, and including, key
+                  comps: keys.slice(1, t),
+                };
+              }
+              // modifies document in-place
+              _graftTree(result.newDocument, document, pc);
+              // make sure to return original document reference
+              return { newDocument: document };
+            }
+            return result;
+          }
+
           const returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
           if (returnValue.test === false) {
             throw new JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
@@ -304,6 +548,28 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
           return returnValue;
         }
       }
+
+      // extended operation forced path resolution
+      if (operation.op === 'x' && xConfig && obj[key] === undefined) {
+
+        // get first path where something isn't defined
+        if (graftPath === undefined) {
+          graftPath = keys.slice(0, t).join('/');
+        }
+
+        if (operation.resolve === true) {
+          // add resolvable nodes
+          // check next key to determine object creation strategy
+          if (Array.isArray(document) && isInteger(String(keys[t]))) { // goofy cast
+            // if original document is an array, numeric path elements
+            // should add new arrays with minimum capacity
+            obj[key] = new Array(~~keys[t] + 1);
+          } else {
+            obj[key] = {};
+          }
+        }
+      }
+
       obj = obj[key];
       // If we have more keys in the path, but the next value isn't a non-null object,
       // throw an OPERATION_PATH_UNRESOLVABLE error instead of iterating again.
@@ -375,6 +641,39 @@ export function applyReducer<T>(document: T, operation: Operation, index: number
 export function validator(operation: Operation, index: number, document?: any, existingPathFragment?: string): void {
   if (typeof operation !== 'object' || operation === null || Array.isArray(operation)) {
     throw new JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);
+  }
+
+  // check for extended ops
+  if (operation.op === 'x') {
+    // default validations
+    if (!isValidExtendedOpId(operation.xid)) {
+      throw new JsonPatchError('Operation `xid` property is not present or invalid string', 'OPERATION_X_ID_INVALID', index, operation, document);
+    }
+
+    const xConfig = xOpRegistry.get(operation.xid);
+    if (!xConfig) {
+      throw new JsonPatchError('Extended operation `xid` property is not a registered extended operation', 'OPERATION_X_OP_INVALID', index, operation, document);
+    }
+
+    if (typeof operation.path !== 'string') {
+      throw new JsonPatchError('Operation `path` property is not a string', 'OPERATION_PATH_INVALID', index, operation, document);
+    }
+
+    if (operation.path.indexOf('/') !== 0 && operation.path.length > 0) {
+      // paths that aren't empty string should start with "/"
+      throw new JsonPatchError('Operation `path` property must start with "/"', 'OPERATION_PATH_INVALID', index, operation, document);
+    }
+
+    if (operation.path === '/') {
+      throw new JsonPatchError('Operation `path` slash-only is ambiguous', 'OPERATION_PATH_UNRESOLVABLE', index, operation, document);
+    }
+
+    if (operation.args !== undefined && !Array.isArray(operation.args)) {
+      throw new JsonPatchError('Operation `args` property is not an array', 'OPERATION_X_ARGS_NOT_ARRAY', index, operation, document);
+    }
+
+    // we made it this far, now run the operation's configured validator
+    xConfig.validator.call(operation, operation, index, document, existingPathFragment);
   }
 
   else if (!objOps[operation.op]) {

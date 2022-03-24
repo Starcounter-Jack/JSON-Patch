@@ -2,6 +2,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var helpers_js_1 = require("./helpers.js");
 exports.JsonPatchError = helpers_js_1.PatchError;
 exports.deepClone = helpers_js_1._deepClone;
+;
+/* Registry of Extended operations */
+var xOpRegistry = new Map();
 /* We use a Javascript hash to store each
  function. Each hash entry (property) uses
  the operation identifiers specified in rfc6902.
@@ -53,8 +56,8 @@ var objOps = {
 /* The operations applicable to an array. Many are the same as for the object */
 var arrOps = {
     add: function (arr, i, document) {
-        if (helpers_js_1.isInteger(i)) {
-            arr.splice(i, 0, this.value);
+        if (helpers_js_1.isInteger(String(i))) {
+            arr.splice(~~i, 0, this.value);
         }
         else { // array props
             arr[i] = this.value;
@@ -63,7 +66,7 @@ var arrOps = {
         return { newDocument: document, index: i };
     },
     remove: function (arr, i, document) {
-        var removedList = arr.splice(i, 1);
+        var removedList = arr.splice(~~i, 1);
         return { newDocument: document, removed: removedList[0] };
     },
     replace: function (arr, i, document) {
@@ -76,6 +79,55 @@ var arrOps = {
     test: objOps.test,
     _get: objOps._get
 };
+/**
+ * Registers an extended (non-RFC 6902) operation for processing.
+ * Will overwrite configs that already exist for given xid string
+ *
+ * @param xid The operation id (must follow the convention /^x-[a-z]+$/
+ *  to avoid visual confusion with the RFC's ops)
+ * @param config the operation configuration object containing
+ *  the array, and object operators (functions), and a validator function for
+ *  the extended operation
+ */
+function useExtendedOperation(xid, config) {
+    if (!helpers_js_1.isValidExtendedOpId(xid)) {
+        throw new exports.JsonPatchError('Extended operation `xid` has malformed id (MUST begin with `x-`)', 'OPERATION_X_ID_INVALID', undefined, xid);
+    }
+    // basic checks for all props
+    if (typeof config.arr !== 'function') {
+        throw new exports.JsonPatchError('Extended operation config has invalid `arr` function', 'OPERATION_X_CONFIG_INVALID', undefined, xid);
+    }
+    if (typeof config.obj !== 'function') {
+        throw new exports.JsonPatchError('Extended operation config has invalid `obj` function', 'OPERATION_X_CONFIG_INVALID', undefined, xid);
+    }
+    if (typeof config.validator !== 'function') {
+        throw new exports.JsonPatchError('Extended operation config has invalid `validator` function', 'OPERATION_X_CONFIG_INVALID', undefined, xid);
+    }
+    // register config as immutable obj
+    xOpRegistry.set(xid, Object.freeze(config));
+}
+exports.useExtendedOperation = useExtendedOperation;
+/**
+ * Performs check for a registered extended (non-RFC 6902) operation.
+ *
+ * @param xid the qualified ("x-<foo>") extended operation name
+ * @return boolean true if xop is registered as an extended operation
+ */
+function hasExtendedOperation(xid) {
+    if (!helpers_js_1.isValidExtendedOpId(xid)) {
+        throw new exports.JsonPatchError('Extended operation `xid` has malformed id (MUST begin with `x-`)', 'OPERATION_X_ID_INVALID', undefined, xid);
+    }
+    return xOpRegistry.has(xid);
+}
+exports.hasExtendedOperation = hasExtendedOperation;
+/**
+ * Removes all previously registered extended operation configurations.
+ * (primarily used during unit testing)
+ */
+function unregisterAllExtendedOperations() {
+    xOpRegistry.clear();
+}
+exports.unregisterAllExtendedOperations = unregisterAllExtendedOperations;
 /**
  * Retrieves a value from a JSON document by a JSON pointer.
  * Returns the value.
@@ -156,6 +208,31 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             operation.value = document;
             return returnValue;
         }
+        else if (operation.op === 'x') {
+            // get extended config
+            var xConfig = xOpRegistry.get(operation.xid);
+            if (!xConfig) {
+                throw new exports.JsonPatchError('Extended operation `xid` property is not a registered extended operation', 'OPERATION_X_OP_INVALID', index, operation, document);
+            }
+            // at empty (root) path default to obj operator
+            var workingDocument = document;
+            var obj = document;
+            if (!mutateDocument) {
+                obj = workingDocument = helpers_js_1._deepClone(document);
+            }
+            var result = { newDocument: operation.value };
+            // if resolve is true, allow extended operator to run against supplied
+            // document object/clone
+            if (operation.resolve === true) {
+                result = xConfig.obj.call(operation, obj, '', workingDocument);
+                // in resolve mode, allow operator result of undefined to revert back to
+                // original document
+                if (result === undefined) {
+                    return { newDocument: document };
+                }
+            }
+            return result;
+        }
         else { /* bad operation */
             if (validateOperation) {
                 throw new exports.JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);
@@ -176,6 +253,18 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
         var len = keys.length;
         var existingPathFragment = undefined;
         var key = void 0;
+        var xConfig = void 0;
+        var workingDocument = document;
+        var graftPath = undefined;
+        if (operation.op === 'x') {
+            xConfig = xOpRegistry.get(operation.xid);
+            if (!xConfig) {
+                throw new exports.JsonPatchError('Extended operation `xid` property is not a registered extended operation', 'OPERATION_X_OP_INVALID', index, operation, document);
+            }
+            // make another clone to allow configured operator to 'abort' or 'no op'
+            // by returning a strict undefined
+            workingDocument = obj = helpers_js_1._deepClone(obj);
+        }
         var validateFunction = void 0;
         if (typeof validateOperation == 'function') {
             validateFunction = validateOperation;
@@ -191,7 +280,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             if (banPrototypeModifications &&
                 (key == '__proto__' ||
                     (key == 'prototype' && t > 0 && keys[t - 1] == 'constructor'))) {
-                throw new TypeError('JSON-Patch: modifying `__proto__` or `constructor/prototype` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
+                throw new TypeError(helpers_js_1.PROTO_ERROR_MSG);
             }
             if (validateOperation) {
                 if (existingPathFragment === undefined) {
@@ -208,8 +297,32 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             }
             t++;
             if (Array.isArray(obj)) {
+                // don't coerce an empty key string into an integer (below w/~~)
+                // if not in resolve mode (extended ops only)
+                if (operation.op === 'x' && operation.resolve !== true && key === '') {
+                    throw new exports.JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", index, operation, document);
+                }
                 if (key === '-') {
                     key = obj.length;
+                    // make some adjustments for grafting with extended ops
+                    if (operation.op === 'x') {
+                        // update global keys array as well
+                        keys[t - 1] = key.toString(10);
+                        // set this point as the graft path
+                        if (graftPath === undefined) {
+                            graftPath = keys.slice(0, t).join('/');
+                        }
+                    }
+                }
+                // extended operations can use a special 'end element' sentinel in array paths
+                else if (operation.op === 'x' && key === '--') {
+                    key = obj.length - 1;
+                    // update global keys array as well
+                    keys[t - 1] = key.toString(10);
+                    // set this point as the graft path
+                    if (graftPath === undefined) {
+                        graftPath = keys.slice(0, t).join('/');
+                    }
                 }
                 else {
                     if (validateOperation && !helpers_js_1.isInteger(key)) {
@@ -217,9 +330,50 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
                     } // only parse key when it's an integer for `arr.prop` to work
                     else if (helpers_js_1.isInteger(key)) {
                         key = ~~key;
+                        // don't allow arbitrary idx creation if not in resolve mode (extended ops only)
+                        if (operation.op === 'x' && operation.resolve !== true && key >= obj.length) {
+                            throw new exports.JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
+                        }
                     }
                 }
                 if (t >= len) {
+                    if (operation.op === 'x' && xConfig) {
+                        // maintain parity with empty root behavior above
+                        if (typeof key === 'string' && key.length === 0 && !operation.resolve) {
+                            return { newDocument: operation.value };
+                        }
+                        // Apply extended array patch
+                        var result = xConfig.arr.call(operation, obj, key, workingDocument);
+                        if (result === undefined) {
+                            return { newDocument: document };
+                        }
+                        // check for ambiguous results
+                        if (result.removed !== undefined && operation.resolve === true) {
+                            // can't use resolve with a removal; ambiguous removal path
+                            throw new exports.JsonPatchError('Extended operation should not remove items while resolving undefined paths', 'OPERATION_X_AMBIGUOUS_REMOVAL', index, operation, document);
+                        }
+                        if (mutateDocument) {
+                            // default graft path
+                            var pc = {
+                                modType: 'graft',
+                                comps: graftPath === undefined ? keys.slice(1, t) : graftPath.split('/').slice(1),
+                            };
+                            // figure out graft or prune
+                            if (result.removed !== undefined) {
+                                // it's a prune
+                                pc = {
+                                    modType: 'prune',
+                                    // use entire path up to, and including, key
+                                    comps: keys.slice(1, t),
+                                };
+                            }
+                            // modifies document in-place
+                            helpers_js_1._graftTree(result.newDocument, document, pc);
+                            // make sure to return original document reference
+                            return { newDocument: document };
+                        }
+                        return result;
+                    }
                     if (validateOperation && operation.op === "add" && key > obj.length) {
                         throw new exports.JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
                     }
@@ -232,11 +386,62 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             }
             else {
                 if (t >= len) {
+                    if (operation.op === 'x' && xConfig) {
+                        // maintain parity with empty root behavior above
+                        if (key.length === 0 && !operation.resolve) {
+                            return { newDocument: operation.value };
+                        }
+                        // Apply extended obj patch
+                        var result = xConfig.obj.call(operation, obj, key, workingDocument);
+                        if (result === undefined) {
+                            return { newDocument: document };
+                        }
+                        if (mutateDocument) {
+                            // default graft path
+                            var pc = {
+                                modType: 'graft',
+                                comps: graftPath === undefined ? keys.slice(1, t) : graftPath.split('/').slice(1),
+                            };
+                            // figure out graft or prune
+                            if (result.removed !== undefined) {
+                                // it's a prune
+                                pc = {
+                                    modType: 'prune',
+                                    // use entire path up to, and including, key
+                                    comps: keys.slice(1, t),
+                                };
+                            }
+                            // modifies document in-place
+                            helpers_js_1._graftTree(result.newDocument, document, pc);
+                            // make sure to return original document reference
+                            return { newDocument: document };
+                        }
+                        return result;
+                    }
                     var returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
                     if (returnValue.test === false) {
                         throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
                     }
                     return returnValue;
+                }
+            }
+            // extended operation forced path resolution
+            if (operation.op === 'x' && xConfig && obj[key] === undefined) {
+                // get first path where something isn't defined
+                if (graftPath === undefined) {
+                    graftPath = keys.slice(0, t).join('/');
+                }
+                if (operation.resolve === true) {
+                    // add resolvable nodes
+                    // check next key to determine object creation strategy
+                    if (Array.isArray(document) && helpers_js_1.isInteger(String(keys[t]))) { // goofy cast
+                        // if original document is an array, numeric path elements
+                        // should add new arrays with minimum capacity
+                        obj[key] = new Array(~~keys[t] + 1);
+                    }
+                    else {
+                        obj[key] = {};
+                    }
                 }
             }
             obj = obj[key];
@@ -311,6 +516,32 @@ exports.applyReducer = applyReducer;
 function validator(operation, index, document, existingPathFragment) {
     if (typeof operation !== 'object' || operation === null || Array.isArray(operation)) {
         throw new exports.JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);
+    }
+    // check for extended ops
+    if (operation.op === 'x') {
+        // default validations
+        if (!helpers_js_1.isValidExtendedOpId(operation.xid)) {
+            throw new exports.JsonPatchError('Operation `xid` property is not present or invalid string', 'OPERATION_X_ID_INVALID', index, operation, document);
+        }
+        var xConfig = xOpRegistry.get(operation.xid);
+        if (!xConfig) {
+            throw new exports.JsonPatchError('Extended operation `xid` property is not a registered extended operation', 'OPERATION_X_OP_INVALID', index, operation, document);
+        }
+        if (typeof operation.path !== 'string') {
+            throw new exports.JsonPatchError('Operation `path` property is not a string', 'OPERATION_PATH_INVALID', index, operation, document);
+        }
+        if (operation.path.indexOf('/') !== 0 && operation.path.length > 0) {
+            // paths that aren't empty string should start with "/"
+            throw new exports.JsonPatchError('Operation `path` property must start with "/"', 'OPERATION_PATH_INVALID', index, operation, document);
+        }
+        if (operation.path === '/') {
+            throw new exports.JsonPatchError('Operation `path` slash-only is ambiguous', 'OPERATION_PATH_UNRESOLVABLE', index, operation, document);
+        }
+        if (operation.args !== undefined && !Array.isArray(operation.args)) {
+            throw new exports.JsonPatchError('Operation `args` property is not an array', 'OPERATION_X_ARGS_NOT_ARRAY', index, operation, document);
+        }
+        // we made it this far, now run the operation's configured validator
+        xConfig.validator.call(operation, operation, index, document, existingPathFragment);
     }
     else if (!objOps[operation.op]) {
         throw new exports.JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);

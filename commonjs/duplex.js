@@ -1,7 +1,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * (c) 2017 Joachim Wester
+ * (c) 2017-2021 Joachim Wester
  * MIT license
  */
 var helpers_js_1 = require("./helpers.js");
