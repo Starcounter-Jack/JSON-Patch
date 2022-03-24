@@ -25,3 +25,5 @@ test/spec/typings/typingsSpec.js
 
 # SauceLabs logs
 *.log
+
+.artifacts
