@@ -246,7 +246,7 @@ var patch = jsonpatch.generate(observer, true);
 ```
 
 #### `jsonpatch.unobserve(document, observer)`
-```
+```typescript
 jsonpatch.unobserve(document: any, observer: Observer): void
 
 type JsonableObj = { [key:string]: Jsonable };
@@ -260,7 +260,7 @@ Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). 
 
 #### `jsonpatch.compare(document1, document2, invertible)`
 
-```
+```typescript
 jsonpatch.compare(document1: Jsonable, document2: Jsonable, invertible = false): Operation[]
 
 type JsonableObj = { [key:string]: Jsonable };
