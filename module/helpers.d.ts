@@ -1,7 +1,7 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * (c) 2017 Joachim Wester
- * MIT license
+ * (c) 2017-2022 Joachim Wester
+ * MIT licensed
  */
 export declare function hasOwnProperty(obj: any, key: any): any;
 export declare function _objectKeys(obj: any): any[];

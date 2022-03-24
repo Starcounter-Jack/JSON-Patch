@@ -1,7 +1,7 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * (c) 2017 Joachim Wester
- * MIT license
+ * (c) 2017-2022 Joachim Wester
+ * MIT licensed
  */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -22,11 +22,11 @@ export function hasOwnProperty(obj, key) {
 }
 export function _objectKeys(obj) {
     if (Array.isArray(obj)) {
-        var keys = new Array(obj.length);
-        for (var k = 0; k < keys.length; k++) {
-            keys[k] = "" + k;
+        var keys_1 = new Array(obj.length);
+        for (var k = 0; k < keys_1.length; k++) {
+            keys_1[k] = "" + k;
         }
-        return keys;
+        return keys_1;
     }
     if (Object.keys) {
         return Object.keys(obj);
@@ -114,7 +114,7 @@ export function getPath(root, obj) {
     if (path === '') {
         throw new Error("Object not found in root");
     }
-    return '/' + path;
+    return "/" + path;
 }
 /**
 * Recursively checks whether an object has any undefined values inside.
@@ -125,8 +125,8 @@ export function hasUndefined(obj) {
     }
     if (obj) {
         if (Array.isArray(obj)) {
-            for (var i = 0, len = obj.length; i < len; i++) {
-                if (hasUndefined(obj[i])) {
+            for (var i_1 = 0, len = obj.length; i_1 < len; i_1++) {
+                if (hasUndefined(obj[i_1])) {
                     return true;
                 }
             }
