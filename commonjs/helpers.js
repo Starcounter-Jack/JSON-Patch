@@ -7,16 +7,19 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PatchError = exports.hasUndefined = exports.getPath = exports._getPathRecursive = exports.unescapePathComponent = exports.escapePathComponent = exports.isInteger = exports._deepClone = exports._objectKeys = exports.hasOwnProperty = void 0;
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);
@@ -122,7 +125,7 @@ function getPath(root, obj) {
     if (path === '') {
         throw new Error("Object not found in root");
     }
-    return "/" + path;
+    return "/".concat(path);
 }
 exports.getPath = getPath;
 /**
@@ -158,7 +161,7 @@ function patchErrorMessageFormatter(message, args) {
     for (var key in args) {
         var value = typeof args[key] === 'object' ? JSON.stringify(args[key], null, 2) : args[key]; // pretty print
         if (typeof value !== 'undefined') {
-            messageParts.push(key + ": " + value);
+            messageParts.push("".concat(key, ": ").concat(value));
         }
     }
     return messageParts.join('\n');

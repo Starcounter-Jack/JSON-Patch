@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.compare = exports.generate = exports.observe = exports.unobserve = void 0;
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
  * (c) 2017-2021 Joachim Wester
@@ -56,7 +57,7 @@ function observe(obj, callback) {
         return observer;
     }
     observer = {};
-    mirror.value = helpers_js_1._deepClone(obj);
+    mirror.value = (0, helpers_js_1._deepClone)(obj);
     if (callback) {
         observer.callback = callback;
         observer.next = null;
@@ -101,7 +102,7 @@ function generate(observer, invertible) {
     var mirror = beforeDict.get(observer.object);
     _generate(mirror.value, observer.object, observer.patches, "", invertible);
     if (observer.patches.length) {
-        core_js_1.applyPatch(mirror.value, observer.patches);
+        (0, core_js_1.applyPatch)(mirror.value, observer.patches);
     }
     var temp = observer.patches;
     if (temp.length > 0) {
@@ -121,34 +122,34 @@ function _generate(mirror, obj, patches, path, invertible) {
     if (typeof obj.toJSON === "function") {
         obj = obj.toJSON();
     }
-    var newKeys = helpers_js_1._objectKeys(obj);
-    var oldKeys = helpers_js_1._objectKeys(mirror);
+    var newKeys = (0, helpers_js_1._objectKeys)(obj);
+    var oldKeys = (0, helpers_js_1._objectKeys)(mirror);
     var changed = false;
     var deleted = false;
     //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
     for (var t = oldKeys.length - 1; t >= 0; t--) {
         var key = oldKeys[t];
         var oldVal = mirror[key];
-        if (helpers_js_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
+        if ((0, helpers_js_1.hasOwnProperty)(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
             var newVal = obj[key];
             if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null && Array.isArray(oldVal) === Array.isArray(newVal)) {
-                _generate(oldVal, newVal, patches, path + "/" + helpers_js_1.escapePathComponent(key), invertible);
+                _generate(oldVal, newVal, patches, path + "/" + (0, helpers_js_1.escapePathComponent)(key), invertible);
             }
             else {
                 if (oldVal !== newVal) {
                     changed = true;
                     if (invertible) {
-                        patches.push({ op: "test", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(oldVal) });
+                        patches.push({ op: "test", path: path + "/" + (0, helpers_js_1.escapePathComponent)(key), value: (0, helpers_js_1._deepClone)(oldVal) });
                     }
-                    patches.push({ op: "replace", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(newVal) });
+                    patches.push({ op: "replace", path: path + "/" + (0, helpers_js_1.escapePathComponent)(key), value: (0, helpers_js_1._deepClone)(newVal) });
                 }
             }
         }
         else if (Array.isArray(mirror) === Array.isArray(obj)) {
             if (invertible) {
-                patches.push({ op: "test", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(oldVal) });
+                patches.push({ op: "test", path: path + "/" + (0, helpers_js_1.escapePathComponent)(key), value: (0, helpers_js_1._deepClone)(oldVal) });
             }
-            patches.push({ op: "remove", path: path + "/" + helpers_js_1.escapePathComponent(key) });
+            patches.push({ op: "remove", path: path + "/" + (0, helpers_js_1.escapePathComponent)(key) });
             deleted = true; // property has been deleted
         }
         else {
@@ -164,8 +165,8 @@ function _generate(mirror, obj, patches, path, invertible) {
     }
     for (var t = 0; t < newKeys.length; t++) {
         var key = newKeys[t];
-        if (!helpers_js_1.hasOwnProperty(mirror, key) && obj[key] !== undefined) {
-            patches.push({ op: "add", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(obj[key]) });
+        if (!(0, helpers_js_1.hasOwnProperty)(mirror, key) && obj[key] !== undefined) {
+            patches.push({ op: "add", path: path + "/" + (0, helpers_js_1.escapePathComponent)(key), value: (0, helpers_js_1._deepClone)(obj[key]) });
         }
     }
 }
