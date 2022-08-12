@@ -33,7 +33,7 @@ export function _objectKeys(obj) {
 * @param  {any} obj value to clone
 * @return {any} cloned obj
 */
-export function _deepClone(obj) {
+export function _deepClone<T = any>(obj: T): T | null {
     switch (typeof obj) {
         case "object":
             return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
