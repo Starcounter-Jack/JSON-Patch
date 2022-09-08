@@ -182,10 +182,10 @@ export function getValueByPointer(document: any, pointer: string): any {
 export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, banPrototypeModifications: boolean = true, index: number = 0): OperationResult<T> {
   if (validateOperation) {
     if (typeof validateOperation == 'function') {
-      validateOperation(operation, 0, document, operation.path);
+      validateOperation(operation, index, document, operation.path);
     }
     else {
-      validator(operation, 0);
+      validator(operation, index);
     }
   }
   /* ROOT OPERATIONS */
