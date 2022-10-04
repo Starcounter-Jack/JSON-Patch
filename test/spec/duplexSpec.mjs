@@ -1892,6 +1892,21 @@ describe('duplex', function() {
         ]);
       };
     });
+
+    variantIt('should ignore paths matched against ignorePaths', [
+      ['ignorePath = string', '/a'],
+      ['ignorePath = RegExp', /\/a/],
+      ['ignorePath = function', (path) => path === '/a']
+    ], function (testIgnorePath) {
+      return function () {
+        const objA = { a: 1, b: 2 };
+        const objB = { a: 3, b: 4 };
+
+        expect(jsonpatch.compare(objA, objB, undefined, testIgnorePath)).toEqual(
+          [{ op: 'replace', path: '/b', value: 4 }]
+        );
+      }
+    });
   });
 
   describe('Registering multiple observers with the same callback', function() {

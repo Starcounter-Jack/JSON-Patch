@@ -13,6 +13,8 @@ export interface Observer<T> {
   callback: (patches: Operation[]) => void;
 }
 
+export type PathMatcher = string | RegExp | ((path: string) => boolean);
+
 var beforeDict = new WeakMap();
 
 class Mirror {
@@ -140,7 +142,7 @@ export function generate<T>(observer: Observer<Object>, invertible = false): Ope
 }
 
 // Dirty check if obj is different from mirror, generate patches and update mirror
-function _generate(mirror, obj, patches, path, invertible) {
+function _generate(mirror, obj, patches, path, invertible, ignorePath?) {
   if (obj === mirror) {
     return;
   }
@@ -160,11 +162,15 @@ function _generate(mirror, obj, patches, path, invertible) {
     var key = oldKeys[t];
     var oldVal = mirror[key];
 
+    if (ignorePath != null && _applyPathMatcher(ignorePath, path + "/" + escapePathComponent(key))) {
+      continue;
+    }
+
     if (hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
       var newVal = obj[key];
 
       if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null && Array.isArray(oldVal) === Array.isArray(newVal)) {
-        _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key), invertible);
+        _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key), invertible, ignorePath);
       }
       else {
         if (oldVal !== newVal) {
@@ -202,11 +208,23 @@ function _generate(mirror, obj, patches, path, invertible) {
     }
   }
 }
+
+// applies path matcher to path and returns result
+function _applyPathMatcher(pathMatcher: PathMatcher, path: string) {
+  if (typeof pathMatcher === "string") {
+    return pathMatcher === path;
+  } else if (typeof pathMatcher === 'object') {
+    return pathMatcher.test(path);
+  } else {
+    return pathMatcher(path);
+  }
+}
+
 /**
  * Create an array of patches from the differences in two objects
  */
-export function compare(tree1: Object | Array<any>, tree2: Object | Array<any>, invertible = false): Operation[] {
+export function compare(tree1: Object | Array<any>, tree2: Object | Array<any>, invertible = false, ignorePath?: PathMatcher): Operation[] {
   var patches = [];
-  _generate(tree1, tree2, patches, '', invertible);
+  _generate(tree1, tree2, patches, '', invertible, ignorePath);
   return patches;
 }

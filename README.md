@@ -258,17 +258,18 @@ Destroys the observer set up on `document`.
 
 Any remaining changes are delivered synchronously (as in `jsonpatch.generate`). Note: this is different that ES6/7 `Object.unobserve`, which delivers remaining changes asynchronously.
 
-#### `jsonpatch.compare(document1, document2, invertible)`
+#### `jsonpatch.compare(document1, document2, invertible, ignorePath)`
 
 ```typescript
-jsonpatch.compare(document1: Jsonable, document2: Jsonable, invertible = false): Operation[]
+jsonpatch.compare(document1: Jsonable, document2: Jsonable, invertible = false, ignorePath?: PathMatcher): Operation[]
 
 type JsonableObj = { [key:string]: Jsonable };
 type JsonableArr = Jsonable[];
 type Jsonable = JsonableArr | JsonableObj | string | number | boolean | null;
+type PathMatcher = string | RegExp | ((path: string) => boolean);
 ```
 
-Compares object trees `document1` and `document2` and returns the difference relative to `document1` as a patches array.  If `invertible` is true, then each change will be preceded by a test operation of the value in `document1`.
+Compares object trees `document1` and `document2` and returns the difference relative to `document1` as a patches array.  If `invertible` is true, then each change will be preceded by a test operation of the value in `document1`. The `ignorePath` param can be provided to ignore comparisons along certain paths in `document1`. If `ignorePath` is provided as a function, it should return `true` to ignore the given path.
 
 If there are no differences, returns an empty array (length 0).
 
