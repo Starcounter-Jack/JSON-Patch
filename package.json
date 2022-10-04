@@ -34,6 +34,7 @@
         "fast-deep-equal": "^2.0.1",
         "http-server": "^0.12.3",
         "jasmine": "^3.4.0",
+        "jsdom": "20.0.1", 
         "request": "^2.88.0",
         "sauce-connect-launcher": "^1.2.7",
         "saucelabs": "^2.1.9",

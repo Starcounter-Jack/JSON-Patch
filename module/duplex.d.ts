@@ -5,6 +5,7 @@ export interface Observer<T> {
     unobserve: () => void;
     callback: (patches: Operation[]) => void;
 }
+export declare type PathMatcher = string | RegExp | ((path: string) => boolean);
 /**
  * Detach an observer from an object
  */
@@ -20,4 +21,4 @@ export declare function generate<T>(observer: Observer<Object>, invertible?: boo
 /**
  * Create an array of patches from the differences in two objects
  */
-export declare function compare(tree1: Object | Array<any>, tree2: Object | Array<any>, invertible?: boolean): Operation[];
+export declare function compare(tree1: Object | Array<any>, tree2: Object | Array<any>, invertible?: boolean, ignorePath?: PathMatcher): Operation[];

@@ -114,7 +114,7 @@ function generate(observer, invertible) {
 }
 exports.generate = generate;
 // Dirty check if obj is different from mirror, generate patches and update mirror
-function _generate(mirror, obj, patches, path, invertible) {
+function _generate(mirror, obj, patches, path, invertible, ignorePath) {
     if (obj === mirror) {
         return;
     }
@@ -129,10 +129,13 @@ function _generate(mirror, obj, patches, path, invertible) {
     for (var t = oldKeys.length - 1; t >= 0; t--) {
         var key = oldKeys[t];
         var oldVal = mirror[key];
+        if (ignorePath != null && _applyPathMatcher(ignorePath, path + "/" + helpers_js_1.escapePathComponent(key))) {
+            continue;
+        }
         if (helpers_js_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
             var newVal = obj[key];
             if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null && Array.isArray(oldVal) === Array.isArray(newVal)) {
-                _generate(oldVal, newVal, patches, path + "/" + helpers_js_1.escapePathComponent(key), invertible);
+                _generate(oldVal, newVal, patches, path + "/" + helpers_js_1.escapePathComponent(key), invertible, ignorePath);
             }
             else {
                 if (oldVal !== newVal) {
@@ -169,13 +172,25 @@ function _generate(mirror, obj, patches, path, invertible) {
         }
     }
 }
+// applies path matcher to path and returns result
+function _applyPathMatcher(pathMatcher, path) {
+    if (typeof pathMatcher === "string") {
+        return pathMatcher === path;
+    }
+    else if (typeof pathMatcher === 'object') {
+        return pathMatcher.test(path);
+    }
+    else {
+        return pathMatcher(path);
+    }
+}
 /**
  * Create an array of patches from the differences in two objects
  */
-function compare(tree1, tree2, invertible) {
+function compare(tree1, tree2, invertible, ignorePath) {
     if (invertible === void 0) { invertible = false; }
     var patches = [];
-    _generate(tree1, tree2, patches, '', invertible);
+    _generate(tree1, tree2, patches, '', invertible, ignorePath);
     return patches;
 }
 exports.compare = compare;

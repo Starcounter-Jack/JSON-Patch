@@ -275,6 +275,38 @@ duplexSuite.add('compare operation same but deep objects, invertible = true', {
   }
 });
 
+duplexSuite.add('compare operation, ignorePath defined', {
+  setup: function() {
+    const obj = {
+      firstName: 'Albert',
+      lastName: 'Einstein',
+      phoneNumbers: [
+        {
+          number: '12345'
+        },
+        {
+          number: '45353'
+        }
+      ]
+    };
+    const obj2 = {
+      firstName: 'Joachim',
+      lastName: 'Wester',
+      mobileNumbers: [
+        {
+          number: '12345'
+        },
+        {
+          number: '45353'
+        }
+      ]
+    };
+  },
+  fn: function() {
+    const patches = jsonpatch.compare(obj, obj2, undefined, '/firstName');
+  }
+});
+
 // if we are in the browser with benchmark < 2.1.2
 if (typeof benchmarkReporter !== 'undefined') {
   benchmarkReporter(duplexSuite);
