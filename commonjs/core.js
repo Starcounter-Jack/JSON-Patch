@@ -276,7 +276,7 @@ function applyPatch(document, patch, validateOperation, mutateDocument, banProto
     }
     var results = new Array(patch.length);
     for (var i = 0, length_1 = patch.length; i < length_1; i++) {
-        // we don't need to pass mutateDocument argument because if it was true, we already deep cloned the object, we'll just pass `true`
+        // we don't need to pass mutateDocument argument because if it was false, we already deep cloned the object, we'll just pass `true`
         results[i] = applyOperation(document, patch[i], validateOperation, true, banPrototypeModifications, i);
         document = results[i].newDocument; // in case root was replaced
     }
