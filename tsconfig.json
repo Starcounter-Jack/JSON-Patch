@@ -4,14 +4,14 @@
         "outDir": "commonjs/",
         "module": "commonjs",
         "lib": [
-            "es2016", "dom"
+            "es2016",
+            "dom"
         ],
         "noEmitHelpers": false,
         "declaration": true,
         "removeComments": false,
         /* emitting `use strict` made PuppetJS break */
-        "allowSyntheticDefaultImports": true,
-        "noImplicitUseStrict": true
+        "allowSyntheticDefaultImports": true
     },
     "include": [
         "src/**/*.ts"

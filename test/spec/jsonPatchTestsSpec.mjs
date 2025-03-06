@@ -30,11 +30,10 @@ describe('json-patch-tests', function() {
           return;
         }
         const testName = test.comment || test.error || JSON.stringify(test.patch);
-        if (test.expected) {
+        if (test.expected !== undefined)  {
           it('should succeed: ' + testName, function() {
             const results = jsonpatch.applyPatch(test.doc, test.patch, true);
-            test.doc = results.newDocument;
-            expect(test.doc).toEqual(test.expected);
+            expect(results.newDocument).toEqual(test.expected);
           });
         } else if (test.error || test.patch[0].op === 'test') {
           it('should throw an error: ' + testName, function() {

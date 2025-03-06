@@ -1,4 +1,13 @@
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.deepClone = exports.JsonPatchError = void 0;
+exports.getValueByPointer = getValueByPointer;
+exports.applyOperation = applyOperation;
+exports.applyPatch = applyPatch;
+exports.applyReducer = applyReducer;
+exports.validator = validator;
+exports.validate = validate;
+exports._areEquals = _areEquals;
 var helpers_js_1 = require("./helpers.js");
 exports.JsonPatchError = helpers_js_1.PatchError;
 exports.deepClone = helpers_js_1._deepClone;
@@ -29,17 +38,28 @@ var objOps = {
         return the removed value, this can be taxing performance-wise,
         and is potentially unneeded */
         var removed = getValueByPointer(document, this.path);
+        // Check for potential circular reference
+        if (this.from !== this.path && this.path.startsWith(this.from + '/')) {
+            throw new exports.JsonPatchError("Cannot move to a path that is a descendant of the source", 'OPERATION_PATH_CREATES_CIRCULAR_REFERENCE', 0, this, document);
+        }
         if (removed) {
-            removed = helpers_js_1._deepClone(removed);
+            removed = (0, helpers_js_1._deepClone)(removed);
         }
         var originalValue = applyOperation(document, { op: "remove", path: this.from }).removed;
         applyOperation(document, { op: "add", path: this.path, value: originalValue });
         return { newDocument: document, removed: removed };
     },
     copy: function (obj, key, document) {
-        var valueToCopy = getValueByPointer(document, this.from);
+        var fromValue = getValueByPointer(document, this.from);
+        // Check for potential circular reference
+        if (this.from === "" || this.from === "/") {
+            // Copying from root to a descendant would create a circular reference
+            if (this.path.startsWith("/")) {
+                throw new exports.JsonPatchError("Creating a circular reference", 'OPERATION_PATH_CREATES_CIRCULAR_REFERENCE', 0, this, document);
+            }
+        }
         // enforce copy by value so further operations don't affect source (see issue #177)
-        applyOperation(document, { op: "add", path: this.path, value: helpers_js_1._deepClone(valueToCopy) });
+        applyOperation(document, { op: "add", path: this.path, value: (0, helpers_js_1._deepClone)(fromValue) });
         return { newDocument: document };
     },
     test: function (obj, key, document) {
@@ -53,7 +73,7 @@ var objOps = {
 /* The operations applicable to an array. Many are the same as for the object */
 var arrOps = {
     add: function (arr, i, document) {
-        if (helpers_js_1.isInteger(i)) {
+        if ((0, helpers_js_1.isInteger)(i)) {
             arr.splice(i, 0, this.value);
         }
         else { // array props
@@ -92,7 +112,6 @@ function getValueByPointer(document, pointer) {
     applyOperation(document, getOriginalDestination);
     return getOriginalDestination.value;
 }
-exports.getValueByPointer = getValueByPointer;
 /**
  * Apply a single JSON Patch Operation on a JSON document.
  * Returns the {newDocument, result} of the operation.
@@ -167,7 +186,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
     } /* END ROOT OPERATIONS */
     else {
         if (!mutateDocument) {
-            document = helpers_js_1._deepClone(document);
+            document = (0, helpers_js_1._deepClone)(document);
         }
         var path = operation.path || "";
         var keys = path.split('/');
@@ -186,8 +205,12 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
         while (true) {
             key = keys[t];
             if (key && key.indexOf('~') != -1) {
-                key = helpers_js_1.unescapePathComponent(key);
+                key = (0, helpers_js_1.unescapePathComponent)(key);
             }
+            // // If this is the last segment and it's empty (trailing slash)
+            // if (key === "" && t === keys.length - 1) {
+            //   key = "";
+            // }
             if (banPrototypeModifications &&
                 (key == '__proto__' ||
                     (key == 'prototype' && t > 0 && keys[t - 1] == 'constructor'))) {
@@ -212,15 +235,24 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
                     key = obj.length;
                 }
                 else {
-                    if (validateOperation && !helpers_js_1.isInteger(key)) {
+                    if (validateOperation && !(0, helpers_js_1.isInteger)(key)) {
                         throw new exports.JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", index, operation, document);
                     } // only parse key when it's an integer for `arr.prop` to work
-                    else if (helpers_js_1.isInteger(key)) {
+                    else if ((0, helpers_js_1.isInteger)(key)) {
+                        // Check for very large index before parsing
+                        if (validateOperation && key.length > 15) { // Simple check for potentially large numbers
+                            throw new exports.JsonPatchError("Array index too large", "OPERATION_PATH_ARRAY_INDEX_TOO_LARGE", index, operation, document);
+                        }
+                        // Now parse it
                         key = ~~key;
                     }
                 }
+                // Keep your existing check for large numbers here too
+                if (validateOperation && typeof key === 'number' && key > Number.MAX_SAFE_INTEGER) {
+                    throw new exports.JsonPatchError("Array index too large", "OPERATION_PATH_ARRAY_INDEX_TOO_LARGE", index, operation, document);
+                }
                 if (t >= len) {
-                    if (validateOperation && operation.op === "add" && key > obj.length) {
+                    if (validateOperation && operation.op === "add" && typeof key === "number" && key > obj.length) {
                         throw new exports.JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
                     }
                     var returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
@@ -248,7 +280,6 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
         }
     }
 }
-exports.applyOperation = applyOperation;
 /**
  * Apply a full JSON Patch array on a JSON document.
  * Returns the {newDocument, result} of the patch.
@@ -272,7 +303,7 @@ function applyPatch(document, patch, validateOperation, mutateDocument, banProto
         }
     }
     if (!mutateDocument) {
-        document = helpers_js_1._deepClone(document);
+        document = (0, helpers_js_1._deepClone)(document);
     }
     var results = new Array(patch.length);
     for (var i = 0, length_1 = patch.length; i < length_1; i++) {
@@ -283,7 +314,6 @@ function applyPatch(document, patch, validateOperation, mutateDocument, banProto
     results.newDocument = document;
     return results;
 }
-exports.applyPatch = applyPatch;
 /**
  * Apply a single JSON Patch Operation on a JSON document.
  * Returns the updated document.
@@ -300,7 +330,6 @@ function applyReducer(document, operation, index) {
     }
     return operationResult.newDocument;
 }
-exports.applyReducer = applyReducer;
 /**
  * Validates a single operation. Called from `jsonpatch.validate`. Throws `JsonPatchError` in case of an error.
  * @param {object} operation - operation object (patch)
@@ -328,7 +357,7 @@ function validator(operation, index, document, existingPathFragment) {
     else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && operation.value === undefined) {
         throw new exports.JsonPatchError('Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)', 'OPERATION_VALUE_REQUIRED', index, operation, document);
     }
-    else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && helpers_js_1.hasUndefined(operation.value)) {
+    else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && (0, helpers_js_1.hasUndefined)(operation.value)) {
         throw new exports.JsonPatchError('Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)', 'OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED', index, operation, document);
     }
     else if (document) {
@@ -353,7 +382,6 @@ function validator(operation, index, document, existingPathFragment) {
         }
     }
 }
-exports.validator = validator;
 /**
  * Validates a sequence of operations. If `document` parameter is provided, the sequence is additionally validated against the object document.
  * If error is encountered, returns a JsonPatchError object
@@ -368,7 +396,7 @@ function validate(sequence, document, externalValidator) {
         }
         if (document) {
             //clone document and sequence so that we can safely try applying operations
-            applyPatch(helpers_js_1._deepClone(document), helpers_js_1._deepClone(sequence), externalValidator || true);
+            applyPatch((0, helpers_js_1._deepClone)(document), (0, helpers_js_1._deepClone)(sequence), externalValidator || true);
         }
         else {
             externalValidator = externalValidator || validator;
@@ -386,7 +414,6 @@ function validate(sequence, document, externalValidator) {
         }
     }
 }
-exports.validate = validate;
 // based on https://github.com/epoberezkin/fast-deep-equal
 // MIT License
 // Copyright (c) 2017 Evgeny Poberezkin
@@ -437,5 +464,4 @@ function _areEquals(a, b) {
     }
     return a !== a && b !== b;
 }
-exports._areEquals = _areEquals;
 ;

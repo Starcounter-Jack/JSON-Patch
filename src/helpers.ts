@@ -144,7 +144,9 @@ export type JsonPatchErrorName = 'SEQUENCE_NOT_AN_ARRAY' |
     'OPERATION_FROM_UNRESOLVABLE' |
     'OPERATION_PATH_ILLEGAL_ARRAY_INDEX' |
     'OPERATION_VALUE_OUT_OF_BOUNDS' |
-    'TEST_OPERATION_FAILED';
+    'TEST_OPERATION_FAILED' |
+    'OPERATION_PATH_CREATES_CIRCULAR_REFERENCE' |
+    'OPERATION_PATH_ARRAY_INDEX_TOO_LARGE';
 
 function patchErrorMessageFormatter(message: String, args: Object): string {
     const messageParts = [message];

@@ -1,3 +1,4 @@
+"use strict";
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
  * (c) 2017-2022 Joachim Wester
@@ -7,21 +8,32 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PatchError = void 0;
+exports.hasOwnProperty = hasOwnProperty;
+exports._objectKeys = _objectKeys;
+exports._deepClone = _deepClone;
+exports.isInteger = isInteger;
+exports.escapePathComponent = escapePathComponent;
+exports.unescapePathComponent = unescapePathComponent;
+exports._getPathRecursive = _getPathRecursive;
+exports.getPath = getPath;
+exports.hasUndefined = hasUndefined;
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);
 }
-exports.hasOwnProperty = hasOwnProperty;
 function _objectKeys(obj) {
     if (Array.isArray(obj)) {
         var keys_1 = new Array(obj.length);
@@ -41,7 +53,6 @@ function _objectKeys(obj) {
     }
     return keys;
 }
-exports._objectKeys = _objectKeys;
 ;
 /**
 * Deeply clone the object.
@@ -59,7 +70,6 @@ function _deepClone(obj) {
             return obj; //no need to clone primitives
     }
 }
-exports._deepClone = _deepClone;
 //3x faster than cached /^\d+$/.test(str)
 function isInteger(str) {
     var i = 0;
@@ -75,7 +85,6 @@ function isInteger(str) {
     }
     return true;
 }
-exports.isInteger = isInteger;
 /**
 * Escapes a json pointer path
 * @param path The raw pointer
@@ -86,7 +95,6 @@ function escapePathComponent(path) {
         return path;
     return path.replace(/~/g, '~0').replace(/\//g, '~1');
 }
-exports.escapePathComponent = escapePathComponent;
 /**
  * Unescapes a json pointer path
  * @param path The escaped pointer
@@ -95,7 +103,6 @@ exports.escapePathComponent = escapePathComponent;
 function unescapePathComponent(path) {
     return path.replace(/~1/g, '/').replace(/~0/g, '~');
 }
-exports.unescapePathComponent = unescapePathComponent;
 function _getPathRecursive(root, obj) {
     var found;
     for (var key in root) {
@@ -113,7 +120,6 @@ function _getPathRecursive(root, obj) {
     }
     return '';
 }
-exports._getPathRecursive = _getPathRecursive;
 function getPath(root, obj) {
     if (root === obj) {
         return '/';
@@ -122,9 +128,8 @@ function getPath(root, obj) {
     if (path === '') {
         throw new Error("Object not found in root");
     }
-    return "/" + path;
+    return "/".concat(path);
 }
-exports.getPath = getPath;
 /**
 * Recursively checks whether an object has any undefined values inside.
 */
@@ -152,13 +157,12 @@ function hasUndefined(obj) {
     }
     return false;
 }
-exports.hasUndefined = hasUndefined;
 function patchErrorMessageFormatter(message, args) {
     var messageParts = [message];
     for (var key in args) {
         var value = typeof args[key] === 'object' ? JSON.stringify(args[key], null, 2) : args[key]; // pretty print
         if (typeof value !== 'undefined') {
-            messageParts.push(key + ": " + value);
+            messageParts.push("".concat(key, ": ").concat(value));
         }
     }
     return messageParts.join('\n');

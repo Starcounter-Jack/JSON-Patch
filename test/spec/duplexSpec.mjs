@@ -1,5 +1,5 @@
 import * as jsonpatch from '../../index.mjs';
-import {EventTarget, defineEventAttribute} from "../../node_modules/event-target-shim/dist/event-target-shim.mjs";
+import {EventTarget, defineEventAttribute} from "event-target-shim";
 
 if (typeof window === 'undefined') {
   global.window = new EventTarget();

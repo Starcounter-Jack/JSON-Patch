@@ -92,6 +92,11 @@ const objOps = {
     and is potentially unneeded */
     let removed = getValueByPointer(document, this.path);
 
+    // Check for potential circular reference
+    if (this.from !== this.path && this.path.startsWith(this.from + '/')) {
+      throw new JsonPatchError("Cannot move to a path that is a descendant of the source", 'OPERATION_PATH_CREATES_CIRCULAR_REFERENCE', 0, this, document);
+    }
+
     if (removed) {
       removed = _deepClone(removed);
     }
@@ -107,10 +112,19 @@ const objOps = {
     return { newDocument: document, removed };
   },
   copy: function (obj, key, document) {
-    const valueToCopy = getValueByPointer(document, this.from);
+    const fromValue = getValueByPointer(document, this.from);
+
+    // Check for potential circular reference
+    if (this.from === "" || this.from === "/") {
+      // Copying from root to a descendant would create a circular reference
+      if (this.path.startsWith("/")) {
+        throw new JsonPatchError("Creating a circular reference", 'OPERATION_PATH_CREATES_CIRCULAR_REFERENCE', 0, this, document);
+      }
+    }
+
     // enforce copy by value so further operations don't affect source (see issue #177)
     applyOperation(document,
-      { op: "add", path: this.path, value: _deepClone(valueToCopy) }
+      { op: "add", path: this.path, value: _deepClone(fromValue) }
     );
     return { newDocument: document }
   },
@@ -251,8 +265,8 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
         key = unescapePathComponent(key);
       }
 
-      if(banPrototypeModifications && 
-          (key == '__proto__' || 
+      if(banPrototypeModifications &&
+          (key == '__proto__' ||
           (key == 'prototype' && t>0 && keys[t-1] == 'constructor'))
         ) {
         throw new TypeError('JSON-Patch: modifying `__proto__` or `constructor/prototype` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
@@ -281,11 +295,23 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
             throw new JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", index, operation, document);
           } // only parse key when it's an integer for `arr.prop` to work
           else if(isInteger(key)) {
+            // Check for very large index before parsing
+            if (validateOperation && key.length > 15) { // Simple check for potentially large numbers
+              throw new JsonPatchError("Array index too large", "OPERATION_PATH_ARRAY_INDEX_TOO_LARGE", index, operation, document);
+            }
+
+            // Now parse it
             key = ~~key;
           }
         }
+
+        // Keep your existing check for large numbers here too
+        if (validateOperation && typeof key === 'number' && key > Number.MAX_SAFE_INTEGER) {
+          throw new JsonPatchError("Array index too large", "OPERATION_PATH_ARRAY_INDEX_TOO_LARGE", index, operation, document);
+        }
+
         if (t >= len) {
-          if (validateOperation && operation.op === "add" && key > obj.length) {
+          if (validateOperation && operation.op === "add" && typeof key === "number" && key > obj.length) {
             throw new JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
           }
           const returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch

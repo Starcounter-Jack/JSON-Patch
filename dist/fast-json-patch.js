@@ -1,284 +1,231 @@
-/*! fast-json-patch, version: 3.1.1 */
-var jsonpatch =
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports) {
+/*! fast-json-patch, version: 3.1.2 */
+var jsonpatch;
+/******/ (() => { // webpackBootstrap
+/******/ 	var __webpack_modules__ = ({
 
-/*!
- * https://github.com/Starcounter-Jack/JSON-Patch
- * (c) 2017-2022 Joachim Wester
- * MIT licensed
- */
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var _hasOwnProperty = Object.prototype.hasOwnProperty;
-function hasOwnProperty(obj, key) {
-    return _hasOwnProperty.call(obj, key);
-}
-exports.hasOwnProperty = hasOwnProperty;
-function _objectKeys(obj) {
-    if (Array.isArray(obj)) {
-        var keys_1 = new Array(obj.length);
-        for (var k = 0; k < keys_1.length; k++) {
-            keys_1[k] = "" + k;
-        }
-        return keys_1;
-    }
-    if (Object.keys) {
-        return Object.keys(obj);
-    }
-    var keys = [];
-    for (var i in obj) {
-        if (hasOwnProperty(obj, i)) {
-            keys.push(i);
-        }
-    }
-    return keys;
-}
-exports._objectKeys = _objectKeys;
-;
-/**
-* Deeply clone the object.
-* https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
-* @param  {any} obj value to clone
-* @return {any} cloned obj
-*/
-function _deepClone(obj) {
-    switch (typeof obj) {
-        case "object":
-            return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
-        case "undefined":
-            return null; //this is how JSON.stringify behaves for array items
-        default:
-            return obj; //no need to clone primitives
-    }
-}
-exports._deepClone = _deepClone;
-//3x faster than cached /^\d+$/.test(str)
-function isInteger(str) {
-    var i = 0;
-    var len = str.length;
-    var charCode;
-    while (i < len) {
-        charCode = str.charCodeAt(i);
-        if (charCode >= 48 && charCode <= 57) {
-            i++;
-            continue;
-        }
-        return false;
-    }
-    return true;
-}
-exports.isInteger = isInteger;
-/**
-* Escapes a json pointer path
-* @param path The raw pointer
-* @return the Escaped path
-*/
-function escapePathComponent(path) {
-    if (path.indexOf('/') === -1 && path.indexOf('~') === -1)
-        return path;
-    return path.replace(/~/g, '~0').replace(/\//g, '~1');
-}
-exports.escapePathComponent = escapePathComponent;
-/**
- * Unescapes a json pointer path
- * @param path The escaped pointer
- * @return The unescaped path
- */
-function unescapePathComponent(path) {
-    return path.replace(/~1/g, '/').replace(/~0/g, '~');
-}
-exports.unescapePathComponent = unescapePathComponent;
-function _getPathRecursive(root, obj) {
-    var found;
-    for (var key in root) {
-        if (hasOwnProperty(root, key)) {
-            if (root[key] === obj) {
-                return escapePathComponent(key) + '/';
-            }
-            else if (typeof root[key] === 'object') {
-                found = _getPathRecursive(root[key], obj);
-                if (found != '') {
-                    return escapePathComponent(key) + '/' + found;
-                }
-            }
-        }
-    }
-    return '';
-}
-exports._getPathRecursive = _getPathRecursive;
-function getPath(root, obj) {
-    if (root === obj) {
-        return '/';
-    }
-    var path = _getPathRecursive(root, obj);
-    if (path === '') {
-        throw new Error("Object not found in root");
-    }
-    return "/" + path;
-}
-exports.getPath = getPath;
-/**
-* Recursively checks whether an object has any undefined values inside.
-*/
-function hasUndefined(obj) {
-    if (obj === undefined) {
-        return true;
-    }
-    if (obj) {
-        if (Array.isArray(obj)) {
-            for (var i_1 = 0, len = obj.length; i_1 < len; i_1++) {
-                if (hasUndefined(obj[i_1])) {
-                    return true;
-                }
-            }
-        }
-        else if (typeof obj === "object") {
-            var objKeys = _objectKeys(obj);
-            var objKeysLength = objKeys.length;
-            for (var i = 0; i < objKeysLength; i++) {
-                if (hasUndefined(obj[objKeys[i]])) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-exports.hasUndefined = hasUndefined;
-function patchErrorMessageFormatter(message, args) {
-    var messageParts = [message];
-    for (var key in args) {
-        var value = typeof args[key] === 'object' ? JSON.stringify(args[key], null, 2) : args[key]; // pretty print
-        if (typeof value !== 'undefined') {
-            messageParts.push(key + ": " + value);
-        }
-    }
-    return messageParts.join('\n');
-}
-var PatchError = /** @class */ (function (_super) {
-    __extends(PatchError, _super);
-    function PatchError(message, name, index, operation, tree) {
-        var _newTarget = this.constructor;
-        var _this = _super.call(this, patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree })) || this;
-        _this.name = name;
-        _this.index = index;
-        _this.operation = operation;
-        _this.tree = tree;
-        Object.setPrototypeOf(_this, _newTarget.prototype); // restore prototype chain, see https://stackoverflow.com/a/48342359
-        _this.message = patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree });
-        return _this;
-    }
-    return PatchError;
-}(Error));
-exports.PatchError = PatchError;
+/***/ 237:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+var core = __webpack_require__(901);
+Object.assign(exports, core);
+
+var duplex = __webpack_require__(828);
+Object.assign(exports, duplex);
+
+var helpers = __webpack_require__(969);
+exports.JsonPatchError = helpers.PatchError;
+exports.deepClone = helpers._deepClone;
+exports.escapePathComponent = helpers.escapePathComponent;
+exports.unescapePathComponent = helpers.unescapePathComponent;
 
 
 /***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
 
-Object.defineProperty(exports, "__esModule", { value: true });
-var helpers_js_1 = __webpack_require__(0);
+/***/ 828:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.unobserve = unobserve;
+exports.observe = observe;
+exports.generate = generate;
+exports.compare = compare;
+/*!
+ * https://github.com/Starcounter-Jack/JSON-Patch
+ * (c) 2017-2021 Joachim Wester
+ * MIT license
+ */
+var helpers_js_1 = __webpack_require__(969);
+var core_js_1 = __webpack_require__(901);
+var beforeDict = new WeakMap();
+var Mirror = /** @class */ (function () {
+    function Mirror(obj) {
+        this.observers = new Map();
+        this.obj = obj;
+    }
+    return Mirror;
+}());
+var ObserverInfo = /** @class */ (function () {
+    function ObserverInfo(callback, observer) {
+        this.callback = callback;
+        this.observer = observer;
+    }
+    return ObserverInfo;
+}());
+function getMirror(obj) {
+    return beforeDict.get(obj);
+}
+function getObserverFromMirror(mirror, callback) {
+    return mirror.observers.get(callback);
+}
+function removeObserverFromMirror(mirror, observer) {
+    mirror.observers.delete(observer.callback);
+}
+/**
+ * Detach an observer from an object
+ */
+function unobserve(root, observer) {
+    observer.unobserve();
+}
+/**
+ * Observes changes made to an object, which can then be retrieved using generate
+ */
+function observe(obj, callback) {
+    var patches = [];
+    var observer;
+    var mirror = getMirror(obj);
+    if (!mirror) {
+        mirror = new Mirror(obj);
+        beforeDict.set(obj, mirror);
+    }
+    else {
+        var observerInfo = getObserverFromMirror(mirror, callback);
+        observer = observerInfo && observerInfo.observer;
+    }
+    if (observer) {
+        return observer;
+    }
+    observer = {};
+    mirror.value = (0, helpers_js_1._deepClone)(obj);
+    if (callback) {
+        observer.callback = callback;
+        observer.next = null;
+        var dirtyCheck = function () {
+            generate(observer);
+        };
+        var fastCheck = function () {
+            clearTimeout(observer.next);
+            observer.next = setTimeout(dirtyCheck);
+        };
+        if (typeof window !== 'undefined') { //not Node
+            window.addEventListener('mouseup', fastCheck);
+            window.addEventListener('keyup', fastCheck);
+            window.addEventListener('mousedown', fastCheck);
+            window.addEventListener('keydown', fastCheck);
+            window.addEventListener('change', fastCheck);
+        }
+    }
+    observer.patches = patches;
+    observer.object = obj;
+    observer.unobserve = function () {
+        generate(observer);
+        clearTimeout(observer.next);
+        removeObserverFromMirror(mirror, observer);
+        if (typeof window !== 'undefined') {
+            window.removeEventListener('mouseup', fastCheck);
+            window.removeEventListener('keyup', fastCheck);
+            window.removeEventListener('mousedown', fastCheck);
+            window.removeEventListener('keydown', fastCheck);
+            window.removeEventListener('change', fastCheck);
+        }
+    };
+    mirror.observers.set(callback, new ObserverInfo(callback, observer));
+    return observer;
+}
+/**
+ * Generate an array of patches from an observer
+ */
+function generate(observer, invertible) {
+    if (invertible === void 0) { invertible = false; }
+    var mirror = beforeDict.get(observer.object);
+    _generate(mirror.value, observer.object, observer.patches, "", invertible);
+    if (observer.patches.length) {
+        (0, core_js_1.applyPatch)(mirror.value, observer.patches);
+    }
+    var temp = observer.patches;
+    if (temp.length > 0) {
+        observer.patches = [];
+        if (observer.callback) {
+            observer.callback(temp);
+        }
+    }
+    return temp;
+}
+// Dirty check if obj is different from mirror, generate patches and update mirror
+function _generate(mirror, obj, patches, path, invertible) {
+    if (obj === mirror) {
+        return;
+    }
+    if (typeof obj.toJSON === "function") {
+        obj = obj.toJSON();
+    }
+    var newKeys = (0, helpers_js_1._objectKeys)(obj);
+    var oldKeys = (0, helpers_js_1._objectKeys)(mirror);
+    var changed = false;
+    var deleted = false;
+    //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
+    for (var t = oldKeys.length - 1; t >= 0; t--) {
+        var key = oldKeys[t];
+        var oldVal = mirror[key];
+        if ((0, helpers_js_1.hasOwnProperty)(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
+            var newVal = obj[key];
+            if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null && Array.isArray(oldVal) === Array.isArray(newVal)) {
+                _generate(oldVal, newVal, patches, path + "/" + (0, helpers_js_1.escapePathComponent)(key), invertible);
+            }
+            else {
+                if (oldVal !== newVal) {
+                    changed = true;
+                    if (invertible) {
+                        patches.push({ op: "test", path: path + "/" + (0, helpers_js_1.escapePathComponent)(key), value: (0, helpers_js_1._deepClone)(oldVal) });
+                    }
+                    patches.push({ op: "replace", path: path + "/" + (0, helpers_js_1.escapePathComponent)(key), value: (0, helpers_js_1._deepClone)(newVal) });
+                }
+            }
+        }
+        else if (Array.isArray(mirror) === Array.isArray(obj)) {
+            if (invertible) {
+                patches.push({ op: "test", path: path + "/" + (0, helpers_js_1.escapePathComponent)(key), value: (0, helpers_js_1._deepClone)(oldVal) });
+            }
+            patches.push({ op: "remove", path: path + "/" + (0, helpers_js_1.escapePathComponent)(key) });
+            deleted = true; // property has been deleted
+        }
+        else {
+            if (invertible) {
+                patches.push({ op: "test", path: path, value: mirror });
+            }
+            patches.push({ op: "replace", path: path, value: obj });
+            changed = true;
+        }
+    }
+    if (!deleted && newKeys.length == oldKeys.length) {
+        return;
+    }
+    for (var t = 0; t < newKeys.length; t++) {
+        var key = newKeys[t];
+        if (!(0, helpers_js_1.hasOwnProperty)(mirror, key) && obj[key] !== undefined) {
+            patches.push({ op: "add", path: path + "/" + (0, helpers_js_1.escapePathComponent)(key), value: (0, helpers_js_1._deepClone)(obj[key]) });
+        }
+    }
+}
+/**
+ * Create an array of patches from the differences in two objects
+ */
+function compare(tree1, tree2, invertible) {
+    if (invertible === void 0) { invertible = false; }
+    var patches = [];
+    _generate(tree1, tree2, patches, '', invertible);
+    return patches;
+}
+
+
+/***/ }),
+
+/***/ 901:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.deepClone = exports.JsonPatchError = void 0;
+exports.getValueByPointer = getValueByPointer;
+exports.applyOperation = applyOperation;
+exports.applyPatch = applyPatch;
+exports.applyReducer = applyReducer;
+exports.validator = validator;
+exports.validate = validate;
+exports._areEquals = _areEquals;
+var helpers_js_1 = __webpack_require__(969);
 exports.JsonPatchError = helpers_js_1.PatchError;
 exports.deepClone = helpers_js_1._deepClone;
 /* We use a Javascript hash to store each
@@ -309,7 +256,7 @@ var objOps = {
         and is potentially unneeded */
         var removed = getValueByPointer(document, this.path);
         if (removed) {
-            removed = helpers_js_1._deepClone(removed);
+            removed = (0, helpers_js_1._deepClone)(removed);
         }
         var originalValue = applyOperation(document, { op: "remove", path: this.from }).removed;
         applyOperation(document, { op: "add", path: this.path, value: originalValue });
@@ -318,7 +265,7 @@ var objOps = {
     copy: function (obj, key, document) {
         var valueToCopy = getValueByPointer(document, this.from);
         // enforce copy by value so further operations don't affect source (see issue #177)
-        applyOperation(document, { op: "add", path: this.path, value: helpers_js_1._deepClone(valueToCopy) });
+        applyOperation(document, { op: "add", path: this.path, value: (0, helpers_js_1._deepClone)(valueToCopy) });
         return { newDocument: document };
     },
     test: function (obj, key, document) {
@@ -332,7 +279,7 @@ var objOps = {
 /* The operations applicable to an array. Many are the same as for the object */
 var arrOps = {
     add: function (arr, i, document) {
-        if (helpers_js_1.isInteger(i)) {
+        if ((0, helpers_js_1.isInteger)(i)) {
             arr.splice(i, 0, this.value);
         }
         else { // array props
@@ -371,7 +318,6 @@ function getValueByPointer(document, pointer) {
     applyOperation(document, getOriginalDestination);
     return getOriginalDestination.value;
 }
-exports.getValueByPointer = getValueByPointer;
 /**
  * Apply a single JSON Patch Operation on a JSON document.
  * Returns the {newDocument, result} of the operation.
@@ -446,7 +392,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
     } /* END ROOT OPERATIONS */
     else {
         if (!mutateDocument) {
-            document = helpers_js_1._deepClone(document);
+            document = (0, helpers_js_1._deepClone)(document);
         }
         var path = operation.path || "";
         var keys = path.split('/');
@@ -465,7 +411,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
         while (true) {
             key = keys[t];
             if (key && key.indexOf('~') != -1) {
-                key = helpers_js_1.unescapePathComponent(key);
+                key = (0, helpers_js_1.unescapePathComponent)(key);
             }
             if (banPrototypeModifications &&
                 (key == '__proto__' ||
@@ -491,15 +437,15 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
                     key = obj.length;
                 }
                 else {
-                    if (validateOperation && !helpers_js_1.isInteger(key)) {
+                    if (validateOperation && !(0, helpers_js_1.isInteger)(key)) {
                         throw new exports.JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", index, operation, document);
                     } // only parse key when it's an integer for `arr.prop` to work
-                    else if (helpers_js_1.isInteger(key)) {
+                    else if ((0, helpers_js_1.isInteger)(key)) {
                         key = ~~key;
                     }
                 }
                 if (t >= len) {
-                    if (validateOperation && operation.op === "add" && key > obj.length) {
+                    if (validateOperation && operation.op === "add" && typeof key === "number" && key > obj.length) {
                         throw new exports.JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
                     }
                     var returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
@@ -527,7 +473,6 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
         }
     }
 }
-exports.applyOperation = applyOperation;
 /**
  * Apply a full JSON Patch array on a JSON document.
  * Returns the {newDocument, result} of the patch.
@@ -551,7 +496,7 @@ function applyPatch(document, patch, validateOperation, mutateDocument, banProto
         }
     }
     if (!mutateDocument) {
-        document = helpers_js_1._deepClone(document);
+        document = (0, helpers_js_1._deepClone)(document);
     }
     var results = new Array(patch.length);
     for (var i = 0, length_1 = patch.length; i < length_1; i++) {
@@ -562,7 +507,6 @@ function applyPatch(document, patch, validateOperation, mutateDocument, banProto
     results.newDocument = document;
     return results;
 }
-exports.applyPatch = applyPatch;
 /**
  * Apply a single JSON Patch Operation on a JSON document.
  * Returns the updated document.
@@ -579,7 +523,6 @@ function applyReducer(document, operation, index) {
     }
     return operationResult.newDocument;
 }
-exports.applyReducer = applyReducer;
 /**
  * Validates a single operation. Called from `jsonpatch.validate`. Throws `JsonPatchError` in case of an error.
  * @param {object} operation - operation object (patch)
@@ -607,7 +550,7 @@ function validator(operation, index, document, existingPathFragment) {
     else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && operation.value === undefined) {
         throw new exports.JsonPatchError('Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)', 'OPERATION_VALUE_REQUIRED', index, operation, document);
     }
-    else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && helpers_js_1.hasUndefined(operation.value)) {
+    else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && (0, helpers_js_1.hasUndefined)(operation.value)) {
         throw new exports.JsonPatchError('Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)', 'OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED', index, operation, document);
     }
     else if (document) {
@@ -632,7 +575,6 @@ function validator(operation, index, document, existingPathFragment) {
         }
     }
 }
-exports.validator = validator;
 /**
  * Validates a sequence of operations. If `document` parameter is provided, the sequence is additionally validated against the object document.
  * If error is encountered, returns a JsonPatchError object
@@ -647,7 +589,7 @@ function validate(sequence, document, externalValidator) {
         }
         if (document) {
             //clone document and sequence so that we can safely try applying operations
-            applyPatch(helpers_js_1._deepClone(document), helpers_js_1._deepClone(sequence), externalValidator || true);
+            applyPatch((0, helpers_js_1._deepClone)(document), (0, helpers_js_1._deepClone)(sequence), externalValidator || true);
         }
         else {
             externalValidator = externalValidator || validator;
@@ -665,7 +607,6 @@ function validate(sequence, document, externalValidator) {
         }
     }
 }
-exports.validate = validate;
 // based on https://github.com/epoberezkin/fast-deep-equal
 // MIT License
 // Copyright (c) 2017 Evgeny Poberezkin
@@ -716,213 +657,237 @@ function _areEquals(a, b) {
     }
     return a !== a && b !== b;
 }
-exports._areEquals = _areEquals;
 ;
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
 
-var core = __webpack_require__(1);
-Object.assign(exports, core);
+/***/ 969:
+/***/ (function(__unused_webpack_module, exports) {
 
-var duplex = __webpack_require__(3);
-Object.assign(exports, duplex);
+"use strict";
 
-var helpers = __webpack_require__(0);
-exports.JsonPatchError = helpers.PatchError;
-exports.deepClone = helpers._deepClone;
-exports.escapePathComponent = helpers.escapePathComponent;
-exports.unescapePathComponent = helpers.unescapePathComponent;
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * (c) 2017-2021 Joachim Wester
- * MIT license
+ * (c) 2017-2022 Joachim Wester
+ * MIT licensed
  */
-var helpers_js_1 = __webpack_require__(0);
-var core_js_1 = __webpack_require__(1);
-var beforeDict = new WeakMap();
-var Mirror = /** @class */ (function () {
-    function Mirror(obj) {
-        this.observers = new Map();
-        this.obj = obj;
-    }
-    return Mirror;
-}());
-var ObserverInfo = /** @class */ (function () {
-    function ObserverInfo(callback, observer) {
-        this.callback = callback;
-        this.observer = observer;
-    }
-    return ObserverInfo;
-}());
-function getMirror(obj) {
-    return beforeDict.get(obj);
-}
-function getObserverFromMirror(mirror, callback) {
-    return mirror.observers.get(callback);
-}
-function removeObserverFromMirror(mirror, observer) {
-    mirror.observers.delete(observer.callback);
-}
-/**
- * Detach an observer from an object
- */
-function unobserve(root, observer) {
-    observer.unobserve();
-}
-exports.unobserve = unobserve;
-/**
- * Observes changes made to an object, which can then be retrieved using generate
- */
-function observe(obj, callback) {
-    var patches = [];
-    var observer;
-    var mirror = getMirror(obj);
-    if (!mirror) {
-        mirror = new Mirror(obj);
-        beforeDict.set(obj, mirror);
-    }
-    else {
-        var observerInfo = getObserverFromMirror(mirror, callback);
-        observer = observerInfo && observerInfo.observer;
-    }
-    if (observer) {
-        return observer;
-    }
-    observer = {};
-    mirror.value = helpers_js_1._deepClone(obj);
-    if (callback) {
-        observer.callback = callback;
-        observer.next = null;
-        var dirtyCheck = function () {
-            generate(observer);
-        };
-        var fastCheck = function () {
-            clearTimeout(observer.next);
-            observer.next = setTimeout(dirtyCheck);
-        };
-        if (typeof window !== 'undefined') { //not Node
-            window.addEventListener('mouseup', fastCheck);
-            window.addEventListener('keyup', fastCheck);
-            window.addEventListener('mousedown', fastCheck);
-            window.addEventListener('keydown', fastCheck);
-            window.addEventListener('change', fastCheck);
-        }
-    }
-    observer.patches = patches;
-    observer.object = obj;
-    observer.unobserve = function () {
-        generate(observer);
-        clearTimeout(observer.next);
-        removeObserverFromMirror(mirror, observer);
-        if (typeof window !== 'undefined') {
-            window.removeEventListener('mouseup', fastCheck);
-            window.removeEventListener('keyup', fastCheck);
-            window.removeEventListener('mousedown', fastCheck);
-            window.removeEventListener('keydown', fastCheck);
-            window.removeEventListener('change', fastCheck);
-        }
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
     };
-    mirror.observers.set(callback, new ObserverInfo(callback, observer));
-    return observer;
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PatchError = void 0;
+exports.hasOwnProperty = hasOwnProperty;
+exports._objectKeys = _objectKeys;
+exports._deepClone = _deepClone;
+exports.isInteger = isInteger;
+exports.escapePathComponent = escapePathComponent;
+exports.unescapePathComponent = unescapePathComponent;
+exports._getPathRecursive = _getPathRecursive;
+exports.getPath = getPath;
+exports.hasUndefined = hasUndefined;
+var _hasOwnProperty = Object.prototype.hasOwnProperty;
+function hasOwnProperty(obj, key) {
+    return _hasOwnProperty.call(obj, key);
 }
-exports.observe = observe;
-/**
- * Generate an array of patches from an observer
- */
-function generate(observer, invertible) {
-    if (invertible === void 0) { invertible = false; }
-    var mirror = beforeDict.get(observer.object);
-    _generate(mirror.value, observer.object, observer.patches, "", invertible);
-    if (observer.patches.length) {
-        core_js_1.applyPatch(mirror.value, observer.patches);
+function _objectKeys(obj) {
+    if (Array.isArray(obj)) {
+        var keys_1 = new Array(obj.length);
+        for (var k = 0; k < keys_1.length; k++) {
+            keys_1[k] = "" + k;
+        }
+        return keys_1;
     }
-    var temp = observer.patches;
-    if (temp.length > 0) {
-        observer.patches = [];
-        if (observer.callback) {
-            observer.callback(temp);
+    if (Object.keys) {
+        return Object.keys(obj);
+    }
+    var keys = [];
+    for (var i in obj) {
+        if (hasOwnProperty(obj, i)) {
+            keys.push(i);
         }
     }
-    return temp;
+    return keys;
 }
-exports.generate = generate;
-// Dirty check if obj is different from mirror, generate patches and update mirror
-function _generate(mirror, obj, patches, path, invertible) {
-    if (obj === mirror) {
-        return;
+;
+/**
+* Deeply clone the object.
+* https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
+* @param  {any} obj value to clone
+* @return {any} cloned obj
+*/
+function _deepClone(obj) {
+    switch (typeof obj) {
+        case "object":
+            return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+        case "undefined":
+            return null; //this is how JSON.stringify behaves for array items
+        default:
+            return obj; //no need to clone primitives
     }
-    if (typeof obj.toJSON === "function") {
-        obj = obj.toJSON();
+}
+//3x faster than cached /^\d+$/.test(str)
+function isInteger(str) {
+    var i = 0;
+    var len = str.length;
+    var charCode;
+    while (i < len) {
+        charCode = str.charCodeAt(i);
+        if (charCode >= 48 && charCode <= 57) {
+            i++;
+            continue;
+        }
+        return false;
     }
-    var newKeys = helpers_js_1._objectKeys(obj);
-    var oldKeys = helpers_js_1._objectKeys(mirror);
-    var changed = false;
-    var deleted = false;
-    //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
-    for (var t = oldKeys.length - 1; t >= 0; t--) {
-        var key = oldKeys[t];
-        var oldVal = mirror[key];
-        if (helpers_js_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
-            var newVal = obj[key];
-            if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null && Array.isArray(oldVal) === Array.isArray(newVal)) {
-                _generate(oldVal, newVal, patches, path + "/" + helpers_js_1.escapePathComponent(key), invertible);
+    return true;
+}
+/**
+* Escapes a json pointer path
+* @param path The raw pointer
+* @return the Escaped path
+*/
+function escapePathComponent(path) {
+    if (path.indexOf('/') === -1 && path.indexOf('~') === -1)
+        return path;
+    return path.replace(/~/g, '~0').replace(/\//g, '~1');
+}
+/**
+ * Unescapes a json pointer path
+ * @param path The escaped pointer
+ * @return The unescaped path
+ */
+function unescapePathComponent(path) {
+    return path.replace(/~1/g, '/').replace(/~0/g, '~');
+}
+function _getPathRecursive(root, obj) {
+    var found;
+    for (var key in root) {
+        if (hasOwnProperty(root, key)) {
+            if (root[key] === obj) {
+                return escapePathComponent(key) + '/';
             }
-            else {
-                if (oldVal !== newVal) {
-                    changed = true;
-                    if (invertible) {
-                        patches.push({ op: "test", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(oldVal) });
-                    }
-                    patches.push({ op: "replace", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(newVal) });
+            else if (typeof root[key] === 'object') {
+                found = _getPathRecursive(root[key], obj);
+                if (found != '') {
+                    return escapePathComponent(key) + '/' + found;
                 }
             }
         }
-        else if (Array.isArray(mirror) === Array.isArray(obj)) {
-            if (invertible) {
-                patches.push({ op: "test", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(oldVal) });
-            }
-            patches.push({ op: "remove", path: path + "/" + helpers_js_1.escapePathComponent(key) });
-            deleted = true; // property has been deleted
-        }
-        else {
-            if (invertible) {
-                patches.push({ op: "test", path: path, value: mirror });
-            }
-            patches.push({ op: "replace", path: path, value: obj });
-            changed = true;
-        }
     }
-    if (!deleted && newKeys.length == oldKeys.length) {
-        return;
+    return '';
+}
+function getPath(root, obj) {
+    if (root === obj) {
+        return '/';
     }
-    for (var t = 0; t < newKeys.length; t++) {
-        var key = newKeys[t];
-        if (!helpers_js_1.hasOwnProperty(mirror, key) && obj[key] !== undefined) {
-            patches.push({ op: "add", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(obj[key]) });
-        }
+    var path = _getPathRecursive(root, obj);
+    if (path === '') {
+        throw new Error("Object not found in root");
     }
+    return "/".concat(path);
 }
 /**
- * Create an array of patches from the differences in two objects
- */
-function compare(tree1, tree2, invertible) {
-    if (invertible === void 0) { invertible = false; }
-    var patches = [];
-    _generate(tree1, tree2, patches, '', invertible);
-    return patches;
+* Recursively checks whether an object has any undefined values inside.
+*/
+function hasUndefined(obj) {
+    if (obj === undefined) {
+        return true;
+    }
+    if (obj) {
+        if (Array.isArray(obj)) {
+            for (var i_1 = 0, len = obj.length; i_1 < len; i_1++) {
+                if (hasUndefined(obj[i_1])) {
+                    return true;
+                }
+            }
+        }
+        else if (typeof obj === "object") {
+            var objKeys = _objectKeys(obj);
+            var objKeysLength = objKeys.length;
+            for (var i = 0; i < objKeysLength; i++) {
+                if (hasUndefined(obj[objKeys[i]])) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
-exports.compare = compare;
+function patchErrorMessageFormatter(message, args) {
+    var messageParts = [message];
+    for (var key in args) {
+        var value = typeof args[key] === 'object' ? JSON.stringify(args[key], null, 2) : args[key]; // pretty print
+        if (typeof value !== 'undefined') {
+            messageParts.push("".concat(key, ": ").concat(value));
+        }
+    }
+    return messageParts.join('\n');
+}
+var PatchError = /** @class */ (function (_super) {
+    __extends(PatchError, _super);
+    function PatchError(message, name, index, operation, tree) {
+        var _newTarget = this.constructor;
+        var _this = _super.call(this, patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree })) || this;
+        _this.name = name;
+        _this.index = index;
+        _this.operation = operation;
+        _this.tree = tree;
+        Object.setPrototypeOf(_this, _newTarget.prototype); // restore prototype chain, see https://stackoverflow.com/a/48342359
+        _this.message = patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree });
+        return _this;
+    }
+    return PatchError;
+}(Error));
+exports.PatchError = PatchError;
 
 
 /***/ })
-/******/ ]);
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __webpack_require__(237);
+/******/ 	jsonpatch = __webpack_exports__;
+/******/ 	
+/******/ })()
+;
