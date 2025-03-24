@@ -278,7 +278,7 @@ Example:
 var documentA = {user: {firstName: "Albert", lastName: "Einstein"}};
 var documentB = {user: {firstName: "Albert", lastName: "Collins"}};
 var diff = jsonpatch.compare(documentA, documentB);
-//diff == [{op: "replace", path: "/user/lastName", value: "Collins"}]
+// diff == [{op: "replace", path: "/user/lastName", value: "Collins"}]
 ```
 
 Example of comparing two object trees with test operations for values in the first object:
@@ -287,7 +287,7 @@ Example of comparing two object trees with test operations for values in the fir
 var documentA = {user: {firstName: "Albert", lastName: "Einstein"}};
 var documentB = {user: {firstName: "Albert", lastName: "Collins"}};
 var diff = jsonpatch.compare(documentA, documentB, true);
-//diff == [
+// diff == [
 //   {op: "test", path: "/user/lastName", value: "Einstein"},
 //   {op: "replace", path: "/user/lastName", value: "Collins"}
 // ];
@@ -332,7 +332,7 @@ var obj = {user: {firstName: "Albert"}};
 var patches = [{op: "replace", path: "/user/firstName", value: "Albert"}, {op: "replace", path: "/user/lastName", value: "Einstein"}];
 var errors = jsonpatch.validate(patches, obj);
 if (errors.length == 0) {
- //there are no errors!
+// there are no errors!
 }
 else {
   for (var i=0; i < errors.length; i++) {
@@ -401,6 +401,7 @@ See the [ECMAScript spec](http://www.ecma-international.org/ecma-262/6.0/index.h
 To see the list of recent changes, see [Releases](https://github.com/Starcounter-Jack/JSON-Patch/releases).
 
 ## Footprint
+
 4 KB minified and gzipped (12 KB minified)
 
 ## Performance
