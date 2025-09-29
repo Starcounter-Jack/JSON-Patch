@@ -93,7 +93,7 @@ Applies `patch` array on `obj`.
 - `document` The document to patch
 - `patch` a JSON-Patch array of operations to apply
 - `validateOperation` Boolean for whether to validate each operation with our default validator, or to pass a validator callback
-- `mutateDocument` Whether to mutate the original document or clone it before applying
+- `mutateDocument` Whether to mutate the original document or clone it before applying, defaults to `true`
 - `banPrototypeModifications`  Whether to ban modifications to `__proto__`, defaults to `true`.
 
 An invalid patch results in throwing an error (see `jsonpatch.validate` for more information about the error object).
@@ -133,7 +133,7 @@ Applies single operation object `operation` on `document`.
 - `document` The document to patch
 - `operation` The operation to apply
 - `validateOperation` Whether to validate the operation, or to pass a validator callback
-- `mutateDocument` Whether to mutate the original document or clone it before applying
+- `mutateDocument` Whether to mutate the original document or clone it before applying, defaults to `true`
 - `banPrototypeModifications` Whether to ban modifications to `__proto__`, defaults to `true`.
 - `index` The index of the operation in your patch array. Useful for better error reporting when that operation fails to apply.
 

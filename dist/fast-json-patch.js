@@ -382,7 +382,7 @@ exports.getValueByPointer = getValueByPointer;
  * @param document The document to patch
  * @param operation The operation to apply
  * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
- * @param mutateDocument Whether to mutate the original document or clone it before applying
+ * @param mutateDocument Whether to mutate the original document or clone it before applying, defaults to `true`
  * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return `{newDocument, result}` after the operation
  */
@@ -538,7 +538,7 @@ exports.applyOperation = applyOperation;
  * @param document The document to patch
  * @param patch The patch to apply
  * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
- * @param mutateDocument Whether to mutate the original document or clone it before applying
+ * @param mutateDocument Whether to mutate the original document or clone it before applying, defaults to `true`
  * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return An array of `{newDocument, result}` after the patch
  */

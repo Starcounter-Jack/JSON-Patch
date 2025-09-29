@@ -175,7 +175,7 @@ export function getValueByPointer(document: any, pointer: string): any {
  * @param document The document to patch
  * @param operation The operation to apply
  * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
- * @param mutateDocument Whether to mutate the original document or clone it before applying
+ * @param mutateDocument Whether to mutate the original document or clone it before applying, defaults to `true`
  * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return `{newDocument, result}` after the operation
  */
@@ -251,8 +251,8 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
         key = unescapePathComponent(key);
       }
 
-      if(banPrototypeModifications && 
-          (key == '__proto__' || 
+      if(banPrototypeModifications &&
+          (key == '__proto__' ||
           (key == 'prototype' && t>0 && keys[t-1] == 'constructor'))
         ) {
         throw new TypeError('JSON-Patch: modifying `__proto__` or `constructor/prototype` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
@@ -324,7 +324,7 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
  * @param document The document to patch
  * @param patch The patch to apply
  * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
- * @param mutateDocument Whether to mutate the original document or clone it before applying
+ * @param mutateDocument Whether to mutate the original document or clone it before applying, defaults to `true`
  * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return An array of `{newDocument, result}` after the patch
  */
