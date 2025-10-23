@@ -2,8 +2,17 @@
 .DS_Store
 
 # Node.js
-node_modules/*
+node_modules/
 npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Build outputs
+dist/
+commonjs/
+module/
+*.tsbuildinfo
+coverage/
 
 # VS Code
 .vscode/*
@@ -19,11 +28,10 @@ npm-debug.log
 # WebStorm
 .idea
 
-# Typescript
-commonjs/*.d.ts
-test/spec/typings/typingsSpec.js
-
-# SauceLabs logs
+# Test artifacts
+.artifacts
 *.log
 
-.artifacts
+# Environment
+.env
+.env.local

@@ -7,7 +7,8 @@
         "json",
         "patch",
         "http",
-        "rest"
+        "rest",
+        "esm"
     ],
     "repository": {
         "type": "git",
@@ -22,44 +23,55 @@
         "url": "http://www.starcounter.com/"
     },
     "license": "MIT",
-    "main": "index.js",
-    "module": "index.mjs",
-    "typings": "index.d.ts",
+    "type": "module",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            },
+            "require": {
+                "types": "./dist/index.d.cts",
+                "default": "./dist/index.cjs"
+            }
+        }
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE.txt"
+    ],
+    "engines": {
+        "node": ">=14.0.0"
+    },
     "devDependencies": {
+        "@types/node": "^22.8.6",
+        "@typescript-eslint/eslint-plugin": "^8.12.2",
+        "@typescript-eslint/parser": "^8.12.2",
         "benchmark": "^2.1.4",
-        "bluebird": "^3.5.5",
-        "bluebird-retry": "^0.11.0",
-        "chalk": "^2.4.2",
-        "event-target-shim": "^5.0.1",
-        "fast-deep-equal": "^2.0.1",
-        "http-server": "^0.12.3",
-        "jasmine": "^3.4.0",
-        "request": "^2.88.0",
-        "sauce-connect-launcher": "^1.2.7",
-        "saucelabs": "^2.1.9",
-        "selenium-webdriver": "^4.0.0-alpha.4",
-        "typescript": "~3.5.2",
-        "webpack": "^4.35.0",
-        "webpack-cli": "^3.3.5"
+        "eslint": "^9.13.0",
+        "prettier": "^3.3.3",
+        "tsup": "^8.3.5",
+        "tsx": "^4.19.1",
+        "typescript": "^5.6.3",
+        "vitest": "^2.1.4"
     },
     "scripts": {
-        "tsc": "npm run tsc-common && npm run tsc-module",
-        "tsc-common": "tsc",
-        "tsc-module": "tsc --module esnext --moduleResolution node --outDir \"module/\" && npm run tsc-to-mjs",
-        "tsc-to-mjs": "bash tsc-to-mjs.sh",
-        "version": "npm run tsc && webpack && git add -A",
-        "build": "npm run tsc && webpack",
-        "serve": "http-server -p 5000 --silent",
-        "tsc-watch": "tsc -w",
-        "test": "npm run tsc && npm run test-core && npm run test-duplex && npm run test-commonjs && npm run test-webpack-import && npm run test-typings",
-        "test-sauce": "npm run build && node test/Sauce/Runner.js",
-        "test-commonjs": "jasmine test/spec/commonjs/requireSpec.js",
-        "test-webpack-import": "webpack --env.NODE_ENV=test && jasmine test/spec/webpack/importSpec.build.js",
-        "test-typings": "tsc test/spec/typings/typingsSpec.ts",
-        "test-duplex": "node --experimental-modules jasmine-run.mjs test/**/*[sS]pec.mjs",
-        "test-core": "node --experimental-modules jasmine-run.mjs 'test/spec/{jsonPatchTestsSpec,coreSpec,validateSpec}.mjs'",
-        "bench": "npm run bench-core && npm run bench-duplex",
-        "bench-core": "node test/spec/coreBenchmark.js",
-        "bench-duplex": "node test/spec/coreBenchmark.js && node test/spec/duplexBenchmark.js"
+        "build": "npm run build:js && npm run build:types",
+        "build:js": "tsup",
+        "build:types": "bash scripts/build-types.sh",
+        "build:watch": "tsup --watch",
+        "type-check": "tsc --noEmit",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "bench": "tsx test/spec/coreBenchmark.js && tsx test/spec/duplexBenchmark.js",
+        "lint": "eslint . --ext .ts,.js",
+        "lint:fix": "eslint . --ext .ts,.js --fix",
+        "format": "prettier --write \"src/**/*.ts\" \"test/**/*.{ts,js}\"",
+        "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.{ts,js}\"",
+        "prepublishOnly": "npm run build"
     }
 }

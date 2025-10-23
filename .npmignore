@@ -1,38 +1,50 @@
-Makefile
-doc/
-examples/
+# Source files - only ship dist/
+src/
 test/
-.travis.yml
-!*.d.ts
-src/*
+examples/
+
+# Config files
 tsconfig.json
+tsup.config.ts
+eslint.config.js
+.prettierrc
+.prettierignore
+vitest.config.ts
+
+# Build artifacts (old structure)
+commonjs/
+module/
+
+# CI/CD
+.travis.yml
+.github/
+
+# Git
+.git*
 
 # Mac OS X
 .DS_Store
 
 # Node.js
-.npmignore
 node_modules/
 npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Development
 CONTRIBUTING.md
-
-# Git
-.git*
-
-# bower
-bower.json
-
-# grunt
-gruntfile.js
-
-#vs-code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+.vscode/
+.idea/
 *.code-workspace
-
-# Local History for Visual Studio Code
 .history/
+.artifacts/
+*.log
 
+# Testing
+coverage/
+
+# Deprecated
+bower.json
+webpack.config.js
+tsc-to-mjs.sh
+jasmine-run.mjs

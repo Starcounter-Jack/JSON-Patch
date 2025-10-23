@@ -1,19 +1,33 @@
 {
     "compilerOptions": {
-        "target": "es5",
-        "outDir": "commonjs/",
-        "module": "commonjs",
-        "lib": [
-            "es2016", "dom"
-        ],
-        "noEmitHelpers": false,
+        "target": "ES2022",
+        "module": "ESNext",
+        "lib": ["ES2022", "DOM"],
+        "moduleResolution": "bundler",
+        "outDir": "dist",
         "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
         "removeComments": false,
-        /* emitting `use strict` made PuppetJS break */
+        // Gradual strictness - can be tightened in future
+        "strict": false,
+        "noImplicitThis": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
-        "noImplicitUseStrict": true
+        "isolatedModules": true,
+        "noEmit": true
     },
     "include": [
         "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "test"
     ]
 }

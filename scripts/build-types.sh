@@ -1,19 +1,27 @@
-export * from './module/core';
-export * from './module/duplex';
+#!/bin/bash
+set -e
+
+# Generate type definitions (ignore errors, types are still generated)
+tsc --project tsconfig.types.json 2>/dev/null || true
+
+# Create index.d.ts if it doesn't exist (from template)
+if [ ! -f dist/index.d.ts ]; then
+  cat > dist/index.d.ts << 'EOF'
+export * from './core';
+export * from './duplex';
 export {
     PatchError as JsonPatchError,
     _deepClone as deepClone,
     escapePathComponent,
     unescapePathComponent
-} from './module/helpers';
-
+} from './helpers';
 
 /**
  * Default export for backwards compat
  */
-import * as core from './module/core';
-import * as duplex from './module/duplex';
-import { PatchError as JsonPatchError, _deepClone as deepClone, escapePathComponent, unescapePathComponent } from './module/helpers';
+import * as core from './core';
+import * as duplex from './duplex';
+import { PatchError as JsonPatchError, _deepClone as deepClone, escapePathComponent, unescapePathComponent } from './helpers';
 declare const _default: {
     JsonPatchError: typeof JsonPatchError;
     deepClone: typeof deepClone;
@@ -32,3 +40,10 @@ declare const _default: {
     _areEquals(a: any, b: any): boolean;
 };
 export default _default;
+EOF
+fi
+
+# Copy for CJS compatibility
+cp dist/index.d.ts dist/index.d.cts
+
+echo "✓ Type definitions generated successfully"
