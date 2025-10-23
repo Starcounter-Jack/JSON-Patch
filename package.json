@@ -67,11 +67,13 @@
         "type-check": "tsc --noEmit",
         "test": "vitest run",
         "test:watch": "vitest",
+        "test:package": "bash scripts/test-package-locally.sh",
         "bench": "tsx test/spec/coreBenchmark.js && tsx test/spec/duplexBenchmark.js",
         "lint": "eslint . --ext .ts,.js",
         "lint:fix": "eslint . --ext .ts,.js --fix",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.{ts,js}\"",
         "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.{ts,js}\"",
+        "prepare-publish": "bash scripts/prepare-publish.sh",
         "prepublishOnly": "npm run build"
     }
 }
