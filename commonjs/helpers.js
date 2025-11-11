@@ -52,7 +52,25 @@ exports._objectKeys = _objectKeys;
 function _deepClone(obj) {
     switch (typeof obj) {
         case "object":
-            return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+            if (obj === null) {
+                return null;
+            }
+            // Handle Date objects specially to preserve them as Date instances
+            if (obj instanceof Date) {
+                return new Date(obj.getTime());
+            }
+            // Handle Arrays
+            if (Array.isArray(obj)) {
+                return obj.map(function (item) { return _deepClone(item); });
+            }
+            // Handle plain objects - recursively clone each property
+            var cloned = {};
+            for (var key in obj) {
+                if (hasOwnProperty(obj, key)) {
+                    cloned[key] = _deepClone(obj[key]);
+                }
+            }
+            return cloned;
         case "undefined":
             return null; //this is how JSON.stringify behaves for array items
         default:

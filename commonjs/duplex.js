@@ -132,7 +132,19 @@ function _generate(mirror, obj, patches, path, invertible) {
         if (helpers_js_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
             var newVal = obj[key];
             if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null && Array.isArray(oldVal) === Array.isArray(newVal)) {
-                _generate(oldVal, newVal, patches, path + "/" + helpers_js_1.escapePathComponent(key), invertible);
+                // Special handling for Date objects: compare by value, not reference
+                if (oldVal instanceof Date && newVal instanceof Date) {
+                    if (oldVal.getTime() !== newVal.getTime()) {
+                        changed = true;
+                        if (invertible) {
+                            patches.push({ op: "test", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(oldVal) });
+                        }
+                        patches.push({ op: "replace", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(newVal) });
+                    }
+                }
+                else {
+                    _generate(oldVal, newVal, patches, path + "/" + helpers_js_1.escapePathComponent(key), invertible);
+                }
             }
             else {
                 if (oldVal !== newVal) {
