@@ -150,6 +150,14 @@ describe('validate', function() {
     expect(error.name).toBe('OPERATION_NOT_AN_OBJECT');
   });
 
+  it('should return an error for an array index with a leading zero', function() {
+    const error = jsonpatch.validate([
+      { op: 'add', path: '/01', value: 9 }
+    ], [10, 20, 30]);
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
+    expect(error.name).toBe('OPERATION_PATH_ILLEGAL_ARRAY_INDEX');
+  });
+
   it('should return an error if the operation "op" property is not a string', function() {
     const error = jsonpatch.validate([
       {
