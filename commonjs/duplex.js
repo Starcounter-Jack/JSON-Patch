@@ -121,6 +121,17 @@ function _generate(mirror, obj, patches, path, invertible) {
     if (typeof obj.toJSON === "function") {
         obj = obj.toJSON();
     }
+    // If one operand is an array and the other is an object, the whole subtree
+    // has to be replaced. Handling it here (instead of only inside the key loop
+    // below) also covers the case where `mirror` is an empty container, in which
+    // the loop would never run and no patch would be emitted.
+    if (Array.isArray(mirror) !== Array.isArray(obj)) {
+        if (invertible) {
+            patches.push({ op: "test", path: path, value: helpers_js_1._deepClone(mirror) });
+        }
+        patches.push({ op: "replace", path: path, value: helpers_js_1._deepClone(obj) });
+        return;
+    }
     var newKeys = helpers_js_1._objectKeys(obj);
     var oldKeys = helpers_js_1._objectKeys(mirror);
     var changed = false;
@@ -144,19 +155,14 @@ function _generate(mirror, obj, patches, path, invertible) {
                 }
             }
         }
-        else if (Array.isArray(mirror) === Array.isArray(obj)) {
+        else {
+            // container types match here (handled above otherwise), so a missing key
+            // is always a removal
             if (invertible) {
                 patches.push({ op: "test", path: path + "/" + helpers_js_1.escapePathComponent(key), value: helpers_js_1._deepClone(oldVal) });
             }
             patches.push({ op: "remove", path: path + "/" + helpers_js_1.escapePathComponent(key) });
             deleted = true; // property has been deleted
-        }
-        else {
-            if (invertible) {
-                patches.push({ op: "test", path: path, value: mirror });
-            }
-            patches.push({ op: "replace", path: path, value: obj });
-            changed = true;
         }
     }
     if (!deleted && newKeys.length == oldKeys.length) {
