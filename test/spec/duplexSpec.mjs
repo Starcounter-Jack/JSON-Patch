@@ -1892,6 +1892,82 @@ describe('duplex', function() {
         ]);
       };
     });
+
+    variantIt('should replace a root value that is not an object or array with a single replace', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        const objA = 7;
+        const objB = 'seven';
+
+        expect(jsonpatch.compare(objA, objB, testInvertible)).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '',
+            value: 7
+          }),
+          {
+            op: 'replace',
+            path: '',
+            value: 'seven'
+          }
+        ]);
+      };
+    });
+
+    variantIt('should replace root null with a value using a single replace', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        const objA = null;
+        const objB = 'not null anymore';
+
+        expect(jsonpatch.compare(objA, objB, testInvertible)).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '',
+            value: null
+          }),
+          {
+            op: 'replace',
+            path: '',
+            value: 'not null anymore'
+          }
+        ]);
+      };
+    });
+
+    variantIt('should replace an object root with an array root using a single replace, even when the object has several keys', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        const objA = { a: 1, b: 2, c: 3 };
+        const objB = ['x', 'y', 'z'];
+
+        const patches = jsonpatch.compare(objA, objB, testInvertible);
+
+        expect(patches).toReallyEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '',
+            value: objA
+          }),
+          {
+            op: 'replace',
+            path: '',
+            value: objB
+          }
+        ]);
+
+        // applying the generated patch should actually turn `objA` into `objB`,
+        // rather than appending `objB`'s entries onto an already-replaced array
+        const result = jsonpatch.applyPatch(jsonpatch.deepClone(objA), patches, true).newDocument;
+        expect(result).toEqual(objB);
+      };
+    });
   });
 
   describe('Registering multiple observers with the same callback', function() {

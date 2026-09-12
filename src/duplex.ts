@@ -145,6 +145,29 @@ function _generate(mirror, obj, patches, path, invertible) {
     return;
   }
 
+  // `mirror`/`obj` are only guaranteed to be non-null objects of the same
+  // "arrayness" once we've recursed into a shared key (see the recursion
+  // guard a few lines below, which only recurses when that holds). At the
+  // top level though, `compare`/`generate` can be called directly with
+  // values that don't share a container shape at all - primitives, `null`,
+  // or an array on one side and a plain object on the other. There's
+  // nothing to key-diff in that case, so just report the value itself as
+  // replaced, once, instead of falling through to the key-by-key loop
+  // below (which assumes `mirror` and `obj` are the same kind of
+  // container, and otherwise ends up pushing one root "replace" per key
+  // still left in `mirror`).
+  if (
+    typeof mirror !== "object" || mirror === null ||
+    typeof obj !== "object" || obj === null ||
+    Array.isArray(mirror) !== Array.isArray(obj)
+  ) {
+    if (invertible) {
+      patches.push({ op: "test", path, value: _deepClone(mirror) });
+    }
+    patches.push({ op: "replace", path, value: _deepClone(obj) });
+    return;
+  }
+
   if (typeof obj.toJSON === "function") {
     obj = obj.toJSON();
   }
