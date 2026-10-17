@@ -39,3 +39,6 @@ gruntfile.js
 playwright.config.js
 test-results/
 playwright-report/
+
+# Claude Code
+.claude/
