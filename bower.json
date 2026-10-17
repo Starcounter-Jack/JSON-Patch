@@ -10,7 +10,6 @@
     ".npmignore",
     ".gitignore",
     "test",
-    "gruntfile.js",
     "node_modules",
     "package.json"
   ]

@@ -21,9 +21,6 @@ CONTRIBUTING.md
 # bower
 bower.json
 
-# grunt
-gruntfile.js
-
 #vs-code
 .vscode/*
 !.vscode/settings.json
