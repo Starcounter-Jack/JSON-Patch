@@ -10,7 +10,6 @@
     ".npmignore",
     ".gitignore",
     "test",
-    ".travis.yml",
     "gruntfile.js",
     "node_modules",
     "package.json"

@@ -2,7 +2,6 @@ Makefile
 doc/
 examples/
 test/
-.travis.yml
 !*.d.ts
 src/*
 tsconfig.json

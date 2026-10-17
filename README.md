@@ -3,7 +3,7 @@ JSON-Patch
 
 > A leaner and meaner implementation of JSON-Patch. Small footprint. High performance.
 
-[![Build Status](https://travis-ci.org/Starcounter-Jack/JSON-Patch.svg?branch=master)](https://travis-ci.org/Starcounter-Jack/JSON-Patch)
+[![Test](https://github.com/Starcounter-Jack/JSON-Patch/actions/workflows/test.yml/badge.svg)](https://github.com/Starcounter-Jack/JSON-Patch/actions/workflows/test.yml)
 
 With JSON-Patch, you can:
 - **apply** patches (arrays) and single operations on JS object
