@@ -21,6 +21,11 @@ Each of the test suite files contains *Jasmine* unit test suite and *Benchmark.j
 
 To run *Benchmark.js* performance tests, press "Run Tests" button.
 
+#### Automated, in Chromium, Firefox and WebKit
+
+1. Download the browsers once: `npx playwright install` (on Linux, `npx playwright install --with-deps` also installs the system libraries they need)
+2. Run `npm run test-browser`
+
 ### In Node.js
 
 1. Go to directory where you have cloned the repo

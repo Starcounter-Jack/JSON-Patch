@@ -26,6 +26,7 @@
     "module": "index.mjs",
     "typings": "index.d.ts",
     "devDependencies": {
+        "@playwright/test": "^1.64.0",
         "benchmark": "^2.1.4",
         "bluebird": "^3.5.5",
         "bluebird-retry": "^0.11.0",
@@ -57,6 +58,7 @@
         "test-typings": "tsc -p test/spec/typings",
         "test-duplex": "node --experimental-modules jasmine-run.mjs test/**/*[sS]pec.mjs",
         "test-core": "node --experimental-modules jasmine-run.mjs 'test/spec/{jsonPatchTestsSpec,coreSpec,validateSpec}.mjs'",
+        "test-browser": "npm run build && playwright test",
         "bench": "npm run bench-core && npm run bench-duplex",
         "bench-core": "node test/spec/coreBenchmark.js",
         "bench-duplex": "node test/spec/coreBenchmark.js && node test/spec/duplexBenchmark.js"

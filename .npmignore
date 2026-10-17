@@ -36,3 +36,7 @@ gruntfile.js
 # Local History for Visual Studio Code
 .history/
 
+# Playwright
+playwright.config.js
+test-results/
+playwright-report/

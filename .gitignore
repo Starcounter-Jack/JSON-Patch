@@ -27,3 +27,7 @@ test/spec/typings/typingsSpec.js
 *.log
 
 .artifacts
+
+# Playwright
+test-results/
+playwright-report/
