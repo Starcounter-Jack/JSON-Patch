@@ -19,8 +19,8 @@ function CapabilityRunner(caps) {
     const accessKey = caps.accessKey;
 
     const saucelabs = new SauceLabs({
-      username: username,
-      password: accessKey
+      user: username,
+      key: accessKey
     });
 
     const By = webdriver.By;
