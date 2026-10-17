@@ -24,7 +24,7 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 ### In Node.js
 
 1. Go to directory where you have cloned the repo
-2. Install dev dependencies (Jasmine Node.js module) by running command `npm install`
+2. Install dev dependencies (Jasmine Node.js module) by running command `npm install`. Use npm 11.10.0 or newer, as older versions ignore the `min-release-age` setting in `.npmrc`.
 3. Run test `npm run test`
  - Testing **`core`** only: `npm run test-core`
  - Testing **`duplex`** only: `npm run test-duplex`
@@ -41,7 +41,7 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 2. Make sure that the browser tests pass in Chrome, Firefox, Safari, Edge and IE11
 3. Make sure that the NodeJS tests pass `npm install && npm run test`
 4. Execute `npm run build` to transpile, bundle and minify.
-5. Execute `npm version` like (`npm version [ major | minor | patch | premajor | preminor | prepatch | prerelease]`)
+5. Execute `npm version` like (`npm version [ major | minor | patch | premajor | preminor | prepatch | prerelease] --ignore-scripts=false`). The flag is needed because `.npmrc` sets `ignore-scripts=true`, which would skip the `version` script that builds and stages the bundles.
 6. Call `git push` to push the changes to `origin master`
 7. Call `git push --tags` to push the tag to `origin master`
 8. Call `npm publish` to push the new version to NPM. [Read more](https://docs.npmjs.com/getting-started/publishing-npm-packages)
