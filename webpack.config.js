@@ -11,6 +11,10 @@ function minimizeKeepingLicenses() {
   };
 }
 
+// `tsc` compiles the library to ES5, but webpack 5 writes its own runtime
+// (the bundle wrapper) as ES2015. Keep the browser bundles ES5, like 3.1.1.
+const BROWSER_TARGET = ['web', 'es5'];
+
 module.exports = env => {
   if(env && env.NODE_ENV === "test") {
     return [
@@ -34,6 +38,7 @@ module.exports = env => {
       {
         entry: './index.js',
         mode: 'production',
+        target: BROWSER_TARGET,
         optimization: {
           minimize: false
         },
@@ -52,6 +57,7 @@ module.exports = env => {
       {
         entry: './index.js',
         mode: 'production',
+        target: BROWSER_TARGET,
         optimization: minimizeKeepingLicenses(),
         output: {
           filename: 'fast-json-patch.min.js',
