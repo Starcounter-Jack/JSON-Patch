@@ -1,6 +1,15 @@
 var webpack = require('webpack');
 const package = require('./package.json');
 const path = require('path');
+const MinimizerPlugin = require('minimizer-webpack-plugin');
+
+// Minify, but keep `/*!` comments (the MIT headers and the version banner)
+// in the file. By default webpack 5 moves them to a separate `*.LICENSE.txt`.
+function minimizeKeepingLicenses() {
+  return {
+    minimizer: [new MinimizerPlugin({ extractComments: false })]
+  };
+}
 
 module.exports = env => {
   if(env && env.NODE_ENV === "test") {
@@ -8,6 +17,7 @@ module.exports = env => {
       {
         entry: './test/spec/webpack/importSpec.src.js',
         mode: 'production',
+        optimization: minimizeKeepingLicenses(),
         output: {
           path: path.resolve(__dirname, 'test/spec/webpack'),
           filename: 'importSpec.build.js'
@@ -42,6 +52,7 @@ module.exports = env => {
       {
         entry: './index.js',
         mode: 'production',
+        optimization: minimizeKeepingLicenses(),
         output: {
           filename: 'fast-json-patch.min.js',
           library: 'jsonpatch',
