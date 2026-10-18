@@ -43,7 +43,7 @@
         "tsc-common": "tsc",
         "tsc-module": "tsc --module esnext --moduleResolution node --outDir \"module/\" && npm run tsc-to-mjs",
         "tsc-to-mjs": "bash tsc-to-mjs.sh",
-        "version": "npm run tsc && webpack && git add -A",
+        "version": "npm run build && git add commonjs module dist",
         "build": "npm run tsc && webpack",
         "serve": "http-server -p 5000 --silent",
         "tsc-watch": "tsc -w",
