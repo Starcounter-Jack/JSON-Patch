@@ -33,6 +33,7 @@ To run *Benchmark.js* performance tests, press "Run Tests" button.
 3. Run test `npm run test`
  - Testing **`core`** only: `npm run test-core`
  - Testing **`duplex`** only: `npm run test-duplex`
+ - Testing the browser bundles in `dist/`: `npm run build && npm run test-dist`
 4. Run test `npm run bench` (Please, consider performance when making any change)
  - Testing **`core*`* only: `npm run bench-core`
  - Testing **`duplex`** only: `npm run bench-duplex`

@@ -24,3 +24,5 @@ jobs:
       - run: npx playwright install --with-deps
       # Builds `dist/` first, so a broken build fails here and not in `npm version`
       - run: npm run test-browser
+      # Tests the `dist/` that `test-browser` just built
+      - run: npm run test-dist
