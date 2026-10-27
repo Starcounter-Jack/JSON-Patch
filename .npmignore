@@ -2,7 +2,6 @@ Makefile
 doc/
 examples/
 test/
-.travis.yml
 !*.d.ts
 src/*
 tsconfig.json
@@ -22,9 +21,6 @@ CONTRIBUTING.md
 # bower
 bower.json
 
-# grunt
-gruntfile.js
-
 #vs-code
 .vscode/*
 !.vscode/settings.json
@@ -36,3 +32,10 @@ gruntfile.js
 # Local History for Visual Studio Code
 .history/
 
+# Playwright
+playwright.config.js
+test-results/
+playwright-report/
+
+# Claude Code
+.claude/

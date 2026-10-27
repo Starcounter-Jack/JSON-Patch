@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        /* don't auto-include transitive @types (e.g. @types/node from webpack) */
+        "types": []
+    },
+    "files": [
+        "typingsSpec.ts"
+    ]
+}

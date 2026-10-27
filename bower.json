@@ -9,10 +9,14 @@
   "ignore": [
     ".npmignore",
     ".gitignore",
+    ".npmrc",
+    ".github",
     "test",
-    ".travis.yml",
-    "gruntfile.js",
+    "test-results",
     "node_modules",
-    "package.json"
+    "package.json",
+    "playwright.config.js",
+    "webpack.config.js",
+    "tsconfig.json"
   ]
 }
