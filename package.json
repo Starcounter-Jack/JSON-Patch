@@ -29,6 +29,7 @@
         "@playwright/test": "^1.64.0",
         "benchmark": "^2.1.4",
         "chalk": "^2.4.2",
+        "esbuild": "^0.28.2",
         "event-target-shim": "^5.0.1",
         "fast-deep-equal": "^2.0.1",
         "http-server": "^14.1.1",
