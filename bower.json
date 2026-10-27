@@ -9,8 +9,14 @@
   "ignore": [
     ".npmignore",
     ".gitignore",
+    ".npmrc",
+    ".github",
     "test",
+    "test-results",
     "node_modules",
-    "package.json"
+    "package.json",
+    "playwright.config.js",
+    "webpack.config.js",
+    "tsconfig.json"
   ]
 }
