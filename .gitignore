@@ -31,3 +31,6 @@ test/spec/typings/typingsSpec.js
 # Playwright
 test-results/
 playwright-report/
+
+# Output of `npm run test-bundler-import`
+test/spec/esbuild/importSpec.build.js
