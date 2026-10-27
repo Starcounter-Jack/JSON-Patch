@@ -34,10 +34,7 @@
         "fast-deep-equal": "^2.0.1",
         "http-server": "^14.1.1",
         "jasmine": "^3.4.0",
-        "minimizer-webpack-plugin": "^5.13.0",
-        "typescript": "~3.5.2",
-        "webpack": "^5.111.1",
-        "webpack-cli": "^7.2.3"
+        "typescript": "~3.5.2"
     },
     "scripts": {
         "tsc": "npm run tsc-common && npm run tsc-module",
