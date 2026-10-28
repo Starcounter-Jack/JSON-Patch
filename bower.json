@@ -16,7 +16,6 @@
     "node_modules",
     "package.json",
     "playwright.config.js",
-    "webpack.config.js",
     "tsconfig.json"
   ]
 }
