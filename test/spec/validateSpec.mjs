@@ -158,6 +158,14 @@ describe('validate', function() {
     expect(error.name).toBe('OPERATION_PATH_ILLEGAL_ARRAY_INDEX');
   });
 
+  it('should return an error for an empty array index', function() {
+    const error = jsonpatch.validate([
+      { op: 'add', path: '/', value: 9 }
+    ], [10, 20, 30]);
+    expect(error instanceof jsonpatch.JsonPatchError).toBe(true);
+    expect(error.name).toBe('OPERATION_PATH_ILLEGAL_ARRAY_INDEX');
+  });
+
   it('should return an error if the operation "op" property is not a string', function() {
     const error = jsonpatch.validate([
       {

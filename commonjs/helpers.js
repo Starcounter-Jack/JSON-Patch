@@ -62,9 +62,7 @@ function _deepClone(obj) {
 exports._deepClone = _deepClone;
 //3x faster than cached /^\d+$/.test(str)
 function isInteger(str) {
-    // A leading zero is not a valid array index per RFC 6901 section 4
-    // (an index is "0", or a digit 1-9 followed by digits).
-    if (str.length > 1 && str.charCodeAt(0) === 48) {
+    if (str.length === 0 || (str.length > 1 && str.charCodeAt(0) === 48)) {
         return false;
     }
     var i = 0;
