@@ -166,6 +166,10 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
         }
     } /* END ROOT OPERATIONS */
     else {
+        if (validateOperation && (document === null || typeof document !== 'object')) {
+            var errorName = operation.op === 'add' ? 'OPERATION_PATH_CANNOT_ADD' : 'OPERATION_PATH_UNRESOLVABLE';
+            throw new exports.JsonPatchError('Cannot perform operation at the desired path', errorName, index, operation, document);
+        }
         if (!mutateDocument) {
             document = helpers_js_1._deepClone(document);
         }
@@ -366,7 +370,7 @@ function validate(sequence, document, externalValidator) {
         if (!Array.isArray(sequence)) {
             throw new exports.JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
         }
-        if (document) {
+        if (document !== undefined) {
             //clone document and sequence so that we can safely try applying operations
             applyPatch(helpers_js_1._deepClone(document), helpers_js_1._deepClone(sequence), externalValidator || true);
         }
