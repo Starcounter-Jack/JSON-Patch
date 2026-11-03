@@ -228,6 +228,10 @@ export function applyOperation<T>(document: T, operation: Operation, validateOpe
     }
   } /* END ROOT OPERATIONS */
   else {
+    if (validateOperation && (document === null || typeof document !== 'object')) {
+      const errorName = operation.op === 'add' ? 'OPERATION_PATH_CANNOT_ADD' : 'OPERATION_PATH_UNRESOLVABLE';
+      throw new JsonPatchError('Cannot perform operation at the desired path', errorName, index, operation, document);
+    }
     if (!mutateDocument) {
       document = _deepClone(document);
     }
@@ -437,7 +441,7 @@ export function validate<T>(sequence: ReadonlyArray<Operation>, document?: T, ex
     if (!Array.isArray(sequence)) {
       throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
     }
-    if (document) {
+    if (document !== undefined) {
       //clone document and sequence so that we can safely try applying operations
       applyPatch(_deepClone(document), _deepClone(sequence), externalValidator || true);
     }
