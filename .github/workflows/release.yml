@@ -1,0 +1,98 @@
+name: Release
+
+# On a version tag (made by `npm version`), builds and checks the package,
+# then stages it on npm through trusted publishing (OIDC, no npm token).
+# Nothing is public until a maintainer approves the staged version on
+# npm with 2FA. npm adds provenance to the release.
+on:
+  push:
+    tags: ['v*']
+
+permissions: {}
+
+env:
+  # A plain `24` takes whichever 24.x the runner has cached. Node 24.22 ships
+  # npm 11.19: `npm stage` needs npm >= 11.15.0, and `min-release-age` in
+  # `.npmrc` needs npm >= 11.10.0, or `npm ci` silently skips the delay
+  NODE_VERSION: '>=24.22.0 <25'
+  # The tagged commit must be on this branch
+  RELEASE_BRANCH: master
+
+jobs:
+  # Runs the dev dependencies (tsc, esbuild, jasmine), so it gets no
+  # OIDC token and no environment
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # Actions are pinned to full commit SHAs, as tags can be moved
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # for the branch check
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Check the tag matches `package.json`
+        run: |
+          expected="v$(node -p 'require("./package.json").version')"
+          if [ "$GITHUB_REF_NAME" != "$expected" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package.json ($expected)"
+            exit 1
+          fi
+      - name: Check the tagged commit is on `${{ env.RELEASE_BRANCH }}`
+        run: |
+          if ! git merge-base --is-ancestor HEAD "origin/$RELEASE_BRANCH"; then
+            echo "Tag $GITHUB_REF_NAME is not on $RELEASE_BRANCH"
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm test
+      # The build output is committed by `npm version`; rebuild it from the
+      # tagged sources and fail if it differs from what is committed
+      - run: npm run build
+      - name: Check the rebuild matches the committed build output
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git status --short
+            git diff --stat
+            echo "The committed build output differs from a clean rebuild"
+            exit 1
+          fi
+      - run: npm run test-dist
+      # The file list and integrity go to the run summary, to compare with
+      # the staged version on npm before approving it
+      - name: Pack
+        run: |
+          npm pack --json > "$RUNNER_TEMP/pack.json"
+          node -e '
+            const [p] = require(process.argv[1]);
+            console.log("```");
+            console.log(`${p.filename}\nshasum: ${p.shasum}\nintegrity: ${p.integrity}\n`);
+            p.files.forEach(f => console.log(`${f.size}\t${f.path}`));
+            console.log("```");
+          ' "$RUNNER_TEMP/pack.json" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: package
+          path: '*.tgz'
+          if-no-files-found: error
+
+  # Waits for approval in the protected `release` environment; runs no
+  # dependency code, only npm on the tarball built above
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    # npm's trusted publisher entry names this workflow and environment
+    environment: release
+    permissions:
+      id-token: write # OIDC token for npm trusted publishing
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: package
+      - run: npm stage publish --provenance ./*.tgz
