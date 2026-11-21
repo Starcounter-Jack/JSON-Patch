@@ -12,7 +12,7 @@
         /* emitting `use strict` made PuppetJS break */
         "allowSyntheticDefaultImports": true,
         "noImplicitUseStrict": true,
-        /* don't auto-include transitive @types (e.g. @types/node from webpack) */
+        /* don't auto-include transitive @types (e.g. @types/node) */
         "types": []
     },
     "include": [
