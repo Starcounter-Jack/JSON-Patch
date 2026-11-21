@@ -23,7 +23,11 @@ npm-debug.log
 commonjs/*.d.ts
 test/spec/typings/typingsSpec.js
 
-# SauceLabs logs
+# Logs
 *.log
 
 .artifacts
+
+# Playwright
+test-results/
+playwright-report/

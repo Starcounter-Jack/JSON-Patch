@@ -11,7 +11,9 @@
         "removeComments": false,
         /* emitting `use strict` made PuppetJS break */
         "allowSyntheticDefaultImports": true,
-        "noImplicitUseStrict": true
+        "noImplicitUseStrict": true,
+        /* don't auto-include transitive @types (e.g. @types/node from webpack) */
+        "types": []
     },
     "include": [
         "src/**/*.ts"

@@ -38,7 +38,7 @@ const customMatchers = {
      * @param obj
      * @returns {boolean}
      */
-  toEqualInJson: function(util, customEqualityTesters) {
+  toEqualInJson: function() {
     return {
       compare: function(actual, expected) {
         return {
@@ -47,7 +47,7 @@ const customMatchers = {
       }
     };
   },
-  toReallyEqual: function(util, customEqualityTesters) {
+  toReallyEqual: function() {
     return {
       compare: function(actual, expected) {
         return {
