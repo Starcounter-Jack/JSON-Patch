@@ -1,6 +1,28 @@
 import * as jsonpatch from '../../index.mjs';
 
 describe('validate', function() {
+  [0, false, '', null].forEach(function(document) {
+    it('rejects a child add on ' + JSON.stringify(document), function() {
+      const patch = [{ op: 'add', path: '/a', value: 1 }];
+      expect(() => jsonpatch.applyPatch(document, patch, true)).toThrowError(jsonpatch.JsonPatchError);
+      const error = jsonpatch.validate(patch, document);
+      expect(error).toEqual(jasmine.any(jsonpatch.JsonPatchError));
+      expect(error.name).toBe('OPERATION_PATH_CANNOT_ADD');
+    });
+
+    it('rejects a child replace on ' + JSON.stringify(document), function() {
+      const error = jsonpatch.validate([{ op: 'replace', path: '/a', value: 1 }], document);
+      expect(error).toEqual(jasmine.any(jsonpatch.JsonPatchError));
+      expect(error.name).toBe('OPERATION_PATH_UNRESOLVABLE');
+    });
+
+    it('allows root operations on ' + JSON.stringify(document), function() {
+      expect(jsonpatch.validate([{ op: 'test', path: '', value: document }], document)).toBeUndefined();
+      expect(jsonpatch.applyPatch(document, [{ op: 'replace', path: '', value: 1 }], true).newDocument).toBe(1);
+      expect(jsonpatch.applyPatch(document, [{ op: 'add', path: '', value: {} }], true).newDocument).toEqual({});
+    });
+  });
+
   it('should return an empty array if the patch is valid', function() {
     const patch = [
       {
