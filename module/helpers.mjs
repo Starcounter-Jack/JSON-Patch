@@ -58,6 +58,9 @@ export function _deepClone(obj) {
 }
 //3x faster than cached /^\d+$/.test(str)
 export function isInteger(str) {
+    if (str.length === 0 || (str.length > 1 && str.charCodeAt(0) === 48)) {
+        return false;
+    }
     var i = 0;
     var len = str.length;
     var charCode;
