@@ -1704,6 +1704,54 @@ describe('duplex', function() {
         ]);
       }
     });
+    variantIt('Replacing an empty array root with an object should be handled well', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        const objA = [];
+        const objB = { a: 1 };
+        const patches = jsonpatch.compare(objA, objB, testInvertible);
+        expect(patches).toEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '',
+            value: objA
+          }),
+          {
+            op: 'replace',
+            path: '',
+            value: objB
+          }
+        ]);
+        // patch round-trips
+        expect(jsonpatch.applyPatch([], patches, true).newDocument).toEqual(objB);
+      }
+    });
+    variantIt('Replacing an empty object root with an array should be handled well', [
+      ['invertible = FALSE', false],
+      ['invertible = TRUE', true]
+    ], function (testInvertible) {
+      return function () {
+        const objA = {};
+        const objB = [1, 2];
+        const patches = jsonpatch.compare(objA, objB, testInvertible);
+        expect(patches).toEqual([
+          ...insertIf(testInvertible, {
+            op: 'test',
+            path: '',
+            value: objA
+          }),
+          {
+            op: 'replace',
+            path: '',
+            value: objB
+          }
+        ]);
+        // patch round-trips
+        expect(jsonpatch.applyPatch({}, patches, true).newDocument).toEqual(objB);
+      }
+    });
     variantIt('should return an add for a property that does not exist in the first obj, without a test operation', [
       ['invertible = FALSE', false],
       ['invertible = TRUE', true]
