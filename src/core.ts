@@ -177,15 +177,16 @@ export function getValueByPointer(document: any, pointer: string): any {
  * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
  * @param mutateDocument Whether to mutate the original document or clone it before applying
  * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
+ * @param index The index of the operation if it is from a patch.
  * @return `{newDocument, result}` after the operation
  */
 export function applyOperation<T>(document: T, operation: Operation, validateOperation: boolean | Validator<T> = false, mutateDocument: boolean = true, banPrototypeModifications: boolean = true, index: number = 0): OperationResult<T> {
   if (validateOperation) {
     if (typeof validateOperation == 'function') {
-      validateOperation(operation, 0, document, operation.path);
+      validateOperation(operation, index, document, operation.path);
     }
     else {
-      validator(operation, 0);
+      validator(operation, index);
     }
   }
   /* ROOT OPERATIONS */
